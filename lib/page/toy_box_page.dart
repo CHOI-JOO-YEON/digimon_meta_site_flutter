@@ -1,0 +1,149 @@
+import 'dart:html';
+
+import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/api/card_api.dart';
+import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/widget/card/card_info_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/card/card_scroll_grdiview_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck_view_widget.dart';
+import 'package:flutter/material.dart';
+
+import '../model/card.dart';
+import '../model/note.dart';
+import '../widget/card/card_search_bar.dart';
+
+@RoutePage()
+class ToyBoxPage extends StatefulWidget {
+  const ToyBoxPage({super.key});
+
+  @override
+  State<ToyBoxPage> createState() => _ToyBoxPageState();
+}
+
+class _ToyBoxPageState extends State<ToyBoxPage> {
+  bool isSearchLoading = true;
+  List<DigimonCard> cards = [];
+  List<NoteDto> notes = [];
+  int totalPages = 0;
+
+  Deck deck = Deck();
+  SearchParameter searchParameter = SearchParameter();
+  DigimonCard? selectCard;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(const Duration(seconds: 0), () async {
+      notes.add(NoteDto(noteId: null, name: '모든 카드'));
+      notes.addAll(await CardApi().getNotes());
+
+      initSearch();
+    });
+  }
+
+  initSearch() async {
+    isSearchLoading = true;
+    setState(() {
+
+    });
+
+    searchParameter.page = 1;
+    CardResponseDto cardResponseDto =
+    await CardApi().getCardsBySearchParameter(searchParameter);
+    cards = cardResponseDto.cards!;
+    totalPages = cardResponseDto.totalPages!;
+
+    isSearchLoading = false;
+    searchParameter.page++;
+    setState(() {
+
+    });
+  }
+
+  addCardByDeck(DigimonCard card) {
+    deck.addCard(card);
+    setState(() {});
+  }
+
+  removeCardByDeck(DigimonCard card) {
+    deck.removeCard(card);
+    setState(() {});
+  }
+
+  loadMoreCard() async {
+    CardResponseDto cardResponseDto =
+    await CardApi().getCardsBySearchParameter(searchParameter);
+    cards.addAll(cardResponseDto.cards!);
+    searchParameter.page++;
+  }
+
+  changeViewCardInfo(DigimonCard digimonCard) {
+    selectCard = digimonCard;
+    setState(() {});
+  }
+
+  searchMethod(SearchParameter searchParameter) {
+    this.searchParameter = searchParameter;
+    loadMoreCard();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(
+              flex: 3,
+              // width: MediaQuery.sizeOf(context).width/2,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery
+                        .sizeOf(context)
+                        .height * 7 / 10,
+                    child: DeckView(
+                      deck: deck,
+                      mouseEnterEvent: changeViewCardInfo,
+                      cardPressEvent: removeCardByDeck,
+                    ),
+                  ),
+                  CardInfoWidget(
+                    selectCard: selectCard,
+                  ),
+                ],
+              )),
+          Expanded(
+            flex: 2,
+            // width: MediaQuery.sizeOf(context).width/2,
+            child: Column(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: CardSearchBar(
+                      notes: notes,
+                      searchParameter: searchParameter,
+                      onSearch: initSearch,
+                    )),
+                Expanded(
+                    flex: 9,
+                    child: !isSearchLoading ? CardScrollGridView(
+                      cards: cards,
+                      rowNumber: 6,
+                      loadMoreCards: loadMoreCard,
+                      cardPressEvent: addCardByDeck,
+                      mouseEnterEvent: changeViewCardInfo,
+                      totalPages: totalPages,
+                    ) : Center(child: CircularProgressIndicator())
+
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
