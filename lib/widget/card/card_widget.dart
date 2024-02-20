@@ -8,14 +8,18 @@ class CustomCard extends StatefulWidget {
   final double width;
   final DigimonCard card;
   final Function(DigimonCard) cardPressEvent;
-  final Function(DigimonCard)? mouseEnterEvent;
+  // final Function(DigimonCard)? mouseEnterEvent;
+  // final Function()? mouseExitEvent;
+  final Function? onHover; // 마우스 오버 콜백
+  final Function? onExit; // 마우스 아웃 콜백
 
   const CustomCard(
       {super.key,
       required this.width,
       required this.cardPressEvent,
-      required this.card,
-      this.mouseEnterEvent});
+      required this.card,  this.onHover, this.onExit,
+      // this.mouseEnterEvent,this.mouseExitEvent
+      });
 
   @override
   State<CustomCard> createState() => _CustomCardState();
@@ -26,38 +30,26 @@ class _CustomCardState extends State<CustomCard> {
   @override
   void initState() {
     super.initState();
-    _compressImage(widget.card);
+    // _compressImage(widget.card);
     setState(() {});
   }
 
-  // 오버레이 표시 함수
-
-
-  // @override
-  // void didUpdateWidget(CustomCard oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   // selectCard가 변경되었는지 확인
-  //   if (widget.width != oldWidget.width) {
-  //     // selectCard가 변경되었다면 이미지를 다시 압축
-  //     _compressImage(widget.card.imgUrl);
+  // Future<void> _compressImage(DigimonCard card) async {
+  //   if (card.compressedImg==null&& card.imgUrl != null) {
+  //     final response = await http.get(Uri.parse(card.imgUrl!));
+  //     if (response.statusCode == 200) {
+  //       final Uint8List compressedImage =
+  //           await FlutterImageCompress.compressWithList(response.bodyBytes,
+  //               minWidth: widget.width.ceil() * 2,
+  //               quality: 50,
+  //               format: CompressFormat.png);
+  //       widget.card.setCompressedImg(compressedImage);
+  //       setState(() {
+  //
+  //       });
+  //     }
   //   }
   // }
-  Future<void> _compressImage(DigimonCard card) async {
-    if (widget.card.compressedImg == null && card.imgUrl != null) {
-      final response = await http.get(Uri.parse(card.imgUrl!));
-      if (response.statusCode == 200) {
-        final Uint8List compressedImage =
-            await FlutterImageCompress.compressWithList(response.bodyBytes,
-                minWidth: widget.width.ceil() * 2,
-                // minWidth: 745,
-                quality: 100,
-                format: CompressFormat.png);
-        setState(() {
-          widget.card.setCompressedImg(compressedImage);
-        });
-      }
-    }
-  }
 
   // @override
   // Widget build(BuildContext context) {
@@ -96,14 +88,26 @@ class _CustomCardState extends State<CustomCard> {
   Widget build(BuildContext context) {
     return Container(
       child: MouseRegion(
-        onEnter: (event) {
-          setState(() {
-            // _showOverlay(context);
-            if (widget.mouseEnterEvent != null) {
-              widget.mouseEnterEvent!(widget.card);
-            }
-          });
+        // onExit: (event){},
+        // onEnter: (event) {
+        //   setState(() {
+        //     // _showOverlay(context);
+        //     // if (widget.mouseEnterEvent != null) {
+        //     //   widget.mouseEnterEvent!(widget.card);
+        //     // }
+        //   });
+        // },
+        onEnter: (event){
+          if(widget.onHover!=null) {
+            widget.onHover!(context);
+          }
         },
+        onExit: (event){
+          if(widget.onExit!=null) {
+            widget.onExit!();
+          }
+
+        } ,
         child: GestureDetector(
           onTap: () {
             widget.cardPressEvent(widget.card);
@@ -111,29 +115,39 @@ class _CustomCardState extends State<CustomCard> {
           child: Stack(
             alignment: Alignment.bottomRight, // 스택의 정렬 방향
             children: [
-              Transform.scale(
-                scale: 1,
-                child: Container(
+              SizedBox(
                   width: widget.width,
-                  child: widget.card.compressedImg == null
-                      ? Container() // 이미지가 없는 경우
-                      : Image.memory(
-                    widget.card.compressedImg!,
-                    fit: BoxFit.cover,
+                  child:
+                  Image.network(widget.card.smallImgUrl??'',fit: BoxFit.fill,)
+                  // widget.card.compressedImg == null
+                  //     ? Container() // 이미지가 없는 경우
+                  //     : Image.memory(
+                  //   widget.card.compressedImg!,
+                  //   fit: BoxFit.fill,
+                  // ),
+                ),
+              // 확대 버튼 추가
+              Positioned(
+                right: widget.width * 0.05, // 위치 조정: 오른쪽 여백을 좀 더 줄임
+                bottom: widget.width * 0.05, // 위치 조정: 아래쪽 여백을 좀 더 줄임
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: widget.width * 0.2, // 크기 조정: 버튼의 너비를 더 크게 조정
+                        height: widget.width * 0.2 // 크기 조정: 버튼의 높이를 더 크게 조정
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: widget.width * 0.16, // 아이콘 크기 조정: 아이콘을 더 크게 조정
+                      icon: const Icon(Icons.zoom_in, color: Colors.black),
+                      onPressed: () {
+                        _showImageDialog(context, widget.card.imgUrl!);
+                      },
+                    ),
                   ),
                 ),
               ),
-              // 확대 버튼 추가
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: IconButton(
-                  icon: Icon(Icons.zoom_in, color: Colors.black,),
-                  onPressed: () {
-                    _showImageDialog(context, widget.card.imgUrl!);
-                  },
-                ),
-              ),
+
             ],
           ),
         ),
@@ -146,7 +160,7 @@ class _CustomCardState extends State<CustomCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Image.network(url, fit: BoxFit.contain),
+          content: Image.network(url, fit: BoxFit.fill),
         );
       },
     );

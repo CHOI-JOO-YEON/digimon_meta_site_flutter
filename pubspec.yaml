@@ -48,6 +48,7 @@ dependencies:
   flutter_image_compress: ^2.1.0
   http: ^1.2.0
   stroke_text: ^0.0.2
+  marquee: ^2.2.3
 
 
 dev_dependencies:

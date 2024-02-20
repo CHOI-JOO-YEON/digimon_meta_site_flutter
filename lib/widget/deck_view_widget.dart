@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck_scroll_gridview_widget.dart';
@@ -20,12 +21,21 @@ class DeckView extends StatefulWidget {
 }
 
 class _DeckViewState extends State<DeckView> {
-  int _rowNumber = 10;
+  int _rowNumber = 8;
 
   void updateRowNumber(int n) {
     _rowNumber = n;
     setState(() {});
   }
+
+  clearDeck(){
+    print('c');
+    widget.deck.clear();
+    setState(() {
+
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,41 +44,58 @@ class _DeckViewState extends State<DeckView> {
       return Column(
         children: [
           Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                //메뉴바
-                Expanded(flex: 1, child: DeckMenuBar(deck: widget.deck)),
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  //메뉴바
+                  Expanded(flex: 3, child: DeckMenuBar(deck: widget.deck, clear: clearDeck)),
 
-                //행에 한번에 표시되는 카드
-                Expanded(
-                  flex: 1,
-                  child: CustomSlider(
-                      sliderValue: _rowNumber, sliderAction: updateRowNumber),
-                ),
-                Expanded(flex: 2, child: DeckStat(deck: widget.deck)),
-              ],
+                  Expanded(flex: 1, child: DeckCount(deck: widget.deck,)),
+
+                  //행에 한번에 표시되는 카드
+                  Expanded(
+                    flex:1,
+                    child: CustomSlider(
+                        sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                  ),
+                  Expanded(flex:3, child: DeckStat(deck: widget.deck)),
+                ],
+              ),
             ),
           ),
 
           //덱그리드뷰
           Expanded(
               flex: 6,
-              child: DeckScrollGridView(
-                deckCount: widget.deck.deckMap,
-                deck: widget.deck.deckCards,
-                rowNumber: _rowNumber,
-                mouseEnterEvent: widget.mouseEnterEvent,
-                cardPressEvent: widget.cardPressEvent,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white30,
+                  borderRadius: BorderRadius.circular(5)
+                ),
+                child: DeckScrollGridView(
+                  deckCount: widget.deck.deckMap,
+                  deck: widget.deck.deckCards,
+                  rowNumber: _rowNumber,
+                  mouseEnterEvent: widget.mouseEnterEvent,
+                  cardPressEvent: widget.cardPressEvent,
+                ),
               )),
           Expanded(
-              flex: 3,
-              child: DeckScrollGridView(
-                deckCount: widget.deck.tamaMap,
-                deck: widget.deck.tamaCards,
-                rowNumber: _rowNumber,
-                mouseEnterEvent: widget.mouseEnterEvent,
-                cardPressEvent: widget.cardPressEvent,
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white60,
+                    borderRadius: BorderRadius.circular(5)
+                ),
+                child: DeckScrollGridView(
+                  deckCount: widget.deck.tamaMap,
+                  deck: widget.deck.tamaCards,
+                  rowNumber: _rowNumber,
+                  mouseEnterEvent: widget.mouseEnterEvent,
+                  cardPressEvent: widget.cardPressEvent,
+                ),
               ))
         ],
       );

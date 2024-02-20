@@ -86,10 +86,11 @@ class DeckImagePage extends StatelessWidget {
       shrinkWrap: true, // 자식의 크기에 맞춤
       itemCount: cards.length,
       itemBuilder: (context, index) {
-        return Image.memory(
-          cards[index].compressedImg!,
-          fit: BoxFit.contain,
-        );
+        // return Image.memory(
+        //   cards[index].compressedImg!,
+        //   fit: BoxFit.contain,
+        // );'
+        return Image.network(cards[index].imgUrl??'',fit: BoxFit.contain,);
       },
     );
   }

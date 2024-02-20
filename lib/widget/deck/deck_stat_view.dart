@@ -22,13 +22,21 @@ class DeckStat extends StatelessWidget {
         builder: (BuildContext context, BoxConstraints constraints) {
       List<Widget> indicators = cardCounts.entries.map((entry) {
         return _buildCardTypeIndicator(entry.key, entry.value,
-            constraints.maxWidth, constraints.maxHeight);
+            constraints.maxWidth);
       }).toList();
       return Container(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: indicators,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.blueAccent
+        ),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: indicators,
+            ),
+          ),
         ),
       );
     });
@@ -79,11 +87,11 @@ class DeckStat extends StatelessWidget {
 
   // 각 카드 유형별 바와 숫자를 나타내는 위젯을 만드는 함수
   Widget _buildCardTypeIndicator(
-      String cardType, int count, double width, double height) {
+      String cardType, int count, double width) {
     // 전체 바의 높이를 정의합니다.
-    final double barMaxHeight = height * 0.8; // 또는 원하는 최대 높이로 설정
+    final double barMaxHeight = width * 0.08; // 또는 원하는 최대 높이로 설정
     // 50장 기준으로 비율을 계산합니다.
-    final double barHeight = min(barMaxHeight, (count / 30) * barMaxHeight);
+    final double barHeight = min(barMaxHeight, (count / 24) * barMaxHeight);
     return Builder(builder: (context) {
       return Expanded(
         child: Column(
@@ -91,33 +99,33 @@ class DeckStat extends StatelessWidget {
           children: [
             Text(
               count.toString(),
-              // style: TextStyle(color: Colors.white),
+              style: TextStyle(fontSize: width*0.03),
             ),
-            SizedBox(height: 4), // 숫자와 바 사이의 간격
+            // SizedBox(height: 4), // 숫자와 바 사이의 간격
             SizedBox(
-              height: height * 0.4,
+              height: width * 0.1,
               child: Stack(
                 children: [
                   Align(
+                    alignment: Alignment.bottomCenter,
                     child: Container(
                       width: double.infinity,
                       height: barHeight,
                       // 계산된 높이를 사용합니다.
                       decoration: BoxDecoration(
-                        color: count > 0 ? Colors.blue : Colors.transparent,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.white),
+                        color: count > 0 ? Colors.lightBlueAccent : Colors.transparent,
+                        // borderRadius: BorderRadius.circular(4),
+                        // border: Border.all(color: Colors.white),
                       ),
                       alignment: Alignment.bottomCenter,
                     ),
-                    alignment: Alignment.bottomCenter,
                   ),
                 ],
               ),
             ),
             Text(
               cardType,
-              // style: TextStyle(color: Colors.black),
+              style: TextStyle(fontSize:width*0.03),
             ),
           ],
         ),

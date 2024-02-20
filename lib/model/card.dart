@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
-class DigimonCard{
+import '../enums/form.dart';
+
+class DigimonCard {
   int? cardId;
   String? cardNo;
   String? cardName;
@@ -21,70 +23,82 @@ class DigimonCard{
   String? attributes;
   List<String>? types;
   String? imgUrl;
+  String? smallImgUrl;
   bool? isParallel;
   String? sortString;
 
-  Uint8List? compressedImg;
+  // Uint8List? compressedImg;
 
-  void setCompressedImg(Uint8List img) {
-    compressedImg = img;
+  String getTypeString() {
+    return types!.join("/");
   }
 
-  DigimonCard({
-    this.cardId,
-    this.cardNo,
-    this.cardName,
-    this.lv,
-    this.dp,
-    this.playCost,
-    this.digivolveCost1,
-    this.digivolveCondition1,
-    this.digivolveCost2,
-    this.digivolveCondition2,
-    this.effect,
-    this.sourceEffect,
-    this.color1,
-    this.color2,
-    this.rarity,
-    this.cardType,
-    this.form,
-    this.attributes,
-    this.types,
-    this.imgUrl,
-    this.isParallel,
-    this.sortString
-  });
+  String getFormString() {
+    return Form.findKorNameByName(form!);
+  }
+
+  // void setCompressedImg(Uint8List img) {
+  //   compressedImg = img;
+  // }
+
+  String getDigivolveString1() {
+    return 'Lv.$digivolveCondition1에서 $digivolveCost1';
+  }
+
+  String getDigivolveString2() {
+    return 'Lv.$digivolveCondition2에서 $digivolveCost2';
+  }
+
+  DigimonCard(
+      {this.cardId,
+      this.cardNo,
+      this.cardName,
+      this.lv,
+      this.dp,
+      this.playCost,
+      this.digivolveCost1,
+      this.digivolveCondition1,
+      this.digivolveCost2,
+      this.digivolveCondition2,
+      this.effect,
+      this.sourceEffect,
+      this.color1,
+      this.color2,
+      this.rarity,
+      this.cardType,
+      this.form,
+      this.attributes,
+      this.types,
+      this.imgUrl,
+      this.isParallel,
+      this.sortString,
+      this.smallImgUrl});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
-      cardId: json['cardId'],
-      cardNo: json['cardNo'],
-      cardName: json['cardName'],
-      lv: json['lv'],
-      dp: json['dp'],
-      playCost: json['playCost'],
-      digivolveCost1: json['digivolveCost1'],
-      digivolveCondition1: json['digivolveCondition1'],
-      digivolveCost2: json['digivolveCost2'],
-      digivolveCondition2: json['digivolveCondition2'],
-      effect: json['effect'],
-      sourceEffect: json['sourceEffect'],
-      color1: json['color1'],
-      // 직접 할당
-      color2: json['color2'],
-      // 직접 할당
-      rarity: json['rarity'],
-      // 직접 할당
-      cardType: json['cardType'],
-      // 직접 할당
-      form: json['form'],
-      // 직접 할당
-      attributes: json['attributes'],
-      types: json['types'] != null ? List<String>.from(json['types']) : null,
-      imgUrl: json['imgUrl'],
-      isParallel: json['isParallel'],
-      sortString: json['sortString']
-    );
+        cardId: json['cardId'],
+        cardNo: json['cardNo'],
+        cardName: json['cardName'],
+        lv: json['lv'],
+        dp: json['dp'],
+        playCost: json['playCost'],
+        digivolveCost1: json['digivolveCost1'],
+        digivolveCondition1: json['digivolveCondition1'],
+        digivolveCost2: json['digivolveCost2'],
+        digivolveCondition2: json['digivolveCondition2'],
+        effect: json['effect'],
+        sourceEffect: json['sourceEffect'],
+        color1: json['color1'],
+        color2: json['color2'],
+        rarity: json['rarity'],
+        cardType: json['cardType'],
+        form: json['form'],
+        attributes: json['attributes'],
+        types: json['types'] != null ? List<String>.from(json['types']) : null,
+        imgUrl: json['imgUrl'],
+        smallImgUrl: json['smallImgUrl'],
+        isParallel: json['isParallel'],
+        sortString: json['sortString']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -100,7 +114,6 @@ class DigimonCard{
         'digivolveCondition2': digivolveCondition2,
         'effect': effect,
         'sourceEffect': sourceEffect,
-        // Handle the toJson for complex types or enums
         'color1': color1,
         'color2': color2,
         'rarity': rarity,
@@ -111,7 +124,7 @@ class DigimonCard{
             types != null ? List<dynamic>.from(types!.map((x) => x)) : null,
         'imgUrl': imgUrl,
         'isParallel': isParallel,
-        'sortString': sortString
-
+        'sortString': sortString,
+        'smallImgUrl': smallImgUrl,
       };
 }

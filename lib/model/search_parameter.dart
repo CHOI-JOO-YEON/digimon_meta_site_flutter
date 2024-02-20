@@ -16,7 +16,7 @@ class SearchParameter{
   Set<String>? rarities;
 
   int page = 1;
-  int size = 36;
+  int size = 84;
 
   int parallelOption = 0; // 0= all, 1= onlyNormal, 2=onlyParallel
 

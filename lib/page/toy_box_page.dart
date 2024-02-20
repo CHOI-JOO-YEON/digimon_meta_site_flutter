@@ -27,6 +27,7 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
   List<DigimonCard> cards = [];
   List<NoteDto> notes = [];
   int totalPages = 0;
+  int currentPage = 0;
 
   Deck deck = Deck();
   SearchParameter searchParameter = SearchParameter();
@@ -46,21 +47,17 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
 
   initSearch() async {
     isSearchLoading = true;
-    setState(() {
-
-    });
+    setState(() {});
 
     searchParameter.page = 1;
     CardResponseDto cardResponseDto =
-    await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardApi().getCardsBySearchParameter(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
 
     isSearchLoading = false;
-    searchParameter.page++;
-    setState(() {
-
-    });
+    currentPage =searchParameter.page++;
+    setState(() {});
   }
 
   addCardByDeck(DigimonCard card) {
@@ -73,11 +70,12 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
     setState(() {});
   }
 
-  loadMoreCard() async {
+  Future<void> loadMoreCard()  async {
     CardResponseDto cardResponseDto =
-    await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardApi().getCardsBySearchParameter(searchParameter);
     cards.addAll(cardResponseDto.cards!);
-    searchParameter.page++;
+    currentPage = searchParameter.page++;
+
   }
 
   changeViewCardInfo(DigimonCard digimonCard) {
@@ -93,56 +91,94 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-              flex: 3,
-              // width: MediaQuery.sizeOf(context).width/2,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery
-                        .sizeOf(context)
-                        .height * 7 / 10,
-                    child: DeckView(
-                      deck: deck,
-                      mouseEnterEvent: changeViewCardInfo,
-                      cardPressEvent: removeCardByDeck,
+      body: Container(
+        color: Colors.cyan,
+        child: Padding(
+          padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  flex: 3,
+                  // width: MediaQuery.sizeOf(context).width/2,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.lightBlueAccent
+                          // border: Border.all()
+                          ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.sizeOf(context).height * 0.98,
+                            child: DeckView(
+                              deck: deck,
+                              mouseEnterEvent: changeViewCardInfo,
+                              cardPressEvent: removeCardByDeck,
+                            ),
+                          ),
+                          // SizedBox(
+                          //   height: MediaQuery.sizeOf(context).height * 0.25,
+                          //   child: Container(
+                          //     decoration: BoxDecoration(
+                          //         color: Colors.blue,
+                          //         borderRadius: BorderRadius.circular(5)
+                          //     ),
+                          //     child: CardInfoWidget(
+                          //       selectCard: selectCard,
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                  )),
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.01,
+              ),
+              Expanded(
+                flex: 2,
+                // width: MediaQuery.sizeOf(context).width/2,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(5),
+                    // border: Border.all()
+                  ),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                    child: Column(
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: CardSearchBar(
+                              notes: notes,
+                              searchParameter: searchParameter,
+                              onSearch: initSearch,
+                            )),
+                        Expanded(
+                            flex: 9,
+                            child: !isSearchLoading
+                                ? CardScrollGridView(
+                                    cards: cards,
+                                    rowNumber: 6,
+                                    loadMoreCards: loadMoreCard,
+                                    cardPressEvent: addCardByDeck,
+                                    mouseEnterEvent: changeViewCardInfo,
+                                    totalPages: totalPages,
+                                    currentPage: currentPage,
+                                  )
+                                : Center(child: CircularProgressIndicator()))
+                      ],
                     ),
                   ),
-                  CardInfoWidget(
-                    selectCard: selectCard,
-                  ),
-                ],
-              )),
-          Expanded(
-            flex: 2,
-            // width: MediaQuery.sizeOf(context).width/2,
-            child: Column(
-              children: [
-                Expanded(
-                    flex: 1,
-                    child: CardSearchBar(
-                      notes: notes,
-                      searchParameter: searchParameter,
-                      onSearch: initSearch,
-                    )),
-                Expanded(
-                    flex: 9,
-                    child: !isSearchLoading ? CardScrollGridView(
-                      cards: cards,
-                      rowNumber: 6,
-                      loadMoreCards: loadMoreCard,
-                      cardPressEvent: addCardByDeck,
-                      mouseEnterEvent: changeViewCardInfo,
-                      totalPages: totalPages,
-                    ) : Center(child: CircularProgressIndicator())
-
-                )
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -15,23 +15,43 @@ class _CustomSliderState extends State<CustomSlider> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    this._currentSliderValue = widget.sliderValue as double;
+    _currentSliderValue = widget.sliderValue.toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      value: _currentSliderValue,
-      min: 4,
-      max: 20,
-      divisions: 16,
-      label: _currentSliderValue.round().toString(),
-      onChanged: (double value) {
-        setState(() {
-          _currentSliderValue = value;
-        });
-        widget.sliderAction(value.round());
-      },
+    double screenWidth = MediaQuery.of(context).size.width;
+    double thumbRadius = screenWidth / 220; // 예시 계산
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            
+            SliderTheme(
+
+              data: SliderTheme.of(context).copyWith(
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius),
+                overlayShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius*1.1)
+
+              ),
+              child:  Slider(
+                value: _currentSliderValue,
+                min: 4,
+                max: 12,
+                divisions: 8,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                  });
+                  widget.sliderAction(value.round());
+                },
+              ),
+            )
+
+
+          ],
+            ),
     );
   }
 }
