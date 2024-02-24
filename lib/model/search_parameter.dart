@@ -48,25 +48,6 @@ class SearchParameter{
 
   @override
   String toString() {
-    return 'SearchParameter{' +
-        ' searchString: $searchString,' +
-        ' noteId: $noteId,' +
-        ' colors: ${colors?.join(", ")},' +
-        ' colorOperation: $colorOperation,' +
-        ' lvs: ${lvs?.join(", ")},' +
-        ' cardTypes: ${cardTypes?.join(", ")},' +
-        ' minPlayCost: $minPlayCost,' +
-        ' maxPlayCost: $maxPlayCost,' +
-        ' minDp: $minDp,' +
-        ' maxDp: $maxDp,' +
-        ' minDigivolutionCost: $minDigivolutionCost,' +
-        ' maxDigivolutionCost: $maxDigivolutionCost,' +
-        ' rarities: ${rarities?.join(", ")},' +
-        ' page: $page,' +
-        ' size: $size,' +
-        ' parallelOption: $parallelOption,' +
-        ' orderOption: $orderOption,' +
-        ' isOrderDesc: $isOrderDesc' +
-        '}';
+    return 'SearchParameter{ searchString: $searchString, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
   }
 }

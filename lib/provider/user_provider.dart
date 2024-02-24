@@ -1,21 +1,61 @@
+import 'package:digimon_meta_site_flutter/api/user_api.dart';
+import 'package:digimon_meta_site_flutter/model/account/login_response_dto.dart';
 import 'package:flutter/material.dart';
 
 import '../model/user.dart';
+import 'dart:html' as html;
 
 class UserProvider with ChangeNotifier {
-  User _user = User();
+  String? _nickname;
+  String? _role;
+  bool _isAuthError = false;
 
-  User get user => _user;
+  String? get nickname => _nickname;
 
-  // 사용자 로그인 정보를 설정하는 메서드
-  void setUser(String token, String name, String role) {
-    _user = User(token: token, name: name, role: role);
-    notifyListeners(); // 소비자에게 변경 사항을 알립니다.
+  String? get role => _role;
+  bool get isAuthError => _isAuthError;
+
+  UserProvider() {
+    _loadUser();
   }
 
-  // 사용자 로그아웃 메서드
-  void logout() {
-    _user = User();
-    notifyListeners(); // 소비자에게 변경 사항을 알립니다.
+  void saveUserInfoToLocalStorage(String nickname, String role) {
+    html.window.localStorage['nickname'] = nickname;
+    html.window.localStorage['role'] = role;
+  }
+
+  Future<void> _loadUser() async {
+    _nickname = html.window.localStorage['nickname'];
+    _role = html.window.localStorage['role'];
+    _nickname = '1';
+    notifyListeners();
+  }
+
+  Future<void> setUser(LoginResponseDto loginResponseDto) async {
+    _nickname = loginResponseDto.nickname;
+    _role = loginResponseDto.role;
+    saveUserInfoToLocalStorage(_nickname!, _role!);
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    _nickname = null;
+    _role = null;
+    html.window.localStorage.remove('nickname');
+    html.window.localStorage.remove('role');
+    notifyListeners();
+  }
+
+  Future<void> unAuth() async {
+    _nickname = null;
+    _role = null;
+    html.window.localStorage.remove('nickname');
+    html.window.localStorage.remove('role');
+    _isAuthError=true;
+    notifyListeners();
+  }
+
+  bool isLogin() {
+    return _nickname != null;
   }
 }

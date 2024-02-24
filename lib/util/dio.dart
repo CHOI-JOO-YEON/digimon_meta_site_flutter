@@ -1,38 +1,43 @@
+import 'package:dio/browser.dart';
 import 'package:dio/dio.dart';
-import 'dart:html' as html;
+import 'package:flutter/material.dart';
+
+
+
+typedef AuthErrorCallback = Function();
+
 class DioClient {
-  final Dio _dio = Dio();
+  static final DioClient _instance = DioClient._internal();
+  Dio _dio = Dio();
 
-  DioClient() {
-    _dio.options.contentType = "application/json";
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        // JWT 토큰을 요청 헤더에 추가
-        final token = await getToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        // 응답 처리
-        return handler.next(response);
-      },
-      onError: (DioException dioException, handler) async {
-        if (dioException.response?.statusCode == 401) {
-          // 401 응답 처리
+  AuthErrorCallback? _onAuthError;
 
-        }
-        return handler.next(dioException);
-      },
-    ));
+  factory DioClient() {
+    return _instance;
   }
 
+  DioClient._internal() {
+    _dio.options.contentType = "application/json";
+    var adapter = BrowserHttpClientAdapter();
+    adapter.withCredentials = true;
+    _dio.httpClientAdapter = adapter;
 
+    _dio.interceptors.add(InterceptorsWrapper(
+      onError: (DioError error, handler) {
+        if (error.response?.statusCode == 401) {
+          // 401 에러가 감지되었을 때 콜백 함수 호출
+          _onAuthError?.call();
+
+        }
+        handler.next(error);
+      },
+    ));
+    // 기타 필요한 Dio 설정
+  }
+
+  set onAuthError(AuthErrorCallback callback) {
+    _onAuthError = callback;
+  }
 
   Dio get dio => _dio;
 }
-Future<String?> getToken() async {
-  return html.window.localStorage['access-token'];
-}
-

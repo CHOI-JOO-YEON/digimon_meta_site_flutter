@@ -21,10 +21,26 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const AdminPage(),
       );
     },
+    DeckImageRoute.name: (routeData) {
+      final args = routeData.argsAs<DeckImageRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: DeckImagePage(
+          key: args.key,
+          deck: args.deck,
+        ),
+      );
+    },
     HomeRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const HomePage(),
+      );
+    },
+    KakaoLoginRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const KakaoLoginPage(),
       );
     },
     LoginRoute.name: (routeData) {
@@ -57,6 +73,44 @@ class AdminRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [DeckImagePage]
+class DeckImageRoute extends PageRouteInfo<DeckImageRouteArgs> {
+  DeckImageRoute({
+    Key? key,
+    required Deck deck,
+    List<PageRouteInfo>? children,
+  }) : super(
+          DeckImageRoute.name,
+          args: DeckImageRouteArgs(
+            key: key,
+            deck: deck,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'DeckImageRoute';
+
+  static const PageInfo<DeckImageRouteArgs> page =
+      PageInfo<DeckImageRouteArgs>(name);
+}
+
+class DeckImageRouteArgs {
+  const DeckImageRouteArgs({
+    this.key,
+    required this.deck,
+  });
+
+  final Key? key;
+
+  final Deck deck;
+
+  @override
+  String toString() {
+    return 'DeckImageRouteArgs{key: $key, deck: $deck}';
+  }
+}
+
+/// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
@@ -66,6 +120,20 @@ class HomeRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'HomeRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [KakaoLoginPage]
+class KakaoLoginRoute extends PageRouteInfo<void> {
+  const KakaoLoginRoute({List<PageRouteInfo>? children})
+      : super(
+          KakaoLoginRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'KakaoLoginRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

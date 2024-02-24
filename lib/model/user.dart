@@ -2,7 +2,24 @@ class User {
   String? token;
   String? name;
   String? role;
-  // 여기에 더 많은 필드를 추가할 수 있습니다.
 
   User({this.token, this.name, this.role});
+
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      token: map['token'],
+      name: map['name'],
+      role: map['role'],
+    );
+  }
+
+  // User 객체에서 Map으로 변환
+  Map<String, String?> toMap() {
+    return {
+      'token': token,
+      'name': name,
+      'role': role,
+    };
+  }
 }

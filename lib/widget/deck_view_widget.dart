@@ -29,7 +29,6 @@ class _DeckViewState extends State<DeckView> {
   }
 
   clearDeck(){
-    print('c');
     widget.deck.clear();
     setState(() {
 
@@ -44,13 +43,13 @@ class _DeckViewState extends State<DeckView> {
       return Column(
         children: [
           Expanded(
-            flex: 1,
+            flex: 4,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   //메뉴바
-                  Expanded(flex: 3, child: DeckMenuBar(deck: widget.deck, clear: clearDeck)),
+                  Expanded(flex: 2, child: DeckMenuBar(deck: widget.deck, clear: clearDeck)),
 
                   Expanded(flex: 1, child: DeckCount(deck: widget.deck,)),
 
@@ -68,7 +67,7 @@ class _DeckViewState extends State<DeckView> {
 
           //덱그리드뷰
           Expanded(
-              flex: 6,
+              flex: 24,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white30,
@@ -82,11 +81,12 @@ class _DeckViewState extends State<DeckView> {
                   cardPressEvent: widget.cardPressEvent,
                 ),
               )),
+          Expanded(flex: 1, child: Container()),
           Expanded(
-              flex: 2,
+              flex: 8,
               child: Container(
                 decoration: BoxDecoration(
-                    color: Colors.white60,
+                    color: Colors.white30,
                     borderRadius: BorderRadius.circular(5)
                 ),
                 child: DeckScrollGridView(

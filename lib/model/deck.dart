@@ -1,8 +1,26 @@
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
+import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 
 import 'card.dart';
 
 class Deck{
+
+  Deck.responseDto(DeckResponseDto deckResponseDto){
+    deckId=deckResponseDto.deckId;
+    deckName=deckResponseDto.deckName??'My Deck';
+    if(deckResponseDto.cardAndCntMap!=null) {
+
+      for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
+        for(int i=0;i<cardEntry.value;i++){
+          addCard(cardEntry.key);
+        }
+      }
+    }
+  }
+  Deck();
+
+
+  int? deckId;
   Map<DigimonCard,int> deckMap={};
   List<DigimonCard> deckCards = [];
   Map<DigimonCard,int> tamaMap={};
@@ -10,6 +28,7 @@ class Deck{
   Map<int,DigimonCard> cardMap ={};
   int deckCount=0;
   int tamaCount=0;
+  String deckName = 'My Deck';
 
   void clear(){
     deckMap.clear();
@@ -17,7 +36,8 @@ class Deck{
     deckCards.clear();
     tamaCards.clear();
     cardMap.clear();
-
+    deckCount=0;
+    tamaCount=0;
   }
 
   addCard(DigimonCard card){
@@ -125,4 +145,5 @@ class Deck{
 
     return 0;
   }
+
 }

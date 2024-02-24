@@ -49,6 +49,10 @@ dependencies:
   http: ^1.2.0
   stroke_text: ^0.0.2
   marquee: ^2.2.3
+  idb_shim: ^2.3.2
+
+#  oauth2: ^2.0.2
+#  kakao_flutter_sdk_user: ^1.8.0
 
 
 dev_dependencies:
@@ -69,6 +73,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  fonts:
+    - family: JalnanGothic
+      fonts:
+        - asset: assets/fonts/JalnanGothic.otf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

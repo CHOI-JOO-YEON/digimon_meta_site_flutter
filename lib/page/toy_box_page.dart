@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_info_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck_view_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/login_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../model/card.dart';
@@ -35,7 +36,6 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(const Duration(seconds: 0), () async {
       notes.add(NoteDto(noteId: null, name: '모든 카드'));
@@ -91,8 +91,9 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(),
       body: Container(
-        color: Colors.cyan,
+        color: Colors.blue[700],
         child: Padding(
           padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
           child: Row(
@@ -100,12 +101,11 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
             children: [
               Expanded(
                   flex: 3,
-                  // width: MediaQuery.sizeOf(context).width/2,
                   child: SingleChildScrollView(
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          color: Colors.lightBlueAccent
+                          color: Colors.white30
                           // border: Border.all()
                           ),
                       child: Column(
@@ -140,40 +140,50 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
               Expanded(
                 flex: 2,
                 // width: MediaQuery.sizeOf(context).width/2,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(5),
-                    // border: Border.all()
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
-                    child: Column(
-                      children: [
-                        Expanded(
-                            flex: 1,
-                            child: CardSearchBar(
-                              notes: notes,
-                              searchParameter: searchParameter,
-                              onSearch: initSearch,
-                            )),
-                        Expanded(
-                            flex: 9,
-                            child: !isSearchLoading
-                                ? CardScrollGridView(
-                                    cards: cards,
-                                    rowNumber: 6,
-                                    loadMoreCards: loadMoreCard,
-                                    cardPressEvent: addCardByDeck,
-                                    mouseEnterEvent: changeViewCardInfo,
-                                    totalPages: totalPages,
-                                    currentPage: currentPage,
-                                  )
-                                : Center(child: CircularProgressIndicator()))
-                      ],
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                        child: LoginWidget() ),
+                    Expanded(
+                      flex: 19,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white30,
+                          borderRadius: BorderRadius.circular(5),
+                          // border: Border.all()
+                        ),
+                        child: Padding(
+                          padding:
+                              EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: CardSearchBar(
+                                    notes: notes,
+                                    searchParameter: searchParameter,
+                                    onSearch: initSearch,
+                                  )),
+                              Expanded(
+                                  flex: 9,
+                                  child: !isSearchLoading
+                                      ? CardScrollGridView(
+                                          cards: cards,
+                                          rowNumber: 6,
+                                          loadMoreCards: loadMoreCard,
+                                          cardPressEvent: addCardByDeck,
+                                          mouseEnterEvent: changeViewCardInfo,
+                                          totalPages: totalPages,
+                                          currentPage: currentPage,
+                                        )
+                                      : Center(child: CircularProgressIndicator()))
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],

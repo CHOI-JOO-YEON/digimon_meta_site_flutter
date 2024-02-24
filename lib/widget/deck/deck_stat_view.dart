@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_bar.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/card.dart';
@@ -21,14 +20,12 @@ class DeckStat extends StatelessWidget {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       List<Widget> indicators = cardCounts.entries.map((entry) {
-        return _buildCardTypeIndicator(entry.key, entry.value,
-            constraints.maxWidth);
+        return _buildCardTypeIndicator(
+            entry.key, entry.value, constraints.maxWidth);
       }).toList();
       return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.blueAccent
-        ),
+            borderRadius: BorderRadius.circular(5), color: Colors.white24),
         child: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.all(8.0),
@@ -51,9 +48,9 @@ class DeckStat extends StatelessWidget {
       'Lv4': 0,
       'Lv5': 0,
       'Lv6': 0,
-      'Lv7+': 0,
-      'TM': 0,
-      'OP': 0,
+      'Lv7': 0,
+      '테이머': 0,
+      '옵션': 0,
     };
 
     for (var card in deck.deckMap.keys) {
@@ -64,9 +61,9 @@ class DeckStat extends StatelessWidget {
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
         counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.deckMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['TM'] = counts['TM']! + deck.deckMap[card]!;
+        counts['테이머'] = counts['테이머']! + deck.deckMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['OP'] = counts['OP']! + deck.deckMap[card]!;
+        counts['옵션'] = counts['옵션']! + deck.deckMap[card]!;
       }
     }
     for (var card in deck.tamaMap.keys) {
@@ -77,19 +74,18 @@ class DeckStat extends StatelessWidget {
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
         counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['TM'] = counts['TM']! + deck.tamaMap[card]!;
+        counts['테이머'] = counts['테이머']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['OP'] = counts['OP']! + deck.tamaMap[card]!;
+        counts['옵션'] = counts['옵션']! + deck.tamaMap[card]!;
       }
     }
     return counts;
   }
 
   // 각 카드 유형별 바와 숫자를 나타내는 위젯을 만드는 함수
-  Widget _buildCardTypeIndicator(
-      String cardType, int count, double width) {
+  Widget _buildCardTypeIndicator(String cardType, int count, double width) {
     // 전체 바의 높이를 정의합니다.
-    final double barMaxHeight = width * 0.08; // 또는 원하는 최대 높이로 설정
+    final double barMaxHeight = width * 0.06; // 또는 원하는 최대 높이로 설정
     // 50장 기준으로 비율을 계산합니다.
     final double barHeight = min(barMaxHeight, (count / 24) * barMaxHeight);
     return Builder(builder: (context) {
@@ -99,11 +95,12 @@ class DeckStat extends StatelessWidget {
           children: [
             Text(
               count.toString(),
-              style: TextStyle(fontSize: width*0.03),
+              style:
+                  TextStyle(fontSize: width * 0.03, fontFamily: 'JalnanGothic'),
             ),
             // SizedBox(height: 4), // 숫자와 바 사이의 간격
             SizedBox(
-              height: width * 0.1,
+              height: barMaxHeight,
               child: Stack(
                 children: [
                   Align(
@@ -113,8 +110,9 @@ class DeckStat extends StatelessWidget {
                       height: barHeight,
                       // 계산된 높이를 사용합니다.
                       decoration: BoxDecoration(
-                        color: count > 0 ? Colors.lightBlueAccent : Colors.transparent,
-                        // borderRadius: BorderRadius.circular(4),
+                        // color: count > 0 ? Colors.white10 : Colors.white60,
+                        color: Colors.white60,
+                        borderRadius: BorderRadius.circular(5),
                         // border: Border.all(color: Colors.white),
                       ),
                       alignment: Alignment.bottomCenter,
@@ -125,7 +123,7 @@ class DeckStat extends StatelessWidget {
             ),
             Text(
               cardType,
-              style: TextStyle(fontSize:width*0.03),
+              style: TextStyle(fontSize: width * 0.03,fontFamily: 'JalnanGothic'),
             ),
           ],
         ),

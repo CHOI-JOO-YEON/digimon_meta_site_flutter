@@ -31,7 +31,7 @@ class _CustomSliderState extends State<CustomSlider> {
 
               data: SliderTheme.of(context).copyWith(
                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius),
-                overlayShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius*1.1)
+                overlayShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius*1.1),
 
               ),
               child:  Slider(
@@ -39,6 +39,8 @@ class _CustomSliderState extends State<CustomSlider> {
                 min: 4,
                 max: 12,
                 divisions: 8,
+                activeColor: Colors.blue[400],
+                thumbColor: Colors.blue[400],
                 label: _currentSliderValue.round().toString(),
                 onChanged: (double value) {
                   setState(() {
