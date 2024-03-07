@@ -66,54 +66,66 @@ class DeckImagePage extends StatelessWidget {
     List<DigimonCard> displayTamas =
         _generateDisplayList(deck.tamaCards, deck.tamaMap);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () =>captureAndDownloadImage(context), child: Icon(Icons.download),),
-      // appBar: AppBar(
-      //   title: Text(deck.deckName,style: const TextStyle(fontFamily: 'JalnanGothic')),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.download),
-      //       onPressed: () => captureAndDownloadImage(context),
-      //     ),
-      //   ],
-      // ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          width: 960,
-          child: SingleChildScrollView(
-            child: RepaintBoundary(
-              key: globalKey,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.blue[100],
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 1,
-                              child: Center(
-                                child: Text(deck.deckName,
-                                    style: TextStyle(fontSize: 25,fontFamily: 'JalnanGothic')),
-                              )),
-                          Expanded(flex: 1, child: DeckStat(deck: deck)),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      _buildGridView(
-                          context, displayTamas, 10, Colors.white60, '디지타마 덱'),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      _buildGridView(
-                          context, displayDecks, 10, Colors.white60, '메인 덱'),
-                      // deckCards를 표시
-                    ],
+      // floatingActionButton: FloatingActionButton(onPressed: () =>captureAndDownloadImage(context), child: Icon(Icons.download),),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 960,
+            child: AppBar(
+              title: Text(deck.deckName,style: const TextStyle(fontFamily: 'JalnanGothic')),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () => captureAndDownloadImage(context),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Align(
+          alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+            width: 960,
+            child: SingleChildScrollView(
+              child: RepaintBoundary(
+                key: globalKey,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                                flex: 1,
+                                child: Center(
+                                  child: Text(deck.deckName,
+                                      style: TextStyle(fontSize: 25,fontFamily: 'JalnanGothic')),
+                                )),
+                            Expanded(flex: 1, child: SizedBox(height: 150, child: DeckStat(deck: deck))),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        _buildGridView(
+                            context, displayTamas, 10, Colors.white60, '디지타마 덱'),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        _buildGridView(
+                            context, displayDecks, 10, Colors.white60, '메인 덱'),
+                        // deckCards를 표시
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -122,49 +134,6 @@ class DeckImagePage extends StatelessWidget {
         ),
       ),
     );
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     actions: [
-    //       IconButton(
-    //         icon: const Icon(Icons.download),
-    //         onPressed: () => captureAndDownloadImage(context),
-    //       ),
-    //     ],
-    //   ),
-    //   body: RepaintBoundary(
-    //     key: globalKey,
-    //     child: Container(
-    //       decoration: BoxDecoration(
-    //           color: Colors.blueAccent,
-    //           borderRadius: BorderRadius.circular(10)
-    //       ),
-    //       child: SizedBox(
-    //         width: 960,
-    //         child: Padding(
-    //             padding: const EdgeInsets.all(8.0),
-    //             child: Column(
-    //               children: [
-    //
-    //                 Row(
-    //                   // crossAxisAlignment: CrossAxisAlignment.start,
-    //                   children: [
-    //
-    //                     Expanded(flex: 1, child: Center(child: Text(deck.deckName, style: TextStyle(fontSize: 25),))),
-    //                     Expanded(flex: 1, child: DeckStat(deck: deck,)),
-    //                   ],
-    //                 ), // tamaCards를 표시
-    //                 SizedBox(height: 5,),
-    //                 _buildGridView(context, displayTamas, 10,Colors.white60,'디지타마 덱'),
-    //                 SizedBox(height: 5,),
-    //                 _buildGridView(context, displayDecks, 10,Colors.white60, '메인 덱'), // deckCards를 표시
-    //               ],
-    //             ),
-    //
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 
   List<DigimonCard> _generateDisplayList(

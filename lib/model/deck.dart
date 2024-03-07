@@ -30,6 +30,18 @@ class Deck{
   int tamaCount=0;
   String deckName = 'My Deck';
 
+  void import(DeckResponseDto? deckResponseDto)
+  {
+    if(deckResponseDto!=null) {
+      clear();
+      for (var entry in deckResponseDto.cardAndCntMap!.entries) {
+        for(int i=0;i<entry.value;i++) {
+          addCard(entry.key);
+        }
+      }
+    }
+
+  }
   void clear(){
     deckMap.clear();
     tamaMap.clear();

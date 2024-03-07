@@ -1,18 +1,14 @@
-import 'dart:js';
 
-import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
-import 'package:dio/dio.dart';
-import 'package:provider/provider.dart';
 
 import '../model/note.dart';
-import '../provider/user_provider.dart';
 
 class CardApi{
 
-  String baseUrl = 'http://localhost:8080';
+  // String baseUrl = 'http://localhost:8080';
+  String baseUrl = const String.fromEnvironment('SERVER_URL');
   DioClient dioClient = DioClient();
 
   Future<CardResponseDto> getCardsBySearchParameter(SearchParameter searchParameter) async {

@@ -24,10 +24,16 @@ class UserProvider with ChangeNotifier {
     html.window.localStorage['role'] = role;
   }
 
+  Future<void> loginCheck() async {
+    bool isLogin = await UserApi().isLogin();
+    if(!isLogin) {
+      logout();
+    }
+  }
+
   Future<void> _loadUser() async {
     _nickname = html.window.localStorage['nickname'];
     _role = html.window.localStorage['role'];
-    _nickname = '1';
     notifyListeners();
   }
 
@@ -58,4 +64,10 @@ class UserProvider with ChangeNotifier {
   bool isLogin() {
     return _nickname != null;
   }
+
+  bool hasManagerRole() {
+    return _role == 'MANAGER' || _role == 'ADMIN';
+  }
+
+
 }

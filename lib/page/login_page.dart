@@ -10,7 +10,8 @@ class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   void openOAuthPopup() {
-    String url = 'http://localhost:8080/oauth2/authorization/kakao';
+    String baseUrl = const String.fromEnvironment('SERVER_URL');
+    String url = '$baseUrl/oauth2/authorization/kakao';
     String windowName = 'OAuthLogin';
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);

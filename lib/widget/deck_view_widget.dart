@@ -7,34 +7,46 @@ import 'package:flutter/material.dart';
 
 import '../model/card.dart';
 import '../model/deck.dart';
+import '../model/deck_response_dto.dart';
 
 class DeckView extends StatefulWidget {
   final Deck deck;
+
   // final Map<DigimonCard, int> deck;
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
+  final Function(DeckResponseDto) import;
 
-  const DeckView({super.key, required this.deck, this.mouseEnterEvent, required this.cardPressEvent});
+  const DeckView(
+      {super.key,
+      required this.deck,
+      this.mouseEnterEvent,
+      required this.cardPressEvent,
+      required this.import});
 
   @override
   State<DeckView> createState() => _DeckViewState();
 }
 
 class _DeckViewState extends State<DeckView> {
-  int _rowNumber = 8;
+  int _rowNumber = 9;
 
   void updateRowNumber(int n) {
     _rowNumber = n;
     setState(() {});
   }
 
-  clearDeck(){
+  clearDeck() {
     widget.deck.clear();
+    setState(() {});
+  }
+
+  addCard(DigimonCard digimonCard) {
+    widget.deck.addCard(digimonCard);
     setState(() {
 
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +61,27 @@ class _DeckViewState extends State<DeckView> {
               child: Row(
                 children: [
                   //메뉴바
-                  Expanded(flex: 2, child: DeckMenuBar(deck: widget.deck, clear: clearDeck)),
+                  Expanded(
+                      flex: 2,
+                      child: DeckMenuBar(
+                        deck: widget.deck,
+                        clear: clearDeck,
+                        import: widget.import,
+                      )),
 
-                  Expanded(flex: 1, child: DeckCount(deck: widget.deck,)),
+                  Expanded(
+                      flex: 1,
+                      child: DeckCount(
+                        deck: widget.deck,
+                      )),
 
                   //행에 한번에 표시되는 카드
                   Expanded(
-                    flex:1,
+                    flex: 1,
                     child: CustomSlider(
                         sliderValue: _rowNumber, sliderAction: updateRowNumber),
                   ),
-                  Expanded(flex:3, child: DeckStat(deck: widget.deck)),
+                  Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
                 ],
               ),
             ),
@@ -67,34 +89,36 @@ class _DeckViewState extends State<DeckView> {
 
           //덱그리드뷰
           Expanded(
-              flex: 24,
+              flex: 14,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white30,
-                  borderRadius: BorderRadius.circular(5)
-                ),
+                    color: Color.fromRGBO(255, 255, 240, 1),
+                    //   color: Color(0xFFFFF9E3),
+                    borderRadius: BorderRadius.circular(5)),
                 child: DeckScrollGridView(
                   deckCount: widget.deck.deckMap,
                   deck: widget.deck.deckCards,
                   rowNumber: _rowNumber,
                   mouseEnterEvent: widget.mouseEnterEvent,
                   cardPressEvent: widget.cardPressEvent,
+                  onLongPress: addCard,
+
                 ),
               )),
           Expanded(flex: 1, child: Container()),
           Expanded(
-              flex: 8,
+              flex: 6,
               child: Container(
                 decoration: BoxDecoration(
-                    color: Colors.white30,
-                    borderRadius: BorderRadius.circular(5)
-                ),
+                    color: Color.fromRGBO(255, 255, 240, 1),
+                    borderRadius: BorderRadius.circular(5)),
                 child: DeckScrollGridView(
                   deckCount: widget.deck.tamaMap,
                   deck: widget.deck.tamaCards,
                   rowNumber: _rowNumber,
                   mouseEnterEvent: widget.mouseEnterEvent,
                   cardPressEvent: widget.cardPressEvent,
+                  onLongPress: addCard,
                 ),
               ))
         ],

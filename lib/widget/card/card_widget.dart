@@ -1,16 +1,18 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
-import 'package:digimon_meta_site_flutter/model/card.dart'; // 가정된 카드 모델
+import 'package:digimon_meta_site_flutter/model/card.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
   final DigimonCard card;
   final Function(DigimonCard) cardPressEvent;
 
-  final Function? onHover; // 마우스 오버 콜백
-  final Function? onExit; // 마우스 아웃 콜백
+  final Function? onHover;
+  final Function? onExit;
+  final Function? onLongPress;
 
   const CustomCard({
     super.key,
@@ -18,7 +20,7 @@ class CustomCard extends StatefulWidget {
     required this.cardPressEvent,
     required this.card,
     this.onHover,
-    this.onExit,
+    this.onExit, this.onLongPress,
   });
 
   @override
@@ -26,13 +28,31 @@ class CustomCard extends StatefulWidget {
 }
 
 class _CustomCardState extends State<CustomCard> {
+
+  Timer? _timer;
   @override
   void initState() {
     super.initState();
     setState(() {});
   }
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
+  void _handleLongPressStart(LongPressStartDetails details) {
+    _timer = Timer.periodic(Duration(milliseconds: 500), (_) {
+      if (widget.onLongPress != null) {
 
+        widget.onLongPress!(widget.card);
+      }
+    });
+  }
+
+  void _handleLongPressEnd(LongPressEndDetails details) {
+    _timer?.cancel();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,8 +71,11 @@ class _CustomCardState extends State<CustomCard> {
           onTap: () {
             widget.cardPressEvent(widget.card);
           },
+          onLongPressStart: _handleLongPressStart,
+          onLongPressEnd: _handleLongPressEnd,
+
           child: Stack(
-            alignment: Alignment.bottomRight, // 스택의 정렬 방향
+            alignment: Alignment.bottomRight,
             children: [
               SizedBox(
                   width: widget.width,
@@ -61,7 +84,6 @@ class _CustomCardState extends State<CustomCard> {
                     fit: BoxFit.fill,
                   )
                   ),
-              // 확대 버튼 추가
               Positioned(
                 right: widget.width * 0.05,
                 bottom: widget.width * 0.05,

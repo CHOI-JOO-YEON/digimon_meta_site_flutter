@@ -20,26 +20,27 @@ class DeckStat extends StatelessWidget {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       List<Widget> indicators = cardCounts.entries.map((entry) {
-        return _buildCardTypeIndicator(
-            entry.key, entry.value, constraints.maxWidth);
+        return _buildCardTypeIndicator(entry.key, entry.value,
+            constraints.maxWidth, constraints.maxHeight);
       }).toList();
       return Container(
+        height: constraints.maxHeight,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5), color: Colors.white24),
-        child: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: indicators,
+        child: Center(
+            child: Container(
+              padding: EdgeInsets.all(constraints.maxHeight * 0.05),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: indicators,
+              ),
             ),
-          ),
+
         ),
       );
     });
   }
 
-  // 카드 유형별 개수를 계산하는 함수
   Map<String, int> _calculateCardCounts() {
     Map<String, int> counts = {
       'Lv-': 0,
@@ -82,23 +83,26 @@ class DeckStat extends StatelessWidget {
     return counts;
   }
 
-  // 각 카드 유형별 바와 숫자를 나타내는 위젯을 만드는 함수
-  Widget _buildCardTypeIndicator(String cardType, int count, double width) {
-    // 전체 바의 높이를 정의합니다.
-    final double barMaxHeight = width * 0.06; // 또는 원하는 최대 높이로 설정
-    // 50장 기준으로 비율을 계산합니다.
+  Widget _buildCardTypeIndicator(
+      String cardType, int count, double width, double height) {
+    final double barMaxHeight = height * 0.5;
     final double barHeight = min(barMaxHeight, (count / 24) * barMaxHeight);
     return Builder(builder: (context) {
       return Expanded(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              count.toString(),
-              style:
-                  TextStyle(fontSize: width * 0.03, fontFamily: 'JalnanGothic'),
+            SizedBox(
+              height: height*0.2,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  count.toString(),
+                  style: TextStyle(
+                      fontSize: height * 0.1, fontFamily: 'JalnanGothic'),
+                ),
+              ),
             ),
-            // SizedBox(height: 4), // 숫자와 바 사이의 간격
             SizedBox(
               height: barMaxHeight,
               child: Stack(
@@ -108,11 +112,13 @@ class DeckStat extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       height: barHeight,
-                      // 계산된 높이를 사용합니다.
                       decoration: BoxDecoration(
                         // color: count > 0 ? Colors.white10 : Colors.white60,
                         color: Colors.white60,
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.only(
+                          // topLeft: Radius.circular(3),
+                          // topRight: Radius.circular(3),
+                        ),
                         // border: Border.all(color: Colors.white),
                       ),
                       alignment: Alignment.bottomCenter,
@@ -121,9 +127,16 @@ class DeckStat extends StatelessWidget {
                 ],
               ),
             ),
-            Text(
-              cardType,
-              style: TextStyle(fontSize: width * 0.03,fontFamily: 'JalnanGothic'),
+            SizedBox(
+              height: height*0.2,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  cardType,
+                  style: TextStyle(
+                      fontSize: height * 0.1, fontFamily: 'JalnanGothic'),
+                ),
+              ),
             ),
           ],
         ),
