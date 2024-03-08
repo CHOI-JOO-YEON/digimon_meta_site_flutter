@@ -28,7 +28,7 @@ class CardApi{
 
   Future<List<NoteDto>> getNotes() async {
     try {
-      var response = await dioClient.dio.get('$baseUrl/card/note');
+      var response = await dioClient.dio.get('$baseUrl/api/card/note');
       if (response.statusCode == 200) {
         return NoteDto.fromJsonList(response.data);
 
