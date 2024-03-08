@@ -1,5 +1,5 @@
 # 베이스 이미지로 Ubuntu를 사용합니다.
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 # 필요한 패키지를 설치합니다.
 RUN apt-get update && apt-get install -y \
