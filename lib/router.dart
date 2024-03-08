@@ -24,5 +24,6 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: ToyBoxRoute.page,path: "/toy-box"),
     AutoRoute(page: DeckImageRoute.page,path: "/deck-image"),
     AutoRoute(page: KakaoLoginRoute.page,path: "/oauth2/kakao")
+
   ];
 }
