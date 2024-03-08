@@ -40,4 +40,4 @@ COPY . .
 RUN flutter build web
 
 # 컨테이너가 시작될 때 웹 서버를 실행합니다.
-CMD ["sh", "-c", "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 --dart-define=SERVER_URL=${SERVER_URL}"]
+CMD ["sh", "-c", "flutter run --release -d web-server --web-hostname 0.0.0.0 --web-port 8080 --dart-define=SERVER_URL=${SERVER_URL}"]
