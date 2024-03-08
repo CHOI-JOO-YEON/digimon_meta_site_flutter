@@ -13,7 +13,7 @@ class CardApi{
 
   Future<CardResponseDto> getCardsBySearchParameter(SearchParameter searchParameter) async {
     try {
-      var response = await dioClient.dio.get('$baseUrl/card/search', queryParameters: searchParameter.toJson());
+      var response = await dioClient.dio.get('$baseUrl/api/card/search', queryParameters: searchParameter.toJson());
       if (response.statusCode == 200) {
         return CardResponseDto.fromJson(response.data);
 
