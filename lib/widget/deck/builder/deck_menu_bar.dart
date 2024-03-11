@@ -144,6 +144,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   }
 
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
+    widget.deck.formatId=formats.keys.first;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -197,12 +198,20 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     List<String> cardColorList = widget.deck.getOrderedCardColorList();
                     Set<String> set = cardColorList.toSet();
                     widget.deck.colorArrange(set);
+                    if(widget.deck.colors.isEmpty) {
+                      _showShortDialog(context, "색을 하나 이상 골라야 합니다.");
+                      return;
+                    }
+                    if(widget.deck.formatId==null) {
+                      _showShortDialog(context, "포맷을 골라야 합니다.");
+                      return;
+                    }
                     Deck? deck = await DeckService().save(widget.deck);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
-                      _showSaveSuccessDialog(context);
+                      _showShortDialog(context,"저장 성공");
                     } else {
-                      _showSaveFailedDialog(context);
+                      _showShortDialog(context,"저장 실패");
                     }
                   },
                   child: Text('저장'),
@@ -215,23 +224,12 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
     );
   }
 
-  void _showSaveSuccessDialog(BuildContext context) {
+  void _showShortDialog(BuildContext context, String text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return const AlertDialog(
-          content: Text('저장 성공'),
-        );
-      },
-    );
-  }
-
-  void _showSaveFailedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const AlertDialog(
-          content: Text('저장 실패'),
+        return AlertDialog(
+          content: Text(text),
         );
       },
     );

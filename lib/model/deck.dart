@@ -215,7 +215,7 @@ class Deck {
   void colorArrange(Set<String> set) {
     var removeSet=[];
     for (var o in colors) {
-      if(set.contains(o)) {
+      if(!set.contains(o)) {
         removeSet.add(o);
       }
     }
