@@ -9,7 +9,7 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_info_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_scroll_grdiview_widget.dart';
-import 'package:digimon_meta_site_flutter/widget/deck_view_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/login_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -130,7 +130,7 @@ class _ToyBoxPageState extends State<ToyBoxPage> {
                                 SizedBox(
                                   height: MediaQuery.sizeOf(context).height * 0.91,
                                   // height: 1000,
-                                  child: DeckView(
+                                  child: DeckBuilderView(
                                     deck: deck,
                                     mouseEnterEvent: changeViewCardInfo,
                                     cardPressEvent: removeCardByDeck, import: deckUpdate,

@@ -3,41 +3,41 @@ import 'dart:convert';
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/deck_request_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
+import 'package:digimon_meta_site_flutter/model/format.dart';
+import 'package:digimon_meta_site_flutter/model/note.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
+import 'package:intl/intl.dart';
 
 import '../model/deck.dart';
+import '../model/paged_response_deck_dto.dart';
 
-class DeckApi{
-
-  // String baseUrl = 'http://localhost:8080';
+class DeckApi {
   String baseUrl = const String.fromEnvironment('SERVER_URL');
   DioClient dioClient = DioClient();
 
   Future<DeckResponseDto?> postDeck(Deck deck) async {
     try {
-      var response = await dioClient.dio.post('$baseUrl/api/deck',data: DeckRequestDto(deck).toJson());
+      var response = await dioClient.dio
+          .post('$baseUrl/api/deck', data: DeckRequestDto(deck).toJson());
       if (response.statusCode == 200) {
-
-         return DeckResponseDto.fromJson(response.data);
-
-      } else if(response.statusCode==401) {
+        return DeckResponseDto.fromJson(response.data);
+      } else if (response.statusCode == 401) {
         return null;
       }
     } catch (e) {
+      print(e);
       // throw Exception('Error occurred while fetching cards');
     }
-
   }
-  Future<DeckResponseDto?> importDeck(Map<String,int> deckCode) async {
+
+  Future<DeckResponseDto?> importDeck(Map<String, int> deckCode) async {
     try {
-      var response = await dioClient.dio.post('$baseUrl/api/deck/import',data: {
-        'deck' : deckCode
-      });
+      var response = await dioClient.dio
+          .post('$baseUrl/api/deck/import', data: {'deck': deckCode});
       if (response.statusCode == 200) {
-
         return DeckResponseDto.fromJson(response.data);
-
-      } else if(response.statusCode==401) {
+      } else if (response.statusCode == 401) {
         return null;
       }
     } catch (e) {
@@ -61,14 +61,57 @@ class DeckApi{
 
   Future<dynamic> exportDeckToTTSFile(Deck deck) async {
     try {
-      var response = await dioClient.dio.post('$baseUrl/api/manager/deck',data: DeckRequestDto(deck).toJson());
+      var response = await dioClient.dio.post('$baseUrl/api/manager/deck',
+          data: DeckRequestDto(deck).toJson());
       if (response.statusCode == 200) {
-          return response.data;
-      } else if(response.statusCode==401) {
+        return response.data;
+      } else if (response.statusCode == 401) {
+        return null;
       }
     } catch (e) {
-      // throw Exception('Error occurred while fetching cards');
+      return null;
     }
+    return null;
+  }
 
+  Future<List<FormatDto>?> getFormats(DateTime dateTime) async {
+    try {
+      String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+
+      var response =
+          await dioClient.dio.get('$baseUrl/api/format?date=$formattedDate');
+      if (response.statusCode == 200) {
+        return FormatDto.fromJsonList(response.data);
+      } else if (response.statusCode == 401) {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+
+
+  Future<PagedResponseDeckDto?> findDecks(DeckSearchParameter deckSearchParameter) async {
+    try {
+      var response = await dioClient.dio.get(
+        '$baseUrl/api/deck',
+        queryParameters: deckSearchParameter.toJson(),
+      );
+
+      if (response.statusCode == 200) {
+        return PagedResponseDeckDto.fromJson(response.data);
+      } else if (response.statusCode == 401) {
+        // 인증 오류 처리
+        return null;
+      } else {
+        // 기타 오류 처리
+        return null;
+      }
+    } catch (e) {
+      // 예외 처리
+      return null;
+    }
   }
 }

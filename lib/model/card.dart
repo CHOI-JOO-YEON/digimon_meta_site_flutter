@@ -26,6 +26,7 @@ class DigimonCard {
   String? smallImgUrl;
   bool? isParallel;
   String? sortString;
+  DateTime? releaseDate;
 
   // Uint8List? compressedImg;
 
@@ -72,7 +73,9 @@ class DigimonCard {
       this.imgUrl,
       this.isParallel,
       this.sortString,
-      this.smallImgUrl});
+      this.smallImgUrl,
+      this.releaseDate
+      });
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
@@ -98,7 +101,10 @@ class DigimonCard {
         imgUrl: json['imgUrl'],
         smallImgUrl: json['smallImgUrl'],
         isParallel: json['isParallel'],
-        sortString: json['sortString']);
+        sortString: json['sortString'],
+        releaseDate: json['releaseDate']
+
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -126,5 +132,6 @@ class DigimonCard {
         'isParallel': isParallel,
         'sortString': sortString,
         'smallImgUrl': smallImgUrl,
+        'releaseDate': releaseDate,
       };
 }

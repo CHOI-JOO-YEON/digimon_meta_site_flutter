@@ -119,6 +119,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     },
                   ),
                   //lv 고르기
+                  Text('LV'),
                   Wrap(
                     spacing: 8.0, // 가로 간격
                     children: selectedLvMap.keys.map((lv) {
@@ -139,6 +140,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     }).toList(),
                   ),
                   //색 고르기
+                  Text('color'),
                   Wrap(
                     spacing: 8.0, // 가로 간격
                     children: selectedColorMap.keys.map((color) {
@@ -161,6 +163,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   //색 or/and
 
                   //카드 타입 고르기
+                  Text('Card Type'),
                   Wrap(
                     spacing: 8.0, // 가로 간격
                     children: selectedCardTypeMap.keys.map((cardType) {
@@ -181,6 +184,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     }).toList(),
                   ),
                   //레어도 고르기
+                  Text('Rarity'),
                   Wrap(
                     spacing: 8.0, // 가로 간격
                     children: selectedRarityMap.keys.map((rarity) {
@@ -201,6 +205,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     }).toList(),
                   ),
                   //dp
+                  Text('DP'),
                   RangeSlider(
                     values: currentDpRange,
                     min: 1000,
@@ -217,6 +222,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     },
                   ),
                   //play cost
+                  Text('Play Cost'),
                   RangeSlider(
                     values: currentPlayCostRange,
                     min: 0,
@@ -234,6 +240,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   ),
                   
                   //digivolve cost
+                  Text('Digivolve Cost'),
                   RangeSlider(
                     values: currentDigivolutionCostRange,
                     min: 0,
@@ -307,6 +314,31 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 TextButton(
                   child: Text("조건 초기화"),
                   onPressed: () {
+                    selectedNote=widget.notes.first;
+                    for (var color in colors) {
+                      selectedColorMap[color] = false;
+                    }
+
+                    for (var cardType in cardTypes) {
+                      selectedCardTypeMap[cardType] = false;
+                    }
+
+                    for (var lv in levels) {
+                      selectedLvMap[lv] = false;
+                    }
+
+                    for (var rarity in rarities) {
+                      selectedRarityMap[rarity] = false;
+                    }
+
+                    currentDpRange = RangeValues(1000, 16000);
+
+                    currentPlayCostRange = RangeValues(0,20);
+                   currentDigivolutionCostRange = RangeValues(0,8);
+
+                    _dialogSearchStringEditingController = TextEditingController(text: _searchStringEditingController?.value.text);
+                    setState(() {
+                    });
                   },
                 ),
               ],

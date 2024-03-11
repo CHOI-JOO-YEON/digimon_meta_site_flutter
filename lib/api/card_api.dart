@@ -7,7 +7,6 @@ import '../model/note.dart';
 
 class CardApi{
 
-  // String baseUrl = 'http://localhost:8080';
   String baseUrl = const String.fromEnvironment('SERVER_URL');
   DioClient dioClient = DioClient();
 

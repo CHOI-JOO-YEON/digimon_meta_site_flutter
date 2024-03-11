@@ -3,7 +3,6 @@ import 'package:digimon_meta_site_flutter/util/dio.dart';
 import '../model/account/login_response_dto.dart';
 
 class UserApi {
-  // String baseUrl = 'http://localhost:8080';
   String baseUrl = const String.fromEnvironment('SERVER_URL');
   DioClient dioClient = DioClient();
 

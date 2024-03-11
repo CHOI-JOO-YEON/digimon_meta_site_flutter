@@ -21,6 +21,12 @@ abstract class _$AppRouter extends RootStackRouter {
         child: const AdminPage(),
       );
     },
+    DeckBuilderRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const DeckBuilderPage(),
+      );
+    },
     DeckImageRoute.name: (routeData) {
       final args = routeData.argsAs<DeckImageRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -29,6 +35,12 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           deck: args.deck,
         ),
+      );
+    },
+    DeckListRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const DeckListPage(),
       );
     },
     HomeRoute.name: (routeData) {
@@ -47,6 +59,12 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const LoginPage(),
+      );
+    },
+    MainRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: MainPage(),
       );
     },
     ToyBoxRoute.name: (routeData) {
@@ -68,6 +86,20 @@ class AdminRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'AdminRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [DeckBuilderPage]
+class DeckBuilderRoute extends PageRouteInfo<void> {
+  const DeckBuilderRoute({List<PageRouteInfo>? children})
+      : super(
+          DeckBuilderRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'DeckBuilderRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -111,6 +143,20 @@ class DeckImageRouteArgs {
 }
 
 /// generated route for
+/// [DeckListPage]
+class DeckListRoute extends PageRouteInfo<void> {
+  const DeckListRoute({List<PageRouteInfo>? children})
+      : super(
+          DeckListRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'DeckListRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<void> {
   const HomeRoute({List<PageRouteInfo>? children})
@@ -148,6 +194,20 @@ class LoginRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'LoginRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [MainPage]
+class MainRoute extends PageRouteInfo<void> {
+  const MainRoute({List<PageRouteInfo>? children})
+      : super(
+          MainRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MainRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

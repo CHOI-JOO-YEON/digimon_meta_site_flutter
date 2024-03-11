@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:stroke_text/stroke_text.dart';
 
-import '../model/card.dart';
-import 'card/card_widget.dart';
+import '../../model/card.dart';
+import '../card/card_widget.dart';
 
 class DeckScrollGridView extends StatefulWidget {
   final Map<DigimonCard, int> deckCount;
   final List<DigimonCard> deck;
   final int rowNumber;
   final Function(DigimonCard)? mouseEnterEvent;
-  final Function(DigimonCard) cardPressEvent;
-  final Function(DigimonCard) onLongPress;
+  final Function(DigimonCard)? cardPressEvent;
+  final Function(DigimonCard)? onLongPress;
 
   const DeckScrollGridView(
       {super.key,
       required this.deckCount,
       required this.rowNumber,
-      this.mouseEnterEvent,  required this.cardPressEvent, required this.deck, required this.onLongPress});
+      this.mouseEnterEvent,   this.cardPressEvent, required this.deck,  this.onLongPress});
 
   @override
   State<DeckScrollGridView> createState() => _DeckScrollGridViewState();

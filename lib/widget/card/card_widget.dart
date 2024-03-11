@@ -8,7 +8,7 @@ import 'package:digimon_meta_site_flutter/model/card.dart';
 class CustomCard extends StatefulWidget {
   final double width;
   final DigimonCard card;
-  final Function(DigimonCard) cardPressEvent;
+  final Function(DigimonCard)? cardPressEvent;
 
   final Function? onHover;
   final Function? onExit;
@@ -17,7 +17,7 @@ class CustomCard extends StatefulWidget {
   const CustomCard({
     super.key,
     required this.width,
-    required this.cardPressEvent,
+    this.cardPressEvent,
     required this.card,
     this.onHover,
     this.onExit, this.onLongPress,
@@ -69,7 +69,10 @@ class _CustomCardState extends State<CustomCard> {
         },
         child: GestureDetector(
           onTap: () {
-            widget.cardPressEvent(widget.card);
+            if(widget.cardPressEvent!=null) {
+              widget.cardPressEvent!(widget.card);
+            }
+
           },
           onLongPressStart: _handleLongPressStart,
           onLongPressEnd: _handleLongPressEnd,

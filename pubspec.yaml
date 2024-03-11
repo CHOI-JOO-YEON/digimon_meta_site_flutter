@@ -50,6 +50,8 @@ dependencies:
   stroke_text: ^0.0.2
   marquee: ^2.2.3
   idb_shim: ^2.3.2
+  intl: ^0.19.0
+
 
 #  oauth2: ^2.0.2
 #  kakao_flutter_sdk_user: ^1.8.0

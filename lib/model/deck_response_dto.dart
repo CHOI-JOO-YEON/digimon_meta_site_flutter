@@ -8,17 +8,31 @@ class DeckResponseDto {
   int? deckId;
   String? deckName;
   Map<DigimonCard, int>? cardAndCntMap;
+  List<String> colors;
 
   DeckResponseDto({this.authorId, this.authorName, this.deckId, this.deckName,
-      this.cardAndCntMap});
-
+      this.cardAndCntMap, required this.colors,}){
+    this.colors = _sortColorsByOrder(colors);
+  }
+  static final Map<String, int> _colorOrder = {
+    'RED': 1,
+    'BLUE': 2,
+    'YELLOW': 3,
+    'GREEN': 4,
+    'BLACK': 5,
+    'PURPLE': 6,
+    'WHITE': 7
+  };
+  List<String> _sortColorsByOrder(List<String> colors) {
+    return colors.toList()..sort((a, b) => _colorOrder[a]!.compareTo(_colorOrder[b]!));
+  }
   factory DeckResponseDto.fromJson(Map<String, dynamic> json) {
     return DeckResponseDto(
       authorId: json['authorId'],
       authorName: json['authorName'],
       deckId: json['deckId'],
       deckName: json['deckName'],
-      // JSON의 'cards' 배열을 직접 메서드에 전달
+      colors: List<String>.from(json['colors']),
       cardAndCntMap: parseJsonToCardAndCntMap(json['cards'] as List<dynamic>),
     );
   }

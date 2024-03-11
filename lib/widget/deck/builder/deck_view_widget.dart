@@ -1,23 +1,21 @@
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
-import 'package:digimon_meta_site_flutter/widget/deck/deck_menu_bar.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
-import 'package:digimon_meta_site_flutter/widget/deck_scroll_gridview_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../model/card.dart';
-import '../model/deck.dart';
-import '../model/deck_response_dto.dart';
+import '../../../model/card.dart';
+import '../../../model/deck.dart';
+import '../../../model/deck_response_dto.dart';
 
-class DeckView extends StatefulWidget {
+class DeckBuilderView extends StatefulWidget {
   final Deck deck;
-
-  // final Map<DigimonCard, int> deck;
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
   final Function(DeckResponseDto) import;
 
-  const DeckView(
+  const DeckBuilderView(
       {super.key,
       required this.deck,
       this.mouseEnterEvent,
@@ -25,10 +23,10 @@ class DeckView extends StatefulWidget {
       required this.import});
 
   @override
-  State<DeckView> createState() => _DeckViewState();
+  State<DeckBuilderView> createState() => _DeckBuilderViewState();
 }
 
-class _DeckViewState extends State<DeckView> {
+class _DeckBuilderViewState extends State<DeckBuilderView> {
   int _rowNumber = 9;
 
   void updateRowNumber(int n) {
@@ -41,6 +39,11 @@ class _DeckViewState extends State<DeckView> {
     setState(() {});
   }
 
+  initDeck() {
+    widget.deck.init();
+    setState(() {});
+  }
+
   addCard(DigimonCard digimonCard) {
     widget.deck.addCard(digimonCard);
     setState(() {
@@ -50,9 +53,7 @@ class _DeckViewState extends State<DeckView> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return Column(
+    return Column(
         children: [
           Expanded(
             flex: 4,
@@ -63,9 +64,10 @@ class _DeckViewState extends State<DeckView> {
                   //메뉴바
                   Expanded(
                       flex: 2,
-                      child: DeckMenuBar(
+                      child: DeckBuilderMenuBar(
                         deck: widget.deck,
                         clear: clearDeck,
+                        init: initDeck,
                         import: widget.import,
                       )),
 
@@ -122,7 +124,7 @@ class _DeckViewState extends State<DeckView> {
                 ),
               ))
         ],
-      );
-    });
+
+    );
   }
 }

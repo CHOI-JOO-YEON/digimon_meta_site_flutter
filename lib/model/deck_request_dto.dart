@@ -3,11 +3,17 @@ import 'deck.dart';
 class DeckRequestDto{
   int? deckId;
   String? deckName;
+  List<String>? colors;
+  int? formatId;
+  bool? isPublic;
   Map<int,int> cardAndCntMap ={};
 
   DeckRequestDto(Deck deck){
     deckId=deck.deckId;
     deckName=deck.deckName;
+    colors= deck.colors.toList();
+    formatId=deck.formatId;
+    isPublic = deck.isPublic;
 
     for (var deckEntry in deck.deckMap.entries) {
         cardAndCntMap[deckEntry.key.cardId!]=deckEntry.value;
@@ -22,6 +28,9 @@ class DeckRequestDto{
     final Map<String, dynamic> data = {
       'deckId': deckId,
       'deckName': deckName,
+      'colors': colors,
+      'isPublic': isPublic,
+      'formatId':formatId,
     };
 
     final Map<String, int> convertedCardAndCntMap = {};
@@ -29,7 +38,6 @@ class DeckRequestDto{
       convertedCardAndCntMap[key.toString()] = value;
     });
     data['cardAndCntMap'] = convertedCardAndCntMap;
-
     return data;
   }
 
