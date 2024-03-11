@@ -8,11 +8,13 @@ class DeckResponseDto {
   int? deckId;
   String? deckName;
   Map<DigimonCard, int>? cardAndCntMap;
-  List<String> colors;
+  List<String>? colors = [];
 
   DeckResponseDto({this.authorId, this.authorName, this.deckId, this.deckName,
-      this.cardAndCntMap, required this.colors,}){
-    this.colors = _sortColorsByOrder(colors);
+      this.cardAndCntMap, this.colors,}){
+    if(colors!=null) {
+      this.colors = _sortColorsByOrder(colors!);
+    }
   }
   static final Map<String, int> _colorOrder = {
     'RED': 1,
@@ -27,12 +29,20 @@ class DeckResponseDto {
     return colors.toList()..sort((a, b) => _colorOrder[a]!.compareTo(_colorOrder[b]!));
   }
   factory DeckResponseDto.fromJson(Map<String, dynamic> json) {
+
+     var colors ;
+     if(json['colors']!=null) {
+       colors = List<String>.from(json['colors']);
+     }else{
+       colors=null;
+     }
+
     return DeckResponseDto(
       authorId: json['authorId'],
       authorName: json['authorName'],
       deckId: json['deckId'],
       deckName: json['deckName'],
-      colors: List<String>.from(json['colors']),
+      colors: colors,
       cardAndCntMap: parseJsonToCardAndCntMap(json['cards'] as List<dynamic>),
     );
   }

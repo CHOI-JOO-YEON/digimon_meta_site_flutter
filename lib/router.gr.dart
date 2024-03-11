@@ -22,9 +22,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     DeckBuilderRoute.name: (routeData) {
+      final args = routeData.argsAs<DeckBuilderRouteArgs>(
+          orElse: () => const DeckBuilderRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const DeckBuilderPage(),
+        child: DeckBuilderPage(
+          key: args.key,
+          deck: args.deck,
+        ),
       );
     },
     DeckImageRoute.name: (routeData) {
@@ -92,16 +97,40 @@ class AdminRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [DeckBuilderPage]
-class DeckBuilderRoute extends PageRouteInfo<void> {
-  const DeckBuilderRoute({List<PageRouteInfo>? children})
-      : super(
+class DeckBuilderRoute extends PageRouteInfo<DeckBuilderRouteArgs> {
+  DeckBuilderRoute({
+    Key? key,
+    Deck? deck,
+    List<PageRouteInfo>? children,
+  }) : super(
           DeckBuilderRoute.name,
+          args: DeckBuilderRouteArgs(
+            key: key,
+            deck: deck,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'DeckBuilderRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<DeckBuilderRouteArgs> page =
+      PageInfo<DeckBuilderRouteArgs>(name);
+}
+
+class DeckBuilderRouteArgs {
+  const DeckBuilderRouteArgs({
+    this.key,
+    this.deck,
+  });
+
+  final Key? key;
+
+  final Deck? deck;
+
+  @override
+  String toString() {
+    return 'DeckBuilderRouteArgs{key: $key, deck: $deck}';
+  }
 }
 
 /// generated route for

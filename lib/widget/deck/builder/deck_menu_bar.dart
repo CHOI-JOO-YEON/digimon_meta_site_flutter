@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/format.dart';
-import 'package:digimon_meta_site_flutter/model/note.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
@@ -510,7 +509,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       },
                       iconSize: iconSize,
                       icon: const Icon(Icons.clear),
-                      tooltip: '초기화',
+                      tooltip: '비우기',
                     ),
                   ),
                   ConstrainedBox(

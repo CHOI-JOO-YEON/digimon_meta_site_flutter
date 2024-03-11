@@ -75,7 +75,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
               itemBuilder: (context, index) {
                 final deck = decks[index];
                 return ListTile(
-                  leading: ColorWheel(colors: deck.colors,),
+                  leading: ColorWheel(colors: deck.colors!,),
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? ''),
                   subtitle: Text('작성자: ${deck.authorName}'),

@@ -15,7 +15,8 @@ import '../widget/card/card_search_bar.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
-  const DeckBuilderPage({super.key});
+  final Deck? deck;
+  const DeckBuilderPage({super.key, this.deck});
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -35,6 +36,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   @override
   void initState() {
     super.initState();
+    if(widget.deck!=null) {
+      deck = widget.deck!;
+    }
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
       notes.add(NoteDto(noteId: null, name: '모든 카드'));

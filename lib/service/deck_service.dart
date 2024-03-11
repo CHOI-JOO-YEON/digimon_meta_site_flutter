@@ -70,4 +70,8 @@ class DeckService{
     return decks;
   }
 
+  Future<bool> deleteDeck(int deckId) async {
+    return await DeckApi().deleteDeck(deckId);
+  }
+
 }

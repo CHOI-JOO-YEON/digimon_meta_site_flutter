@@ -60,7 +60,8 @@ class _DeckSearchViewState extends State<DeckSearchView>
               Expanded(
                 child: TabBarView(controller: _tabController, children: [
                  DeckListViewer(formatList: formats, deckUpdate: widget.deckUpdate),
-                  MyDeckListViewer(formatList: formats, deckUpdate: widget.deckUpdate,)
+                  MyDeckListViewer(formatList: formats, deckUpdate: widget.deckUpdate,
+                  )
                   // Center(child: Text('Content of Tab 2')),
                 ]),
               )

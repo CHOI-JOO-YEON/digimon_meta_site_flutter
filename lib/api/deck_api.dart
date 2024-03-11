@@ -41,6 +41,7 @@ class DeckApi {
         return null;
       }
     } catch (e) {
+      print(e);
       return null;
     }
     return null;
@@ -112,6 +113,30 @@ class DeckApi {
     } catch (e) {
       // 예외 처리
       return null;
+    }
+  }
+
+  Future<bool> deleteDeck(int deckId) async{
+    try {
+      var response = await dioClient.dio.post(
+        '$baseUrl/api/deck/delete',
+        queryParameters: {
+          'deck-id' : deckId
+        }
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else if (response.statusCode == 401) {
+        // 인증 오류 처리
+        return false;
+      } else {
+        // 기타 오류 처리
+        return false;
+      }
+    } catch (e) {
+      // 예외 처리
+      return false;
     }
   }
 }
