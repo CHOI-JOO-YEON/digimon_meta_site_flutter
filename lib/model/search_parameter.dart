@@ -20,7 +20,7 @@ class SearchParameter{
 
   int parallelOption = 0; // 0= all, 1= onlyNormal, 2=onlyParallel
 
-  String orderOption = "cardNo";
+  String orderOption = "sortString";
   bool isOrderDesc = false;
 
   Map<String, dynamic> toJson() {
