@@ -54,7 +54,6 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                               onChanged: (SiteName? value) {
                                 setState(() {
                                   selectedButton = value!;
-                                  // 선택 상태가 바뀔 때마다 텍스트 필드 업데이트
                                   textEditingController.text =
                                       selectedButton.ExportToSiteDeckCode(
                                           widget.deck);
@@ -111,6 +110,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
           min(constraints.maxWidth / 10, constraints.maxHeight / 2);
       double iconSize = iconButtonSize; // IconButton 내부의 Icon 크기
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
               flex: 1,
@@ -119,10 +119,11 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('작성자: ${widget.deck.author}'),
+                    Text('작성자: ${widget.deck.author}',
+                      style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),),
                     Text(
                       '덱 이름: ${widget.deck.deckName}',
-                      style: const TextStyle(fontFamily: 'JalnanGothic'),
+                      style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
                     ),
                   ],
                 ),

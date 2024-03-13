@@ -94,7 +94,8 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
               flex: 14,
               child: Container(
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 255, 240, 1),
+                color:  Theme.of(context).cardColor,
+                    // color: Color.fromRGBO(255, 255, 240, 1),
                     //   color: Color(0xFFFFF9E3),
                     borderRadius: BorderRadius.circular(5)),
                 child: DeckScrollGridView(
@@ -112,7 +113,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
               flex: 6,
               child: Container(
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 255, 240, 1),
+                    color:  Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(5)),
                 child: DeckScrollGridView(
                   deckCount: widget.deck.tamaMap,

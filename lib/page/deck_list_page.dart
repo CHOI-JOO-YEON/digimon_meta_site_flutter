@@ -41,7 +41,10 @@ class _DeckListPageState extends State<DeckListPage> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.blueAccent),
+
+                  // color: Colors.blueAccent
+                  color:  Theme.of(context).highlightColor
+              ),
               child: SingleChildScrollView(
                 child: SizedBox(
                   height: MediaQuery.sizeOf(context).height * 0.88,
@@ -62,7 +65,7 @@ class _DeckListPageState extends State<DeckListPage> {
             flex: 2,
             child: Container(
               decoration: BoxDecoration(
-                // color: Colors.blueAccent,
+                color:  Theme.of(context).highlightColor,
                 borderRadius: BorderRadius.circular(5),
                 // border: Border.all()
               ),

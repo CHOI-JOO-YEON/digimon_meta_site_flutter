@@ -44,14 +44,19 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       ? '포맷'
                       : '${_selectedFormat!.name} ['
                       '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
-                      '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]'),
+                      '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]',
+                    style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  ),
                   value: _selectedFormat,
                   items: widget.formatList.map((FormatDto format) {
                     return DropdownMenuItem<FormatDto>(
                       value: format,
                       child: Text('${format!.name} ['
                           '${DateFormat('yyyy-MM-dd').format(format!.startDate)} ~ '
-                          '${DateFormat('yyyy-MM-dd').format(format!.endDate)}]'),
+                          '${DateFormat('yyyy-MM-dd').format(format!.endDate)}]',
+                        style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+
+                      ),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -63,11 +68,13 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 ),
               ),
             ),
-            SizedBox(width: 16.0),
+            SizedBox(width: MediaQuery.sizeOf(context).width*0.009,),
             Expanded(
               child: TextField(
-                decoration: const InputDecoration(
+                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                decoration:InputDecoration(
                   labelText: '검색어',
+                  labelStyle:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -78,10 +85,13 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             ),
             ElevatedButton(onPressed: (){
               widget.search(1);
-            }, child: Text('검색'))
+            }, child: Text('검색',
+              style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+
+            ))
           ],
         ),
-        SizedBox(height: 10,),
+        SizedBox(height: MediaQuery.sizeOf(context).width*0.009),
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [...List.generate(
@@ -101,19 +111,13 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     });
                   },
                   child: Container(
-                    width: 40.0,
-                    height: 40.0,
+                    width: MediaQuery.sizeOf(context).width*0.02,
+                    height: MediaQuery.sizeOf(context).width*0.02,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: widget.searchParameter.colors.contains(color)
                           ? buttonColor
                           : buttonColor.withOpacity(0.3),
-                      border: Border.all(
-                        color: widget.searchParameter.colors.contains(color)
-                            ? Colors.black
-                            : buttonColor.withOpacity(0.3),
-                        width: 2.0,
-                      ),
                     ),
                   ),
                 );
@@ -128,8 +132,10 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   });
                 },
               ),
-              Text('OR'),
-              SizedBox(width: 16.0),
+              Text('OR',
+                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+              ),
+              SizedBox(width: MediaQuery.sizeOf(context).width*0.009),
               Radio(
                 value: 1,
                 groupValue: widget.searchParameter.colorOperation,
@@ -139,7 +145,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   });
                 },
               ),
-              Text('AND'),
+              Text('AND',
+                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+              ),
             ]
         ),
       ],

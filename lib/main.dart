@@ -55,6 +55,48 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      theme: ThemeData(
+       fontFamily: 'JalnanGothic',
+        primarySwatch: MaterialColor(0xFF1A237E, {
+          50: Color(0xFFE8EAF6),
+          100: Color(0xFFC5CAE9),
+          200: Color(0xFF9FA8DA),
+          300: Color(0xFF7986CB),
+          400: Color(0xFF5C6BC0),
+          500: Color(0xFF3F51B5),
+          600: Color(0xFF3949AB),
+          700: Color(0xFF303F9F),
+          800: Color(0xFF283593),
+          900: Color(0xFF1A237E),
+        }),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: MaterialColor(0xFF1A237E, {
+            50: Color(0xFFE8EAF6),
+            100: Color(0xFFC5CAE9),
+            200: Color(0xFF9FA8DA),
+            300: Color(0xFF7986CB),
+            400: Color(0xFF5C6BC0),
+            500: Color(0xFF3F51B5),
+            600: Color(0xFF3949AB),
+            700: Color(0xFF303F9F),
+            800: Color(0xFF283593),
+            900: Color(0xFF1A237E),
+          }),
+          accentColor: Color(0xFFFF6B00),
+          backgroundColor: Color(0xFFF5F5F5),
+          cardColor: Color(0xFFFFFFFF),
+        ),
+        textTheme: TextTheme(
+          headline1: TextStyle(color: Color(0xFF1A237E)),
+          headline2: TextStyle(color: Color(0xFF3949AB)),
+          headline3: TextStyle(color: Color(0xFF303F9F)),
+          headline4: TextStyle(color: Color(0xFF283593)),
+          headline5: TextStyle(color: Color(0xFF1A237E)),
+          headline6: TextStyle(color: Color(0xFF1A237E)),
+          bodyText1: TextStyle(color: Color(0xFF000000)),
+          bodyText2: TextStyle(color: Color(0xFF000000)),
+        ),
+      ),
       routerConfig: widget.router.config(),
     );
   }

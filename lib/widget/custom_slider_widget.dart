@@ -39,8 +39,8 @@ class _CustomSliderState extends State<CustomSlider> {
                 min: 4,
                 max: 14,
                 divisions: 10,
-                activeColor: Colors.blue[400],
-                thumbColor: Colors.blue[400],
+                // activeColor: Colors.blue[400],
+                // thumbColor: Colors.blue[400],
                 label: _currentSliderValue.round().toString(),
                 onChanged: (double value) {
                   setState(() {

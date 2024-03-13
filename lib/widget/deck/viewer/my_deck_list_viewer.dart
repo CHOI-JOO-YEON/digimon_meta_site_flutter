@@ -63,6 +63,33 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       await searchDecks(1);
     }
   }
+
+  void showModifyConfirmationDialog(BuildContext context, DeckResponseDto deck) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('덱 수정'),
+          content: Text('이 덱을 수정하시겠습니까?'),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('수정'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.router.push(DeckBuilderRoute(deck: Deck.responseDto(deck)));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   void showDeleteConfirmationDialog(BuildContext context, int deckId) {
     showDialog(
       context: context,
@@ -117,7 +144,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                         IconButton(
                           icon: Icon(Icons.mode),
                           onPressed: (){
-                            context.router.push(DeckBuilderRoute(deck: Deck.responseDto(decks[index])));
+                            showModifyConfirmationDialog(context, deck);
                           },
                         ),
                         IconButton(
@@ -131,8 +158,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                   ),
                   leading: ColorWheel(colors: deck.colors!,),
                   selected: index == _selectedIndex,
-                  title: Text(deck.deckName ?? ''),
-                  subtitle: Text('작성자: ${deck.authorName}'),
+                  title: Text(deck.deckName ?? '',
+                  style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  ),
+                  subtitle: Text('작성자: ${deck.authorName}',
+                    style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009)
+                  ),
                   // 덱 아이템을 탭했을 때의 동작 처리
                   onTap: () {
                     _selectedIndex=index;

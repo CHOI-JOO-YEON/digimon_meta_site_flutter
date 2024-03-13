@@ -37,7 +37,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     return Column(
       children: [
         Expanded(
-          flex: 4,
+          flex: 8,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -71,10 +71,11 @@ class _DeckViewerViewState extends State<DeckViewerView> {
 
         //덱그리드뷰
         Expanded(
-            flex: 14,
+            flex: 28,
             child: Container(
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(255, 255, 240, 1),
+                  // color: Color.fromRGBO(255, 255, 240, 1),
+                color:  Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(5)),
               child: DeckScrollGridView(
                 deckCount: widget.deck.deckMap,
@@ -85,10 +86,10 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             )),
         Expanded(flex: 1, child: Container()),
         Expanded(
-            flex: 6,
+            flex: 12,
             child: Container(
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(255, 255, 240, 1),
+                  color:  Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(5)),
               child: DeckScrollGridView(
                 deckCount: widget.deck.tamaMap,

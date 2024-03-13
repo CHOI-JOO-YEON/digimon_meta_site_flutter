@@ -16,6 +16,7 @@ import '../widget/card/card_search_bar.dart';
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
   final Deck? deck;
+
   const DeckBuilderPage({super.key, this.deck});
 
   @override
@@ -36,7 +37,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   @override
   void initState() {
     super.initState();
-    if(widget.deck!=null) {
+    if (widget.deck != null) {
       deck = widget.deck!;
     }
     Future.delayed(const Duration(seconds: 0), () async {
@@ -102,7 +103,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: Colors.blueAccent),
+                  color: Theme.of(context).highlightColor),
               child: SingleChildScrollView(
                 child: SizedBox(
                   height: MediaQuery.sizeOf(context).height * 0.88,
@@ -123,41 +124,40 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           Expanded(
             flex: 2,
             child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(5),
-                      // border: Border.all()
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(
-                          MediaQuery.sizeOf(context).width * 0.01),
-                      child: Column(
-                        children: [
-                          Expanded(
-                              flex: 1,
-                              child: CardSearchBar(
-                                notes: notes,
-                                searchParameter: searchParameter,
-                                onSearch: initSearch,
-                              )),
-                          Expanded(
-                              flex: 9,
-                              child: !isSearchLoading
-                                  ? CardScrollGridView(
-                                      cards: cards,
-                                      rowNumber: 6,
-                                      loadMoreCards: loadMoreCard,
-                                      cardPressEvent: addCardByDeck,
-                                      // mouseEnterEvent: changeViewCardInfo,
-                                      totalPages: totalPages,
-                                      currentPage: currentPage,
-                                    )
-                                  : Center(child: CircularProgressIndicator()))
-                        ],
-                      ),
-                    ),
-                  ),
-
+              decoration: BoxDecoration(
+                color: Theme.of(context).highlightColor,
+                borderRadius: BorderRadius.circular(5),
+                // border: Border.all()
+              ),
+              child: Padding(
+                padding:
+                    EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                child: Column(
+                  children: [
+                    Expanded(
+                        flex: 1,
+                        child: CardSearchBar(
+                          notes: notes,
+                          searchParameter: searchParameter,
+                          onSearch: initSearch,
+                        )),
+                    Expanded(
+                        flex: 9,
+                        child: !isSearchLoading
+                            ? CardScrollGridView(
+                                cards: cards,
+                                rowNumber: 6,
+                                loadMoreCards: loadMoreCard,
+                                cardPressEvent: addCardByDeck,
+                                // mouseEnterEvent: changeViewCardInfo,
+                                totalPages: totalPages,
+                                currentPage: currentPage,
+                              )
+                            : Center(child: CircularProgressIndicator()))
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

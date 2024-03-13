@@ -52,9 +52,15 @@ class _DeckSearchViewState extends State<DeckSearchView>
             children: [
               TabBar(
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: '전체 덱'),
-                  Tab(text: '나의 덱'),
+                tabs:  [
+                  // Tab(text: '전체 덱'),
+                  Tab(child: Text(
+                    '전체 덱',
+                    style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  ),),Tab(child: Text(
+                      '나의 덱',
+                      style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  ),),
                 ],
               ),
               Expanded(
