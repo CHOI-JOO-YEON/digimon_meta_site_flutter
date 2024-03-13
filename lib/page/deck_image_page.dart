@@ -19,30 +19,11 @@ class DeckImagePage extends StatelessWidget {
   Widget build(BuildContext context) {
     GlobalKey globalKey = GlobalKey();
 
-    // Future<void> captureAndDownloadImage(BuildContext context) async {
-    //   try {
-    //     RenderRepaintBoundary boundary = globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    //     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-    //     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    //     final blob = html.Blob([byteData!.buffer.asUint8List()], 'image/png');
-    //     final url = html.Url.createObjectUrlFromBlob(blob);
-    //
-    //     final anchor = html.AnchorElement(href: url)
-    //       ..setAttribute('download', 'deck_image.png')
-    //       ..click();
-    //
-    //     // URL 해제
-    //     html.Url.revokeObjectUrl(url);
-    //   } catch (e) {
-    //     // 에러 처리
-    //   }
-    // }
 
     Future<void> captureAndDownloadImage(BuildContext context) async {
       try {
         RenderRepaintBoundary boundary = globalKey.currentContext!
             .findRenderObject() as RenderRepaintBoundary;
-        // pixelRatio를 조정하여 이미지의 스케일을 변경합니다. 여기서는 스케일을 낮추기 위해 1보다 작은 값을 사용합니다.
         ui.Image image = await boundary.toImage(pixelRatio: 1);
         ByteData? byteData =
             await image.toByteData(format: ui.ImageByteFormat.png);
@@ -53,10 +34,8 @@ class DeckImagePage extends StatelessWidget {
           ..setAttribute('download', '${deck.deckName}.png')
           ..click();
 
-        // URL 해제
         html.Url.revokeObjectUrl(url);
       } catch (e) {
-        // 에러 처리
         print(e);
       }
     }
