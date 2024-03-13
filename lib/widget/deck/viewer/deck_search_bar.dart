@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,6 +33,11 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return Column(
       children: [
         Row(
@@ -45,7 +52,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       : '${_selectedFormat!.name} ['
                       '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
                       '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]',
-                    style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                    style: TextStyle(fontSize:fontSize),
                   ),
                   value: _selectedFormat,
                   items: widget.formatList.map((FormatDto format) {
@@ -54,7 +61,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       child: Text('${format!.name} ['
                           '${DateFormat('yyyy-MM-dd').format(format!.startDate)} ~ '
                           '${DateFormat('yyyy-MM-dd').format(format!.endDate)}]',
-                        style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                        style: TextStyle(fontSize:fontSize),
 
                       ),
                     );
@@ -68,13 +75,13 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 ),
               ),
             ),
-            SizedBox(width: MediaQuery.sizeOf(context).width*0.009,),
+            SizedBox(width: fontSize,),
             Expanded(
               child: TextField(
-                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                style: TextStyle(fontSize: fontSize),
                 decoration:InputDecoration(
                   labelText: '검색어',
-                  labelStyle:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  labelStyle:  TextStyle(fontSize: fontSize),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -86,12 +93,12 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             ElevatedButton(onPressed: (){
               widget.search(1);
             }, child: Text('검색',
-              style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+              style: TextStyle(fontSize: fontSize),
 
             ))
           ],
         ),
-        SizedBox(height: MediaQuery.sizeOf(context).width*0.009),
+        SizedBox(height:fontSize),
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [...List.generate(
@@ -133,9 +140,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 },
               ),
               Text('OR',
-                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                style: TextStyle(fontSize: fontSize),
               ),
-              SizedBox(width: MediaQuery.sizeOf(context).width*0.009),
+              SizedBox(width: fontSize),
               Radio(
                 value: 1,
                 groupValue: widget.searchParameter.colorOperation,
@@ -146,7 +153,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 },
               ),
               Text('AND',
-                style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                style: TextStyle(fontSize: fontSize),
               ),
             ]
         ),

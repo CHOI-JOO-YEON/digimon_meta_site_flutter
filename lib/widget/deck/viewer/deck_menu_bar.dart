@@ -104,6 +104,11 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       double iconButtonSize =
@@ -120,10 +125,10 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('작성자: ${widget.deck.author}',
-                      style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),),
+                      style: TextStyle(fontSize: fontSize),),
                     Text(
                       '덱 이름: ${widget.deck.deckName}',
-                      style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                      style: TextStyle(fontSize: fontSize),
                     ),
                   ],
                 ),

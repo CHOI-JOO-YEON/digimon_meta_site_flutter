@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
@@ -81,12 +83,12 @@ class _DeckListViewerState extends State<DeckListViewer> {
                   title: Text(
                     deck.deckName ?? '',
                     style: TextStyle(
-                        fontSize: MediaQuery.sizeOf(context).width * 0.009),
+                        fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)),
                   ),
                   subtitle: Text(
                     '작성자: ${deck.authorName}',
                     style: TextStyle(
-                        fontSize: MediaQuery.sizeOf(context).width * 0.009),
+                        fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)),
                   ),
                   onTap: () {
                     _selectedIndex = index;

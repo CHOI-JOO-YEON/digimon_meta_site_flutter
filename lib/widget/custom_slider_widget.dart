@@ -22,6 +22,11 @@ class _CustomSliderState extends State<CustomSlider> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double thumbRadius = screenWidth / 220; // 예시 계산
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    if(isPortrait){
+      thumbRadius*=2;
+    }
+
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

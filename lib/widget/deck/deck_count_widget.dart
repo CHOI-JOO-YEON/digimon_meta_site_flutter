@@ -10,6 +10,11 @@ class DeckCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     // deckCount에 따른 색상 결정
     Color deckCountColor = deck.deckCount == 50 ? Colors.green : Colors.red;
     // tamaCount에 따른 색상 결정
@@ -27,19 +32,19 @@ class DeckCount extends StatelessWidget {
               children: [
                 Text(
                   '덱',
-                  style: TextStyle(fontSize: min(constraints.maxWidth/10,constraints.maxHeight/8), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '${deck.deckCount}/50',
-                  style: TextStyle(color: deckCountColor, fontSize:min(constraints.maxWidth/10,constraints.maxHeight/8), fontWeight: FontWeight.bold),
+                  style: TextStyle(color: deckCountColor, fontSize:fontSize, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '디지타마 덱',
-                  style: TextStyle(fontSize: min(constraints.maxWidth/10,constraints.maxHeight/8), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '${deck.tamaCount}/5',
-                  style: TextStyle(color: tamaCountColor, fontSize: min(constraints.maxWidth/10,constraints.maxHeight/8), fontWeight: FontWeight.bold),
+                  style: TextStyle(color: tamaCountColor, fontSize: fontSize, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

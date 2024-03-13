@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/model/deck.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
@@ -118,6 +120,11 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   }
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return Column(
       children: [
         DeckSearchBar(
@@ -159,10 +166,10 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                   leading: ColorWheel(colors: deck.colors!,),
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? '',
-                  style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                  style:  TextStyle(fontSize:fontSize),
                   ),
                   subtitle: Text('작성자: ${deck.authorName}',
-                    style: TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009)
+                    style: TextStyle(fontSize: fontSize)
                   ),
                   // 덱 아이템을 탭했을 때의 동작 처리
                   onTap: () {

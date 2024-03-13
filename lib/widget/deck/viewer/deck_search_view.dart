@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:digimon_meta_site_flutter/model/deck.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
@@ -39,13 +41,21 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
   @override
   void dispose() {
-    _tabController.dispose();
+    if(mounted) {
+      _tabController.dispose();
+    }
+
     super.dispose();
   }
 
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return isLoading
         ? const Center(child: CircularProgressIndicator())
         : Column(
@@ -56,10 +66,10 @@ class _DeckSearchViewState extends State<DeckSearchView>
                   // Tab(text: '전체 덱'),
                   Tab(child: Text(
                     '전체 덱',
-                    style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                    style:  TextStyle(fontSize: fontSize),
                   ),),Tab(child: Text(
                       '나의 덱',
-                      style:  TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009),
+                      style:  TextStyle(fontSize: fontSize),
                   ),),
                 ],
               ),

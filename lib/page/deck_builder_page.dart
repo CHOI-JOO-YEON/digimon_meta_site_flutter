@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -24,6 +25,14 @@ class DeckBuilderPage extends StatefulWidget {
 }
 
 class _DeckBuilderPageState extends State<DeckBuilderPage> {
+  late ScrollController scrollController;
+
+  ///The controller of sliding up panel
+  SlidingUpPanelController panelController = SlidingUpPanelController();
+
+  double minBound = 0;
+
+  double upperBound = 1.0;
   bool isSearchLoading = true;
   List<DigimonCard> cards = [];
   List<NoteDto> notes = [];
@@ -36,6 +45,18 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   @override
   void initState() {
+    scrollController = ScrollController();
+    scrollController.addListener(() {
+      if (scrollController.offset >=
+          scrollController.position.maxScrollExtent &&
+          !scrollController.position.outOfRange) {
+        panelController.expand();
+      } else if (scrollController.offset <=
+          scrollController.position.minScrollExtent &&
+          !scrollController.position.outOfRange) {
+        panelController.anchor();
+      } else {}
+    });
     super.initState();
     if (widget.deck != null) {
       deck = widget.deck!;
@@ -93,7 +114,99 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    return isPortrait?
+    Padding(
+      padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+
+                // color: Colors.blueAccent
+                color:  Theme.of(context).highlightColor
+            ),
+            child:SingleChildScrollView(
+              child: SizedBox(
+                height: MediaQuery.sizeOf(context).height * 0.88,
+                // height: 1000,
+                child: DeckBuilderView(
+                  deck: deck,
+                  // mouseEnterEvent: changeViewCardInfo,
+                  cardPressEvent: removeCardByDeck,
+                  import: deckUpdate,
+                ),
+              ),
+            ),
+          ),
+          SlidingUpPanelWidget(
+            controlHeight: 30.0,
+            anchor: 0.4,
+            minimumBound: minBound,
+            upperBound: upperBound,
+            panelController: panelController,
+            enableOnTap: false,
+            child: Container(
+              decoration: BoxDecoration(
+                // border: Border.all(),
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.grey[200],
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                child: SizedBox(
+                  height: 1000,
+                  child: Column(
+                    children: [
+                      Text('카드 검색'),
+                      Expanded(
+                        child:Container(
+                          decoration: BoxDecoration(
+                            // color: Theme.of(context).highlightColor,
+                            borderRadius: BorderRadius.circular(5),
+                            // border: Border.all()
+                          ),
+                          child: Padding(
+                            padding:
+                            EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: CardSearchBar(
+                                      notes: notes,
+                                      searchParameter: searchParameter,
+                                      onSearch: initSearch,
+                                    )),
+                                Expanded(
+                                    flex: 9,
+                                    child: !isSearchLoading
+                                        ? CardScrollGridView(
+                                      cards: cards,
+                                      rowNumber: 6,
+                                      loadMoreCards: loadMoreCard,
+                                      cardPressEvent: addCardByDeck,
+                                      // mouseEnterEvent: changeViewCardInfo,
+                                      totalPages: totalPages,
+                                      currentPage: currentPage,
+                                    )
+                                        : Center(child: CircularProgressIndicator()))
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    )
+        : Padding(
       padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

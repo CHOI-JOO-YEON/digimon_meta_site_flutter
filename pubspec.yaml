@@ -52,6 +52,7 @@ dependencies:
   idb_shim: ^2.3.2
   intl: ^0.19.0
   auto_size_text: ^3.0.0
+  flutter_sliding_up_panel: ^2.1.1
 
 
 

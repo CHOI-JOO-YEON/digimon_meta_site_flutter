@@ -43,9 +43,7 @@ class MainPage extends StatelessWidget {
                                   Text(
                                     '${userProvider.nickname}님 안녕하세요',
                                     style: TextStyle(
-                                        fontSize:
-                                            MediaQuery.sizeOf(context).width *
-                                                0.009),
+                                        fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
                                   ),
                                 SizedBox(
                                     width: MediaQuery.sizeOf(context).width *
@@ -59,10 +57,7 @@ class MainPage extends StatelessWidget {
                                           child: Text(
                                             '로그아웃',
                                             style: TextStyle(
-                                                fontSize:
-                                                    MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        0.009),
+                                                fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
                                           ),
                                         ),
                                       )
@@ -74,10 +69,8 @@ class MainPage extends StatelessWidget {
                                           child: Text(
                                             '로그인',
                                             style: TextStyle(
-                                                fontSize:
-                                                    MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        0.009),
+                                                fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -93,20 +86,22 @@ class MainPage extends StatelessWidget {
                         controller: controller,
                         tabs: [
                           Tab(
-                            icon: Icon(Icons.build),
+                            // icon: Icon(Icons.build),
                             child: Text(
-                              'Deck Builder',
+                              'Builder',
                               style: TextStyle(
-                                  fontSize:
-                                      MediaQuery.sizeOf(context).width * 0.009),
+                                  fontSize: min(
+                                      MediaQuery.sizeOf(context).width * 0.02,
+                                      25)),
                             ),
                           ),
                           Tab(
-                            icon: Icon(Icons.list_alt),
-                            child: Text('Deck List',
+                            // icon: Icon(Icons.list_alt),
+                            child: Text('List',
                                 style: TextStyle(
-                                    fontSize: MediaQuery.sizeOf(context).width *
-                                        0.009)),
+                                    fontSize: min(
+                                        MediaQuery.sizeOf(context).width * 0.02,
+                                        25))),
                           )
                         ],
                       ),

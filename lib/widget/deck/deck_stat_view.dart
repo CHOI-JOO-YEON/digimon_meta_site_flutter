@@ -48,8 +48,8 @@ class DeckStat extends StatelessWidget {
       'Lv5': 0,
       'Lv6': 0,
       'Lv7': 0,
-      '테이머': 0,
-      '옵션': 0,
+      'TM': 0,
+      'OP': 0,
     };
 
     for (var card in deck.deckMap.keys) {
@@ -60,9 +60,9 @@ class DeckStat extends StatelessWidget {
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
         counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.deckMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['테이머'] = counts['테이머']! + deck.deckMap[card]!;
+        counts['TM'] = counts['TM']! + deck.deckMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['옵션'] = counts['옵션']! + deck.deckMap[card]!;
+        counts['OP'] = counts['OP']! + deck.deckMap[card]!;
       }
     }
     for (var card in deck.tamaMap.keys) {
@@ -73,9 +73,9 @@ class DeckStat extends StatelessWidget {
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
         counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['테이머'] = counts['테이머']! + deck.tamaMap[card]!;
+        counts['TM'] = counts['TM']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['옵션'] = counts['옵션']! + deck.tamaMap[card]!;
+        counts['OP'] = counts['OP']! + deck.tamaMap[card]!;
       }
     }
     return counts;

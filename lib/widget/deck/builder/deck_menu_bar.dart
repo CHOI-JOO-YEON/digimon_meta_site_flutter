@@ -413,6 +413,11 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.015,25);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       double iconButtonSize =
@@ -431,7 +436,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       Expanded(
                         flex: 3,
                         child: TextField(
-                          style: const TextStyle(fontFamily: 'JalnanGothic'),
+                          style: TextStyle(fontFamily: 'JalnanGothic',fontSize: fontSize),
                           controller: _deckNameController,
                           readOnly: !_isEditing,
                           decoration: InputDecoration(
