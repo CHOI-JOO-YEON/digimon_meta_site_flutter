@@ -45,7 +45,6 @@ class DeckImagePage extends StatelessWidget {
     List<DigimonCard> displayTamas =
         _generateDisplayList(deck.tamaCards, deck.tamaMap);
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(onPressed: () =>captureAndDownloadImage(context), child: Icon(Icons.download),),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Align(
@@ -53,7 +52,8 @@ class DeckImagePage extends StatelessWidget {
           child: SizedBox(
             width: 960,
             child: AppBar(
-              title: Text(deck.deckName,style: const TextStyle(fontFamily: 'JalnanGothic')),
+              backgroundColor: Theme.of(context).colorScheme.background,
+              title: Text('${deck.deckName} 이미지 내보내기',style: const TextStyle(fontFamily: 'JalnanGothic')),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.download),
@@ -75,7 +75,8 @@ class DeckImagePage extends StatelessWidget {
                 key: globalKey,
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.blue[100],
+                    color:  Theme.of(context).splashColor,
+                      // color: Colors.blue[100],
                       borderRadius: BorderRadius.circular(10)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -96,12 +97,12 @@ class DeckImagePage extends StatelessWidget {
                           height: 5,
                         ),
                         _buildGridView(
-                            context, displayTamas, 10, Colors.white60, '디지타마 덱'),
+                            context, displayTamas, 10, Theme.of(context).cardColor, '디지타마 덱'),
                         const SizedBox(
                           height: 5,
                         ),
                         _buildGridView(
-                            context, displayDecks, 10, Colors.white60, '메인 덱'),
+                            context, displayDecks, 10, Theme.of(context).cardColor, '메인 덱'),
                         // deckCards를 표시
                       ],
                     ),

@@ -12,10 +12,8 @@ class DeckStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 카드 유형별 개수를 계산합니다.
     Map<String, int> cardCounts = _calculateCardCounts();
 
-    // 각 카드 유형별로 위젯을 구성합니다.
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -26,7 +24,7 @@ class DeckStat extends StatelessWidget {
       return Container(
         height: constraints.maxHeight,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5), color: Colors.white24),
+            borderRadius: BorderRadius.circular(5), color: Theme.of(context).cardColor),
         child: Center(
             child: Container(
               padding: EdgeInsets.all(constraints.maxHeight * 0.05),

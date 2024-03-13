@@ -55,60 +55,59 @@ class _CustomCardState extends State<CustomCard> {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: MouseRegion(
-        onEnter: (event) {
-          if (widget.onHover != null) {
-            widget.onHover!(context);
+    String color = widget.card.color2??widget.card.color1!;
+    return MouseRegion(
+      onEnter: (event) {
+        if (widget.onHover != null) {
+          widget.onHover!(context);
+        }
+      },
+      onExit: (event) {
+        if (widget.onExit != null) {
+          widget.onExit!();
+        }
+      },
+      child: GestureDetector(
+        onTap: () {
+          if(widget.cardPressEvent!=null) {
+            widget.cardPressEvent!(widget.card);
           }
-        },
-        onExit: (event) {
-          if (widget.onExit != null) {
-            widget.onExit!();
-          }
-        },
-        child: GestureDetector(
-          onTap: () {
-            if(widget.cardPressEvent!=null) {
-              widget.cardPressEvent!(widget.card);
-            }
 
-          },
-          onLongPressStart: _handleLongPressStart,
-          onLongPressEnd: _handleLongPressEnd,
+        },
+        onLongPressStart: _handleLongPressStart,
+        onLongPressEnd: _handleLongPressEnd,
 
-          child: Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              SizedBox(
-                  width: widget.width,
-                  child: Image.network(
-                    widget.card.smallImgUrl ?? '',
-                    fit: BoxFit.fill,
-                  )
-                  ),
-              Positioned(
-                right: widget.width * 0.05,
-                bottom: widget.width * 0.05,
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: widget.width * 0.2,
-                        height: widget.width * 0.2
-                        ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      iconSize: widget.width * 0.16,
-                      icon: const Icon(Icons.zoom_in, color: Colors.black),
-                      onPressed: () {
-                        _showImageDialog(context, widget.card);
-                      },
-                    ),
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            SizedBox(
+                width: widget.width,
+                child: Image.network(
+                  widget.card.smallImgUrl ?? '',
+                  fit: BoxFit.fill,
+                )
+                ),
+            Positioned(
+              right: widget.width * 0.05,
+              bottom: widget.width * 0.05,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: widget.width * 0.2,
+                      height: widget.width * 0.2
+                      ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: widget.width * 0.16,
+                    icon: Icon(Icons.zoom_in, color: color=='BLACK'?Colors.white: Colors.black),
+                    onPressed: () {
+                      _showImageDialog(context, widget.card);
+                    },
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
