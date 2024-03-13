@@ -56,7 +56,7 @@ class DeckStat extends StatelessWidget {
 
     for (var card in deck.deckMap.keys) {
       if (card.lv == 0) {
-        counts['Lv0'] = counts['Lv0']! + deck.deckMap[card]!;
+        counts['Lv-'] = counts['Lv-']! + deck.deckMap[card]!;
       } else if (card.lv == 2) {
         counts['Lv2'] = counts['Lv2']! + deck.deckMap[card]!;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
@@ -69,7 +69,7 @@ class DeckStat extends StatelessWidget {
     }
     for (var card in deck.tamaMap.keys) {
       if (card.lv == 0) {
-        counts['Lv0'] = counts['Lv0']! + deck.tamaMap[card]!;
+        counts['Lv-'] = counts['Lv-']! + deck.tamaMap[card]!;
       } else if (card.lv == 2) {
         counts['Lv2'] = counts['Lv2']! + deck.tamaMap[card]!;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
