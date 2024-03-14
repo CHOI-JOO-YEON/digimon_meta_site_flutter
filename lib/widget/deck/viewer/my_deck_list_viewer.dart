@@ -29,7 +29,8 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   List<DeckResponseDto> decks = [];
   int currentPage = 1;
   int maxPage = 0;
-  int _selectedIndex=-1;
+  int _selectedIndex = -1;
+
   @override
   void initState() {
     super.initState();
@@ -40,25 +41,21 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
-    setState(() {
-      currentPage = page;
-    });
+    currentPage = page;
+    setState(() {});
     deckSearchParameter.updatePage(page);
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(deckSearchParameter);
     if (pagedDeck != null) {
-      setState(() {
+      decks = pagedDeck.decks;
+      maxPage = pagedDeck.totalPages;
+      _selectedIndex = 0;
 
-        decks = pagedDeck.decks;
-        maxPage = pagedDeck.totalPages;
-        _selectedIndex=0;
-      });
       widget.deckUpdate(decks.first);
-
     }
   }
 
-  void deleteDeck(int deckId) async{
+  void deleteDeck(int deckId) async {
     bool isSuccess = await DeckService().deleteDeck(deckId);
     if (isSuccess) {
       // 삭제가 성공한 경우에만 위젯을 다시 로딩
@@ -66,7 +63,8 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
     }
   }
 
-  void showModifyConfirmationDialog(BuildContext context, DeckResponseDto deck) {
+  void showModifyConfirmationDialog(
+      BuildContext context, DeckResponseDto deck) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -84,7 +82,8 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
               child: Text('수정'),
               onPressed: () {
                 Navigator.of(context).pop();
-                context.router.push(DeckBuilderRoute(deck: Deck.responseDto(deck)));
+                context.router
+                    .push(DeckBuilderRoute(deck: Deck.responseDto(deck)));
               },
             ),
           ],
@@ -92,6 +91,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       },
     );
   }
+
   void showDeleteConfirmationDialog(BuildContext context, int deckId) {
     showDialog(
       context: context,
@@ -118,12 +118,14 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
-    if(isPortrait) {
-      fontSize*=2;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    if (isPortrait) {
+      fontSize *= 2;
     }
     return Column(
       children: [
@@ -137,8 +139,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
         ),
         Expanded(
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
             child: ListView.builder(
               itemCount: decks.length,
               itemBuilder: (context, index) {
@@ -150,7 +151,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.mode),
-                          onPressed: (){
+                          onPressed: () {
                             showModifyConfirmationDialog(context, deck);
                           },
                         ),
@@ -163,17 +164,19 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                       ],
                     ),
                   ),
-                  leading: ColorWheel(colors: deck.colors!,),
+                  leading: ColorWheel(
+                    colors: deck.colors!,
+                  ),
                   selected: index == _selectedIndex,
-                  title: Text(deck.deckName ?? '',
-                  style:  TextStyle(fontSize:fontSize),
+                  title: Text(
+                    deck.deckName ?? '',
+                    style: TextStyle(fontSize: fontSize),
                   ),
                   subtitle: Text('작성자: ${deck.authorName}',
-                    style: TextStyle(fontSize: fontSize)
-                  ),
+                      style: TextStyle(fontSize: fontSize)),
                   // 덱 아이템을 탭했을 때의 동작 처리
                   onTap: () {
-                    _selectedIndex=index;
+                    _selectedIndex = index;
                     widget.deckUpdate(decks[index]);
                   },
                 );
@@ -192,7 +195,8 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                     }
                   : null,
             ),
-            Text('Page $currentPage of $maxPage',  style: TextStyle(fontSize: fontSize)),
+            Text('Page $currentPage of $maxPage',
+                style: TextStyle(fontSize: fontSize)),
             IconButton(
               icon: Icon(Icons.arrow_forward),
               onPressed: currentPage < maxPage

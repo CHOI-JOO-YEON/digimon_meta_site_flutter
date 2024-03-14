@@ -39,28 +39,27 @@ class _DeckListViewerState extends State<DeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
-    setState(() {
-      currentPage = page;
-    });
+    currentPage = page;
+    setState(() {});
     deckSearchParameter.updatePage(page);
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(deckSearchParameter);
     if (pagedDeck != null) {
-      setState(() {
-        decks = pagedDeck.decks;
-        maxPage = pagedDeck.totalPages;
-        _selectedIndex = 0;
-      });
+      decks = pagedDeck.decks;
+      maxPage = pagedDeck.totalPages;
+      _selectedIndex = 0;
+
       widget.deckUpdate(decks.first);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
-    if(isPortrait) {
-      fontSize*=2;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    if (isPortrait) {
+      fontSize *= 2;
     }
     return Column(
       children: [
@@ -84,14 +83,10 @@ class _DeckListViewerState extends State<DeckListViewer> {
                     colors: deck.colors!,
                   ),
                   selected: index == _selectedIndex,
-                  title: Text(
-                    deck.deckName ?? '',
-                      style: TextStyle(fontSize: fontSize)
-                  ),
-                  subtitle: Text(
-                    '작성자: ${deck.authorName}',
-                      style: TextStyle(fontSize: fontSize)
-                  ),
+                  title: Text(deck.deckName ?? '',
+                      style: TextStyle(fontSize: fontSize)),
+                  subtitle: Text('작성자: ${deck.authorName}',
+                      style: TextStyle(fontSize: fontSize)),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);
@@ -113,7 +108,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
                   : null,
             ),
             Text('Page $currentPage of $maxPage',
-            style: TextStyle(fontSize: fontSize)),
+                style: TextStyle(fontSize: fontSize)),
             IconButton(
               icon: Icon(Icons.arrow_forward),
               onPressed: currentPage < maxPage

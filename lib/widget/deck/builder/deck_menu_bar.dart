@@ -114,12 +114,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             color: deck.colors.contains(color)
                                 ? buttonColor
                                 : buttonColor.withOpacity(0.3),
-                            border: Border.all(
-                              color: deck.colors.contains(color)
-                                  ? Colors.black
-                                  : buttonColor.withOpacity(0.3),
-                              width: 2.0,
-                            ),
+
                           ),
                         ),
                         SizedBox(height: 4.0),
@@ -151,16 +146,20 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              content: SizedBox(
+              content:
+              SizedBox(
                 width: MediaQuery.sizeOf(context).width / 3,
                 height: MediaQuery.sizeOf(context).height / 2,
-                child: Column(
+                child:
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(widget.deck.isPublic ? '전체 공개' : '비공개'),
                         Switch(
+                          inactiveThumbColor: Colors.red,
                           value: widget.deck.isPublic,
                           onChanged: (bool v) {
                             setState(() {
@@ -235,6 +234,66 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
     );
   }
 
+  void showDeckResetDialog(
+      BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('새로 만들기'),
+          content: Text('새로운 덱을 작성하시겠습니까? \n저장되지 않은 변경사항은 사라집니다.'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              child: Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('예', style: TextStyle(color: Colors.red),),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deckNameController.text= 'My Deck';
+                widget.init();
+
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showDeckClearDialog(
+      BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('덱 비우기'),
+          content: Text('덱을 비우시겠습니까?'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              child: Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('예', style: TextStyle(color: Colors.red),),
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.clear();
+
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   void _showImportDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -493,9 +552,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
-
-                        _deckNameController.text='My Deck';
-                        widget.init();
+                        showDeckResetDialog(context);
                       },
                       iconSize: iconSize,
                       icon: const Icon(Icons.add_box),
@@ -508,7 +565,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
-                        widget.clear();
+                        showDeckClearDialog(context);
                       },
                       iconSize: iconSize,
                       icon: const Icon(Icons.clear),
