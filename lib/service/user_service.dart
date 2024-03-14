@@ -20,7 +20,6 @@ class UserService{
         return false;
       }
       Provider.of<UserProvider>(context, listen: false).setUser(loginResponseDto);
-      // UserProvider().setUser(loginResponseDto);
     }catch(e){
       return false;
     }

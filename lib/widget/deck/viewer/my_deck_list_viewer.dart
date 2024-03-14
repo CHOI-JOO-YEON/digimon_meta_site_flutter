@@ -192,7 +192,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                     }
                   : null,
             ),
-            Text('Page $currentPage of $maxPage'),
+            Text('Page $currentPage of $maxPage',  style: TextStyle(fontSize: fontSize)),
             IconButton(
               icon: Icon(Icons.arrow_forward),
               onPressed: currentPage < maxPage

@@ -40,4 +40,12 @@ class UserApi {
     }
     return null;
   }
+  Future<bool> logout() async {
+    final response = await dioClient.dio.post('$baseUrl/api/account/logout');
+    if(response.statusCode==200) {
+      return true;
+    }
+    return false;
+
+  }
 }

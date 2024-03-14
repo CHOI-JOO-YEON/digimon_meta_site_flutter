@@ -105,15 +105,14 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
   @override
   Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.01,25);
+    double iconSize  = min(MediaQuery.sizeOf(context).width*0.03,25);
     if(isPortrait) {
       fontSize*=2;
+      iconSize*=1.2;
     }
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      double iconButtonSize =
-          min(constraints.maxWidth / 10, constraints.maxHeight / 2);
-      double iconSize = iconButtonSize; // IconButton 내부의 Icon 크기
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -143,7 +142,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints.tightFor(
-                        width: iconButtonSize, height: iconButtonSize),
+                        width: iconSize, height: iconSize),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () => _showExportDialog(context),
@@ -154,7 +153,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                   ),
                   ConstrainedBox(
                     constraints: BoxConstraints.tightFor(
-                        width: iconButtonSize, height: iconButtonSize),
+                        width: iconSize, height: iconSize),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () {
@@ -168,7 +167,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                   if (hasManagerRole) // 권한 체크 조건
                     ConstrainedBox(
                       constraints: BoxConstraints.tightFor(
-                          width: iconButtonSize, height: iconButtonSize),
+                          width: iconSize, height: iconSize),
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () async {

@@ -45,11 +45,15 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _nickname = null;
-    _role = null;
-    html.window.localStorage.remove('nickname');
-    html.window.localStorage.remove('role');
-    notifyListeners();
+    bool isLogout = await UserApi().logout();
+    if(isLogout){
+      _nickname = null;
+      _role = null;
+      html.window.localStorage.remove('nickname');
+      html.window.localStorage.remove('role');
+      notifyListeners();
+    }
+
   }
 
   Future<void> unAuth() async {

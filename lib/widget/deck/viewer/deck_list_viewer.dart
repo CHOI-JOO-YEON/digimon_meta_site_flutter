@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
-import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
@@ -58,6 +57,11 @@ class _DeckListViewerState extends State<DeckListViewer> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width*0.009,15);
+    if(isPortrait) {
+      fontSize*=2;
+    }
     return Column(
       children: [
         DeckSearchBar(
@@ -82,13 +86,11 @@ class _DeckListViewerState extends State<DeckListViewer> {
                   selected: index == _selectedIndex,
                   title: Text(
                     deck.deckName ?? '',
-                    style: TextStyle(
-                        fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)),
+                      style: TextStyle(fontSize: fontSize)
                   ),
                   subtitle: Text(
                     '작성자: ${deck.authorName}',
-                    style: TextStyle(
-                        fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)),
+                      style: TextStyle(fontSize: fontSize)
                   ),
                   onTap: () {
                     _selectedIndex = index;
@@ -110,9 +112,8 @@ class _DeckListViewerState extends State<DeckListViewer> {
                     }
                   : null,
             ),
-            Text('Page $currentPage of $maxPage',style:
-            TextStyle(fontSize: MediaQuery.sizeOf(context).width*0.009)
-              ,),
+            Text('Page $currentPage of $maxPage',
+            style: TextStyle(fontSize: fontSize)),
             IconButton(
               icon: Icon(Icons.arrow_forward),
               onPressed: currentPage < maxPage

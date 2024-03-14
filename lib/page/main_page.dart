@@ -41,7 +41,7 @@ class MainPage extends StatelessWidget {
                               children: [
                                 if (userProvider.isLogin())
                                   Text(
-                                    '${userProvider.nickname}님 안녕하세요',
+                                    '${userProvider.nickname}',
                                     style: TextStyle(
                                         fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
                                   ),
