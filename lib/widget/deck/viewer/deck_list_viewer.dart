@@ -28,7 +28,9 @@ class _DeckListViewerState extends State<DeckListViewer> {
   int currentPage = 1;
   int maxPage = 0;
   int _selectedIndex = -1;
-
+  bool isLoading= false;
+  
+  
   @override
   void initState() {
     super.initState();
@@ -39,24 +41,30 @@ class _DeckListViewerState extends State<DeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
-    int recentPage=  currentPage;
+    if(isLoading) {
+      return;
+    }
+
+      isLoading =true;
+
     currentPage = page;
     deckSearchParameter.updatePage(page);
-    PagedResponseDeckDto? pagedDeck =
-        await DeckService().getDeck(deckSearchParameter);
+    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(deckSearchParameter);
+
+
     if (pagedDeck != null) {
+
       decks = pagedDeck.decks;
+      
       maxPage = pagedDeck.totalPages;
       _selectedIndex = 0;
 
       widget.deckUpdate(decks.first);
-    }else{
-      currentPage=recentPage;
-      deckSearchParameter.updatePage(recentPage);
-      setState(() {
-
-      });
     }
+    setState(() {
+
+    });
+      isLoading =false;
 
 
   }
