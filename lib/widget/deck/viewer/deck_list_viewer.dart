@@ -39,8 +39,8 @@ class _DeckListViewerState extends State<DeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
+    int recentPage=  currentPage;
     currentPage = page;
-    setState(() {});
     deckSearchParameter.updatePage(page);
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(deckSearchParameter);
@@ -50,7 +50,15 @@ class _DeckListViewerState extends State<DeckListViewer> {
       _selectedIndex = 0;
 
       widget.deckUpdate(decks.first);
+    }else{
+      currentPage=recentPage;
+      deckSearchParameter.updatePage(recentPage);
+      setState(() {
+
+      });
     }
+
+
   }
 
   @override
