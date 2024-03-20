@@ -78,6 +78,8 @@ class DigimonCard {
       });
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
+
+
     return DigimonCard(
         cardId: json['cardId'],
         cardNo: json['cardNo'],
@@ -102,7 +104,7 @@ class DigimonCard {
         smallImgUrl: json['smallImgUrl'],
         isParallel: json['isParallel'],
         sortString: json['sortString'],
-        releaseDate: json['releaseDate']
+        releaseDate: json['releaseDate']!=null? DateTime.parse(json['releaseDate']):null,
 
     );
   }

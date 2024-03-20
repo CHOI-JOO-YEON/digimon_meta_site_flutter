@@ -44,6 +44,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
+              flex: 3,
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<FormatDto>(
                   isExpanded: true,
@@ -75,8 +76,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 ),
               ),
             ),
-            SizedBox(width: fontSize,),
+            Expanded(flex: 1, child: Container()),
             Expanded(
+              flex: 3,
               child: TextField(
                 style: TextStyle(fontSize: fontSize),
                 decoration:InputDecoration(
@@ -90,12 +92,15 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 },
               ),
             ),
-            ElevatedButton(onPressed: (){
-              widget.search(1);
-            }, child: Text('검색',
-              style: TextStyle(fontSize: fontSize),
+            Expanded(
+              flex: 1,
+              child: TextButton(onPressed: (){
+                widget.search(1);
+              }, child: Text('검색',
+                style: TextStyle(fontSize: fontSize),
 
-            ))
+              )),
+            )
           ],
         ),
         SizedBox(height:fontSize),

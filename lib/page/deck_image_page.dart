@@ -64,10 +64,10 @@ class _DeckImagePageState extends State<DeckImagePage> {
       try {
         RenderRepaintBoundary boundary = globalKey.currentContext!
             .findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage(pixelRatio: 1);
+        ui.Image image = await boundary.toImage(pixelRatio: 1.5);
         ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.png);
-        final blob = html.Blob([byteData!.buffer.asUint8List()], 'image/png');
+        final blob = html.Blob([byteData!.buffer.asUint8List()], 'image/png','native');
         final url = html.Url.createObjectUrlFromBlob(blob);
 
         final anchor = html.AnchorElement(href: url)

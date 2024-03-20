@@ -111,6 +111,7 @@ class DeckApi {
         return null;
       }
     } catch (e) {
+      print(e);
       // 예외 처리
       return null;
     }

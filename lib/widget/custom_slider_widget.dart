@@ -15,14 +15,16 @@ class _CustomSliderState extends State<CustomSlider> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _currentSliderValue = widget.sliderValue.toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double thumbRadius = screenWidth / 220; // 예시 계산
+    double thumbRadius = screenWidth / 150; // 예시 계산
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
     if(isPortrait){
       thumbRadius*=2;
     }
@@ -44,8 +46,6 @@ class _CustomSliderState extends State<CustomSlider> {
                 min: 4,
                 max: 14,
                 divisions: 10,
-                // activeColor: Colors.blue[400],
-                // thumbColor: Colors.blue[400],
                 label: _currentSliderValue.round().toString(),
                 onChanged: (double value) {
                   setState(() {

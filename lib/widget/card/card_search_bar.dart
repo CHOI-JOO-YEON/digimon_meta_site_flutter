@@ -103,20 +103,27 @@ class _CardSearchBarState extends State<CardSearchBar> {
               content: Column(
                 mainAxisSize: MainAxisSize.min, // 컬럼 크기를 내용에 맞게 조절
                 children: [
-                  DropdownButton<NoteDto>(
-                    value: selectedNote,
-                    hint: Text(selectedNote?.name ?? "입수처"),
-                    items: widget.notes.map((NoteDto note) {
-                      return DropdownMenuItem<NoteDto>(
-                        value: note,
-                        child: Text(note.name),
-                      );
-                    }).toList(),
-                    onChanged: (NoteDto? newValue) {
-                      setState(() {
-                        selectedNote = newValue;
-                      });
-                    },
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: DropdownButton<NoteDto>(
+                      value: selectedNote,
+                      hint: Text(selectedNote?.name ?? "입수처"
+                      ,overflow: TextOverflow.ellipsis  ,
+
+                      ),
+                      items: widget.notes.map((NoteDto note) {
+                        return DropdownMenuItem<NoteDto>(
+
+                          value: note,
+                          child: Text(note.name),
+                        );
+                      }).toList(),
+                      onChanged: (NoteDto? newValue) {
+                        setState(() {
+                          selectedNote = newValue;
+                        });
+                      },
+                    ),
                   ),
                   //lv 고르기
                   Text('LV'),
@@ -367,6 +374,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: IconButton(
+                padding: EdgeInsets.zero,
                 onPressed: () {
                   widget.onSearch();
                 },
@@ -374,6 +382,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: IconButton(
+              padding: EdgeInsets.zero,
                 onPressed: _showFilterDialog, icon: Icon(Icons.menu)))
       ],
     );

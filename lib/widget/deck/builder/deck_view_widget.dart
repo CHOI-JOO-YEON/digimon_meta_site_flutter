@@ -27,6 +27,7 @@ class DeckBuilderView extends StatefulWidget {
 }
 
 class _DeckBuilderViewState extends State<DeckBuilderView> {
+  bool isInit = true;
   int _rowNumber = 9;
 
   void updateRowNumber(int n) {
@@ -53,6 +54,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   @override
   Widget build(BuildContext context) {
+
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
+    if(isPortrait&&isInit){
+      _rowNumber=6;
+    }
+    isInit= false;
     return Column(
         children: [
           Expanded(

@@ -20,7 +20,9 @@ class CardApi{
         throw Exception('Failed to load cards');
       }
     } catch (e) {
-      throw Exception('Error occurred while fetching cards');
+      print(e);
+      return CardResponseDto();
+      // throw Exception('Error occurred while fetching cards');
     }
 
   }
