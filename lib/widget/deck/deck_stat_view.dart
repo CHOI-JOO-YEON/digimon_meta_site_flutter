@@ -115,8 +115,8 @@ class DeckStat extends StatelessWidget {
                         // color: Colors.white60,
                         color:  Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.only(
-                          // topLeft: Radius.circular(3),
-                          // topRight: Radius.circular(3),
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
                         ),
                         // border: Border.all(color: Colors.white),
                       ),

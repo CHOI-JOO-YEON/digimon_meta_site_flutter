@@ -100,7 +100,36 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
       },
     );
   }
+  void _showDeckCopyDialog(
+      BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('덱 복사'),
+          content: Text('이 덱을 카피하여 새로운 덱을 만들겠습니까?'),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('예'),
+              onPressed: () {
 
+               Deck deck = Deck.deck(widget.deck);
+                Navigator.of(context).pop();
+                context.router
+                    .push(DeckBuilderRoute(deck: deck));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,6 +191,17 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                       iconSize: iconSize,
                       icon: const Icon(Icons.image),
                       tooltip: '이미지 저장',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckCopyDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.copy),
+                      tooltip: '복사해서 새로운 덱 만들기',
                     ),
                   ),
                   if (hasManagerRole) // 권한 체크 조건

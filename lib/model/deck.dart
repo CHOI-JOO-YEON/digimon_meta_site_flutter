@@ -30,8 +30,24 @@ class Deck {
       }
     }
   }
+  Deck.deck(Deck deck) {
+    deckName = deck.deckName+' Copy';
+    formatId = deck.formatId;
+    for (var tama in deck.tamaMap.entries) {
+      for(int i=0;i<tama.value;i++){
+        addCard(tama.key);
+      }
+    }
+    for (var card in deck.deckMap.entries) {
+      for(int i=0;i<card.value;i++){
+        addCard(card.key);
+      }
+    }
+  }
 
   Deck();
+
+
 
   int? deckId;
   Map<DigimonCard, int> deckMap = {};
@@ -223,4 +239,6 @@ class Deck {
       colors.remove(o);
     }
   }
+
+
 }
