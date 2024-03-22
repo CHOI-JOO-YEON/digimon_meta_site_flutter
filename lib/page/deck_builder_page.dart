@@ -57,7 +57,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
-      notes.add(NoteDto(noteId: null, name: '모든 카드'));
+      // notes.add(NoteDto(noteId: null, name: '모든 카드'));
       notes.addAll(await CardApi().getNotes());
 
       initSearch();

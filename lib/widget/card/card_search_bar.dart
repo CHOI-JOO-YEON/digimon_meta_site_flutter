@@ -35,7 +35,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
   final List<String> cardTypes = ['TAMER', 'OPTION', 'DIGIMON', 'DIGITAMA'];
   final List<String> rarities = ['C', 'U', 'R', 'SR', 'SEC', 'P'];
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
-
+  NoteDto all =   NoteDto(noteId: null, name: '모든 카드');
   @override
   void initState() {
     super.initState();
@@ -58,12 +58,17 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   void _showFilterDialog() {
     NoteDto? selectedNote;
-    for (var note in widget.notes) {
-      if (note.noteId == widget.searchParameter.noteId) {
-        selectedNote = note;
-        break;
+    if(widget.searchParameter.noteId==null) {
+      selectedNote=all;
+    }else{
+      for (var note in widget.notes) {
+        if (note.noteId == widget.searchParameter.noteId) {
+          selectedNote = note;
+          break;
+        }
       }
     }
+
     Map<String, bool> selectedColorMap = {};
     for (var color in colors) {
       selectedColorMap[color] =
@@ -393,7 +398,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 TextButton(
                   child: Text("조건 초기화"),
                   onPressed: () {
-                    selectedNote = widget.notes.first;
+                    selectedNote = all;
                     for (var color in colors) {
                       selectedColorMap[color] = false;
                     }
@@ -487,6 +492,19 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     List<DropdownMenuItem<NoteDto>> menuItems = [];
 
+
+    menuItems.add(
+      DropdownMenuItem<NoteDto>(
+        value: all,
+        child: Text(all.name,  style: TextStyle(fontWeight: FontWeight.bold),),
+      ),
+    );
+    menuItems.add(
+      DropdownMenuItem<NoteDto>(
+        enabled: false,
+        child: Divider(),
+      ),
+    );
     menuItems
         .addAll(_createMenuItemsWithHeaderAndDivider('부스터 팩', boosterPackList));
     menuItems
@@ -496,7 +514,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
     menuItems.addAll(
         _createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
     menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
+    if(!etcList.isEmpty){
+      menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
+    }
+
 
     return menuItems;
   }
