@@ -18,6 +18,7 @@ class DeckViewerView extends StatefulWidget {
   const DeckViewerView({
     super.key,
     required this.deck,
+    // this.mouseEnterEvent,
   });
 
   @override

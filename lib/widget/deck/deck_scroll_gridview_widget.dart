@@ -22,7 +22,52 @@ class DeckScrollGridView extends StatefulWidget {
   State<DeckScrollGridView> createState() => _DeckScrollGridViewState();
 }
 
+
 class _DeckScrollGridViewState extends State<DeckScrollGridView> {
+
+  OverlayEntry? _overlayEntry;
+
+  void _showBigImage(BuildContext cardContext, String imgUrl, int index) {
+    final RenderBox renderBox = cardContext.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    final screenHeight = MediaQuery.of(cardContext).size.height;
+    final screenWidth = MediaQuery.of(cardContext).size.width;
+    final maxHeight = screenHeight * 0.5; // 화면 높이의 절반을 최대 높이로 설정
+
+    final aspectRatio = renderBox.size.width / renderBox.size.height;
+    final maxWidth = maxHeight * aspectRatio; // 최대 높이에 맞는 너비 계산
+
+    final bool onRightSide = (index % widget.rowNumber) < widget.rowNumber / 2;
+    final double overlayLeft = onRightSide
+        ? offset.dx + renderBox.size.width
+        : offset.dx - maxWidth;
+
+    final double overlayTop = (offset.dy + maxHeight > screenHeight)
+        ? screenHeight - maxHeight
+        : offset.dy;
+
+    final double correctedLeft = overlayLeft < 0 ? 0 : overlayLeft;
+
+    final double correctedWidth =
+    correctedLeft + maxWidth > screenWidth ? screenWidth - correctedLeft : maxWidth;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: correctedLeft,
+        top: overlayTop,
+        width: correctedWidth,
+        height: correctedWidth / aspectRatio,
+        child: Image.network(imgUrl, fit: BoxFit.cover),
+      ),
+    );
+
+    Overlay.of(cardContext)?.insert(_overlayEntry!);
+  }
+  void _hideBigImage() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -49,7 +94,10 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView> {
                       card: card,
                       width: (constraints.maxWidth / widget.rowNumber) * 0.99,
                       cardPressEvent: widget.cardPressEvent,
-                      onLongPress: widget.onLongPress
+                      onLongPress: widget.onLongPress,
+                      onHover: (context) =>
+                          _showBigImage(context, card.imgUrl!, index),
+                      onExit: _hideBigImage,
 
                     ),
                     Positioned(

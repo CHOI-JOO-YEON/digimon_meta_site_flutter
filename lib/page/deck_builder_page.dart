@@ -196,7 +196,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             rowNumber: 6,
                             loadMoreCards: loadMoreCard,
                             cardPressEvent: addCardByDeck,
-                            // mouseEnterEvent: changeViewCardInfo,
                             totalPages: totalPages,
                             currentPage: currentPage,
                           )
@@ -245,7 +244,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     // height: 1000,
                     child: DeckBuilderView(
                       deck: deck,
-                      // mouseEnterEvent: changeViewCardInfo,
+                      // mouseEnterEvent: ,
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
                     ),

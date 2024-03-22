@@ -134,6 +134,7 @@ class _DeckListPageState extends State<DeckListPage> {
                                   child: _selectedDeck == null
                                       ? Container()
                                       : DeckViewerView(
+
                                     deck: _selectedDeck!,
                                   ),
                                       ),
