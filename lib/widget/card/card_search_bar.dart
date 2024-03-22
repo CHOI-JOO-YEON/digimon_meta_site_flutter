@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/note.dart';
@@ -21,6 +22,7 @@ class CardSearchBar extends StatefulWidget {
 class _CardSearchBarState extends State<CardSearchBar> {
   TextEditingController? _searchStringEditingController;
   TextEditingController? _dialogSearchStringEditingController;
+  List<DropdownMenuItem<NoteDto>> dropDownMenuItems = [];
   final List<String> colors = [
     'red',
     'blue',
@@ -111,13 +113,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       ,overflow: TextOverflow.ellipsis  ,
 
                       ),
-                      items: widget.notes.map((NoteDto note) {
-                        return DropdownMenuItem<NoteDto>(
-
-                          value: note,
-                          child: Text(note.name),
-                        );
-                      }).toList(),
+                      items: dropDownMenuItems,
+                      // widget.notes.map((NoteDto note) {
+                      //   return DropdownMenuItem<NoteDto>(
+                      //
+                      //     value: note,
+                      //     child: Text(note.name),
+                      //   );
+                      // }).toList(),
                       onChanged: (NoteDto? newValue) {
                         setState(() {
                           selectedNote = newValue;
@@ -146,8 +149,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       );
                     }).toList(),
                   ),
+                  Divider(),
                   //색 고르기
-                  Text('color'),
+                  Text('Color'),
                   Wrap(
                     spacing: 8.0, // 가로 간격
                     children: selectedColorMap.keys.map((color) {
@@ -162,13 +166,15 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               });
                             },
                           ),
-                          Text(color),
+                          Text(color.toUpperCase()
+                          ,style: TextStyle(color: ColorService().getColorFromString(color.toUpperCase())),
+                          ),
                         ],
                       );
                     }).toList(),
                   ),
                   //색 or/and
-
+                  Divider(),
                   //카드 타입 고르기
                   Text('Card Type'),
                   Wrap(
@@ -190,6 +196,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       );
                     }).toList(),
                   ),
+                  Divider(),
                   //레어도 고르기
                   Text('Rarity'),
                   Wrap(
@@ -211,6 +218,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       );
                     }).toList(),
                   ),
+                  Divider(),
                   //dp
                   Text('DP'),
                   RangeSlider(
@@ -227,7 +235,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         currentDpRange = values;
                       });
                     },
-                  ),
+                  ),Divider(),
                   //play cost
                   Text('Play Cost'),
                   RangeSlider(
@@ -244,7 +252,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         currentPlayCostRange = values;
                       });
                     },
-                  ),
+                  ),Divider(),
                   
                   //digivolve cost
                   Text('Digivolve Cost'),
@@ -269,7 +277,11 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
                   //검색어
                   TextField(
+                    
                     controller: _dialogSearchStringEditingController,
+                    decoration:InputDecoration(
+                      labelText: '검색어',
+                    ),
                   )
 
                   //
@@ -343,7 +355,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     currentPlayCostRange = RangeValues(0,20);
                    currentDigivolutionCostRange = RangeValues(0,8);
 
-                    _dialogSearchStringEditingController = TextEditingController(text: _searchStringEditingController?.value.text);
+                    _dialogSearchStringEditingController = TextEditingController(text: '');
                     setState(() {
                     });
                   },
@@ -356,8 +368,114 @@ class _CardSearchBarState extends State<CardSearchBar> {
     );
   }
 
+  Comparator<NoteDto> noteDtoComparator = (a, b) {
+    // releaseDate가 null인 경우 우선순위에서 뒤로 가도록 처리
+    if (a.releaseDate == null && b.releaseDate == null) {
+      return a.name.compareTo(b.name);
+    } else if (a.releaseDate == null) {
+      return 1;
+    } else if (b.releaseDate == null) {
+      return -1;
+    }
+
+    // releaseDate가 내림차순으로 정렬
+    int releaseDateComparison = b.releaseDate!.compareTo(a.releaseDate!);
+    if (releaseDateComparison != 0) {
+      return releaseDateComparison;
+    }
+
+    // releaseDate가 같은 경우 name 오름차순으로 정렬
+    return a.name.compareTo(b.name);
+  };
+
+
+  List<DropdownMenuItem<NoteDto>> generateDropDownMenuItems() {
+    List<NoteDto> boosterPackList = [];
+    List<NoteDto> staterDeckList = [];
+    List<NoteDto> boosterPromoList = [];
+    List<NoteDto> starterPromoList = [];
+    List<NoteDto> eventList = [];
+    List<NoteDto> etcList = [];
+
+    for (var note in widget.notes) {
+      switch (note.cardOrigin) {
+        case 'BOOSTER_PACK':
+          boosterPackList.add(note);
+          break;
+        case 'STARTER_DECK':
+          staterDeckList.add(note);
+          break;
+        case 'BOOSTER_PROMO':
+          boosterPromoList.add(note);
+          break;
+        case 'STARTER_PROMO':
+          starterPromoList.add(note);
+          break;
+        case 'EVENT':
+          eventList.add(note);
+          break;
+        default:
+          etcList.add(note);
+      }
+    }
+
+    boosterPackList.sort(noteDtoComparator);
+    staterDeckList.sort(noteDtoComparator);
+    boosterPromoList.sort(noteDtoComparator);
+    starterPromoList.sort(noteDtoComparator);
+    eventList.sort(noteDtoComparator);
+    etcList.sort(noteDtoComparator);
+
+    List<DropdownMenuItem<NoteDto>> menuItems = [];
+
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('부스터 팩', boosterPackList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('스타터 덱', staterDeckList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('부스터 프로모', boosterPromoList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
+
+    return menuItems;
+  }
+
+  List<DropdownMenuItem<NoteDto>> _createMenuItemsWithHeaderAndDivider(String header, List<NoteDto> items) {
+    List<DropdownMenuItem<NoteDto>> menuItems = [];
+
+    menuItems.add(
+      DropdownMenuItem<NoteDto>(
+        enabled: false,
+        child: Text(
+          header,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    for (var item in items) {
+      menuItems.add(
+        DropdownMenuItem<NoteDto>(
+          value: item,
+          child: Text(item.name),
+        ),
+      );
+    }
+
+    if (items.isNotEmpty) {
+      menuItems.add(
+        DropdownMenuItem<NoteDto>(
+          enabled: false,
+          child: Divider(),
+        ),
+      );
+    }
+
+    return menuItems;
+  }
   @override
   Widget build(BuildContext context) {
+    dropDownMenuItems = generateDropDownMenuItems();
+
+
     return Row(
       children: [
         Expanded(

@@ -62,9 +62,16 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
     Future<void> captureAndDownloadImage(BuildContext context) async {
       try {
+
         RenderRepaintBoundary boundary = globalKey.currentContext!
             .findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage(pixelRatio: 1.5);
+
+
+        final size = boundary.size;
+        const targetWidth = 1000;
+
+        final pixelRatio = targetWidth / size.width;
+        ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
         ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.png);
         final blob = html.Blob([byteData!.buffer.asUint8List()], 'image/png','native');

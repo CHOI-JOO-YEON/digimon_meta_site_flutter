@@ -59,9 +59,6 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                 Expanded(
                     flex: 1,
                     child: Container(),
-                    // child: DeckCount(
-                    //   deck: widget.deck,
-                    // )
                 ),
 
                 //행에 한번에 표시되는 카드
