@@ -36,7 +36,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
   final List<String> rarities = ['C', 'U', 'R', 'SR', 'SEC', 'P'];
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
 
-
   @override
   void initState() {
     super.initState();
@@ -50,7 +49,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     if (_searchStringEditingController != null) {
       _searchStringEditingController!.dispose();
     }
-    if(_dialogSearchStringEditingController!=null) {
+    if (_dialogSearchStringEditingController != null) {
       _dialogSearchStringEditingController!.dispose();
     }
 
@@ -88,13 +87,20 @@ class _CardSearchBarState extends State<CardSearchBar> {
           widget.searchParameter.rarities?.contains(rarity) ?? false;
     }
 
-    RangeValues currentDpRange = RangeValues(widget.searchParameter.minDp as double, widget.searchParameter.maxDp as double);
+    RangeValues currentDpRange = RangeValues(
+        widget.searchParameter.minDp as double,
+        widget.searchParameter.maxDp as double);
 
-    RangeValues currentPlayCostRange = RangeValues(widget.searchParameter.minPlayCost as double, widget.searchParameter.maxPlayCost as double);
-    RangeValues currentDigivolutionCostRange = RangeValues(widget.searchParameter.minDigivolutionCost as double, widget.searchParameter.maxDigivolutionCost as double);
+    RangeValues currentPlayCostRange = RangeValues(
+        widget.searchParameter.minPlayCost as double,
+        widget.searchParameter.maxPlayCost as double);
+    RangeValues currentDigivolutionCostRange = RangeValues(
+        widget.searchParameter.minDigivolutionCost as double,
+        widget.searchParameter.maxDigivolutionCost as double);
 
-    _dialogSearchStringEditingController = TextEditingController(text: _searchStringEditingController?.value.text);
-    
+    _dialogSearchStringEditingController =
+        TextEditingController(text: _searchStringEditingController?.value.text);
+    int _parallelOption = widget.searchParameter.parallelOption;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -102,190 +108,238 @@ class _CardSearchBarState extends State<CardSearchBar> {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Text("세부 검색 조건"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min, // 컬럼 크기를 내용에 맞게 조절
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: DropdownButton<NoteDto>(
-                      value: selectedNote,
-                      hint: Text(selectedNote?.name ?? "입수처"
-                      ,overflow: TextOverflow.ellipsis  ,
-
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // 컬럼 크기를 내용에 맞게 조절
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: DropdownButton<NoteDto>(
+                        value: selectedNote,
+                        hint: Text(
+                          selectedNote?.name ?? "입수처",
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        items: dropDownMenuItems,
+                        onChanged: (NoteDto? newValue) {
+                          setState(() {
+                            selectedNote = newValue;
+                          });
+                        },
                       ),
-                      items: dropDownMenuItems,
-                      // widget.notes.map((NoteDto note) {
-                      //   return DropdownMenuItem<NoteDto>(
-                      //
-                      //     value: note,
-                      //     child: Text(note.name),
-                      //   );
-                      // }).toList(),
-                      onChanged: (NoteDto? newValue) {
+                    ),
+                    //lv 고르기
+                    Text('LV'),
+                    Wrap(
+                      spacing: 8.0, // 가로 간격
+                      children: selectedLvMap.keys.map((lv) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: selectedLvMap[lv] ?? false,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  selectedLvMap[lv] = newValue!;
+                                });
+                              },
+                            ),
+                            Text('$lv'),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    Divider(),
+                    //색 고르기
+                    Text('컬러'),
+                    Wrap(
+                      spacing: 8.0, // 가로 간격
+                      children: selectedColorMap.keys.map((color) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: selectedColorMap[color] ?? false,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  selectedColorMap[color] = newValue!;
+                                });
+                              },
+                            ),
+                            Text(
+                              color.toUpperCase(),
+                              style: TextStyle(
+                                  color: ColorService()
+                                      .getColorFromString(color.toUpperCase())),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    //색 or/and
+                    Divider(),
+                    //카드 타입 고르기
+                    Text('카드 타입'),
+                    Wrap(
+                      spacing: 8.0, // 가로 간격
+                      children: selectedCardTypeMap.keys.map((cardType) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: selectedCardTypeMap[cardType] ?? false,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  selectedCardTypeMap[cardType] = newValue!;
+                                });
+                              },
+                            ),
+                            Text(cardType),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    Divider(),
+                    //레어도 고르기
+                    Text('레어도'),
+                
+                
+                    Wrap(
+                      spacing: 8.0, // 가로 간격
+                      children: selectedRarityMap.keys.map((rarity) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: selectedRarityMap[rarity] ?? false,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  selectedRarityMap[rarity] = newValue!;
+                                });
+                              },
+                            ),
+                            Text(rarity),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    Divider(),
+                    Text('패럴렐 여부'),
+                    Wrap(
+                        spacing: 8.0, // 가로 간격
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: _parallelOption == 0,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _parallelOption = 0;
+                                  });
+                                },
+                              ),
+                              Text('All'),
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: _parallelOption == 1,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _parallelOption = 1;
+                                  });
+                                },
+                              ),
+                              Text('Only Normal')
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: _parallelOption == 2,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _parallelOption = 2;
+                                  });
+                                },
+                              ),
+                              Text('Only Parallel'),
+                            ],
+                          )
+                        ]),
+                    Divider(),
+                    //dp
+                    Text('DP'),
+                    RangeSlider(
+                      values: currentDpRange,
+                      min: 1000,
+                      max: 16000,
+                      divisions: 15,
+                      labels: RangeLabels(
+                        currentDpRange.start.round().toString(),
+                        currentDpRange.end.round().toString(),
+                      ),
+                      onChanged: (RangeValues values) {
                         setState(() {
-                          selectedNote = newValue;
+                          currentDpRange = values;
                         });
                       },
                     ),
-                  ),
-                  //lv 고르기
-                  Text('LV'),
-                  Wrap(
-                    spacing: 8.0, // 가로 간격
-                    children: selectedLvMap.keys.map((lv) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: selectedLvMap[lv] ?? false,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                selectedLvMap[lv] = newValue!;
-                              });
-                            },
-                          ),
-                          Text('$lv'),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                  Divider(),
-                  //색 고르기
-                  Text('Color'),
-                  Wrap(
-                    spacing: 8.0, // 가로 간격
-                    children: selectedColorMap.keys.map((color) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: selectedColorMap[color] ?? false,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                selectedColorMap[color] = newValue!;
-                              });
-                            },
-                          ),
-                          Text(color.toUpperCase()
-                          ,style: TextStyle(color: ColorService().getColorFromString(color.toUpperCase())),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                  //색 or/and
-                  Divider(),
-                  //카드 타입 고르기
-                  Text('Card Type'),
-                  Wrap(
-                    spacing: 8.0, // 가로 간격
-                    children: selectedCardTypeMap.keys.map((cardType) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: selectedCardTypeMap[cardType] ?? false,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                selectedCardTypeMap[cardType] = newValue!;
-                              });
-                            },
-                          ),
-                          Text(cardType),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                  Divider(),
-                  //레어도 고르기
-                  Text('Rarity'),
-                  Wrap(
-                    spacing: 8.0, // 가로 간격
-                    children: selectedRarityMap.keys.map((rarity) {
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: selectedRarityMap[rarity] ?? false,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                selectedRarityMap[rarity] = newValue!;
-                              });
-                            },
-                          ),
-                          Text(rarity),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                  Divider(),
-                  //dp
-                  Text('DP'),
-                  RangeSlider(
-                    values: currentDpRange,
-                    min: 1000,
-                    max: 16000,
-                    divisions: 15,
-                    labels: RangeLabels(
-                      currentDpRange.start.round().toString(),
-                      currentDpRange.end.round().toString(),
+                    Divider(),
+                    //play cost
+                    Text('등장/사용 코스트'),
+                    RangeSlider(
+                      values: currentPlayCostRange,
+                      min: 0,
+                      max: 20,
+                      divisions: 20,
+                      labels: RangeLabels(
+                        currentPlayCostRange.start.round().toString(),
+                        currentPlayCostRange.end.round().toString(),
+                      ),
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          currentPlayCostRange = values;
+                        });
+                      },
                     ),
-                    onChanged: (RangeValues values) {
-                      setState(() {
-                        currentDpRange = values;
-                      });
-                    },
-                  ),Divider(),
-                  //play cost
-                  Text('Play Cost'),
-                  RangeSlider(
-                    values: currentPlayCostRange,
-                    min: 0,
-                    max: 20,
-                    divisions: 20,
-                    labels: RangeLabels(
-                      currentPlayCostRange.start.round().toString(),
-                      currentPlayCostRange.end.round().toString(),
+                    Divider(),
+                
+                    //digivolve cost
+                    Text('진화 코스트'),
+                    RangeSlider(
+                      values: currentDigivolutionCostRange,
+                      min: 0,
+                      max: 8,
+                      divisions: 8,
+                      labels: RangeLabels(
+                        currentDigivolutionCostRange.start.round().toString(),
+                        currentDigivolutionCostRange.end.round().toString(),
+                      ),
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          currentDigivolutionCostRange = values;
+                        });
+                      },
                     ),
-                    onChanged: (RangeValues values) {
-                      setState(() {
-                        currentPlayCostRange = values;
-                      });
-                    },
-                  ),Divider(),
-                  
-                  //digivolve cost
-                  Text('Digivolve Cost'),
-                  RangeSlider(
-                    values: currentDigivolutionCostRange,
-                    min: 0,
-                    max: 8,
-                    divisions: 8,
-                    labels: RangeLabels(
-                      currentDigivolutionCostRange.start.round().toString(),
-                      currentDigivolutionCostRange.end.round().toString(),
-                    ),
-                    onChanged: (RangeValues values) {
-                      setState(() {
-                        currentDigivolutionCostRange = values;
-                      });
-                    },
-                  ),
-                  
-                  
-                  //특일 여부
-
-                  //검색어
-                  TextField(
-                    
-                    controller: _dialogSearchStringEditingController,
-                    decoration:InputDecoration(
-                      labelText: '검색어',
-                    ),
-                  )
-
-                  //
-                ],
+                
+                    //특일 여부
+                
+                    //검색어
+                    TextField(
+                      controller: _dialogSearchStringEditingController,
+                      decoration: InputDecoration(
+                        labelText: '검색어',
+                      ),
+                    )
+                
+                    //
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -316,15 +370,21 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         .map((entry) => entry.key)
                         .toSet();
 
-                    widget.searchParameter.minDp =  currentDpRange.start.round();
-                    widget.searchParameter.maxDp =  currentDpRange.end.round();
-                    widget.searchParameter.minPlayCost = currentPlayCostRange.start.round();
-                    widget.searchParameter.maxPlayCost = currentPlayCostRange.end.round();
-                    widget.searchParameter.minDigivolutionCost = currentDigivolutionCostRange.start.round();
-                    widget.searchParameter.maxDigivolutionCost= currentDigivolutionCostRange.end.round();
-                    widget.searchParameter.searchString = _dialogSearchStringEditingController?.value.text;
-                    _searchStringEditingController?.text =_dialogSearchStringEditingController!.value.text;
-
+                    widget.searchParameter.minDp = currentDpRange.start.round();
+                    widget.searchParameter.maxDp = currentDpRange.end.round();
+                    widget.searchParameter.minPlayCost =
+                        currentPlayCostRange.start.round();
+                    widget.searchParameter.maxPlayCost =
+                        currentPlayCostRange.end.round();
+                    widget.searchParameter.minDigivolutionCost =
+                        currentDigivolutionCostRange.start.round();
+                    widget.searchParameter.maxDigivolutionCost =
+                        currentDigivolutionCostRange.end.round();
+                    widget.searchParameter.searchString =
+                        _dialogSearchStringEditingController?.value.text;
+                    _searchStringEditingController?.text =
+                        _dialogSearchStringEditingController!.value.text;
+                    widget.searchParameter.parallelOption = _parallelOption;
                     widget.onSearch();
 
                     Navigator.pop(context);
@@ -333,7 +393,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 TextButton(
                   child: Text("조건 초기화"),
                   onPressed: () {
-                    selectedNote=widget.notes.first;
+                    selectedNote = widget.notes.first;
                     for (var color in colors) {
                       selectedColorMap[color] = false;
                     }
@@ -352,12 +412,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
                     currentDpRange = RangeValues(1000, 16000);
 
-                    currentPlayCostRange = RangeValues(0,20);
-                   currentDigivolutionCostRange = RangeValues(0,8);
-
-                    _dialogSearchStringEditingController = TextEditingController(text: '');
-                    setState(() {
-                    });
+                    currentPlayCostRange = RangeValues(0, 20);
+                    currentDigivolutionCostRange = RangeValues(0, 8);
+                    _parallelOption = 0;
+                    _dialogSearchStringEditingController =
+                        TextEditingController(text: '');
+                    setState(() {});
                   },
                 ),
               ],
@@ -387,7 +447,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
     // releaseDate가 같은 경우 name 오름차순으로 정렬
     return a.name.compareTo(b.name);
   };
-
 
   List<DropdownMenuItem<NoteDto>> generateDropDownMenuItems() {
     List<NoteDto> boosterPackList = [];
@@ -428,17 +487,22 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     List<DropdownMenuItem<NoteDto>> menuItems = [];
 
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('부스터 팩', boosterPackList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('스타터 덱', staterDeckList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('부스터 프로모', boosterPromoList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
+    menuItems
+        .addAll(_createMenuItemsWithHeaderAndDivider('부스터 팩', boosterPackList));
+    menuItems
+        .addAll(_createMenuItemsWithHeaderAndDivider('스타터 덱', staterDeckList));
+    menuItems.addAll(
+        _createMenuItemsWithHeaderAndDivider('부스터 프로모', boosterPromoList));
+    menuItems.addAll(
+        _createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
     menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
     menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
 
     return menuItems;
   }
 
-  List<DropdownMenuItem<NoteDto>> _createMenuItemsWithHeaderAndDivider(String header, List<NoteDto> items) {
+  List<DropdownMenuItem<NoteDto>> _createMenuItemsWithHeaderAndDivider(
+      String header, List<NoteDto> items) {
     List<DropdownMenuItem<NoteDto>> menuItems = [];
 
     menuItems.add(
@@ -471,10 +535,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     return menuItems;
   }
+
   @override
   Widget build(BuildContext context) {
     dropDownMenuItems = generateDropDownMenuItems();
-
 
     return Row(
       children: [
@@ -500,8 +564,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: IconButton(
-              padding: EdgeInsets.zero,
-                onPressed: _showFilterDialog, icon: Icon(Icons.menu)))
+                padding: EdgeInsets.zero,
+                onPressed: _showFilterDialog,
+                icon: Icon(Icons.menu)))
       ],
     );
   }
