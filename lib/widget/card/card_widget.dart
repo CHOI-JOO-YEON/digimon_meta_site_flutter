@@ -38,6 +38,9 @@ class _CustomCardState extends State<CustomCard> {
   @override
   void dispose() {
     _timer?.cancel();
+    if (widget.onExit != null) {
+      widget.onExit!();
+    }
     super.dispose();
   }
 
