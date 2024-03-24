@@ -104,6 +104,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     setState(() {
                       _selectedFormat = value;
                       widget.searchParameter.formatId = value?.formatId;
+                      widget.search(1);
                     });
                   },
                 ),
