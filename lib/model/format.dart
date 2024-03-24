@@ -3,9 +3,10 @@ class FormatDto {
   String? name;
   DateTime startDate;
   DateTime endDate;
+  bool? isOnlyEn;
 
 
-  FormatDto({required this.formatId, required this.name, required this.startDate,required this.endDate});
+  FormatDto({required this.formatId, required this.name, required this.startDate,required this.endDate, this.isOnlyEn});
 
   factory FormatDto.fromJson(Map<String, dynamic> json) {
     return FormatDto(
@@ -13,6 +14,7 @@ class FormatDto {
       name: json['formatName'],
       startDate:  DateTime.parse(json['startDate']) ,
       endDate: DateTime.parse(json['endDate']) ,
+      isOnlyEn: json['isOnlyEn']??false
     );
   }
   static List<FormatDto> fromJsonList(List<dynamic> jsonList) {

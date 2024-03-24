@@ -140,6 +140,14 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
     widget.deck.formatId=formats.keys.first;
+    for (var format in formats.values) {
+      if(!format.isOnlyEn!) {
+        widget.deck.formatId=format.formatId!;
+        break;
+      }
+    }
+
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -173,15 +181,38 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     DropdownButton<int>(
                       value: widget.deck.formatId,
                       hint: Text(formats[widget.deck.formatId]?.name ?? "포맷 "),
-                      items: formats.keys.map((int idx) {
-                        return DropdownMenuItem<int>(
-                          value: idx,
-                          child: Text(
-                              '${formats[idx]!.name} ['
-                                  '${DateFormat('yyyy-MM-dd').format(formats[idx]!.startDate)} ~ '
-                                  '${DateFormat('yyyy-MM-dd').format(formats[idx]!.endDate)}]'),
-                        );
-                      }).toList(),
+                      items: [
+                        DropdownMenuItem<int>(
+                          child: Text('일반 포맷', style: TextStyle(fontWeight: FontWeight.bold),),
+                          enabled: false,
+                        ),
+                        ...formats.entries
+                            .where((entry) => entry.value.isOnlyEn == false)
+                            .map((entry) {
+                          return DropdownMenuItem<int>(
+                            value: entry.key,
+                            child: Text(
+                                '${entry.value.name} ['
+                                    '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                                    '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                          );
+                        }).toList(),
+                        DropdownMenuItem<int>(
+                          child: Text('미발매 포맷',style: TextStyle(fontWeight: FontWeight.bold)),
+                          enabled: false,
+                        ),
+                        ...formats.entries
+                            .where((entry) => entry.value.isOnlyEn == true)
+                            .map((entry) {
+                          return DropdownMenuItem<int>(
+                            value: entry.key,
+                            child: Text(
+                                '${entry.value.name} ['
+                                    '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                                    '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                          );
+                        }).toList(),
+                      ],
                       onChanged: (int? newValue) {
                         setState(() {
                           widget.deck.formatId = newValue!;
