@@ -58,6 +58,28 @@ class _CardSearchBarState extends State<CardSearchBar> {
         return "에러";
     }
   }
+  String getKorColorStringByEn(String s) {
+    switch (s) {
+      case 'red':
+        return '적';
+      case 'blue':
+        return '청';
+      case 'yellow':
+        return '황';
+      case 'green':
+        return '녹';
+      case 'green':
+        return '녹';
+      case 'black':
+        return '흑';
+      case 'purple':
+        return '자';
+      case 'white':
+        return '백';
+      default:
+        return "에러";
+    }
+  }
 
   @override
   void dispose() {
@@ -193,7 +215,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               },
                             ),
                             Text(
-                              color.characters.first.toUpperCase(),
+                            getKorColorStringByEn(color),
                               style: TextStyle(
                                   color: ColorService()
                                       .getColorFromString(color.toUpperCase())),
