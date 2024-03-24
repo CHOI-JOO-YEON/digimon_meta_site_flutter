@@ -31,6 +31,7 @@ class DeckBuilderPage extends StatefulWidget {
 
 class _DeckBuilderPageState extends State<DeckBuilderPage> {
   final ScrollController _scrollController = ScrollController();
+  final PanelController _panelController = PanelController();
   bool isSearchLoading = true;
   List<DigimonCard> cards = [];
   List<NoteDto> notes = [];
@@ -116,9 +117,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
     if (isPortrait) {
       return SlidingUpPanel(
+        controller: _panelController,
         renderPanelSheet: false,
         minHeight: 50,
-        maxHeight: MediaQuery.of(context).size.height * 0.5,
+        maxHeight: MediaQuery.of(context).size.height * 1,
+        snapPoint: 0.5,
         panel: Container(
           decoration: BoxDecoration(
             color: Colors.grey[300],
@@ -148,11 +151,14 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       ),
                       Expanded(
                           flex: 1,
-                          child: Row(
+                          child:Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
+                            children:  [
                               TextButton(
                                   onPressed: () {
+                                    if(_panelController.isPanelOpen){
+                                      _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
+                                    }
                                     _scrollController.animateTo(
                                       0,
                                       duration: Duration(milliseconds: 500),
@@ -162,8 +168,14 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   child: Text('메인덱 보기'
                                   ,style: TextStyle(fontSize: fontSize),
 
-                                  )),
+                                  )
+
+                              ),
                               TextButton(onPressed: () {
+                                if(_panelController.isPanelOpen){
+                                  _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
+                                }
+
                                 _scrollController.animateTo(
                                   _scrollController.position.maxScrollExtent,
                                   duration: Duration(milliseconds: 500),

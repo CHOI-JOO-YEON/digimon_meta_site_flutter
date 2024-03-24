@@ -8,7 +8,13 @@ import 'dart:html' as html;
 import '../provider/user_provider.dart';
 
 @RoutePage()
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  // bool _isLoginDialogShown = false;
   void openOAuthPopup() {
     String baseUrl = const String.fromEnvironment('SERVER_URL');
     String url = '$baseUrl/oauth2/authorization/kakao';
@@ -16,7 +22,6 @@ class MainPage extends StatelessWidget {
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);
   }
-
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter.tabBar(
@@ -33,6 +38,34 @@ class MainPage extends StatelessWidget {
                       flex: 1,
                       child: Consumer<UserProvider>(
                         builder: (context, userProvider, child) {
+                          // if(!userProvider.isLogin()){
+                          //   _isLoginDialogShown=false;
+                          // }
+                          // if (userProvider.isLogin() && !_isLoginDialogShown) {
+                          //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                          //     showDialog(
+                          //       context: context,
+                          //       builder: (BuildContext context) {
+                          //         return AlertDialog(
+                          //           title: Text('로그인 성공'),
+                          //           content: Text('로그인이 성공적으로 완료되었습니다.'),
+                          //           actions: [
+                          //             TextButton(
+                          //               onPressed: () {
+                          //                 Navigator.of(context).pop();
+                          //               },
+                          //               child: Text('확인'),
+                          //             ),
+                          //           ],
+                          //         );
+                          //       },
+                          //     ).then((_) {
+                          //       setState(() {
+                          //         _isLoginDialogShown = true;
+                          //       });
+                          //     });
+                          //   });
+                          // }
                           return Padding(
                             padding: const EdgeInsets.all(10),
                             child: Row(
