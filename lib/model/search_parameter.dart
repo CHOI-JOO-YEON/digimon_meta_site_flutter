@@ -22,6 +22,7 @@ class SearchParameter{
 
   String orderOption = "sortString";
   bool isOrderDesc = false;
+  bool isEnglishCardInclude = false;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
@@ -43,6 +44,7 @@ class SearchParameter{
     data['parallelOption'] = parallelOption;
     data['orderOption'] = orderOption;
     data['isOrderDesc'] = isOrderDesc;
+    data['isEnglishCardInclude'] = isEnglishCardInclude;
     return data;
   }
 

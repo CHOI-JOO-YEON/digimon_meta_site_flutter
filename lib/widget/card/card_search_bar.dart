@@ -32,15 +32,31 @@ class _CardSearchBarState extends State<CardSearchBar> {
     'purple',
     'white'
   ];
-  final List<String> cardTypes = ['TAMER', 'OPTION', 'DIGIMON', 'DIGITAMA'];
+  final List<String> cardTypes = [ 'DIGITAMA','DIGIMON' ,'TAMER', 'OPTION',];
   final List<String> rarities = ['C', 'U', 'R', 'SR', 'SEC', 'P'];
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
-  NoteDto all =   NoteDto(noteId: null, name: '모든 카드');
+  NoteDto all = NoteDto(noteId: null, name: '모든 카드');
+
   @override
   void initState() {
     super.initState();
     _searchStringEditingController =
         TextEditingController(text: widget.searchParameter.searchString);
+  }
+
+  String getCardTypeByString(String s) {
+    switch (s) {
+      case 'TAMER':
+        return '테이머';
+      case 'OPTION':
+        return '옵션';
+      case 'DIGIMON':
+        return '디지몬';
+      case 'DIGITAMA':
+        return '디지타마';
+      default:
+        return "에러";
+    }
   }
 
   @override
@@ -58,9 +74,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   void _showFilterDialog() {
     NoteDto? selectedNote;
-    if(widget.searchParameter.noteId==null) {
-      selectedNote=all;
-    }else{
+    if (widget.searchParameter.noteId == null) {
+      selectedNote = all;
+    } else {
       for (var note in widget.notes) {
         if (note.noteId == widget.searchParameter.noteId) {
           selectedNote = note;
@@ -106,6 +122,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     _dialogSearchStringEditingController =
         TextEditingController(text: _searchStringEditingController?.value.text);
     int _parallelOption = widget.searchParameter.parallelOption;
+    bool enCardInclude = widget.searchParameter.isEnglishCardInclude;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -129,12 +146,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         onChanged: (NoteDto? newValue) {
                           setState(() {
                             selectedNote = newValue;
+                            if (newValue!.cardOrigin == 'ENGLISH') {
+                              print('!');
+                              enCardInclude = true;
+                            }
                           });
                         },
                       ),
                     ),
                     //lv 고르기
-                    Text('LV'),
+                    Text('LV',style: TextStyle(fontWeight: FontWeight.bold),),
                     Wrap(
                       spacing: 8.0, // 가로 간격
                       children: selectedLvMap.keys.map((lv) {
@@ -149,14 +170,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                 });
                               },
                             ),
-                            Text('$lv'),
+                            Text(lv==0?'-': '$lv'),
                           ],
                         );
                       }).toList(),
                     ),
                     Divider(),
                     //색 고르기
-                    Text('컬러'),
+                    Text('컬러',style: TextStyle(fontWeight: FontWeight.bold),),
                     Wrap(
                       spacing: 8.0, // 가로 간격
                       children: selectedColorMap.keys.map((color) {
@@ -172,7 +193,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               },
                             ),
                             Text(
-                              color.toUpperCase(),
+                              color.characters.first.toUpperCase(),
                               style: TextStyle(
                                   color: ColorService()
                                       .getColorFromString(color.toUpperCase())),
@@ -184,7 +205,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     //색 or/and
                     Divider(),
                     //카드 타입 고르기
-                    Text('카드 타입'),
+                    Text('카드 타입',style: TextStyle(fontWeight: FontWeight.bold),),
                     Wrap(
                       spacing: 8.0, // 가로 간격
                       children: selectedCardTypeMap.keys.map((cardType) {
@@ -199,16 +220,15 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                 });
                               },
                             ),
-                            Text(cardType),
+                            Text(getCardTypeByString(cardType)),
                           ],
                         );
                       }).toList(),
                     ),
                     Divider(),
                     //레어도 고르기
-                    Text('레어도'),
-                
-                
+                    Text('레어도',style: TextStyle(fontWeight: FontWeight.bold),),
+
                     Wrap(
                       spacing: 8.0, // 가로 간격
                       children: selectedRarityMap.keys.map((rarity) {
@@ -229,7 +249,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       }).toList(),
                     ),
                     Divider(),
-                    Text('패럴렐 여부'),
+                    Text('패럴렐 여부',style: TextStyle(fontWeight: FontWeight.bold),),
                     Wrap(
                         spacing: 8.0, // 가로 간격
                         children: [
@@ -244,7 +264,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              Text('All'),
+                              Text('모두'),
                             ],
                           ),
                           Row(
@@ -258,7 +278,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              Text('Only Normal')
+                              Text('일반 카드만')
                             ],
                           ),
                           Row(
@@ -272,13 +292,49 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              Text('Only Parallel'),
+                              Text('패럴렐 카드만'),
                             ],
                           )
                         ]),
                     Divider(),
+
+                    Text('영문 카드 포함 여부',style: TextStyle(fontWeight: FontWeight.bold),),
+                    Wrap(
+                      spacing: 8.0, // 가로 간격
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: !enCardInclude,
+                              onChanged: (value) {
+                                setState(() {
+                                  enCardInclude = !value!;
+                                });
+                              },
+                            ),
+                            Text('한글 카드만'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: enCardInclude,
+                              onChanged: (value) {
+                                setState(() {
+                                  enCardInclude = value!;
+                                });
+                              },
+                            ),
+                            Text('영문 카드 포함')
+                          ],
+                        ),
+                      ],
+                    ),
+                    Divider(),
                     //dp
-                    Text('DP'),
+                    Text('DP',style: TextStyle(fontWeight: FontWeight.bold),),
                     RangeSlider(
                       values: currentDpRange,
                       min: 1000,
@@ -296,7 +352,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     ),
                     Divider(),
                     //play cost
-                    Text('등장/사용 코스트'),
+                    Text('등장/사용 코스트',style: TextStyle(fontWeight: FontWeight.bold),),
                     RangeSlider(
                       values: currentPlayCostRange,
                       min: 0,
@@ -313,9 +369,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       },
                     ),
                     Divider(),
-                
+
                     //digivolve cost
-                    Text('진화 코스트'),
+                    Text('진화 코스트',style: TextStyle(fontWeight: FontWeight.bold),),
                     RangeSlider(
                       values: currentDigivolutionCostRange,
                       min: 0,
@@ -331,9 +387,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         });
                       },
                     ),
-                
+
                     //특일 여부
-                
+
                     //검색어
                     TextField(
                       controller: _dialogSearchStringEditingController,
@@ -341,7 +397,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         labelText: '검색어',
                       ),
                     )
-                
+
                     //
                   ],
                 ),
@@ -390,6 +446,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     _searchStringEditingController?.text =
                         _dialogSearchStringEditingController!.value.text;
                     widget.searchParameter.parallelOption = _parallelOption;
+                    widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.onSearch();
 
                     Navigator.pop(context);
@@ -422,6 +479,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     _parallelOption = 0;
                     _dialogSearchStringEditingController =
                         TextEditingController(text: '');
+                    enCardInclude = false;
                     setState(() {});
                   },
                 ),
@@ -459,6 +517,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     List<NoteDto> boosterPromoList = [];
     List<NoteDto> starterPromoList = [];
     List<NoteDto> eventList = [];
+    List<NoteDto> enList = [];
     List<NoteDto> etcList = [];
 
     for (var note in widget.notes) {
@@ -478,6 +537,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
         case 'EVENT':
           eventList.add(note);
           break;
+        case 'ENGLISH':
+          enList.add(note);
+          break;
         default:
           etcList.add(note);
       }
@@ -492,11 +554,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     List<DropdownMenuItem<NoteDto>> menuItems = [];
 
-
     menuItems.add(
       DropdownMenuItem<NoteDto>(
         value: all,
-        child: Text(all.name,  style: TextStyle(fontWeight: FontWeight.bold),),
+        child: Text(
+          all.name,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
     menuItems.add(
@@ -514,10 +578,11 @@ class _CardSearchBarState extends State<CardSearchBar> {
     menuItems.addAll(
         _createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
     menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
-    if(!etcList.isEmpty){
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('영문 카드', enList));
+
+    if (!etcList.isEmpty) {
       menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
     }
-
 
     return menuItems;
   }

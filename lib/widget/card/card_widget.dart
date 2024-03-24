@@ -20,7 +20,8 @@ class CustomCard extends StatefulWidget {
     this.cardPressEvent,
     required this.card,
     this.onHover,
-    this.onExit, this.onLongPress,
+    this.onExit,
+    this.onLongPress,
   });
 
   @override
@@ -28,13 +29,14 @@ class CustomCard extends StatefulWidget {
 }
 
 class _CustomCardState extends State<CustomCard> {
-
   Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     setState(() {});
   }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -47,7 +49,6 @@ class _CustomCardState extends State<CustomCard> {
   void _handleLongPressStart(LongPressStartDetails details) {
     _timer = Timer.periodic(Duration(milliseconds: 500), (_) {
       if (widget.onLongPress != null) {
-
         widget.onLongPress!(widget.card);
       }
     });
@@ -56,9 +57,10 @@ class _CustomCardState extends State<CustomCard> {
   void _handleLongPressEnd(LongPressEndDetails details) {
     _timer?.cancel();
   }
+
   @override
   Widget build(BuildContext context) {
-    String color = widget.card.color2??widget.card.color1!;
+    String color = widget.card.color2 ?? widget.card.color1!;
     return MouseRegion(
       onEnter: (event) {
         if (widget.onHover != null) {
@@ -72,14 +74,12 @@ class _CustomCardState extends State<CustomCard> {
       },
       child: GestureDetector(
         onTap: () {
-          if(widget.cardPressEvent!=null) {
+          if (widget.cardPressEvent != null) {
             widget.cardPressEvent!(widget.card);
           }
-
         },
         onLongPressStart: _handleLongPressStart,
         onLongPressEnd: _handleLongPressEnd,
-
         child: Stack(
           alignment: Alignment.bottomRight,
           children: [
@@ -88,21 +88,19 @@ class _CustomCardState extends State<CustomCard> {
                 child: Image.network(
                   widget.card.smallImgUrl ?? '',
                   fit: BoxFit.fill,
-                )
-                ),
+                )),
             Positioned(
               right: widget.width * 0.05,
               bottom: widget.width * 0.05,
               child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: widget.width * 0.2,
-                      height: widget.width * 0.2
-                      ),
+                      width: widget.width * 0.2, height: widget.width * 0.2),
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: widget.width * 0.16,
-                    icon: Icon(Icons.zoom_in, color: color=='BLACK'?Colors.white: Colors.black),
+                    icon: Icon(Icons.zoom_in,
+                        color: color == 'BLACK' ? Colors.white : Colors.black),
                     onPressed: () {
                       _showImageDialog(context, widget.card);
                     },
@@ -115,6 +113,58 @@ class _CustomCardState extends State<CustomCard> {
       ),
     );
   }
+
+  // void _showImageDialog(BuildContext context, DigimonCard card) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         actionsAlignment: MainAxisAlignment.end,
+  //         actions: [
+  //           IconButton(
+  //             icon: Icon(Icons.close),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //         content:  SizedBox(
+  //           height: MediaQuery.sizeOf(context).height*0.8,
+  //           child: Row(
+  //               children: [
+  //                 Expanded(
+  //                     flex: 1,
+  //                     child: Image.network(card.imgUrl ?? '', fit: BoxFit.fitHeight)),
+  //                 Expanded(
+  //                     flex: 1,
+  //                     child: Padding(
+  //                       padding: const EdgeInsets.all(20),
+  //                       child: Column(
+  //                         children: [
+  //                           Row(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             children: [
+  //                               Text(card.cardNo??''),
+  //                               SizedBox(width: 5,),
+  //                               Text(card.cardName??''),
+  //                             ],
+  //                           ),
+  //                           SizedBox(height: 5,),
+  //                           Text(card.effect??''),
+  //                           SizedBox(height: 5,),
+  //                           Text(card.sourceEffect??''),
+  //                         ],
+  //
+  //                       ),
+  //                     )),
+  //               ],
+  //
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showImageDialog(BuildContext context, DigimonCard card) {
     showDialog(
