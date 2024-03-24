@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
@@ -12,8 +13,6 @@ import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.d
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-// import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
-// import 'package:flutter_sliding_up_panel/sliding_up_panel_widget.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -106,7 +105,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     deck.import(deckResponseDto);
     setState(() {});
   }
-
+  Timer? _debounce;
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -118,13 +117,22 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-          return SlidingUpPanel(
-            controller: _panelController,
-            renderPanelSheet: false,
-            minHeight: 50,
-            maxHeight: constraints.maxHeight,
-            snapPoint: 0.5,
-            panel: Container(
+        return SlidingUpPanel(
+          controller: _panelController,
+          renderPanelSheet: false,
+          minHeight: 50,
+          maxHeight: constraints.maxHeight,
+          snapPoint: 0.5,
+          onPanelSlide: (v){
+            if (_debounce?.isActive ?? false) _debounce?.cancel();
+            _debounce = Timer(const Duration(milliseconds: 100), () {
+             setState(() {
+
+             });
+            });
+          },
+          panelBuilder: (ScrollController sc) {
+            return Container(
               decoration: BoxDecoration(
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(5),
@@ -153,13 +161,16 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           ),
                           Expanded(
                               flex: 1,
-                              child:Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
-                                children:  [
+                                children: [
                                   TextButton(
                                       onPressed: () {
-                                        if(_panelController.isPanelOpen){
-                                          _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
+                                        if (_panelController.isPanelOpen) {
+                                          _panelController
+                                              .animatePanelToPosition(0.5,
+                                                  duration: Duration(
+                                                      milliseconds: 500));
                                         }
                                         _scrollController.animateTo(
                                           0,
@@ -167,81 +178,97 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                           curve: Curves.easeInOut,
                                         );
                                       },
-                                      child: Text('메인덱 보기'
-                                      ,style: TextStyle(fontSize: fontSize),
+                                      child: Text(
+                                        '메인덱 보기',
+                                        style: TextStyle(fontSize: fontSize),
+                                      )),
+                                  TextButton(
+                                      onPressed: () {
+                                        if (_panelController.isPanelOpen) {
+                                          _panelController
+                                              .animatePanelToPosition(0.5,
+                                                  duration: Duration(
+                                                      milliseconds: 500));
+                                        }
 
-                                      )
-
-                                  ),
-                                  TextButton(onPressed: () {
-                                    if(_panelController.isPanelOpen){
-                                      _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
-                                    }
-
-                                    _scrollController.animateTo(
-                                      _scrollController.position.maxScrollExtent,
-                                      duration: Duration(milliseconds: 500),
-                                      curve: Curves.easeInOut,
-                                    );
-
-                                  }, child: Text('타마덱 보기'
-                                    ,style: TextStyle(fontSize: fontSize),
-                                  ))
+                                        _scrollController.animateTo(
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                          duration: Duration(milliseconds: 500),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      },
+                                      child: Text(
+                                        '타마덱 보기',
+                                        style: TextStyle(fontSize: fontSize),
+                                      ))
                                 ],
                               ))
                         ],
                       ),
                     ),
                     Expanded(
-                        flex: 1,
-                        child: CardSearchBar(
-                          notes: notes,
-                          searchParameter: searchParameter,
-                          onSearch: initSearch,
-                        )),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Expanded(
-                        flex: 9,
-                        child: !isSearchLoading
-                            ? CardScrollGridView(
-                                cards: cards,
-                                rowNumber: 6,
-                                loadMoreCards: loadMoreCard,
-                                cardPressEvent: addCardByDeck,
-                                totalPages: totalPages,
-                                currentPage: currentPage,
-                              )
-                            : Center(child: CircularProgressIndicator()))
-                  ],
-                ),
-              ),
-            ),
-            body: Padding(
-              padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.sizeOf(context).height * 0.88,
-                      child: DeckBuilderView(
-                        deck: deck,
-                        cardPressEvent: removeCardByDeck,
-                        import: deckUpdate,
+                    flex: 2,
+                        child: Column(children: [
+                      SizedBox(
+                        height: 50,
+                          // flex: 1,
+                          child: CardSearchBar(
+                            notes: notes,
+                            searchParameter: searchParameter,
+                            onSearch: initSearch,
+                          )),
+                      SizedBox(
+                        height: 5,
                       ),
-                    ),
-                    Container(
-                      height: MediaQuery.sizeOf(context).height * 0.6,
-                    ),
+                      Expanded(
+                          // flex: 9,
+                          child: !isSearchLoading
+                              ? CardScrollGridView(
+                            cards: cards,
+                            rowNumber: 6,
+                            loadMoreCards: loadMoreCard,
+                            cardPressEvent: addCardByDeck,
+                            totalPages: totalPages,
+                            currentPage: currentPage,
+                          )
+                              : Center(child: CircularProgressIndicator())),
+                    ],)),
+
+                    Expanded(
+                        flex: _panelController.panelPosition<0.6?2:0,
+
+                        child: Container()),
                   ],
                 ),
               ),
+            );
+          },
+          // panel:
+
+          body: Padding(
+            padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.88,
+                    child: DeckBuilderView(
+                      deck: deck,
+                      cardPressEvent: removeCardByDeck,
+                      import: deckUpdate,
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.sizeOf(context).height * 0.6,
+                  ),
+                ],
+              ),
             ),
-          );
-        }
-      );
+          ),
+        );
+      });
     } else {
       return Padding(
         padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),

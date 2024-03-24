@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
@@ -40,7 +41,7 @@ class _DeckListPageState extends State<DeckListPage> {
     }
     super.dispose();
   }
-
+  Timer? _debounce;
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -51,92 +52,120 @@ class _DeckListPageState extends State<DeckListPage> {
     }
     return isPortrait
         ? LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+            builder: (BuildContext context, BoxConstraints constraints) {
             return SlidingUpPanel(
                 controller: _panelController,
                 renderPanelSheet: false,
                 minHeight: 50,
                 maxHeight: constraints.maxHeight,
                 snapPoint: 0.5,
-                panel: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: MediaQuery.sizeOf(context).width * 0.01,
-                        right: MediaQuery.sizeOf(context).width * 0.01,
-                        bottom: MediaQuery.sizeOf(context).width * 0.01),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          child: Row(
-                            children: [
-                              Expanded(flex: 1, child: Container()),
-                              Expanded(
-                                flex: 1,
-                                child: Transform.scale(
-                                  scaleX: 2,
-                                  child: Icon(
-                                    Icons.drag_handle,
-                                    color: Theme.of(context).primaryColor,
+                onPanelSlide: (v){
+                  if (_debounce?.isActive ?? false) _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 100), () {
+                    setState(() {
+
+                    });
+                  });
+                },
+                panelBuilder: (ScrollController sc) {
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.sizeOf(context).width * 0.01,
+                          right: MediaQuery.sizeOf(context).width * 0.01,
+                          bottom: MediaQuery.sizeOf(context).width * 0.01),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 50,
+                            child: Row(
+                              children: [
+                                Expanded(flex: 1, child: Container()),
+                                Expanded(
+                                  flex: 1,
+                                  child: Transform.scale(
+                                    scaleX: 2,
+                                    child: Icon(
+                                      Icons.drag_handle,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      TextButton(
-                                          onPressed: () {
-                                            if(_panelController.isPanelOpen){
-                                              _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
-                                            }
-                                            _scrollController.animateTo(
-                                              0,
-                                              duration: Duration(milliseconds: 500),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                          child: Text(
-                                            '메인덱 보기',
-                                            style: TextStyle(fontSize: fontSize),
-                                          )),
-                                      TextButton(
-                                          onPressed: () {
-                                            if(_panelController.isPanelOpen){
-                                              _panelController.animatePanelToPosition(0.5,duration: Duration(milliseconds: 500));
-                                            }
-                                            _scrollController.animateTo(
-                                              _scrollController
-                                                  .position.maxScrollExtent,
-                                              duration: Duration(milliseconds: 500),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                          child: Text(
-                                            '타마덱 보기',
-                                            style: TextStyle(fontSize: fontSize),
-                                          ))
-                                    ],
-                                  ))
-                            ],
+                                Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+                                              if (_panelController
+                                                  .isPanelOpen) {
+                                                _panelController
+                                                    .animatePanelToPosition(0.5,
+                                                        duration: Duration(
+                                                            milliseconds: 500));
+                                              }
+                                              _scrollController.animateTo(
+                                                0,
+                                                duration:
+                                                    Duration(milliseconds: 500),
+                                                curve: Curves.easeInOut,
+                                              );
+                                            },
+                                            child: Text(
+                                              '메인덱 보기',
+                                              style:
+                                                  TextStyle(fontSize: fontSize),
+                                            )),
+                                        TextButton(
+                                            onPressed: () {
+                                              if (_panelController
+                                                  .isPanelOpen) {
+                                                _panelController
+                                                    .animatePanelToPosition(0.5,
+                                                        duration: Duration(
+                                                            milliseconds: 500));
+                                              }
+                                              _scrollController.animateTo(
+                                                _scrollController
+                                                    .position.maxScrollExtent,
+                                                duration:
+                                                    Duration(milliseconds: 500),
+                                                curve: Curves.easeInOut,
+                                              );
+                                            },
+                                            child: Text(
+                                              '타마덱 보기',
+                                              style:
+                                                  TextStyle(fontSize: fontSize),
+                                            ))
+                                      ],
+                                    ))
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: DeckSearchView(
-                            deckUpdate: updateSelectedDeck,
+                          Expanded(
+                            child: DeckSearchView(
+                              deckUpdate: updateSelectedDeck,
+                            ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                              flex: _panelController.panelPosition<0.6?1:0,
+
+                              child: Container()),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
                 body: Padding(
-                  padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+                  padding:
+                      EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     child: Column(
@@ -156,8 +185,7 @@ class _DeckListPageState extends State<DeckListPage> {
                     ),
                   ),
                 ));
-          }
-        )
+          })
         // Stack(
         //   children: [
         //     Container(

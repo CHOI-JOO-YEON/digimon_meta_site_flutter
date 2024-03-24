@@ -111,7 +111,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: widget.rowNumber,
           crossAxisSpacing: constraints.maxWidth / 100,
-          mainAxisSpacing: constraints.maxHeight / 100,
+          mainAxisSpacing: constraints.maxWidth / 100,
           childAspectRatio: 0.715,
         ),
         itemCount: widget.cards.length + (isLoading ? 1 : 0),
