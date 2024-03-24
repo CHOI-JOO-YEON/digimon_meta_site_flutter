@@ -17,7 +17,7 @@ class AppRouter extends _$AppRouter {
 
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: DeckImageRoute.page,path: "/deck-image"),
+    AutoRoute(page: DeckImageRoute.page,path: "/deck-image",guards: [DeckGuard()]),
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
     AutoRoute(
       initial: true,
@@ -29,4 +29,17 @@ class AppRouter extends _$AppRouter {
       ],
     ),
   ];
+
+}
+class DeckGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    final args = resolver.route.args;
+
+    if (args is DeckImageRouteArgs ) {
+      resolver.next(true);
+    } else {
+      router.replace(MainRoute(children: [DeckBuilderRoute()]));
+    }
+  }
 }
