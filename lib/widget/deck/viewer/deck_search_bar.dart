@@ -28,6 +28,12 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
     // TODO: implement initState
     super.initState();
     _selectedFormat=widget.formatList.first;
+    for (var format in widget.formatList) {
+      if(!format.isOnlyEn!) {
+        _selectedFormat =format;
+        break;
+      }
+    }
   }
 
 
@@ -46,6 +52,8 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             Expanded(
               flex: 3,
               child: DropdownButtonHideUnderline(
+
+
                 child: DropdownButton<FormatDto>(
                   isExpanded: true,
                   hint: Text(_selectedFormat == null
@@ -56,17 +64,42 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     style: TextStyle(fontSize:fontSize),
                   ),
                   value: _selectedFormat,
-                  items: widget.formatList.map((FormatDto format) {
-                    return DropdownMenuItem<FormatDto>(
-                      value: format,
-                      child: Text('${format!.name} ['
-                          '${DateFormat('yyyy-MM-dd').format(format!.startDate)} ~ '
-                          '${DateFormat('yyyy-MM-dd').format(format!.endDate)}]',
-                        style: TextStyle(fontSize:fontSize),
-
-                      ),
-                    );
-                  }).toList(),
+                  items: [
+                    DropdownMenuItem<FormatDto>(
+                      child: Text('일반 포맷', style: TextStyle(fontWeight: FontWeight.bold)),
+                      enabled: false,
+                    ),
+                    ...widget.formatList
+                        .where((format) => format.isOnlyEn == false)
+                        .map((format) {
+                      return DropdownMenuItem<FormatDto>(
+                        value: format,
+                        child: Text(
+                          '${format.name} ['
+                              '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
+                              '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
+                          style: TextStyle(fontSize: fontSize),
+                        ),
+                      );
+                    }).toList(),
+                    DropdownMenuItem<FormatDto>(
+                      child: Text('영어 전용 포맷', style: TextStyle(fontWeight: FontWeight.bold)),
+                      enabled: false,
+                    ),
+                    ...widget.formatList
+                        .where((format) => format.isOnlyEn == true)
+                        .map((format) {
+                      return DropdownMenuItem<FormatDto>(
+                        value: format,
+                        child: Text(
+                          '${format.name} ['
+                              '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
+                              '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
+                          style: TextStyle(fontSize: fontSize),
+                        ),
+                      );
+                    }).toList(),
+                  ],
                   onChanged: (value) {
                     setState(() {
                       _selectedFormat = value;

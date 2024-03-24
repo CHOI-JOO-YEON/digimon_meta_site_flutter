@@ -100,7 +100,6 @@ class DeckApi {
         '$baseUrl/api/deck',
         queryParameters: deckSearchParameter.toJson(),
       );
-
       if (response.statusCode == 200) {
         return PagedResponseDeckDto.fromJson(response.data);
       } else if (response.statusCode == 401) {

@@ -7,6 +7,7 @@ import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../../../model/deck.dart';
 import '../../../model/deck_response_dto.dart';
 import '../../../model/format.dart';
 
@@ -35,6 +36,12 @@ class _DeckListViewerState extends State<DeckListViewer> {
   void initState() {
     super.initState();
     deckSearchParameter.formatId = widget.formatList.first.formatId;
+    for (var format in widget.formatList) {
+      if(!format.isOnlyEn!) {
+        deckSearchParameter.formatId =format.formatId;
+        break;
+      }
+    }
     Future.delayed(const Duration(seconds: 0), () async {
       await searchDecks(1);
     });
@@ -53,13 +60,15 @@ class _DeckListViewerState extends State<DeckListViewer> {
 
 
     if (pagedDeck != null) {
-
       decks = pagedDeck.decks;
       
       maxPage = pagedDeck.totalPages;
       _selectedIndex = 0;
 
-      widget.deckUpdate(decks.first);
+      if(!decks.isEmpty) {
+        widget.deckUpdate(decks.first);
+      }
+
     }
     setState(() {
 

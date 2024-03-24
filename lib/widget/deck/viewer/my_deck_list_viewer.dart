@@ -35,6 +35,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   void initState() {
     super.initState();
     deckSearchParameter.formatId = widget.formatList.first.formatId;
+    for (var format in widget.formatList) {
+      if(!format.isOnlyEn!) {
+        deckSearchParameter.formatId =format.formatId;
+        break;
+      }
+    }
     Future.delayed(const Duration(seconds: 0), () async {
       await searchDecks(1);
     });
