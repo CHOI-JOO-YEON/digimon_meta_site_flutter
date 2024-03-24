@@ -71,9 +71,9 @@ class _DeckListViewerState extends State<DeckListViewer> {
 
     }
     setState(() {
-
-    });
       isLoading =false;
+    });
+
 
 
   }
