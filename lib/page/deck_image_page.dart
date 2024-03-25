@@ -75,15 +75,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
         ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
         ByteData? byteData =
         await image.toByteData(format: ui.ImageByteFormat.png);
-        await WebImageDownloader.downloadImageFromUInt8List(uInt8List: byteData!.buffer.asUint8List(),name: '${widget.deck.deckName}.png');
-        // final blob = html.Blob([byteData!.buffer.asUint8List()], 'image/png','native');
-        // final url = html.Url.createObjectUrlFromBlob(blob);
-        //
-        // final anchor = html.AnchorElement(href: url)
-        //   ..setAttribute('download', '${widget.deck.deckName}.png')
-        //   ..click();
+        await WebImageDownloader.downloadImageFromUInt8List(uInt8List: byteData!.buffer.asUint8List(),name: '${widget.deck.deckName}.png',imageType: ImageType.png);
 
-        // html.Url.revokeObjectUrl(url);
       } catch (e) {
         print(e);
       }

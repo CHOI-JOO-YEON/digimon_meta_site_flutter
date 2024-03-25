@@ -45,7 +45,7 @@ class DeckService{
   }
 
   Future<Map<int,FormatDto>> getFormats(Deck deck) async {
-     List<FormatDto>? formats = await DeckApi().getFormats(deck.latestCardDate);
+     List<FormatDto>? formats = await DeckApi().getFormats(deck.getLatestCardDate());
      Map<int,FormatDto> map = {};
      if(formats!=null){
        for (var format in formats) {

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:image_downloader_web/image_downloader_web.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
@@ -171,6 +172,19 @@ class _CustomCardState extends State<CustomCard> {
       builder: (BuildContext context) {
         return AlertDialog(
           content: Image.network(card.imgUrl ?? '', fit: BoxFit.fill),
+          actions: [
+            IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () async {
+                  print(card.imgUrl);
+                  if(card.imgUrl!=null) {
+                    await WebImageDownloader.downloadImageFromWeb(card.imgUrl!,name: '${card.cardNo}_${card.cardName}.png');
+                    print('!');
+                  }
+
+
+                }, icon: Icon(Icons.download)),
+          ],
         );
       },
     );

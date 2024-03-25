@@ -17,6 +17,8 @@ class Deck {
   }
 
 
+
+
   Deck.responseDto(DeckResponseDto deckResponseDto) {
     deckId = deckResponseDto.deckId;
     deckName = deckResponseDto.deckName!;
@@ -58,7 +60,6 @@ class Deck {
   int deckCount = 0;
   int tamaCount = 0;
   String deckName = 'My Deck';
-  DateTime latestCardDate = DateTime.parse('1999-01-01 00:00:00');
   Set<String> colors = {};
   String? author;
   int? authorId;
@@ -103,6 +104,18 @@ class Deck {
     }
   }
 
+  DateTime getLatestCardDate(){
+    DateTime latestReleaseDate = DateTime.fromMillisecondsSinceEpoch(0);
+
+    cardMap.forEach((key, card) {
+      if (card.releaseDate != null && card.releaseDate!.isAfter(latestReleaseDate)) {
+        latestReleaseDate = card.releaseDate!;
+      }
+    });
+
+    return latestReleaseDate;
+  }
+
   void clear() {
     deckMap.clear();
     tamaMap.clear();
@@ -111,13 +124,9 @@ class Deck {
     cardMap.clear();
     deckCount = 0;
     tamaCount = 0;
-    latestCardDate = DateTime.parse('1999-01-01 00:00:00');
   }
 
   addCard(DigimonCard card) {
-    if (card.releaseDate != null && card.releaseDate!.isAfter(latestCardDate)) {
-      latestCardDate = card.releaseDate!;
-    }
     if (cardMap.containsKey(card.cardId)) {
       card = cardMap[card.cardId]!;
     } else {

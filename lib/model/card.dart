@@ -2,31 +2,31 @@ import 'dart:typed_data';
 
 import '../enums/form.dart';
 
-class DigimonCard {
-  int? cardId;
-  String? cardNo;
-  String? cardName;
-  int? lv;
-  int? dp;
-  int? playCost;
-  int? digivolveCost1;
-  int? digivolveCondition1;
-  int? digivolveCost2;
-  int? digivolveCondition2;
-  String? effect;
-  String? sourceEffect;
-  String? color1;
-  String? color2;
-  String? rarity;
-  String? cardType;
-  String? form;
-  String? attributes;
-  List<String>? types;
-  String? imgUrl;
-  String? smallImgUrl;
-  bool? isParallel;
-  String? sortString;
-  DateTime? releaseDate;
+  class DigimonCard {
+    int? cardId;
+    String? cardNo;
+    String? cardName;
+    int? lv;
+    int? dp;
+    int? playCost;
+    int? digivolveCost1;
+    int? digivolveCondition1;
+    int? digivolveCost2;
+    int? digivolveCondition2;
+    String? effect;
+    String? sourceEffect;
+    String? color1;
+    String? color2;
+    String? rarity;
+    String? cardType;
+    String? form;
+    String? attributes;
+    List<String>? types;
+    String? imgUrl;
+    String? smallImgUrl;
+    bool? isParallel;
+    String? sortString;
+    DateTime? releaseDate;
 
   // Uint8List? compressedImg;
 
