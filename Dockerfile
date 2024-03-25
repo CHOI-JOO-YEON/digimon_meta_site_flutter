@@ -10,10 +10,18 @@ RUN apt-get update && apt-get install -y \
     lib32stdc++6 \
     libglu1-mesa
 
+
+
 # Flutter SDK를 다운로드하고 설치합니다.
-RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.9-stable.tar.xz
-RUN tar xf flutter_linux_3.16.9-stable.tar.xz
+#RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.9-stable.tar.xz
+#RUN tar xf flutter_linux_3.16.9-stable.tar.xz
+#ENV PATH="/flutter/bin:${PATH}"
+
+
+RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz
+RUN tar xf flutter_linux_3.19.0-stable.tar.xz
 ENV PATH="/flutter/bin:${PATH}"
+
 
 RUN git config --global --add safe.directory /flutter
 # Flutter 설치 경로를 출력합니다.

@@ -113,7 +113,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       fontSize *= 2;
     }
-    print(MediaQuery.of(context).size);
+    print('Tab Page ${MediaQuery.of(context).size}');
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
