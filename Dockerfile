@@ -34,6 +34,8 @@ COPY pubspec.yaml .
 
 RUN flutter pub cache repair
 
+RUN flutter pub outdated
+
 # 프로젝트의 의존성을 가져옵니다.
 RUN flutter pub get
 
