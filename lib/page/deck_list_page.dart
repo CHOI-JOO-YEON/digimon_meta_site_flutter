@@ -46,7 +46,6 @@ class _DeckListPageState extends State<DeckListPage> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
-    print(MediaQuery.of(context).size);
     if (isPortrait) {
       fontSize *= 2;
     }
