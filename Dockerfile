@@ -32,6 +32,13 @@ WORKDIR /app
 # 프로젝트의 pubspec.yaml 파일을 복사합니다.
 COPY pubspec.yaml .
 
+# 의존성 패키지 업그레이드
+RUN flutter pub upgrade
+
+# 프로젝트 클린
+RUN flutter clean
+
+
 RUN flutter pub cache repair
 
 # 프로젝트의 의존성을 가져옵니다.
@@ -39,8 +46,6 @@ RUN flutter pub get
 
 # 프로젝트의 소스 코드를 복사합니다.
 COPY . .
-
-RUN flutter clean
 
 # Flutter 웹 애플리케이션을 빌드합니다.
 RUN flutter build web
