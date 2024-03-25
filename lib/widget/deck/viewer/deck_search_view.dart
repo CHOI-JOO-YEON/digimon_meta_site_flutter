@@ -34,6 +34,10 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
     Future.delayed(const Duration(seconds: 0), () async {
       formats = await DeckService().getAllFormat();
+      if(formats.isEmpty) {
+        formats.add(new FormatDto(formatId: 1, name: '테스트', startDate: DateTime.now(), endDate: DateTime.now(),isOnlyEn: false));
+
+      }
       isLoading = false;
 
       setState(() {});

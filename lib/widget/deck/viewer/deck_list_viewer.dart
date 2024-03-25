@@ -29,16 +29,15 @@ class _DeckListViewerState extends State<DeckListViewer> {
   int currentPage = 1;
   int maxPage = 0;
   int _selectedIndex = -1;
-  bool isLoading= false;
-  
-  
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     deckSearchParameter.formatId = widget.formatList.first.formatId;
     for (var format in widget.formatList) {
-      if(!format.isOnlyEn!) {
-        deckSearchParameter.formatId =format.formatId;
+      if (!format.isOnlyEn!) {
+        deckSearchParameter.formatId = format.formatId;
         break;
       }
     }
@@ -48,34 +47,30 @@ class _DeckListViewerState extends State<DeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
-    if(isLoading) {
+    if (isLoading) {
       return;
     }
 
-      isLoading =true;
+    isLoading = true;
 
     currentPage = page;
     deckSearchParameter.updatePage(page);
-    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(deckSearchParameter);
-
+    PagedResponseDeckDto? pagedDeck =
+        await DeckService().getDeck(deckSearchParameter);
 
     if (pagedDeck != null) {
       decks = pagedDeck.decks;
-      
+
       maxPage = pagedDeck.totalPages;
       _selectedIndex = 0;
 
-      if(!decks.isEmpty) {
+      if (!decks.isEmpty) {
         widget.deckUpdate(decks.first);
       }
-
     }
     setState(() {
-      isLoading =false;
+      isLoading = false;
     });
-
-
-
   }
 
   @override

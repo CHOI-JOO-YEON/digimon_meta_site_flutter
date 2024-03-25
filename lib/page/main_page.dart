@@ -24,91 +24,95 @@ class MainPage extends StatelessWidget {
       builder: (context, child, controller) {
         return Scaffold(
           resizeToAvoidBottomInset: false,
-          body: Column(
-            children: [
-              SizedBox(
-                height: max(MediaQuery.sizeOf(context).height * 0.1, 80),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          return Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (userProvider.isLogin())
-                                  Text(
-                                    '${userProvider.nickname}',
-                                    style: TextStyle(
-                                        fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
-                                  ),
-                                SizedBox(
-                                    width: MediaQuery.sizeOf(context).width *
-                                        0.009),
-                                userProvider.isLogin()
-                                    ? Center(
-                                  child: TextButton(
-                                    onPressed: () {
-                                      userProvider.logout();
-                                    },
-                                    child: Text(
-                                      '로그아웃',
+          body: MediaQuery.removePadding(
+            removeBottom: true,
+            context: context,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: max(MediaQuery.sizeOf(context).height * 0.1, 80),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Consumer<UserProvider>(
+                          builder: (context, userProvider, child) {
+                            return Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  if (userProvider.isLogin())
+                                    Text(
+                                      '${userProvider.nickname}',
                                       style: TextStyle(
-                                          fontSize:fontSize),
+                                          fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
                                     ),
-                                  ),
-                                )
-                                    : Center(
-                                  child: TextButton(
-                                    onPressed: () {
-                                      openOAuthPopup();
-                                    },
-                                    child: Text(
-                                      '로그인',
-                                      style: TextStyle(
-                                          fontSize: fontSize
+                                  SizedBox(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.009),
+                                  userProvider.isLogin()
+                                      ? Center(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        userProvider.logout();
+                                      },
+                                      child: Text(
+                                        '로그아웃',
+                                        style: TextStyle(
+                                            fontSize:fontSize),
+                                      ),
+                                    ),
+                                  )
+                                      : Center(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        openOAuthPopup();
+                                      },
+                                      child: Text(
+                                        '로그인',
+                                        style: TextStyle(
+                                            fontSize: fontSize
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: TabBar(
-                        controller: controller,
-                        tabs: [
-                          Tab(
-                            // icon: Icon(Icons.build),
-                            child: Text(
-                              'Builder',
-                              style: TextStyle(
-                                  fontSize: fontSize*0.9),
-                            ),
-                          ),
-                          Tab(
-                            // icon: Icon(Icons.list_alt),
-                            child: Text('List',
+                      Expanded(
+                        flex: 1,
+                        child: TabBar(
+                          controller: controller,
+                          tabs: [
+                            Tab(
+                              // icon: Icon(Icons.build),
+                              child: Text(
+                                'Builder',
                                 style: TextStyle(
-                                    fontSize: fontSize*0.9)),
-                          )
-                        ],
+                                    fontSize: fontSize*0.9),
+                              ),
+                            ),
+                            Tab(
+                              // icon: Icon(Icons.list_alt),
+                              child: Text('List',
+                                  style: TextStyle(
+                                      fontSize: fontSize*0.9)),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    Expanded(flex: 1, child: Container()),
-                  ],
+                      Expanded(flex: 1, child: Container()),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(child: child)
-            ],
+                Expanded(child: child)
+              ],
+            ),
           ),
         );
       },
