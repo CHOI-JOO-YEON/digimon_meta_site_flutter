@@ -43,12 +43,10 @@ class _DeckListPageState extends State<DeckListPage> {
   }
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
-    final bool isPortrait = (screenHeight - keyboardHeight) > screenWidth;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    print(MediaQuery.of(context).size);
     if (isPortrait) {
       fontSize *= 2;
     }
