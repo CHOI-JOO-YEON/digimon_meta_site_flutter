@@ -23,7 +23,7 @@ class MainPage extends StatelessWidget {
       routes: [DeckBuilderRoute(), DeckListRoute()],
       builder: (context, child, controller) {
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          // resizeToAvoidBottomInset: false,
           body: Column(
               children: [
                 SizedBox(
