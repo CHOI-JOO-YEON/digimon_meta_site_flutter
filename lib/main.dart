@@ -9,6 +9,7 @@ import 'package:url_strategy/url_strategy.dart';
 import 'dart:html' as html;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   final appRouter = AppRouter();
   WidgetsFlutterBinding.ensureInitialized();

@@ -16,7 +16,6 @@ class MainPage extends StatelessWidget {
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);
   }
-
   @override
   Widget build(BuildContext context) {
     return AutoTabsRouter.tabBar(
