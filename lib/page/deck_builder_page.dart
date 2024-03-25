@@ -121,8 +121,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           controller: _panelController,
           renderPanelSheet: false,
           minHeight: 50,
-          maxHeight: constraints.maxHeight,
-          snapPoint: 0.5,
+          maxHeight: constraints.maxHeight/2,
+          isDraggable: false,
           onPanelSlide: (v){
             if (_debounce?.isActive ?? false) _debounce?.cancel();
             _debounce = Timer(const Duration(milliseconds: 100), () {
@@ -131,26 +131,44 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
              });
             });
           },
-          panelBuilder: (ScrollController sc) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: MediaQuery.sizeOf(context).width * 0.01,
-                    right: MediaQuery.sizeOf(context).width * 0.01,
-                    bottom: MediaQuery.sizeOf(context).width * 0.01),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: Row(
-                        children: [
-                          Expanded(flex: 1, child: Container()),
-                          Expanded(
-                            flex: 1,
+          panel: Container(
+            margin:  EdgeInsets.only(
+                left: MediaQuery.sizeOf(context).width * 0.01,
+                right: MediaQuery.sizeOf(context).width * 0.01,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10)
+              )
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  left: MediaQuery.sizeOf(context).width * 0.01,
+                  right: MediaQuery.sizeOf(context).width * 0.01,
+                  bottom: MediaQuery.sizeOf(context).width * 0.01),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 1, child: Container()),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: (){
+                              print('!');
+                              if(_panelController.isPanelOpen){
+                                _panelController.close();
+                              }else{
+                                _panelController.open();
+                              }
+                              setState(() {
+
+                              });
+                            },
                             child: Transform.scale(
                               scaleX: 2,
                               child: Icon(
@@ -159,92 +177,77 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               ),
                             ),
                           ),
-                          Expanded(
-                              flex: 1,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        if (_panelController.isPanelOpen) {
-                                          _panelController
-                                              .animatePanelToPosition(0.5,
-                                                  duration: Duration(
-                                                      milliseconds: 500));
-                                        }
-                                        _scrollController.animateTo(
-                                          0,
-                                          duration: Duration(milliseconds: 500),
-                                          curve: Curves.easeInOut,
-                                        );
-                                      },
-                                      child: Text(
-                                        '메인덱 보기',
-                                        style: TextStyle(fontSize: fontSize),
-                                      )),
-                                  TextButton(
-                                      onPressed: () {
-                                        if (_panelController.isPanelOpen) {
-                                          _panelController
-                                              .animatePanelToPosition(0.5,
-                                                  duration: Duration(
-                                                      milliseconds: 500));
-                                        }
+                        ),
+                        Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
 
-                                        _scrollController.animateTo(
-                                          _scrollController
-                                              .position.maxScrollExtent,
-                                          duration: Duration(milliseconds: 500),
-                                          curve: Curves.easeInOut,
-                                        );
-                                      },
-                                      child: Text(
-                                        '타마덱 보기',
-                                        style: TextStyle(fontSize: fontSize),
-                                      ))
-                                ],
-                              ))
-                        ],
-                      ),
+                                      _scrollController.animateTo(
+                                        0,
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    child: Text(
+                                      '메인덱 보기',
+                                      style: TextStyle(fontSize: fontSize),
+                                    )),
+                                TextButton(
+                                    onPressed: () {
+
+
+                                      _scrollController.animateTo(
+                                        _scrollController
+                                            .position.maxScrollExtent,
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    child: Text(
+                                      '타마덱 보기',
+                                      style: TextStyle(fontSize: fontSize),
+                                    ))
+                              ],
+                            ))
+                      ],
                     ),
-                    Expanded(
-                    flex: 2,
-                        child: Column(children: [
-                      SizedBox(
-                        height: 50,
-                          // flex: 1,
-                          child: CardSearchBar(
-                            notes: notes,
-                            searchParameter: searchParameter,
-                            onSearch: initSearch,
-                          )),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Expanded(
+                  ),
+                  Expanded(
+                      flex: 2,
+                      child: Column(children: [
+                        SizedBox(
+                            height: 50,
+                            // flex: 1,
+                            child: CardSearchBar(
+                              notes: notes,
+                              searchParameter: searchParameter,
+                              onSearch: initSearch,
+                            )),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Expanded(
                           // flex: 9,
-                          child: !isSearchLoading
-                              ? CardScrollGridView(
-                            cards: cards,
-                            rowNumber: 6,
-                            loadMoreCards: loadMoreCard,
-                            cardPressEvent: addCardByDeck,
-                            totalPages: totalPages,
-                            currentPage: currentPage,
-                          )
-                              : Center(child: CircularProgressIndicator())),
-                    ],)),
+                            child: !isSearchLoading
+                                ? CardScrollGridView(
+                              cards: cards,
+                              rowNumber: 6,
+                              loadMoreCards: loadMoreCard,
+                              cardPressEvent: addCardByDeck,
+                              totalPages: totalPages,
+                              currentPage: currentPage,
+                            )
+                                : Center(child: CircularProgressIndicator())),
+                      ],)),
 
-                    Expanded(
-                        flex: _panelController.panelPosition<0.6?2:0,
-
-                        child: Container()),
-                  ],
-                ),
+                ],
               ),
-            );
-          },
-          // panel:
+            ),
+          ),
 
           body: Padding(
             padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
