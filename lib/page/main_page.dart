@@ -20,7 +20,7 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
     print('Main Page ${MediaQuery.of(context).size}');
-    print(MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom);
+    print('Keboard ${MediaQuery.of(context).viewInsets.bottom}');
     return AutoTabsRouter.tabBar(
       routes: [DeckBuilderRoute(), DeckListRoute()],
       builder: (context, child, controller) {
