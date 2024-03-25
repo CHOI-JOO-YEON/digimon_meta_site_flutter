@@ -25,14 +25,15 @@ class DeckBuilderMenuBar extends StatefulWidget {
       {super.key,
       required this.deck,
       required this.clear,
-      required this.import, required this.init});
+      required this.import,
+      required this.init});
 
   @override
   State<DeckBuilderMenuBar> createState() => _DeckBuilderMenuBarState();
 }
 
 class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
-  bool _isEditing = false;
+  // bool _isEditing = false;
   final TextEditingController _deckNameController = TextEditingController();
 
   @override
@@ -45,6 +46,39 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   void dispose() {
     _deckNameController.dispose();
     super.dispose();
+  }
+
+  void _showRenameDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('덱 이름 수정'),
+            content: TextField(
+              controller: _deckNameController,
+              autofocus: true,
+              decoration: InputDecoration(hintText: '덱 이름을 입력하세요'),
+            ),
+            actions: [
+              TextButton(
+                child: Text('취소'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('완료'),
+                onPressed: () {
+                  setState(() {
+                    widget.deck.deckName = _deckNameController.text;
+                  });
+                  Navigator.of(context).pop();
+                  FocusScope.of(context).unfocus(); // 키보드 숨기기
+                },
+              ),
+            ],
+          );
+        });
   }
 
   void _showLoginDialog(BuildContext context) {
@@ -114,7 +148,6 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             color: deck.colors.contains(color)
                                 ? buttonColor
                                 : buttonColor.withOpacity(0.3),
-
                           ),
                         ),
                         SizedBox(height: 4.0),
@@ -139,14 +172,13 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   }
 
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
-    widget.deck.formatId=formats.keys.first;
+    widget.deck.formatId = formats.keys.first;
     for (var format in formats.values) {
-      if(!format.isOnlyEn!) {
-        widget.deck.formatId=format.formatId!;
+      if (!format.isOnlyEn!) {
+        widget.deck.formatId = format.formatId!;
         break;
       }
     }
-
 
     showDialog(
       context: context,
@@ -154,12 +186,10 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              content:
-              SizedBox(
+              content: SizedBox(
                 width: MediaQuery.sizeOf(context).width / 3,
                 height: MediaQuery.sizeOf(context).height / 2,
-                child:
-                Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Row(
@@ -183,7 +213,10 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       hint: Text(formats[widget.deck.formatId]?.name ?? "포맷 "),
                       items: [
                         DropdownMenuItem<int>(
-                          child: Text('일반 포맷', style: TextStyle(fontWeight: FontWeight.bold),),
+                          child: Text(
+                            '일반 포맷',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           enabled: false,
                         ),
                         ...formats.entries
@@ -191,14 +224,14 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             .map((entry) {
                           return DropdownMenuItem<int>(
                             value: entry.key,
-                            child: Text(
-                                '${entry.value.name} ['
-                                    '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                                    '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                            child: Text('${entry.value.name} ['
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
                           );
                         }).toList(),
                         DropdownMenuItem<int>(
-                          child: Text('미발매 포맷',style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text('미발매 포맷',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                           enabled: false,
                         ),
                         ...formats.entries
@@ -206,10 +239,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             .map((entry) {
                           return DropdownMenuItem<int>(
                             value: entry.key,
-                            child: Text(
-                                '${entry.value.name} ['
-                                    '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                                    '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                            child: Text('${entry.value.name} ['
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
                           );
                         }).toList(),
                       ],
@@ -225,23 +257,24 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               actions: <Widget>[
                 ElevatedButton(
                   onPressed: () async {
-                    List<String> cardColorList = widget.deck.getOrderedCardColorList();
+                    List<String> cardColorList =
+                        widget.deck.getOrderedCardColorList();
                     Set<String> set = cardColorList.toSet();
                     widget.deck.colorArrange(set);
-                    if(widget.deck.colors.isEmpty) {
+                    if (widget.deck.colors.isEmpty) {
                       _showShortDialog(context, "색을 하나 이상 골라야 합니다.");
                       return;
                     }
-                    if(widget.deck.formatId==null) {
+                    if (widget.deck.formatId == null) {
                       _showShortDialog(context, "포맷을 골라야 합니다.");
                       return;
                     }
                     Deck? deck = await DeckService().save(widget.deck);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
-                      _showShortDialog(context,"저장 성공");
+                      _showShortDialog(context, "저장 성공");
                     } else {
-                      _showShortDialog(context,"저장 실패");
+                      _showShortDialog(context, "저장 실패");
                     }
                   },
                   child: Text('저장'),
@@ -265,8 +298,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
     );
   }
 
-  void showDeckResetDialog(
-      BuildContext context) {
+  void showDeckResetDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -282,12 +314,14 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               },
             ),
             ElevatedButton(
-              child: Text('예', style: TextStyle(color: Colors.red),),
+              child: Text(
+                '예',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
-                _deckNameController.text= 'My Deck';
+                _deckNameController.text = 'My Deck';
                 widget.init();
-
               },
             ),
           ],
@@ -296,8 +330,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
     );
   }
 
-  void showDeckClearDialog(
-      BuildContext context) {
+  void showDeckClearDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -313,11 +346,13 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               },
             ),
             ElevatedButton(
-              child: Text('예', style: TextStyle(color: Colors.red),),
+              child: Text(
+                '예',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 widget.clear();
-
               },
             ),
           ],
@@ -325,6 +360,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
       },
     );
   }
+
   void _showImportDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -503,12 +539,13 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width*0.015,25);
-    double iconSize  = min(MediaQuery.sizeOf(context).width*0.03,25);
-    if(isPortrait) {
-      fontSize*=2;
-      iconSize*=1.1;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.015, 25);
+    double iconSize = min(MediaQuery.sizeOf(context).width * 0.03, 25);
+    if (isPortrait) {
+      fontSize *= 2;
+      iconSize *= 1.1;
     }
 
     return LayoutBuilder(
@@ -524,49 +561,65 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        flex: 3,
-                        child: TextField(
-                          style: TextStyle(fontFamily: 'JalnanGothic',fontSize: fontSize),
-                          controller: _deckNameController,
-                          readOnly: !_isEditing,
-                          decoration: InputDecoration(
-                            hintText: "덱 이름",
-                            border: !_isEditing
-                                ? InputBorder.none
-                                : const UnderlineInputBorder(),
-                          ),
+                          flex: 3,
+                          child: Text(widget.deck.deckName,
+                      style: TextStyle(
+                                fontFamily: 'JalnanGothic', fontSize: fontSize),
+                      )),
+                  Expanded(
+                        flex: 1,
+                        child: IconButton(
+                          iconSize: iconSize,
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.mode),
+                          onPressed: () => _showRenameDialog(context),
                         ),
-                      ),
-                      if (_isEditing)
-                        Expanded(
-                          flex: 1,
-                          child: IconButton(
-                            iconSize: iconSize,
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.check),
-                            onPressed: () {
-                              setState(() {
-                                _isEditing = false;
-                                widget.deck.deckName =
-                                    _deckNameController.text; // 덱 이름 업데이트
-                              });
-                            },
-                          ),
-                        )
-                      else
-                        Expanded(
-                          flex: 1,
-                          child: IconButton(
-                            iconSize: iconSize,
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              setState(() {
-                                _isEditing = true;
-                              });
-                            },
-                          ),
-                        ),
+                      )
+                      // Expanded(
+                      //   flex: 3,
+                      //   child: TextField(
+                      //     style: TextStyle(
+                      //         fontFamily: 'JalnanGothic', fontSize: fontSize),
+                      //     controller: _deckNameController,
+                      //     readOnly: !_isEditing,
+                      //     decoration: InputDecoration(
+                      //       hintText: "덱 이름",
+                      //       border: !_isEditing
+                      //           ? InputBorder.none
+                      //           : const UnderlineInputBorder(),
+                      //     ),
+                      //   ),
+                      // ),
+                      // if (_isEditing)
+                      //   Expanded(
+                      //     flex: 1,
+                      //     child: IconButton(
+                      //       iconSize: iconSize,
+                      //       padding: EdgeInsets.zero,
+                      //       icon: const Icon(Icons.check),
+                      //       onPressed: () {
+                      //         setState(() {
+                      //           _isEditing = false;
+                      //           widget.deck.deckName =
+                      //               _deckNameController.text; // 덱 이름 업데이트
+                      //         });
+                      //       },
+                      //     ),
+                      //   )
+                      // else
+                      //   Expanded(
+                      //     flex: 1,
+                      //     child: IconButton(
+                      //       iconSize: iconSize,
+                      //       padding: EdgeInsets.zero,
+                      //       icon: const Icon(Icons.edit),
+                      //       onPressed: () {
+                      //         setState(() {
+                      //           _isEditing = true;
+                      //         });
+                      //       },
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ),

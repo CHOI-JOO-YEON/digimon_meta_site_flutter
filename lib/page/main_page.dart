@@ -23,11 +23,8 @@ class MainPage extends StatelessWidget {
       routes: [DeckBuilderRoute(), DeckListRoute()],
       builder: (context, child, controller) {
         return Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: MediaQuery.removePadding(
-            removeBottom: true,
-            context: context,
-            child: Column(
+          resizeToAvoidBottomInset: false,
+          body: Column(
               children: [
                 SizedBox(
                   height: max(MediaQuery.sizeOf(context).height * 0.1, 80),
@@ -113,7 +110,7 @@ class MainPage extends StatelessWidget {
                 Expanded(child: child)
               ],
             ),
-          ),
+
         );
       },
     );
