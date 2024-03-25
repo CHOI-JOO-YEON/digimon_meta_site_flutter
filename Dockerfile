@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 
 # Flutter SDK를 다운로드하고 설치합니다.
-RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.9-stable.tar.xz
-RUN tar xf flutter_linux_3.16.9-stable.tar.xz
+RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.4-stable.tar.xz
+RUN tar xf flutter_linux_3.19.4-stable.tar.xz
 ENV PATH="/flutter/bin:${PATH}"
 
 
