@@ -2,7 +2,6 @@ import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:marquee/marquee.dart';
 
 class CardInfoWidget extends StatefulWidget {
   final DigimonCard? selectCard;
@@ -123,15 +122,7 @@ class _CardInfoWidgetState extends State<CardInfoWidget> {
                   child: useMarquee
                       ? SizedBox(
                           width: height * 1.6,
-                          child: Marquee(
-                            text: text,
-                            style: TextStyle(fontSize: height * 0.3),
-                            velocity: 50.0,
-                            // 텍스트의 움직이는 속도
-                            pauseAfterRound: Duration.zero,
-                            // 각 라운드 후 일시 정지 없음
-                            blankSpace: height * 0.5, // 텍스트 사이의 공백
-                          ),
+
                         )
                       : FittedBox(
                           fit: BoxFit.scaleDown, // 컨테이너에 맞게 텍스트 크기 조절
