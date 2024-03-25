@@ -31,7 +31,6 @@ class UserService{
       if(loginResponseDto==null){
         return false;
       }
-      html.window.localStorage['access-token'] = loginResponseDto.accessToken;
       html.window.localStorage['nickname'] = loginResponseDto.nickname;
       html.window.localStorage['role'] = loginResponseDto.role;
     }catch(e){

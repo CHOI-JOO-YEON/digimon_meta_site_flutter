@@ -7,11 +7,19 @@ class UserApi {
   DioClient dioClient = DioClient();
 
   Future<LoginResponseDto?> oauthLogin(String code) async {
-    final response = await dioClient.dio.get('$baseUrl/api/account/token/kakao',
-        queryParameters: {'code': code});
-    if (response.statusCode == 200) {
-      return LoginResponseDto.fromJson(response.data);
+
+    try{
+      final response = await dioClient.dio.get('$baseUrl/api/account/token/kakao',
+          queryParameters: {'code': code});
+
+      if (response.statusCode == 200) {
+        return LoginResponseDto.fromJson(response.data);
+      }
+    }catch (e){
+      print(e);
     }
+
+
     return null;
   }
 
