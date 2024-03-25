@@ -23,7 +23,7 @@ class MainPage extends StatelessWidget {
       routes: [DeckBuilderRoute(), DeckListRoute()],
       builder: (context, child, controller) {
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           body: MediaQuery.removePadding(
             removeBottom: true,
             context: context,
