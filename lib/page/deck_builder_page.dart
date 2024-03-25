@@ -123,16 +123,17 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           maxHeight: constraints.maxHeight/2,
           isDraggable: false,
           panel: Container(
-            margin:  EdgeInsets.only(
-                left: MediaQuery.sizeOf(context).width * 0.01,
-                right: MediaQuery.sizeOf(context).width * 0.01,
-            ),
+            // margin:  EdgeInsets.only(
+            //     left: MediaQuery.sizeOf(context).width * 0.01,
+            //     right: MediaQuery.sizeOf(context).width * 0.01,
+            // ),
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10)
-              )
+              borderRadius: BorderRadius.circular(5)
+              // borderRadius: BorderRadius.only(
+              //   topLeft: Radius.circular(10),
+              //   topRight: Radius.circular(10)
+              // )
             ),
             child: Padding(
               padding: EdgeInsets.only(

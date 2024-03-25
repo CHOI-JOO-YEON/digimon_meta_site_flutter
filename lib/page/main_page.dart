@@ -18,10 +18,12 @@ class MainPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
     return AutoTabsRouter.tabBar(
       routes: [DeckBuilderRoute(), DeckListRoute()],
       builder: (context, child, controller) {
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           body: Column(
             children: [
               SizedBox(
@@ -49,26 +51,26 @@ class MainPage extends StatelessWidget {
                                         0.009),
                                 userProvider.isLogin()
                                     ? Center(
-                                  child: ElevatedButton(
+                                  child: TextButton(
                                     onPressed: () {
                                       userProvider.logout();
                                     },
                                     child: Text(
                                       '로그아웃',
                                       style: TextStyle(
-                                          fontSize:min(MediaQuery.sizeOf(context).width *0.02,15)),
+                                          fontSize:fontSize),
                                     ),
                                   ),
                                 )
                                     : Center(
-                                  child: ElevatedButton(
+                                  child: TextButton(
                                     onPressed: () {
                                       openOAuthPopup();
                                     },
                                     child: Text(
                                       '로그인',
                                       style: TextStyle(
-                                          fontSize: min(MediaQuery.sizeOf(context).width *0.02,15)
+                                          fontSize: fontSize
                                       ),
                                     ),
                                   ),
@@ -89,18 +91,14 @@ class MainPage extends StatelessWidget {
                             child: Text(
                               'Builder',
                               style: TextStyle(
-                                  fontSize: min(
-                                      MediaQuery.sizeOf(context).width * 0.02,
-                                      25)),
+                                  fontSize: fontSize*0.9),
                             ),
                           ),
                           Tab(
                             // icon: Icon(Icons.list_alt),
                             child: Text('List',
                                 style: TextStyle(
-                                    fontSize: min(
-                                        MediaQuery.sizeOf(context).width * 0.02,
-                                        25))),
+                                    fontSize: fontSize*0.9)),
                           )
                         ],
                       ),

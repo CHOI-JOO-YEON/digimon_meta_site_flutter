@@ -505,7 +505,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     double fontSize = min(MediaQuery.sizeOf(context).width*0.015,25);
-    double iconSize  = min(MediaQuery.sizeOf(context).width*0.025,25);
+    double iconSize  = min(MediaQuery.sizeOf(context).width*0.03,25);
     if(isPortrait) {
       fontSize*=2;
       iconSize*=1.1;
@@ -541,6 +541,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                         Expanded(
                           flex: 1,
                           child: IconButton(
+                            iconSize: iconSize,
                             padding: EdgeInsets.zero,
                             icon: const Icon(Icons.check),
                             onPressed: () {
@@ -556,6 +557,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                         Expanded(
                           flex: 1,
                           child: IconButton(
+                            iconSize: iconSize,
                             padding: EdgeInsets.zero,
                             icon: const Icon(Icons.edit),
                             onPressed: () {
