@@ -105,7 +105,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     deck.import(deckResponseDto);
     setState(() {});
   }
-  Timer? _debounce;
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -123,14 +122,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           minHeight: 50,
           maxHeight: constraints.maxHeight/2,
           isDraggable: false,
-          onPanelSlide: (v){
-            if (_debounce?.isActive ?? false) _debounce?.cancel();
-            _debounce = Timer(const Duration(milliseconds: 100), () {
-             setState(() {
-
-             });
-            });
-          },
           panel: Container(
             margin:  EdgeInsets.only(
                 left: MediaQuery.sizeOf(context).width * 0.01,
@@ -159,7 +150,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           flex: 1,
                           child: GestureDetector(
                             onTap: (){
-                              print('!');
                               if(_panelController.isPanelOpen){
                                 _panelController.close();
                               }else{
