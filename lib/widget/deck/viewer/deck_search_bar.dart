@@ -128,6 +128,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                             style: TextStyle(fontSize: 20),
                           ),
                           Switch(
+                            inactiveThumbColor: Colors.red,
                             value: isChecked,
                             onChanged: (value) {
                               setState(() {
