@@ -1,5 +1,9 @@
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
+import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import 'card.dart';
 
@@ -26,25 +30,46 @@ class Deck {
     authorId = deckResponseDto.authorId;
     if (deckResponseDto.cardAndCntMap != null) {
       for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
-        for (int i = 0; i < cardEntry.value; i++) {
-          addCard(cardEntry.key);
+        DigimonCard card = cardEntry.key;
+
+        cardMap[card.cardId!] = card;
+        if(card.cardType=='DIGITAMA') {
+          tamaMap[card] = cardEntry.value;
+          tamaCards.add(card);
+
+          tamaCount++;
+        }
+        else {
+          deckMap[card] = cardEntry.value;
+          deckCards.add(card);
+
+          deckCount++;
         }
       }
     }
+    tamaCards.sort(digimonCardComparator);
+    deckCards.sort(digimonCardComparator);
   }
   Deck.deck(Deck deck) {
     deckName = deck.deckName+' Copy';
     formatId = deck.formatId;
     for (var tama in deck.tamaMap.entries) {
-      for(int i=0;i<tama.value;i++){
-        addCard(tama.key);
-      }
+      cardMap[tama.key.cardId!] = tama.key;
+      tamaMap[tama.key] = tama.value;
+      tamaCards.add(tama.key);
+
+      tamaCount++;
     }
+
     for (var card in deck.deckMap.entries) {
-      for(int i=0;i<card.value;i++){
-        addCard(card.key);
-      }
+      cardMap[card.key.cardId!] = card.key;
+      deckMap[card.key] = card.value;
+      deckCards.add(card.key);
+
+      deckCount++;
     }
+    tamaCards.sort(digimonCardComparator);
+    deckCards.sort(digimonCardComparator);
   }
 
   Deck();
@@ -63,6 +88,7 @@ class Deck {
   Set<String> colors = {};
   String? author;
   int? authorId;
+  LimitDto? limitDto = LimitProvider().getCurrentLimit();
 
   int? formatId;
   bool isPublic = false;
@@ -96,11 +122,27 @@ class Deck {
   void import(DeckResponseDto? deckResponseDto) {
     if (deckResponseDto != null) {
       clear();
-      for (var entry in deckResponseDto.cardAndCntMap!.entries) {
-        for (int i = 0; i < entry.value; i++) {
-          addCard(entry.key);
+      if (deckResponseDto.cardAndCntMap != null) {
+        for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
+          DigimonCard card = cardEntry.key;
+
+          cardMap[card.cardId!] = card;
+          if(card.cardType=='DIGITAMA') {
+            tamaMap[card] = cardEntry.value;
+            tamaCards.add(card);
+
+            tamaCount++;
+          }
+          else {
+            deckMap[card] = cardEntry.value;
+            deckCards.add(card);
+
+            deckCount++;
+          }
         }
       }
+      tamaCards.sort(digimonCardComparator);
+      deckCards.sort(digimonCardComparator);
     }
   }
 
@@ -126,7 +168,9 @@ class Deck {
     tamaCount = 0;
   }
 
-  addCard(DigimonCard card) {
+  addCard(DigimonCard card,BuildContext context) {
+    LimitProvider limitProvider = Provider.of(context,listen: false);
+
     if (cardMap.containsKey(card.cardId)) {
       card = cardMap[card.cardId]!;
     } else {
@@ -134,27 +178,32 @@ class Deck {
     }
     if (card.cardType == 'DIGITAMA') {
       if (tamaMap.containsKey(card)) {
-        if (tamaMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)) {
+        if (tamaMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)&&tamaMap[card]!<limitProvider.getCardAllowedQuantity(card.cardNo!)) {
           tamaMap[card] = tamaMap[card]! + 1;
           tamaCount++;
         }
       } else {
-        tamaMap[card] = 1;
-        tamaCards.add(card);
-        tamaCards.sort(digimonCardComparator);
-        tamaCount++;
+        if(limitProvider.getCardAllowedQuantity(card.cardNo!)>0) {
+          tamaMap[card] = 1;
+          tamaCards.add(card);
+          tamaCards.sort(digimonCardComparator);
+          tamaCount++;
+        }
       }
     } else {
       if (deckMap.containsKey(card)) {
-        if (deckMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)) {
+        if (deckMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)&&deckMap[card]!<limitProvider.getCardAllowedQuantity(card.cardNo!)) {
           deckMap[card] = deckMap[card]! + 1;
           deckCount++;
         }
       } else {
-        deckMap[card] = 1;
-        deckCards.add(card);
-        deckCards.sort(digimonCardComparator);
-        deckCount++;
+        if(limitProvider.getCardAllowedQuantity(card.cardNo!)>0) {
+          deckMap[card] = 1;
+          deckCards.add(card);
+          deckCards.sort(digimonCardComparator);
+          deckCount++;
+        }
+
       }
     }
   }

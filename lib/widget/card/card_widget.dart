@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
+import 'package:provider/provider.dart';
+
+import '../../provider/limit_provider.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
@@ -80,39 +83,157 @@ class _CustomCardState extends State<CustomCard> {
         },
         onLongPressStart: _handleLongPressStart,
         onLongPressEnd: _handleLongPressEnd,
-        child: Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            SizedBox(
-                width: widget.width,
-                child: Image.network(
-                  widget.card.smallImgUrl ?? '',
-                  fit: BoxFit.fill,
-                )),
-            Positioned(
-              right: widget.width * 0.05,
-              bottom: widget.width * 0.05,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                      width: widget.width * 0.2, height: widget.width * 0.2),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: widget.width * 0.16,
-                    icon: Icon(Icons.zoom_in,
-                        color: color == 'BLACK' ? Colors.white : Colors.black),
-                    onPressed: () {
-                      _showImageDialog(context, widget.card);
-                    },
+        child: Consumer<LimitProvider>(
+          builder: (context, limitProvider, child) {
+            int allowedQuantity = limitProvider.getCardAllowedQuantity(widget.card.cardNo!);
+            return Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                SizedBox(
+                  width: widget.width,
+                  child: Image.network(
+                    widget.card.smallImgUrl ?? '',
+                    fit: BoxFit.fill,
                   ),
                 ),
-              ),
-            ),
-          ],
+                if (allowedQuantity == 1 || allowedQuantity == 0)
+                  Positioned(
+                    top: widget.width * 0.08,
+                    right: widget.width * 0.08,
+                    child: Builder(
+                      builder: (context) {
+                        double containerSize = widget.width * 0.2;
+                        double iconSize = widget.width * 0.15;
+                        double fontSize = widget.width * 0.12;
+
+                        if (allowedQuantity == 0) {
+                          return Container(
+                            padding: EdgeInsets.zero,
+                            width: containerSize,
+                            height: containerSize,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.block,
+                                color: Colors.white,
+                                size: iconSize,
+                              ),
+                            ),
+                          );
+                        } else if (allowedQuantity == 1) {
+                          return Container(
+                            padding: EdgeInsets.zero,
+                            width: containerSize,
+                            height: containerSize,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '1',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return SizedBox();
+                        }
+                      },
+                    ),
+                  ),
+                Positioned(
+                  right: widget.width * 0.05,
+                  bottom: widget.width * 0.05,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                        width: widget.width * 0.2,
+                        height: widget.width * 0.2,
+                      ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: widget.width * 0.16,
+                        icon: Icon(
+                          Icons.zoom_in,
+                          color: color == 'BLACK' ? Colors.white : Colors.black,
+                        ),
+                        onPressed: () {
+                          _showImageDialog(context, widget.card);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
+  // @override
+  // Widget build(BuildContext context) {
+  //   String color = widget.card.color2 ?? widget.card.color1!;
+  //   return MouseRegion(
+  //     onEnter: (event) {
+  //       if (widget.onHover != null) {
+  //         widget.onHover!(context);
+  //       }
+  //     },
+  //     onExit: (event) {
+  //       if (widget.onExit != null) {
+  //         widget.onExit!();
+  //       }
+  //     },
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         if (widget.cardPressEvent != null) {
+  //           widget.cardPressEvent!(widget.card);
+  //         }
+  //       },
+  //       onLongPressStart: _handleLongPressStart,
+  //       onLongPressEnd: _handleLongPressEnd,
+  //       child: Stack(
+  //         alignment: Alignment.bottomRight,
+  //         children: [
+  //           SizedBox(
+  //               width: widget.width,
+  //               child: Image.network(
+  //                 widget.card.smallImgUrl ?? '',
+  //                 fit: BoxFit.fill,
+  //               )),
+  //           Positioned(
+  //             right: widget.width * 0.05,
+  //             bottom: widget.width * 0.05,
+  //             child: Center(
+  //               child: ConstrainedBox(
+  //                 constraints: BoxConstraints.tightFor(
+  //                     width: widget.width * 0.2, height: widget.width * 0.2),
+  //                 child: IconButton(
+  //                   padding: EdgeInsets.zero,
+  //                   iconSize: widget.width * 0.16,
+  //                   icon: Icon(Icons.zoom_in,
+  //                       color: color == 'BLACK' ? Colors.white : Colors.black),
+  //                   onPressed: () {
+  //                     _showImageDialog(context, widget.card);
+  //                   },
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // void _showImageDialog(BuildContext context, DigimonCard card) {
   //   showDialog(
@@ -176,10 +297,8 @@ class _CustomCardState extends State<CustomCard> {
             IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () async {
-                  print(card.imgUrl);
                   if(card.imgUrl!=null) {
                     await WebImageDownloader.downloadImageFromWeb(card.imgUrl!,name: '${card.cardNo}_${card.cardName}.png');
-                    print('!');
                   }
 
 

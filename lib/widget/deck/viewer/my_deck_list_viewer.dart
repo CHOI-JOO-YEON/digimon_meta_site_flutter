@@ -55,7 +55,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
 
     currentPage = page;
     deckSearchParameter.updatePage(page);
-    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(deckSearchParameter);
+    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(deckSearchParameter,context);
 
 
     if (pagedDeck != null) {

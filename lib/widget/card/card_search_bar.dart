@@ -217,7 +217,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                             Text(
                             getKorColorStringByEn(color),
                               style: TextStyle(
-                                  color: ColorService()
+                                  color: ColorService
                                       .getColorFromString(color.toUpperCase())),
                             ),
                           ],

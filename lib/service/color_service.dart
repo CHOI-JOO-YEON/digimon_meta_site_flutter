@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ColorService{
 
-  Color getColorFromString(String colorString) {
+  static Color getColorFromString(String colorString) {
     switch (colorString) {
       case 'RED':
         return Colors.red;

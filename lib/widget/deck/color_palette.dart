@@ -17,7 +17,7 @@ class ColorWheel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Color> colorValues = colors.map((color) {
-      return ColorService().getColorFromString(color);
+      return ColorService.getColorFromString(color);
     }).toList();
 
     return SizedBox(

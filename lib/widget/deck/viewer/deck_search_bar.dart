@@ -1,10 +1,14 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../model/deck_search_parameter.dart';
 import '../../../model/format.dart';
+import '../../../model/limit_dto.dart';
+import '../../../provider/limit_provider.dart';
 import '../../../service/color_service.dart';
 
 class DeckSearchBar extends StatefulWidget {
@@ -47,6 +51,101 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
         break;
       }
     }
+  }
+
+  void _showDeckSettingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<LimitProvider>(
+          builder: (context, limitProvider, child) {
+            LimitDto? selectedLimit = limitProvider.selectedLimit;
+            bool isChecked = widget.searchParameter.isOnlyValidDeck;
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        widget.searchParameter.isOnlyValidDeck = isChecked;
+                        if (selectedLimit != null) {
+                          limitProvider.updateSelectLimit(
+                              selectedLimit!.restrictionBeginDate);
+
+                        }
+                        widget.search(1);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('적용'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('취소'),
+                    ),
+                  ],
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            '금지/제한: ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: DropdownButtonFormField<LimitDto>(
+                              value: selectedLimit,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedLimit = newValue;
+                                });
+                              },
+                              items:
+                                  limitProvider.limits.values.map((limitDto) {
+                                return DropdownMenuItem<LimitDto>(
+                                  value: limitDto,
+                                  child: Text(
+                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '유효한 덱만 보기',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          Switch(
+                            value: isChecked,
+                            onChanged: (value) {
+                              setState(() {
+                                isChecked = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -124,7 +223,14 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 ),
               ),
             ),
-            Expanded(flex: 1, child: Container()),
+            // Expanded(flex: 1, child: ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => _showDeckSettingDialog(context),
+              iconSize: fontSize,
+              icon: const Icon(Icons.settings),
+              tooltip: '검색 설정',
+            ),
             Expanded(
               flex: 3,
               child: TextField(
@@ -159,7 +265,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             colors.length,
             (index) {
               String color = colors[index];
-              Color buttonColor = ColorService().getColorFromString(color);
+              Color buttonColor = ColorService.getColorFromString(color);
 
               return GestureDetector(
                 onTap: () {

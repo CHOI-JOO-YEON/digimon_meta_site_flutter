@@ -7,7 +7,6 @@ import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/deck.dart';
 import '../../../model/deck_response_dto.dart';
 import '../../../model/format.dart';
 
@@ -56,7 +55,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
     currentPage = page;
     deckSearchParameter.updatePage(page);
     PagedResponseDeckDto? pagedDeck =
-        await DeckService().getDeck(deckSearchParameter);
+        await DeckService().getDeck(deckSearchParameter,context);
 
     if (pagedDeck != null) {
       decks = pagedDeck.decks;

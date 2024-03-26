@@ -46,7 +46,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   }
 
   addCard(DigimonCard digimonCard) {
-    widget.deck.addCard(digimonCard);
+    widget.deck.addCard(digimonCard,context);
     setState(() {
 
     });

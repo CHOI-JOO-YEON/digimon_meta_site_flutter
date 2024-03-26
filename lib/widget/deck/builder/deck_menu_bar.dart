@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 
 import '../../../enums/site_enum.dart';
 import '../../../model/deck.dart';
+import '../../../model/limit_dto.dart';
+import '../../../provider/limit_provider.dart';
 
 class DeckBuilderMenuBar extends StatefulWidget {
   final Deck deck;
@@ -44,7 +46,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   @override
   void dispose() {
-    _deckNameController.dispose();
+    if (mounted) {
+      _deckNameController.dispose();
+    }
     super.dispose();
   }
 
@@ -119,7 +123,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
       builder: (BuildContext context, StateSetter setState) {
         return Column(
           children: [
-            Text('덱 컬러 선택'),
+            Text('덱 컬러 선택', style: TextStyle(fontSize: 25)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
@@ -172,6 +176,8 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   }
 
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
+    LimitProvider limitProvider = Provider.of(context,listen: false);
+
     widget.deck.formatId = formats.keys.first;
     for (var format in formats.values) {
       if (!format.isOnlyEn!) {
@@ -195,7 +201,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(widget.deck.isPublic ? '전체 공개' : '비공개'),
+                        Text(widget.deck.isPublic ? '전체 공개' : '비공개', style: TextStyle(fontSize: 25),),
                         Switch(
                           inactiveThumbColor: Colors.red,
                           value: widget.deck.isPublic,
@@ -207,7 +213,10 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                         ),
                       ],
                     ),
+                    Divider(),
                     _colorSelectionWidget(widget.deck),
+                    Divider(),
+                    Text('포맷', style: TextStyle(fontSize: 25)),
                     DropdownButton<int>(
                       value: widget.deck.formatId,
                       hint: Text(formats[widget.deck.formatId]?.name ?? "포맷 "),
@@ -251,6 +260,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                         });
                       },
                     ),
+                    Divider(),
+                    Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
+                    Text('${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}', style: TextStyle(fontSize: 20))
                   ],
                 ),
               ),
@@ -537,14 +549,87 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
     );
   }
 
+  void _showDeckSettingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<LimitProvider>(
+          builder: (context, limitProvider, child) {
+            LimitDto? selectedLimit = limitProvider.selectedLimit;
+
+            return AlertDialog(
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('취소'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (selectedLimit != null) {
+                          limitProvider.updateSelectLimit(
+                              selectedLimit!.restrictionBeginDate);
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: Text('확인'),
+                    ),
+                  ],
+                ),
+
+              ],
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '금지/제한: ',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(width: 10,),
+                      Expanded(
+                        child: DropdownButtonFormField<LimitDto>(
+                          value: selectedLimit,
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedLimit = newValue;
+                            });
+                          },
+                          items: limitProvider.limits.values.map((limitDto) {
+                            return DropdownMenuItem<LimitDto>(
+                              value: limitDto,
+                              child: Text(
+                                '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.015, 25);
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.015, 20);
     double iconSize = min(MediaQuery.sizeOf(context).width * 0.03, 25);
     if (isPortrait) {
-      fontSize *= 2;
+      fontSize *= 1.7;
       iconSize *= 1.1;
     }
 
@@ -558,15 +643,19 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                 padding: const EdgeInsets.all(0),
                 child: Container(
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                          flex: 3,
-                          child: Text(widget.deck.deckName,
-                      style: TextStyle(
-                                fontFamily: 'JalnanGothic', fontSize: fontSize),
-                      )),
-                  Expanded(
+                        flex: 3,
+                        child: Text(
+                          widget.deck.deckName,
+                          // maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontFamily: 'JalnanGothic', fontSize: fontSize),
+                        ),
+                      ),
+                      Expanded(
                         flex: 1,
                         child: IconButton(
                           iconSize: iconSize,
@@ -575,51 +664,6 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                           onPressed: () => _showRenameDialog(context),
                         ),
                       )
-                      // Expanded(
-                      //   flex: 3,
-                      //   child: TextField(
-                      //     style: TextStyle(
-                      //         fontFamily: 'JalnanGothic', fontSize: fontSize),
-                      //     controller: _deckNameController,
-                      //     readOnly: !_isEditing,
-                      //     decoration: InputDecoration(
-                      //       hintText: "덱 이름",
-                      //       border: !_isEditing
-                      //           ? InputBorder.none
-                      //           : const UnderlineInputBorder(),
-                      //     ),
-                      //   ),
-                      // ),
-                      // if (_isEditing)
-                      //   Expanded(
-                      //     flex: 1,
-                      //     child: IconButton(
-                      //       iconSize: iconSize,
-                      //       padding: EdgeInsets.zero,
-                      //       icon: const Icon(Icons.check),
-                      //       onPressed: () {
-                      //         setState(() {
-                      //           _isEditing = false;
-                      //           widget.deck.deckName =
-                      //               _deckNameController.text; // 덱 이름 업데이트
-                      //         });
-                      //       },
-                      //     ),
-                      //   )
-                      // else
-                      //   Expanded(
-                      //     flex: 1,
-                      //     child: IconButton(
-                      //       iconSize: iconSize,
-                      //       padding: EdgeInsets.zero,
-                      //       icon: const Icon(Icons.edit),
-                      //       onPressed: () {
-                      //         setState(() {
-                      //           _isEditing = true;
-                      //         });
-                      //       },
-                      //     ),
-                      //   ),
                     ],
                   ),
                 ),
@@ -710,6 +754,17 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       iconSize: iconSize,
                       icon: const Icon(Icons.image),
                       tooltip: '이미지 저장',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckSettingDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.settings),
+                      tooltip: '덱 설정',
                     ),
                   ),
                   if (hasManagerRole) // 권한 체크 조건

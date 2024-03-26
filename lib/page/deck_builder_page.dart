@@ -80,7 +80,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   addCardByDeck(DigimonCard card) {
-    deck.addCard(card);
+    deck.addCard(card, context);
     setState(() {});
   }
 

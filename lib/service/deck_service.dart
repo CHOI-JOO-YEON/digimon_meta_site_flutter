@@ -4,11 +4,14 @@ import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../model/deck.dart';
 import 'dart:html' as html;
 
 import '../model/format.dart';
+import '../provider/limit_provider.dart';
 class DeckService{
   DeckApi deckApi = DeckApi();
 
@@ -64,7 +67,12 @@ class DeckService{
     return [];
   }
 
-  Future<PagedResponseDeckDto?> getDeck(DeckSearchParameter deckSearchParameter) async {
+  Future<PagedResponseDeckDto?> getDeck(DeckSearchParameter deckSearchParameter,BuildContext context) async {
+    LimitProvider limitProvider = Provider.of(context,listen: false);
+    if(limitProvider.selectedLimit!=null) {
+      deckSearchParameter.limitId = limitProvider.selectedLimit!.id;
+    }
+
     PagedResponseDeckDto? decks = await DeckApi().findDecks(deckSearchParameter);
 
     return decks;

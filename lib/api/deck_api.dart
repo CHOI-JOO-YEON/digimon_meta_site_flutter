@@ -94,7 +94,7 @@ class DeckApi {
 
 
 
-  Future<PagedResponseDeckDto?> findDecks(DeckSearchParameter deckSearchParameter) async {
+  Future<PagedResponseDeckDto?>   findDecks(DeckSearchParameter deckSearchParameter) async {
     try {
       var response = await dioClient.dio.get(
         '$baseUrl/api/deck',

@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/user.dart';
+import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/user_service.dart';
@@ -17,6 +18,7 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => LimitProvider()),
     ],
     child: MyApp(
       router: appRouter,
@@ -44,6 +46,7 @@ class _MyAppState extends State<MyApp> {
     DioClient().onAuthError = () {
       Provider.of<UserProvider>(context, listen: false).unAuth();
     };
+    _initializeLimitProvider();
   }
   void listenForOAuthToken() {
     html.window.addEventListener('message', (event) async {
@@ -52,6 +55,10 @@ class _MyAppState extends State<MyApp> {
       await UserService().oauthLogin(code, context);
     });
   }
+  Future<void> _initializeLimitProvider() async {
+    final limitProvider = Provider.of<LimitProvider>(context, listen: false);
+    await limitProvider.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +66,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Digimon-Meta',
       theme: ThemeData(
        fontFamily: 'JalnanGothic',
-        primarySwatch: MaterialColor(0xFF1A237E, {
+        primarySwatch: const MaterialColor(0xFF1A237E, {
           50: Color(0xFFE8EAF6),
           100: Color(0xFFC5CAE9),
           200: Color(0xFF9FA8DA),
@@ -72,7 +79,7 @@ class _MyAppState extends State<MyApp> {
           900: Color(0xFF1A237E),
         }),
         colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: MaterialColor(0xFF1A237E, {
+          primarySwatch: const MaterialColor(0xFF1A237E, {
             50: Color(0xFFE8EAF6),
             100: Color(0xFFC5CAE9),
             200: Color(0xFF9FA8DA),
@@ -84,11 +91,11 @@ class _MyAppState extends State<MyApp> {
             800: Color(0xFF283593),
             900: Color(0xFF1A237E),
           }),
-          accentColor: Color(0xFFFF6B00),
-          backgroundColor: Color(0xFFF5F5F5),
-          cardColor: Color(0xFFFFFFFF),
+          accentColor: const Color(0xFFFF6B00),
+          backgroundColor: const Color(0xFFF5F5F5),
+          cardColor: const Color(0xFFFFFFFF),
         ),
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           headline1: TextStyle(color: Color(0xFF1A237E)),
           headline2: TextStyle(color: Color(0xFF3949AB)),
           headline3: TextStyle(color: Color(0xFF303F9F)),
