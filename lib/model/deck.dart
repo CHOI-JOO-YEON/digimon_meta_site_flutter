@@ -37,13 +37,13 @@ class Deck {
           tamaMap[card] = cardEntry.value;
           tamaCards.add(card);
 
-          tamaCount++;
+          tamaCount+=cardEntry.value;
         }
         else {
           deckMap[card] = cardEntry.value;
           deckCards.add(card);
 
-          deckCount++;
+          deckCount+=cardEntry.value;
         }
       }
     }
@@ -58,7 +58,7 @@ class Deck {
       tamaMap[tama.key] = tama.value;
       tamaCards.add(tama.key);
 
-      tamaCount++;
+      tamaCount+=tama.value;
     }
 
     for (var card in deck.deckMap.entries) {
@@ -66,7 +66,7 @@ class Deck {
       deckMap[card.key] = card.value;
       deckCards.add(card.key);
 
-      deckCount++;
+      deckCount+=card.value;
     }
     tamaCards.sort(digimonCardComparator);
     deckCards.sort(digimonCardComparator);
@@ -131,13 +131,13 @@ class Deck {
             tamaMap[card] = cardEntry.value;
             tamaCards.add(card);
 
-            tamaCount++;
+            tamaCount+=cardEntry.value;
           }
           else {
             deckMap[card] = cardEntry.value;
             deckCards.add(card);
 
-            deckCount++;
+            deckCount+=cardEntry.value;
           }
         }
       }

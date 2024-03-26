@@ -92,9 +92,8 @@ class DeckApi {
     return null;
   }
 
-
-
-  Future<PagedResponseDeckDto?>   findDecks(DeckSearchParameter deckSearchParameter) async {
+  Future<PagedResponseDeckDto?> findDecks(
+      DeckSearchParameter deckSearchParameter) async {
     try {
       var response = await dioClient.dio.get(
         '$baseUrl/api/deck',
@@ -116,14 +115,10 @@ class DeckApi {
     }
   }
 
-  Future<bool> deleteDeck(int deckId) async{
+  Future<bool> deleteDeck(int deckId) async {
     try {
-      var response = await dioClient.dio.post(
-        '$baseUrl/api/deck/delete',
-        queryParameters: {
-          'deck-id' : deckId
-        }
-      );
+      var response = await dioClient.dio.post('$baseUrl/api/deck/delete',
+          queryParameters: {'deck-id': deckId});
 
       if (response.statusCode == 200) {
         return true;
