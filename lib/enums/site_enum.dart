@@ -68,11 +68,9 @@ extension SiteNameMapExtension on SiteName {
     }
     for (int i = 1; i < readStrings.length; i++) {
       String cardCode = readStrings[i];
-      // 정규 표현식을 사용하여 비숫자로 끝나는지 확인하고, 조건에 맞으면 마지막 문자 제거
       if (RegExp(r'\D$').hasMatch(cardCode)) {
         cardCode = cardCode.substring(0, cardCode.length - 1);
       }
-      // 카드 코드와 수량을 맵에 추가 또는 업데이트
       result.update(cardCode, (value) => value + 1, ifAbsent: () => 1);
     }
 
@@ -82,7 +80,7 @@ extension SiteNameMapExtension on SiteName {
 
   String _convertDeckToDeckCodeByTTS(Deck deck) {
     List<String> returnStrings = [];
-    returnStrings.add("Exported from Joo");
+    returnStrings.add("Exported from Digimon-Meta");
     for (var entry in deck.deckMap.entries) {
       for(int i=0;i<entry.value;i++){
         returnStrings.add(entry.key.cardNo!);

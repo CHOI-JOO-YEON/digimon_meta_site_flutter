@@ -82,8 +82,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   void deleteDeck(int deckId) async {
     bool isSuccess = await DeckService().deleteDeck(deckId);
     if (isSuccess) {
-      // 삭제가 성공한 경우에만 위젯을 다시 로딩
-      await searchDecks(1);
+      if(decks.length==1) {
+        await searchDecks(1);
+      }else{
+        await searchDecks(deckSearchParameter.page);
+      }
+
     }
   }
 
