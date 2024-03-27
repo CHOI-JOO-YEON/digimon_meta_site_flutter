@@ -45,7 +45,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     return Column(
       children: [
         Expanded(
-          flex: 8,
+          flex: 4,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -76,7 +76,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
 
         //덱그리드뷰
         Expanded(
-            flex: 28,
+            flex: 14,
             child: Container(
               decoration: BoxDecoration(
                   // color: Color.fromRGBO(255, 255, 240, 1),
@@ -91,7 +91,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             )),
         Expanded(flex: 1, child: Container()),
         Expanded(
-            flex: 12,
+            flex: 6,
             child: Container(
               decoration: BoxDecoration(
                   color:  Theme.of(context).cardColor,

@@ -263,51 +263,54 @@ class _DeckListPageState extends State<DeckListPage> {
         //     )
         //   ],
         // )
-        : Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+        : Padding(
+      padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
 
-                      // color: Colors.blueAccent
-                      color: Theme.of(context).highlightColor),
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      height: MediaQuery.sizeOf(context).height * 0.88,
-                      // height: 1000,
-                      child: _selectedDeck == null
-                          ? Container()
-                          : DeckViewerView(
-                              deck: _selectedDeck!,
-                            ),
+                        // color: Colors.blueAccent
+                        color: Theme.of(context).highlightColor),
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        height: MediaQuery.sizeOf(context).height * 0.88,
+                        // height: 1000,
+                        child: _selectedDeck == null
+                            ? Container()
+                            : DeckViewerView(
+                                deck: _selectedDeck!,
+                              ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: MediaQuery.sizeOf(context).width * 0.01,
-              ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).highlightColor,
-                    borderRadius: BorderRadius.circular(5),
-                    // border: Border.all()
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
-                    child: DeckSearchView(
-                      deckUpdate: updateSelectedDeck,
+                SizedBox(
+                  width: MediaQuery.sizeOf(context).width * 0.01,
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).highlightColor,
+                      borderRadius: BorderRadius.circular(5),
+                      // border: Border.all()
+                    ),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                      child: DeckSearchView(
+                        deckUpdate: updateSelectedDeck,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
+              ],
+            ),
+        );
   }
 }
