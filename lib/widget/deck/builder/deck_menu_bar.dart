@@ -237,7 +237,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                           return DropdownMenuItem<int>(
                             value: entry.key,
                             child: Text(
-                              '${entry.value.name} \n['
+                              '${entry.value.name} ['
                               '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
                               '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
                               // overflow: TextOverflow.ellipsis,
