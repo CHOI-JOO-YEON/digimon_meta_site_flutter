@@ -13,7 +13,6 @@ import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.d
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-
 import '../model/card.dart';
 import '../model/note.dart';
 import '../widget/card/card_search_bar.dart';
@@ -105,6 +104,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     deck.import(deckResponseDto);
     setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -120,125 +120,289 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           controller: _panelController,
           renderPanelSheet: false,
           minHeight: 50,
-          maxHeight: constraints.maxHeight/2,
+          snapPoint: 0.5,
+          maxHeight: constraints.maxHeight,
           isDraggable: false,
-          panel: Container(
-            // margin:  EdgeInsets.only(
-            //     left: MediaQuery.sizeOf(context).width * 0.01,
-            //     right: MediaQuery.sizeOf(context).width * 0.01,
-            // ),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(5)
-              // borderRadius: BorderRadius.only(
-              //   topLeft: Radius.circular(10),
-              //   topRight: Radius.circular(10)
-              // )
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(
-                  left: MediaQuery.sizeOf(context).width * 0.01,
-                  right: MediaQuery.sizeOf(context).width * 0.01,
-                  bottom: MediaQuery.sizeOf(context).width * 0.01),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 50,
-                    child: Row(
-                      children: [
-                        Expanded(flex: 1, child: Container()),
-                        Expanded(
-                          flex: 1,
-                          child: GestureDetector(
-                            onTap: (){
-                              if(_panelController.isPanelOpen){
-                                _panelController.close();
-                              }else{
-                                _panelController.open();
-                              }
-                              setState(() {
-
-                              });
-                            },
-                            child: Transform.scale(
-                              scaleX: 2,
-                              child: Icon(
-                                Icons.drag_handle,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                    onPressed: () {
-
-                                      _scrollController.animateTo(
-                                        0,
-                                        duration: Duration(milliseconds: 500),
-                                        curve: Curves.easeInOut,
-                                      );
-                                    },
-                                    child: Text(
-                                      '메인덱 보기',
-                                      style: TextStyle(fontSize: fontSize),
-                                    )),
-                                TextButton(
-                                    onPressed: () {
-
-
-                                      _scrollController.animateTo(
-                                        _scrollController
-                                            .position.maxScrollExtent,
-                                        duration: Duration(milliseconds: 500),
-                                        curve: Curves.easeInOut,
-                                      );
-                                    },
-                                    child: Text(
-                                      '타마덱 보기',
-                                      style: TextStyle(fontSize: fontSize),
-                                    ))
-                              ],
-                            ))
-                      ],
-                    ),
+          panelBuilder: (ScrollController sc) {
+            return Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(5)
                   ),
-                  Expanded(
-                      flex: 2,
-                      child: Column(children: [
-                        SizedBox(
-                            height: 50,
-                            // flex: 1,
-                            child: CardSearchBar(
-                              notes: notes,
-                              searchParameter: searchParameter,
-                              onSearch: initSearch,
-                            )),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Expanded(
-                          // flex: 9,
-                            child: !isSearchLoading
-                                ? CardScrollGridView(
-                              cards: cards,
-                              rowNumber: 6,
-                              loadMoreCards: loadMoreCard,
-                              cardPressEvent: addCardByDeck,
-                              totalPages: totalPages,
-                              currentPage: currentPage,
-                            )
-                                : Center(child: CircularProgressIndicator())),
-                      ],)),
-
-                ],
+              child: Padding(
+                padding: EdgeInsets.only(
+                    left: MediaQuery.sizeOf(context).width * 0.01,
+                    right: MediaQuery.sizeOf(context).width * 0.01,
+                    bottom: MediaQuery.sizeOf(context).width * 0.01),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      child: Row(
+                        children: [
+                          Expanded(flex: 1, child: Container()),
+                          Expanded(
+                              flex: 1,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    onPressed: _panelController.panelPosition > 0.3
+                                        ? () {
+                                      if (_panelController.panelPosition > 0.7) {
+                                        _panelController.animatePanelToSnapPoint().then((_) {
+                                          setState(() {});
+                                        });
+                                      } else {
+                                        _panelController.close().then((_) {
+                                          setState(() {});
+                                        });
+                                      }
+                                    }
+                                        : null,
+                                    icon: Icon(
+                                      Icons.arrow_drop_down,
+                                      color: _panelController.panelPosition > 0.3
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  Text(
+                                    '검색 패널',
+                                    style: TextStyle(fontSize: fontSize, color:  Theme.of(context).primaryColor),
+                                  ),
+                                  IconButton(
+                                    onPressed: _panelController.panelPosition < 0.7
+                                        ? () {
+                                      if (_panelController.panelPosition < 0.3) {
+                                        _panelController.animatePanelToSnapPoint().then((_) {
+                                          setState(() {});
+                                        });
+                                      } else {
+                                        _panelController.open().then((_) {
+                                          setState(() {});
+                                        });
+                                      }
+                                    }
+                                        : null,
+                                    icon: Icon(
+                                      Icons.arrow_drop_up,
+                                      color: _panelController.panelPosition < 0.7
+                                          ?  Theme.of(context).primaryColor
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              )
+                          ),
+                          // Expanded(
+                          //   flex: 1,
+                          //   child: GestureDetector(
+                          //     onTap: () {
+                          //       // if (_panelController.isPanelOpen) {
+                          //       //   _panelController.close();
+                          //       // } else {
+                          //       //   _panelController.open();
+                          //       // }
+                          //       // setState(() {});
+                          //     },
+                          //     child: Transform.scale(
+                          //       scaleX: 2,
+                          //       child: Icon(
+                          //         Icons.drag_handle,
+                          //         color: Theme.of(context).primaryColor,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          Expanded(
+                              flex: 1,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                      onPressed: () {
+                                        _scrollController.animateTo(
+                                          0,
+                                          duration: Duration(milliseconds: 500),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      },
+                                      child: Text(
+                                        '메인덱 보기',
+                                        style: TextStyle(fontSize: fontSize),
+                                      )),
+                                  TextButton(
+                                      onPressed: () {
+                                        _scrollController.animateTo(
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                          duration: Duration(milliseconds: 500),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      },
+                                      child: Text(
+                                        '타마덱 보기',
+                                        style: TextStyle(fontSize: fontSize),
+                                      ))
+                                ],
+                              ))
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                                height: 50,
+                                // flex: 1,
+                                child: CardSearchBar(
+                                  notes: notes,
+                                  searchParameter: searchParameter,
+                                  onSearch: initSearch,
+                                )),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Expanded(
+                                flex: 9,
+                                child: !isSearchLoading
+                                    ? CardScrollGridView(
+                                        cards: cards,
+                                        rowNumber: 6,
+                                        loadMoreCards: loadMoreCard,
+                                        cardPressEvent: addCardByDeck,
+                                        totalPages: totalPages,
+                                        currentPage: currentPage,
+                                      )
+                                    : Center(
+                                        child: CircularProgressIndicator())),
+                            Expanded(flex: _panelController.panelPosition<0.7? 11:0, child: Container())
+                          ],
+                        )),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
+          // panel: Container(
+          //   // margin:  EdgeInsets.only(
+          //   //     left: MediaQuery.sizeOf(context).width * 0.01,
+          //   //     right: MediaQuery.sizeOf(context).width * 0.01,
+          //   // ),
+          //   decoration: BoxDecoration(
+          //     color: Colors.grey[300],
+          //     borderRadius: BorderRadius.circular(5)
+          //     // borderRadius: BorderRadius.only(
+          //     //   topLeft: Radius.circular(10),
+          //     //   topRight: Radius.circular(10)
+          //     // )
+          //   ),
+          //   child: Padding(
+          //     padding: EdgeInsets.only(
+          //         left: MediaQuery.sizeOf(context).width * 0.01,
+          //         right: MediaQuery.sizeOf(context).width * 0.01,
+          //         bottom: MediaQuery.sizeOf(context).width * 0.01),
+          //     child: Column(
+          //       children: [
+          //         SizedBox(
+          //           height: 50,
+          //           child: Row(
+          //             children: [
+          //               Expanded(flex: 1, child: Container()),
+          //               Expanded(
+          //                 flex: 1,
+          //                 child: GestureDetector(
+          //                   onTap: (){
+          //                     if(_panelController.isPanelOpen){
+          //                       _panelController.close();
+          //                     }else{
+          //                       _panelController.open();
+          //                     }
+          //                     setState(() {
+          //
+          //                     });
+          //                   },
+          //                   child: Transform.scale(
+          //                     scaleX: 2,
+          //                     child: Icon(
+          //                       Icons.drag_handle,
+          //                       color: Theme.of(context).primaryColor,
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ),
+          //               Expanded(
+          //                   flex: 1,
+          //                   child: Row(
+          //                     mainAxisAlignment: MainAxisAlignment.end,
+          //                     children: [
+          //                       TextButton(
+          //                           onPressed: () {
+          //
+          //                             _scrollController.animateTo(
+          //                               0,
+          //                               duration: Duration(milliseconds: 500),
+          //                               curve: Curves.easeInOut,
+          //                             );
+          //                           },
+          //                           child: Text(
+          //                             '메인덱 보기',
+          //                             style: TextStyle(fontSize: fontSize),
+          //                           )),
+          //                       TextButton(
+          //                           onPressed: () {
+          //
+          //
+          //                             _scrollController.animateTo(
+          //                               _scrollController
+          //                                   .position.maxScrollExtent,
+          //                               duration: Duration(milliseconds: 500),
+          //                               curve: Curves.easeInOut,
+          //                             );
+          //                           },
+          //                           child: Text(
+          //                             '타마덱 보기',
+          //                             style: TextStyle(fontSize: fontSize),
+          //                           ))
+          //                     ],
+          //                   ))
+          //             ],
+          //           ),
+          //         ),
+          //         Expanded(
+          //             flex: 2,
+          //             child: Column(children: [
+          //               SizedBox(
+          //                   height: 50,
+          //                   // flex: 1,
+          //                   child: CardSearchBar(
+          //                     notes: notes,
+          //                     searchParameter: searchParameter,
+          //                     onSearch: initSearch,
+          //                   )),
+          //               SizedBox(
+          //                 height: 5,
+          //               ),
+          //               Expanded(
+          //                 // flex: 9,
+          //                   child: !isSearchLoading
+          //                       ? CardScrollGridView(
+          //                     cards: cards,
+          //                     rowNumber: 6,
+          //                     loadMoreCards: loadMoreCard,
+          //                     cardPressEvent: addCardByDeck,
+          //                     totalPages: totalPages,
+          //                     currentPage: currentPage,
+          //                   )
+          //                       : Center(child: CircularProgressIndicator())),
+          //             ],)),
+          //
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           body: Padding(
             padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),

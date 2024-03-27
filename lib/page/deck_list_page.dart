@@ -56,97 +56,137 @@ class _DeckListPageState extends State<DeckListPage> {
                 controller: _panelController,
                 renderPanelSheet: false,
                 minHeight: 50,
-                maxHeight: constraints.maxHeight/2,
+                maxHeight: constraints.maxHeight,
+                snapPoint: 0.5,
                 isDraggable: false,
-                panel: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: MediaQuery.sizeOf(context).width * 0.01,
-                        right: MediaQuery.sizeOf(context).width * 0.01,
-                        bottom: MediaQuery.sizeOf(context).width * 0.01),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          child: Row(
-                            children: [
-                              Expanded(flex: 1, child: Container()),
-                              Expanded(
-                                flex: 1,
-                                child: GestureDetector(
-                                  onTap: (){
-                                    if(_panelController.isPanelOpen){
-                                      _panelController.close();
-                                    }else{
-                                      _panelController.open();
-                                    }
-                                    setState(() {
-
-                                    });
-                                  },
-                                  child: Transform.scale(
-                                    scaleX: 2,
-                                    child: Icon(
-                                      Icons.drag_handle,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
+                panelBuilder: (ScrollController sc){
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.sizeOf(context).width * 0.01,
+                          right: MediaQuery.sizeOf(context).width * 0.01,
+                          bottom: MediaQuery.sizeOf(context).width * 0.01),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 50,
+                            child: Row(
+                              children: [
+                                Expanded(flex: 1, child: Container()),
+                                Expanded(
                                   flex: 1,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      TextButton(
-                                          onPressed: () {
-
-                                            _scrollController.animateTo(
-                                              0,
-                                              duration:
-                                              Duration(milliseconds: 500),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                          child: Text(
-                                            '메인덱 보기',
-                                            style:
-                                            TextStyle(fontSize: fontSize),
-                                          )),
-                                      TextButton(
-                                          onPressed: () {
-
-                                            _scrollController.animateTo(
-                                              _scrollController
-                                                  .position.maxScrollExtent,
-                                              duration:
-                                              Duration(milliseconds: 500),
-                                              curve: Curves.easeInOut,
-                                            );
-                                          },
-                                          child: Text(
-                                            '타마덱 보기',
-                                            style:
-                                            TextStyle(fontSize: fontSize),
-                                          ))
+                                      IconButton(
+                                        onPressed: _panelController.panelPosition > 0.3
+                                            ? () {
+                                          if (_panelController.panelPosition > 0.7) {
+                                            _panelController.animatePanelToSnapPoint().then((_) {
+                                              setState(() {});
+                                            });
+                                          } else {
+                                            _panelController.close().then((_) {
+                                              setState(() {});
+                                            });
+                                          }
+                                        }
+                                            : null,
+                                        icon: Icon(
+                                          Icons.arrow_drop_down,
+                                          color: _panelController.panelPosition > 0.3
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                      Text(
+                                        '검색 패널',
+                                        style: TextStyle(fontSize: fontSize, color:  Theme.of(context).primaryColor),
+                                      ),
+                                      IconButton(
+                                        onPressed: _panelController.panelPosition < 0.7
+                                            ? () {
+                                          if (_panelController.panelPosition < 0.3) {
+                                            _panelController.animatePanelToSnapPoint().then((_) {
+                                              setState(() {});
+                                            });
+                                          } else {
+                                            _panelController.open().then((_) {
+                                              setState(() {});
+                                            });
+                                          }
+                                        }
+                                            : null,
+                                        icon: Icon(
+                                          Icons.arrow_drop_up,
+                                          color: _panelController.panelPosition < 0.7
+                                              ?  Theme.of(context).primaryColor
+                                              : Colors.grey,
+                                        ),
+                                      ),
                                     ],
-                                  ))
-                            ],
+                                  )
+                                ),
+                                Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+
+                                              _scrollController.animateTo(
+                                                0,
+                                                duration:
+                                                Duration(milliseconds: 500),
+                                                curve: Curves.easeInOut,
+                                              );
+                                            },
+                                            child: Text(
+                                              '메인덱 보기',
+                                              style:
+                                              TextStyle(fontSize: fontSize),
+                                            )),
+                                        TextButton(
+                                            onPressed: () {
+
+                                              _scrollController.animateTo(
+                                                _scrollController
+                                                    .position.maxScrollExtent,
+                                                duration:
+                                                Duration(milliseconds: 500),
+                                                curve: Curves.easeInOut,
+                                              );
+                                            },
+                                            child: Text(
+                                              '타마덱 보기',
+                                              style:
+                                              TextStyle(fontSize: fontSize),
+                                            ))
+                                      ],
+                                    ))
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: DeckSearchView(
-                            deckUpdate: updateSelectedDeck,
+                          Expanded(
+                            flex: 5,
+                            child: DeckSearchView(
+                              deckUpdate: updateSelectedDeck,
+                            ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                              flex: _panelController.panelPosition<0.7?5:0,
+                              child: Container())
+                        ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
+
                 body: Padding(
                   padding:
                       EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
