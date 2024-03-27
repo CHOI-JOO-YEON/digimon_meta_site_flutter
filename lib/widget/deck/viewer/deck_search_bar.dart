@@ -72,7 +72,6 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                         if (selectedLimit != null) {
                           limitProvider.updateSelectLimit(
                               selectedLimit!.restrictionBeginDate);
-
                         }
                         widget.search(1);
                         Navigator.of(context).pop();
@@ -170,10 +169,11 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   hint: Text(
                     _selectedFormat == null
                         ? '포맷'
-                        : '${_selectedFormat!.name} ['
+                        : '${_selectedFormat!.name} \n['
                             '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
                             '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]',
                     style: TextStyle(fontSize: fontSize),
+                    // overflow: TextOverflow.ellipsis,
                   ),
                   value: _selectedFormat,
                   items: [
@@ -188,7 +188,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       return DropdownMenuItem<FormatDto>(
                         value: format,
                         child: Text(
-                          '${format.name} ['
+                          '${format.name} \n['
                           '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
                           '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
                           style: TextStyle(fontSize: fontSize),
@@ -196,17 +196,19 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       );
                     }).toList(),
                     DropdownMenuItem<FormatDto>(
-                      child: Text('영어 전용 포맷',
+                      child: Text('미발매 포맷 [예상 발매 일정]',
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       enabled: false,
                     ),
                     ...widget.formatList
                         .where((format) => format.isOnlyEn == true)
+                        .toList()
+                        .reversed
                         .map((format) {
                       return DropdownMenuItem<FormatDto>(
                         value: format,
                         child: Text(
-                          '${format.name} ['
+                          '${format.name} \n['
                           '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
                           '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
                           style: TextStyle(fontSize: fontSize),

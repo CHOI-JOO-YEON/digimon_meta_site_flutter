@@ -176,7 +176,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   }
 
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
-    LimitProvider limitProvider = Provider.of(context,listen: false);
+    LimitProvider limitProvider = Provider.of(context, listen: false);
 
     widget.deck.formatId = formats.keys.first;
     for (var format in formats.values) {
@@ -201,7 +201,10 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(widget.deck.isPublic ? '전체 공개' : '비공개', style: TextStyle(fontSize: 25),),
+                        Text(
+                          widget.deck.isPublic ? '전체 공개' : '비공개',
+                          style: TextStyle(fontSize: 25),
+                        ),
                         Switch(
                           inactiveThumbColor: Colors.red,
                           value: widget.deck.isPublic,
@@ -233,18 +236,23 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             .map((entry) {
                           return DropdownMenuItem<int>(
                             value: entry.key,
-                            child: Text('${entry.value.name} ['
-                                '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                                '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                            child: Text(
+                              '${entry.value.name} \n['
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
+                              // overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         }).toList(),
                         DropdownMenuItem<int>(
-                          child: Text('미발매 포맷',
+                          child: Text('미발매 포맷 [예상 발매 일정]',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           enabled: false,
                         ),
                         ...formats.entries
                             .where((entry) => entry.value.isOnlyEn == true)
+                            .toList()
+                            .reversed
                             .map((entry) {
                           return DropdownMenuItem<int>(
                             value: entry.key,
@@ -262,7 +270,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     ),
                     Divider(),
                     Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
-                    Text('${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}', style: TextStyle(fontSize: 20))
+                    Text(
+                        '${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}',
+                        style: TextStyle(fontSize: 20))
                   ],
                 ),
               ),
@@ -580,7 +590,6 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     ),
                   ],
                 ),
-
               ],
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -591,7 +600,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                         '금지/제한: ',
                         style: TextStyle(fontSize: 20),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Expanded(
                         child: DropdownButtonFormField<LimitDto>(
                           value: selectedLimit,
