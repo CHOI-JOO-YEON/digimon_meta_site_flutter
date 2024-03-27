@@ -178,12 +178,17 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
     LimitProvider limitProvider = Provider.of(context, listen: false);
 
-    widget.deck.formatId = formats.keys.first;
-    for (var format in formats.values) {
-      if (!format.isOnlyEn!) {
-        widget.deck.formatId = format.formatId!;
-        break;
-      }
+
+    var korFormats = formats.entries
+        .where((entry) => entry.value.isOnlyEn == false).toList();
+    if(!korFormats.isEmpty) {
+      widget.deck.formatId = korFormats.first.key;
+    }else{
+      var enFormats = formats.entries
+          .where((entry) => entry.value.isOnlyEn == true)
+          .toList()
+          .reversed;
+      widget.deck.formatId = enFormats.first.key;
     }
 
     showDialog(
