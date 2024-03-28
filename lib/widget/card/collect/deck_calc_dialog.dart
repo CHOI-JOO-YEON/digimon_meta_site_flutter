@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/CardQuantityCalculator.dart';
+import '../../../model/card.dart';
 import '../../../model/deck_response_dto.dart';
 import '../../../model/format.dart';
 import '../../../provider/collect_provider.dart';
@@ -24,9 +25,9 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   late CardQuantityCalculator _calculator;
   int _selectedFormatId = 0;
   Map<int, Set<int>> _checkedDeckIds = {};
-  bool _showExceededCards = false;
-  bool _showEnCards = false;
-  bool _useCardNoAsKey = false;
+  bool _showExceededCards = true;
+  bool _showEnCards = true;
+  bool _useCardNoAsKey = true;
 
   @override
   void initState() {
@@ -67,6 +68,20 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   @override
   Widget build(BuildContext context) {
     CollectProvider collectProvider = Provider.of(context, listen: false);
+
+    // 카드 리스트 정렬
+    List<DigimonCard> sortedCards = !_useCardNoAsKey
+        ? _calculator.maxQuantitiesByCardNo.entries
+        .map((entry) => _calculator.getCardByCardNo(entry.key))
+        .whereType<DigimonCard>()
+        .toList()
+
+        : _calculator.maxQuantitiesById.keys
+        .map((id) => _calculator.getCardById(id))
+        .whereType<DigimonCard>()
+        .toList();
+
+    sortedCards.sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
     return AlertDialog(
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -197,76 +212,27 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                           ),
                           Expanded(
                             child: ListView.builder(
-                              itemCount: _useCardNoAsKey
-                                  ? _calculator.maxQuantitiesByCardNo.length
-                                  : _calculator.maxQuantitiesById.length,
+                              itemCount: sortedCards.length,
                               itemBuilder: (context, index) {
-                                if (_useCardNoAsKey) {
-                                  final entry = _calculator
-                                      .maxQuantitiesByCardNo.entries
-                                      .elementAt(index);
-                                  final cardNo = entry.key;
-                                  final quantity = entry.value;
-                                  final card =
-                                      _calculator.getCardByCardNo(cardNo);
-                                  if (card != null) {
-                                    final nowQuantity = collectProvider
-                                        .getCardQuantity(card.cardId!);
-                                    if ((!_showExceededCards &&
-                                            nowQuantity < quantity) ||
-                                        _showExceededCards) {
-                                      if ((!_showEnCards && !card.isEn) ||
-                                          _showEnCards) {
-                                        return Card(
-                                          child: ListTile(
-                                            leading: Image.network(
-                                                card.smallImgUrl ?? ''),
-                                            title: Text(
-                                                '${card.cardNo} ${card.cardName}' ??
-                                                    ''),
-                                            subtitle: Text(
-                                              '소지: $nowQuantity / 필요: $quantity',
-                                              style: TextStyle(
-                                                  color: nowQuantity >= quantity
-                                                      ? Colors.black
-                                                      : Colors.red),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  }
-                                } else {
-                                  final entry = _calculator
-                                      .maxQuantitiesById.entries
-                                      .elementAt(index);
-                                  final card =
-                                      _calculator.getCardById(entry.key)!;
-                                  final quantity = entry.value;
-                                  final nowQuantity = collectProvider
-                                      .getCardQuantity(card.cardId!);
-                                  if ((!_showExceededCards &&
-                                          nowQuantity < quantity) ||
-                                      _showExceededCards) {
-                                    if ((!_showEnCards && !card.isEn) ||
-                                        _showEnCards) {
-                                      return Card(
-                                        child: ListTile(
-                                          leading: Image.network(
-                                              card.smallImgUrl ?? ''),
-                                          title: Text(
-                                              '${card.cardNo} ${card.cardName}' ??
-                                                  ''),
-                                          subtitle: Text(
-                                            '소지: $nowQuantity / 필요: $quantity',
-                                            style: TextStyle(
-                                                color: nowQuantity >= quantity
-                                                    ? Colors.black
-                                                    : Colors.red),
-                                          ),
+                                final card = sortedCards[index];
+                                final quantity = !_useCardNoAsKey
+                                    ? _calculator.maxQuantitiesByCardNo[card.cardNo] ?? 0
+                                    : _calculator.maxQuantitiesById[card.cardId] ?? 0;
+                                final nowQuantity = collectProvider.getCardQuantity(card.cardId!);
+
+                                if ((!_showExceededCards && nowQuantity < quantity) || _showExceededCards) {
+                                  if ((!_showEnCards && !card.isEn) || _showEnCards) {
+                                    return Card(
+                                      child: ListTile(
+                                        leading: Image.network(card.smallImgUrl ?? ''),
+                                        title: Text('${card.cardNo} ${card.cardName}' ?? ''),
+                                        subtitle: Text(
+                                          '소지: $nowQuantity / 필요: $quantity',
+                                          style: TextStyle(
+                                              color: nowQuantity >= quantity ? Colors.green : Colors.red),
                                         ),
-                                      );
-                                    }
+                                      ),
+                                    );
                                   }
                                 }
                                 return SizedBox();
