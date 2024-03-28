@@ -28,13 +28,23 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   bool _showExceededCards = true;
   bool _showEnCards = true;
   bool _useCardNoAsKey = true;
-
+  List sortedFormats = [];
+  List pastFormats =[];
+  List currentFormats =[];
   @override
   void initState() {
     super.initState();
     _calculator = CardQuantityCalculator();
-    _selectedFormatId =
-        widget.formats.isNotEmpty ? widget.formats[0].formatId! : 0;
+    final now = DateTime.now();
+    sortedFormats= widget.formats.toList()
+      ..sort((a, b) => a.startDate!.compareTo(b.startDate!));
+     pastFormats =
+    sortedFormats.where((format) => format.endDate!.isBefore(now)).toList();
+    currentFormats  = sortedFormats
+        .where((format) => !format.endDate!.isBefore(now))
+        .toList();
+
+    _selectedFormatId = currentFormats.first.formatId;
     _initializeCheckedDeckIds();
   }
 
@@ -69,19 +79,21 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   Widget build(BuildContext context) {
     CollectProvider collectProvider = Provider.of(context, listen: false);
 
-    // 카드 리스트 정렬
     List<DigimonCard> sortedCards = !_useCardNoAsKey
         ? _calculator.maxQuantitiesByCardNo.entries
-        .map((entry) => _calculator.getCardByCardNo(entry.key))
-        .whereType<DigimonCard>()
-        .toList()
-
+            .map((entry) => _calculator.getCardByCardNo(entry.key))
+            .whereType<DigimonCard>()
+            .toList()
         : _calculator.maxQuantitiesById.keys
-        .map((id) => _calculator.getCardById(id))
-        .whereType<DigimonCard>()
-        .toList();
+            .map((id) => _calculator.getCardById(id))
+            .whereType<DigimonCard>()
+            .toList();
+    sortedCards
+        .sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
 
-    sortedCards.sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
+
+
+
     return AlertDialog(
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -101,21 +113,46 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                         ),
                         child: Column(
                           children: [
-                            Text('포맷',style: TextStyle(fontSize: 30),),
+                            Text('포맷', style: TextStyle(fontSize: 30)),
                             Expanded(
+                              flex: 6,
                               child: ListView.builder(
-                                itemCount: widget.formats.length,
+                                itemCount: currentFormats.length,
                                 itemBuilder: (context, index) {
-                                  final format = widget.formats[widget.formats.length-1-index];
+                                  final format = currentFormats[index];
                                   return ListTile(
                                     title: Text(format.name ?? ''),
-                                    onTap: () => _onFormatSelected(format.formatId!),
-                                    selected: _selectedFormatId == format.formatId,
+                                    onTap: () =>
+                                        _onFormatSelected(format.formatId!),
+                                    selected:
+                                        _selectedFormatId == format.formatId,
                                     selectedTileColor: Colors.grey[200],
                                   );
                                 },
                               ),
                             ),
+                            if (pastFormats.isNotEmpty) ...[
+                              Text('지난 포맷', style: TextStyle(fontSize: 20)),
+                              Expanded(
+                                flex: 2,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: pastFormats.length,
+                                  itemBuilder: (context, index) {
+                                    final format = pastFormats[index];
+                                    return ListTile(
+                                      title: Text(format.name ?? ''),
+                                      onTap: () =>
+                                          _onFormatSelected(format.formatId!),
+                                      selected:
+                                          _selectedFormatId == format.formatId,
+                                      selectedTileColor: Colors.grey[200],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -127,24 +164,28 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                         ),
                         child: Column(
                           children: [
-                            Text('덱 이름',style: TextStyle(fontSize: 30)),
+                            Text('덱 이름', style: TextStyle(fontSize: 30)),
                             Expanded(
                               child: ListView.builder(
                                 itemCount:
-                                    widget.deckMap[_selectedFormatId]?.length ?? 0,
+                                    widget.deckMap[_selectedFormatId]?.length ??
+                                        0,
                                 itemBuilder: (context, index) {
                                   final deck =
                                       widget.deckMap[_selectedFormatId]![index];
-                                  final isChecked = _checkedDeckIds[_selectedFormatId]
-                                          ?.contains(deck.deckId) ??
-                                      false;
+                                  final isChecked =
+                                      _checkedDeckIds[_selectedFormatId]
+                                              ?.contains(deck.deckId) ??
+                                          false;
                                   return CheckboxListTile(
                                     title: Row(
                                       children: [
                                         ColorWheel(
                                           colors: deck.colors!,
                                         ),
-                                        SizedBox(width: 10,),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
                                         Text(deck.deckName ?? ''),
                                       ],
                                     ),
@@ -162,7 +203,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                     Expanded(
                       child: Column(
                         children: [
-                          Text('필요한 카드 목록',style: TextStyle(fontSize: 30)),
+                          Text('필요한 카드 목록', style: TextStyle(fontSize: 30)),
                           Container(
                             padding: EdgeInsets.all(8.0),
                             child: Row(
@@ -216,20 +257,33 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                               itemBuilder: (context, index) {
                                 final card = sortedCards[index];
                                 final quantity = !_useCardNoAsKey
-                                    ? _calculator.maxQuantitiesByCardNo[card.cardNo] ?? 0
-                                    : _calculator.maxQuantitiesById[card.cardId] ?? 0;
-                                final nowQuantity = collectProvider.getCardQuantity(card.cardId!);
+                                    ? _calculator.maxQuantitiesByCardNo[
+                                            card.cardNo] ??
+                                        0
+                                    : _calculator
+                                            .maxQuantitiesById[card.cardId] ??
+                                        0;
+                                final nowQuantity = collectProvider
+                                    .getCardQuantity(card.cardId!);
 
-                                if ((!_showExceededCards && nowQuantity < quantity) || _showExceededCards) {
-                                  if ((!_showEnCards && !card.isEn) || _showEnCards) {
+                                if ((!_showExceededCards &&
+                                        nowQuantity < quantity) ||
+                                    _showExceededCards) {
+                                  if ((!_showEnCards && !card.isEn) ||
+                                      _showEnCards) {
                                     return Card(
                                       child: ListTile(
-                                        leading: Image.network(card.smallImgUrl ?? ''),
-                                        title: Text('${card.cardNo} ${card.cardName}' ?? ''),
+                                        leading: Image.network(
+                                            card.smallImgUrl ?? ''),
+                                        title: Text(
+                                            '${card.cardNo} ${card.cardName}' ??
+                                                ''),
                                         subtitle: Text(
                                           '소지: $nowQuantity / 필요: $quantity',
                                           style: TextStyle(
-                                              color: nowQuantity >= quantity ? Colors.green : Colors.red),
+                                              color: nowQuantity >= quantity
+                                                  ? Colors.green
+                                                  : Colors.red),
                                         ),
                                       ),
                                     );
