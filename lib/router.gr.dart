@@ -15,6 +15,12 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
+    CollectRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const CollectPage(),
+      );
+    },
     DeckBuilderRoute.name: (routeData) {
       final args = routeData.argsAs<DeckBuilderRouteArgs>(
           orElse: () => const DeckBuilderRouteArgs());
@@ -55,6 +61,20 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
   };
+}
+
+/// generated route for
+/// [CollectPage]
+class CollectRoute extends PageRouteInfo<void> {
+  const CollectRoute({List<PageRouteInfo>? children})
+      : super(
+          CollectRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'CollectRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for

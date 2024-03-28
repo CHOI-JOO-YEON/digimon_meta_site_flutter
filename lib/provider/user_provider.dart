@@ -14,7 +14,9 @@ class UserProvider with ChangeNotifier {
 
   String? get role => _role;
   bool get isAuthError => _isAuthError;
+  bool _isLogin = false;
 
+  bool get isLogin => _isLogin;
   UserProvider() {
     _loadUser();
   }
@@ -24,16 +26,20 @@ class UserProvider with ChangeNotifier {
     html.window.localStorage['role'] = role;
   }
 
-  Future<void> loginCheck() async {
+  Future<bool> loginCheck() async {
     bool isLogin = await UserApi().isLogin();
     if(!isLogin) {
       logout();
     }
+    return isLogin;
   }
 
   Future<void> _loadUser() async {
     _nickname = html.window.localStorage['nickname'];
     _role = html.window.localStorage['role'];
+    if(_nickname!=null) {
+      _isLogin=true;
+    }
     notifyListeners();
   }
 
@@ -41,6 +47,7 @@ class UserProvider with ChangeNotifier {
     _nickname = loginResponseDto.nickname;
     _role = loginResponseDto.role;
     saveUserInfoToLocalStorage(_nickname!, _role!);
+    _isLogin=true;
     notifyListeners();
   }
 
@@ -51,6 +58,7 @@ class UserProvider with ChangeNotifier {
       _role = null;
       html.window.localStorage.remove('nickname');
       html.window.localStorage.remove('role');
+      _isLogin=false;
       notifyListeners();
     }
 
@@ -62,12 +70,10 @@ class UserProvider with ChangeNotifier {
     html.window.localStorage.remove('nickname');
     html.window.localStorage.remove('role');
     _isAuthError=true;
+    _isLogin=false;
     notifyListeners();
   }
 
-  bool isLogin() {
-    return _nickname != null;
-  }
 
   bool hasManagerRole() {
     return _role == 'MANAGER' || _role == 'ADMIN';

@@ -1,7 +1,7 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/material.dart';
 
-import 'card_widget.dart';
+import '../card_widget.dart';
 
 class CardScrollGridView extends StatefulWidget {
   final List<DigimonCard> cards;

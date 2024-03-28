@@ -8,14 +8,14 @@ import 'package:digimon_meta_site_flutter/model/deck.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
-import 'package:digimon_meta_site_flutter/widget/card/card_scroll_grdiview_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
-import '../widget/card/card_search_bar.dart';
+import '../widget/card/builder/card_search_bar.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {

@@ -689,6 +689,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
             child: Consumer<UserProvider>(builder: (BuildContext context,
                 UserProvider userProvider, Widget? child) {
               bool hasManagerRole = userProvider.hasManagerRole(); // 권한 확인
+              bool isLogin = userProvider.isLogin; // 권한 확인
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -724,7 +725,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () async {
-                        if (userProvider.isLogin()) {
+                        if (userProvider.isLogin) {
                           Map<int, FormatDto> formats =
                               await DeckService().getFormats(widget.deck);
                           _showSaveDialog(context, formats);

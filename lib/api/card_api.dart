@@ -22,7 +22,6 @@ class CardApi{
     } catch (e) {
       print(e);
       return CardResponseDto();
-      // throw Exception('Error occurred while fetching cards');
     }
 
   }

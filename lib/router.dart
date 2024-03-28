@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/page/collect_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_builder_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_image_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_list_page.dart';
@@ -26,6 +27,7 @@ class AppRouter extends _$AppRouter {
       children: [
         AutoRoute(path: 'deck-builder', page: DeckBuilderRoute.page),
         AutoRoute(path: 'deck-list', page: DeckListRoute.page),
+        AutoRoute(path: 'collect', page: CollectRoute.page),
       ],
     ),
   ];

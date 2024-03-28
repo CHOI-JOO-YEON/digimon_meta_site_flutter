@@ -102,17 +102,29 @@ class DeckApi {
       if (response.statusCode == 200) {
         return PagedResponseDeckDto.fromJson(response.data);
       } else if (response.statusCode == 401) {
-        // 인증 오류 처리
         return null;
       } else {
-        // 기타 오류 처리
         return null;
       }
     } catch (e) {
       print(e);
-      // 예외 처리
       return null;
     }
+  }
+
+  Future<List<DeckResponseDto>?> findAllMyDecks() async {
+    try {
+      var response = await dioClient.dio.get(
+        '$baseUrl/api/deck/all',
+      );
+      if (response.statusCode == 200) {
+        return DeckResponseDto.fromJsonList(response.data);
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
+    return null;
   }
 
   Future<bool> deleteDeck(int deckId) async {
@@ -123,14 +135,11 @@ class DeckApi {
       if (response.statusCode == 200) {
         return true;
       } else if (response.statusCode == 401) {
-        // 인증 오류 처리
         return false;
       } else {
-        // 기타 오류 처리
         return false;
       }
     } catch (e) {
-      // 예외 처리
       return false;
     }
   }

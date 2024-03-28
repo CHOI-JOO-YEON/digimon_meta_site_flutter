@@ -2,31 +2,32 @@ import 'dart:typed_data';
 
 import '../enums/form.dart';
 
-  class DigimonCard {
-    int? cardId;
-    String? cardNo;
-    String? cardName;
-    int? lv;
-    int? dp;
-    int? playCost;
-    int? digivolveCost1;
-    int? digivolveCondition1;
-    int? digivolveCost2;
-    int? digivolveCondition2;
-    String? effect;
-    String? sourceEffect;
-    String? color1;
-    String? color2;
-    String? rarity;
-    String? cardType;
-    String? form;
-    String? attributes;
-    List<String>? types;
-    String? imgUrl;
-    String? smallImgUrl;
-    bool? isParallel;
-    String? sortString;
-    DateTime? releaseDate;
+class DigimonCard {
+  int? cardId;
+  String? cardNo;
+  String? cardName;
+  int? lv;
+  int? dp;
+  int? playCost;
+  int? digivolveCost1;
+  int? digivolveCondition1;
+  int? digivolveCost2;
+  int? digivolveCondition2;
+  String? effect;
+  String? sourceEffect;
+  String? color1;
+  String? color2;
+  String? rarity;
+  String? cardType;
+  String? form;
+  String? attributes;
+  List<String>? types;
+  String? imgUrl;
+  String? smallImgUrl;
+  bool? isParallel;
+  String? sortString;
+  DateTime? releaseDate;
+  bool isEn;
 
   // Uint8List? compressedImg;
 
@@ -74,38 +75,38 @@ import '../enums/form.dart';
       this.isParallel,
       this.sortString,
       this.smallImgUrl,
-      this.releaseDate
-      });
+      this.releaseDate,
+      required this.isEn});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
-
-
     return DigimonCard(
-        cardId: json['cardId'],
-        cardNo: json['cardNo'],
-        cardName: json['cardName'],
-        lv: json['lv'],
-        dp: json['dp'],
-        playCost: json['playCost'],
-        digivolveCost1: json['digivolveCost1'],
-        digivolveCondition1: json['digivolveCondition1'],
-        digivolveCost2: json['digivolveCost2'],
-        digivolveCondition2: json['digivolveCondition2'],
-        effect: json['effect'],
-        sourceEffect: json['sourceEffect'],
-        color1: json['color1'],
-        color2: json['color2'],
-        rarity: json['rarity'],
-        cardType: json['cardType'],
-        form: json['form'],
-        attributes: json['attributes'],
-        types: json['types'] != null ? List<String>.from(json['types']) : null,
-        imgUrl: json['imgUrl'],
-        smallImgUrl: json['smallImgUrl'],
-        isParallel: json['isParallel'],
-        sortString: json['sortString'],
-        releaseDate: json['releaseDate']!=null? DateTime.parse(json['releaseDate']):null,
-
+      cardId: json['cardId'],
+      cardNo: json['cardNo'],
+      cardName: json['cardName'],
+      lv: json['lv'],
+      dp: json['dp'],
+      playCost: json['playCost'],
+      digivolveCost1: json['digivolveCost1'],
+      digivolveCondition1: json['digivolveCondition1'],
+      digivolveCost2: json['digivolveCost2'],
+      digivolveCondition2: json['digivolveCondition2'],
+      effect: json['effect'],
+      sourceEffect: json['sourceEffect'],
+      color1: json['color1'],
+      color2: json['color2'],
+      rarity: json['rarity'],
+      cardType: json['cardType'],
+      form: json['form'],
+      attributes: json['attributes'],
+      types: json['types'] != null ? List<String>.from(json['types']) : null,
+      imgUrl: json['imgUrl'],
+      smallImgUrl: json['smallImgUrl'],
+      isParallel: json['isParallel'],
+      sortString: json['sortString'],
+      releaseDate: json['releaseDate'] != null
+          ? DateTime.parse(json['releaseDate'])
+          : null,
+      isEn: json['isEn'] ?? false,
     );
   }
 

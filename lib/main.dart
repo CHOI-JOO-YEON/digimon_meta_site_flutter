@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/user.dart';
+import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
@@ -19,6 +20,17 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => LimitProvider()),
+      ChangeNotifierProxyProvider<UserProvider, CollectProvider>(
+        create: (_) => CollectProvider(),
+        update: (_, userProvider, collectProvider) {
+          if (userProvider.isLogin) {
+            collectProvider?.initialize();
+          } else {
+            collectProvider?.clear();
+          }
+          return collectProvider!;
+        },
+      ),
     ],
     child: MyApp(
       router: appRouter,
@@ -47,6 +59,7 @@ class _MyAppState extends State<MyApp> {
       Provider.of<UserProvider>(context, listen: false).unAuth();
     };
     _initializeLimitProvider();
+    _initializeCollectProvider();
   }
   void listenForOAuthToken() {
     html.window.addEventListener('message', (event) async {
@@ -59,7 +72,14 @@ class _MyAppState extends State<MyApp> {
     final limitProvider = Provider.of<LimitProvider>(context, listen: false);
     await limitProvider.initialize();
   }
+  Future<void> _initializeCollectProvider() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final collectProvider = Provider.of<CollectProvider>(context, listen: false);
 
+    if (userProvider.isLogin) {
+      await collectProvider.initialize();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

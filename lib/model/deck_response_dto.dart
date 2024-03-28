@@ -9,9 +9,10 @@ class DeckResponseDto {
   String? deckName;
   Map<DigimonCard, int>? cardAndCntMap;
   List<String>? colors = [];
+  int? formatId;
 
   DeckResponseDto({this.authorId, this.authorName, this.deckId, this.deckName,
-      this.cardAndCntMap, this.colors,}){
+      this.cardAndCntMap, this.colors,this.formatId}){
     if(colors!=null) {
       this.colors = _sortColorsByOrder(colors!);
     }
@@ -44,15 +45,18 @@ class DeckResponseDto {
       deckName: json['deckName'],
       colors: colors,
       cardAndCntMap: parseJsonToCardAndCntMap(json['cards'] as List<dynamic>),
+      formatId: json['formatId']
     );
   }
+  static List<DeckResponseDto> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => DeckResponseDto.fromJson(json)).toList();
+  }
 
-  // static 메서드로 변경하고 인자 타입을 List<dynamic>으로 수정
   static Map<DigimonCard, int> parseJsonToCardAndCntMap(List<dynamic> cardsJson) {
     Map<DigimonCard, int> cardAndCntMap = {};
     for (var cardJson in cardsJson) {
       DigimonCard card = DigimonCard.fromJson(cardJson as Map<String, dynamic>);
-      int cnt = cardJson['cnt'] as int; // 'cnt'를 int로 안전하게 캐스팅
+      int cnt = cardJson['cnt'] as int;
       cardAndCntMap[card] = cnt;
     }
     return cardAndCntMap;

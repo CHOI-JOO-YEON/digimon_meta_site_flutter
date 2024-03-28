@@ -20,7 +20,7 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
     return AutoTabsRouter.tabBar(
-      routes: [DeckBuilderRoute(), DeckListRoute()],
+      routes: [DeckBuilderRoute(), DeckListRoute(), CollectRoute() ],
       builder: (context, child, controller) {
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -40,7 +40,7 @@ class MainPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                if (userProvider.isLogin())
+                                if (userProvider.isLogin)
                                   Text(
                                     '${userProvider.nickname}',
                                     style: TextStyle(
@@ -49,7 +49,7 @@ class MainPage extends StatelessWidget {
                                 SizedBox(
                                     width: MediaQuery.sizeOf(context).width *
                                         0.009),
-                                userProvider.isLogin()
+                                userProvider.isLogin
                                     ? Center(
                                   child: TextButton(
                                     onPressed: () {
@@ -85,9 +85,9 @@ class MainPage extends StatelessWidget {
                       flex: 1,
                       child: TabBar(
                         controller: controller,
+
                         tabs: [
                           Tab(
-                            // icon: Icon(Icons.build),
                             child: Text(
                               'Builder',
                               style: TextStyle(
@@ -95,10 +95,15 @@ class MainPage extends StatelessWidget {
                             ),
                           ),
                           Tab(
-                            // icon: Icon(Icons.list_alt),
                             child: Text('List',
                                 style: TextStyle(
                                     fontSize: fontSize*0.9)),
+                          ),
+                          Tab(
+                            child: Text('Collect',
+                                style: TextStyle(
+                                    fontSize: fontSize*0.9)
+                            ),
                           )
                         ],
                       ),

@@ -2,7 +2,7 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/material.dart';
 
-import '../../model/note.dart';
+import '../../../model/note.dart';
 
 class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;

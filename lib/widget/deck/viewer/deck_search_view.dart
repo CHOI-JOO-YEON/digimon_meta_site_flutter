@@ -72,8 +72,8 @@ class _DeckSearchViewState extends State<DeckSearchView>
     return isLoading
         ? const Center(child: CircularProgressIndicator())
         : Consumer<UserProvider>(builder: (context, userProvider, child) {
-          _isDisabled[1]=!userProvider.isLogin();
-          if(!userProvider.isLogin()) {
+          _isDisabled[1]=!userProvider.isLogin;
+          if(!userProvider.isLogin) {
             _tabController.index=0;
           }
             return Column(

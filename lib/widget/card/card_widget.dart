@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +9,9 @@ import '../../provider/limit_provider.dart';
 class CustomCard extends StatefulWidget {
   final double width;
   final DigimonCard card;
+  final bool? isActive;
+  final bool? zoomActive;
+
   final Function(DigimonCard)? cardPressEvent;
 
   final Function? onHover;
@@ -24,7 +25,7 @@ class CustomCard extends StatefulWidget {
     required this.card,
     this.onHover,
     this.onExit,
-    this.onLongPress,
+    this.onLongPress, this.isActive, this.zoomActive,
   });
 
   @override
@@ -91,9 +92,19 @@ class _CustomCardState extends State<CustomCard> {
               children: [
                 SizedBox(
                   width: widget.width,
-                  child: Image.network(
-                    widget.card.smallImgUrl ?? '',
-                    fit: BoxFit.fill,
+                  child: ColorFiltered(
+                    colorFilter: widget.isActive ?? true
+                        ? ColorFilter.mode(Colors.transparent, BlendMode.srcATop)
+                        : ColorFilter.matrix(<double>[
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0,      0,      0,      1, 0,
+                    ]),
+                    child: Image.network(
+                      widget.card.smallImgUrl ?? '',
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 if (allowedQuantity == 1 || allowedQuantity == 0)
@@ -149,6 +160,7 @@ class _CustomCardState extends State<CustomCard> {
                       },
                     ),
                   ),
+                if(widget.zoomActive!=false)
                 Positioned(
                   right: widget.width * 0.05,
                   bottom: widget.width * 0.05,
@@ -179,113 +191,6 @@ class _CustomCardState extends State<CustomCard> {
       ),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   String color = widget.card.color2 ?? widget.card.color1!;
-  //   return MouseRegion(
-  //     onEnter: (event) {
-  //       if (widget.onHover != null) {
-  //         widget.onHover!(context);
-  //       }
-  //     },
-  //     onExit: (event) {
-  //       if (widget.onExit != null) {
-  //         widget.onExit!();
-  //       }
-  //     },
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         if (widget.cardPressEvent != null) {
-  //           widget.cardPressEvent!(widget.card);
-  //         }
-  //       },
-  //       onLongPressStart: _handleLongPressStart,
-  //       onLongPressEnd: _handleLongPressEnd,
-  //       child: Stack(
-  //         alignment: Alignment.bottomRight,
-  //         children: [
-  //           SizedBox(
-  //               width: widget.width,
-  //               child: Image.network(
-  //                 widget.card.smallImgUrl ?? '',
-  //                 fit: BoxFit.fill,
-  //               )),
-  //           Positioned(
-  //             right: widget.width * 0.05,
-  //             bottom: widget.width * 0.05,
-  //             child: Center(
-  //               child: ConstrainedBox(
-  //                 constraints: BoxConstraints.tightFor(
-  //                     width: widget.width * 0.2, height: widget.width * 0.2),
-  //                 child: IconButton(
-  //                   padding: EdgeInsets.zero,
-  //                   iconSize: widget.width * 0.16,
-  //                   icon: Icon(Icons.zoom_in,
-  //                       color: color == 'BLACK' ? Colors.white : Colors.black),
-  //                   onPressed: () {
-  //                     _showImageDialog(context, widget.card);
-  //                   },
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // void _showImageDialog(BuildContext context, DigimonCard card) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         actionsAlignment: MainAxisAlignment.end,
-  //         actions: [
-  //           IconButton(
-  //             icon: Icon(Icons.close),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //         content:  SizedBox(
-  //           height: MediaQuery.sizeOf(context).height*0.8,
-  //           child: Row(
-  //               children: [
-  //                 Expanded(
-  //                     flex: 1,
-  //                     child: Image.network(card.imgUrl ?? '', fit: BoxFit.fitHeight)),
-  //                 Expanded(
-  //                     flex: 1,
-  //                     child: Padding(
-  //                       padding: const EdgeInsets.all(20),
-  //                       child: Column(
-  //                         children: [
-  //                           Row(
-  //                             mainAxisAlignment: MainAxisAlignment.center,
-  //                             children: [
-  //                               Text(card.cardNo??''),
-  //                               SizedBox(width: 5,),
-  //                               Text(card.cardName??''),
-  //                             ],
-  //                           ),
-  //                           SizedBox(height: 5,),
-  //                           Text(card.effect??''),
-  //                           SizedBox(height: 5,),
-  //                           Text(card.sourceEffect??''),
-  //                         ],
-  //
-  //                       ),
-  //                     )),
-  //               ],
-  //
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showImageDialog(BuildContext context, DigimonCard card) {
     showDialog(

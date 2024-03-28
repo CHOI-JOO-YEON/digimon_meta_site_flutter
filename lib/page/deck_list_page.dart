@@ -210,59 +210,7 @@ class _DeckListPageState extends State<DeckListPage> {
                   ),
                 ));
           })
-        // Stack(
-        //   children: [
-        //     Container(
-        //       decoration: BoxDecoration(
-        //           borderRadius: BorderRadius.circular(5),
-        //
-        //           // color: Colors.blueAccent
-        //           color:  Theme.of(context).highlightColor
-        //       ),
-        //       child: SingleChildScrollView(
-        //         child: SizedBox(
-        //           height: MediaQuery.sizeOf(context).height *0.9,
-        //           child: _selectedDeck == null
-        //               ? Container()
-        //               : DeckViewerView(
-        //             deck: _selectedDeck!,
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //     SlidingUpPanelWidget(
-        //       controlHeight: 30.0,
-        //       anchor: 0.4,
-        //       minimumBound: minBound,
-        //       upperBound: upperBound,
-        //       panelController: panelController,
-        //       enableOnTap: false,
-        //       child: Container(
-        //         decoration: BoxDecoration(
-        //           // border: Border.all(),
-        //           borderRadius: BorderRadius.circular(5),
-        //           color: Colors.grey[200],
-        //         ),
-        //         child: Padding(
-        //           padding: EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
-        //           child: SizedBox(
-        //             height: 1000,
-        //             child: Column(
-        //               children: [
-        //                 Text('덱 검색'),
-        //                 Expanded(
-        //                   child: DeckSearchView(
-        //                     deckUpdate: updateSelectedDeck,
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //       ),
-        //     )
-        //   ],
-        // )
+
         : Padding(
       padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
           child: Row(
