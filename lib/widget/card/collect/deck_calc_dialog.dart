@@ -106,7 +106,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                               child: ListView.builder(
                                 itemCount: widget.formats.length,
                                 itemBuilder: (context, index) {
-                                  final format = widget.formats[index];
+                                  final format = widget.formats[widget.formats.length-1-index];
                                   return ListTile(
                                     title: Text(format.name ?? ''),
                                     onTap: () => _onFormatSelected(format.formatId!),
