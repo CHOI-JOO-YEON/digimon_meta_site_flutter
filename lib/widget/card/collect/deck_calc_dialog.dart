@@ -29,18 +29,19 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   bool _showEnCards = true;
   bool _useCardNoAsKey = true;
   List sortedFormats = [];
-  List pastFormats =[];
-  List currentFormats =[];
+  List pastFormats = [];
+  List currentFormats = [];
+
   @override
   void initState() {
     super.initState();
     _calculator = CardQuantityCalculator();
     final now = DateTime.now();
-    sortedFormats= widget.formats.toList()
+    sortedFormats = widget.formats.toList()
       ..sort((a, b) => a.startDate!.compareTo(b.startDate!));
-     pastFormats =
-    sortedFormats.where((format) => format.endDate!.isBefore(now)).toList();
-    currentFormats  = sortedFormats
+    pastFormats =
+        sortedFormats.where((format) => format.endDate!.isBefore(now)).toList();
+    currentFormats = sortedFormats
         .where((format) => !format.endDate!.isBefore(now))
         .toList();
 
@@ -90,9 +91,6 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
             .toList();
     sortedCards
         .sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
-
-
-
 
     return AlertDialog(
       content: SizedBox(
@@ -202,51 +200,63 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                     ),
                     Expanded(
                       child: Column(
+
                         children: [
                           Text('필요한 카드 목록', style: TextStyle(fontSize: 30)),
                           Container(
                             padding: EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                              spacing: 8.0,
+                              runSpacing: 4.0,
                               children: [
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _showExceededCards,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showExceededCards = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text('이미 가지고 있는 카드 표시'),
-                                  ],
+                                IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: _showExceededCards,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _showExceededCards = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text('이미 가지고 있는 카드 표시'),
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _showEnCards,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _showEnCards = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text('미발매 카드 표시'),
-                                  ],
+                                IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: _showEnCards,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _showEnCards = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text('미발매 카드 표시'),
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: _useCardNoAsKey,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _useCardNoAsKey = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text('패레 구분'),
-                                  ],
+                                IntrinsicWidth(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Checkbox(
+                                        value: _useCardNoAsKey,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _useCardNoAsKey = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text('패레 구분'),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
