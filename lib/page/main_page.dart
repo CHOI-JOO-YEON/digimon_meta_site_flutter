@@ -20,7 +20,7 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
     return AutoTabsRouter.tabBar(
-      routes: [DeckBuilderRoute(), DeckListRoute(), CollectRoute() ],
+      routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute() ],
       builder: (context, child, controller) {
 
         return Scaffold(

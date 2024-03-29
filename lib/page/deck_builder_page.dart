@@ -62,7 +62,15 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       initSearch();
     });
   }
-
+  @override
+  void didUpdateWidget(covariant DeckBuilderPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.deck != oldWidget.deck) {
+      setState(() {
+        deck = widget.deck ?? Deck();
+      });
+    }
+  }
   initSearch() async {
     isSearchLoading = true;
     setState(() {});
