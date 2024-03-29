@@ -22,6 +22,7 @@ class MainPage extends StatelessWidget {
     return AutoTabsRouter.tabBar(
       routes: [DeckBuilderRoute(), DeckListRoute(), CollectRoute() ],
       builder: (context, child, controller) {
+
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Column(

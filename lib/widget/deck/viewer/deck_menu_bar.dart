@@ -121,8 +121,8 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
 
                Deck deck = Deck.deck(widget.deck);
                 Navigator.of(context).pop();
-                context.router
-                    .push(DeckBuilderRoute(deck: deck));
+
+               context.navigateTo(DeckBuilderRoute(deck: deck));
               },
             ),
           ],

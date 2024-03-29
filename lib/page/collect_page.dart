@@ -68,7 +68,7 @@ class _CollectPageState extends State<CollectPage> {
                   onPressed: () {
                     // 확인 버튼을 누르면 deck-builder 페이지로 이동
                     Navigator.of(context).pop();
-                    context.router.push(DeckBuilderRoute());
+                    context.navigateTo(DeckBuilderRoute());
                   },
                 ),
               ],
