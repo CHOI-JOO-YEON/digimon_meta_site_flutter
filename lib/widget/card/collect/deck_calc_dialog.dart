@@ -64,7 +64,10 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   }
   void _updateSelectAllCheckbox() {
     setState(() {
-      _isAllDecksSelected = widget.deckMap[_selectedFormatId]!.every((deck) => _checkedDeckIds[_selectedFormatId]!.contains(deck.deckId));
+      if(widget.deckMap[_selectedFormatId]!=null) {
+        _isAllDecksSelected = widget.deckMap[_selectedFormatId]!.every((deck) => _checkedDeckIds[_selectedFormatId]!.contains(deck.deckId));
+      }
+
     });
   }
   void _onDeckChecked(DeckResponseDto deck, bool isChecked) {
@@ -85,6 +88,9 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   }
   void _selectAllDecks(bool? isChecked) {
     if(isChecked==null) {
+      return;
+    }
+    if(widget.deckMap[_selectedFormatId]==null) {
       return;
     }
     setState(() {
