@@ -667,7 +667,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       Expanded(
                           child: TextField(
                             controller: _deckNameController,
-
+                            onChanged: (v) {
+                              widget.deck.deckName=v;
+                            },
                           ))
                       // Expanded(
                       //   flex: 3,
