@@ -273,8 +273,10 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                     : _calculator
                                             .maxQuantitiesById[card.cardId] ??
                                         0;
-                                final nowQuantity = collectProvider
-                                    .getCardQuantity(card.cardId!);
+                                final nowQuantity = !_useCardNoAsKey?
+                                    collectProvider.getCardQuantityByCardNo(card.cardNo!)
+                                    : collectProvider
+                                    .getCardQuantityById(card.cardId!);
 
                                 if ((!_showExceededCards &&
                                         nowQuantity < quantity) ||

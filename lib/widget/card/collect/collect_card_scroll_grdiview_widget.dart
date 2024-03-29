@@ -118,7 +118,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                     child: Consumer<CollectProvider>(
                       builder: (context, collectProvider, _) {
                         final quantity = collectProvider
-                            .getCardQuantity(widget.cards[index].cardId!);
+                            .getCardQuantityById(widget.cards[index].cardId!);
                         return Text(
                           '수량: $quantity',
                           style: const TextStyle(color: Colors.white),
@@ -166,7 +166,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                     Consumer<CollectProvider>(
                       builder: (context, collectProvider, _) {
                         final quantity = collectProvider
-                            .getCardQuantity(widget.cards[index].cardId!);
+                            .getCardQuantityById(widget.cards[index].cardId!);
                         return Column(
                           children: [
                             CustomCard(
@@ -191,7 +191,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                                   child: IconButton(
                                     onPressed: () {
                                       collectProvider.removeCard(
-                                          widget.cards[index].cardId!);
+                                          widget.cards[index]);
                                     },
                                     padding: EdgeInsets.zero,
                                     iconSize: iconSize,
@@ -219,7 +219,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                                   child: IconButton(
                                     onPressed: () {
                                       collectProvider
-                                          .addCard(widget.cards[index].cardId!);
+                                          .addCard(widget.cards[index]);
                                     },
                                     padding: EdgeInsets.zero,
                                     iconSize: iconSize,

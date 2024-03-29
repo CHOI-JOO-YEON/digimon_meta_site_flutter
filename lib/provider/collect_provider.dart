@@ -1,14 +1,17 @@
+import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/card_collect_dto.dart';
 import 'package:flutter/foundation.dart';
 import '../api/collect_api.dart';
 
 class CollectProvider with ChangeNotifier {
   bool collectMode = false;
-  Map<int, int> collectMap ={};
+  Map<int, int> collectMapById ={};
+  Map<String, int> collectMapByCardNo ={};
 
   void clear(){
     collectMode=false;
-    collectMap={};
+    collectMapById={};
+    collectMapByCardNo={};
   }
 
   Future<void> initialize() async {
@@ -16,7 +19,9 @@ class CollectProvider with ChangeNotifier {
     List<CardCollectDto>? list = await CollectApi().getCollect();
     if (list != null) {
       for (CardCollectDto cardCollect in list) {
-        collectMap[cardCollect.cardImgId]=cardCollect.quantity;
+        collectMapById[cardCollect.cardImgId]=cardCollect.quantity;
+
+        collectMapByCardNo[cardCollect.cardNo!] =( collectMapByCardNo[cardCollect.cardNo!]??0)+cardCollect.quantity;
       }
     }
     notifyListeners();
@@ -24,7 +29,7 @@ class CollectProvider with ChangeNotifier {
 
   Future<bool> save() async {
     List<CardCollectDto> list = [];
-    for (var c in collectMap.entries) {
+    for (var c in collectMapById.entries) {
       list.add(CardCollectDto(cardImgId: c.key, quantity: c.value));
     }
 
@@ -41,30 +46,45 @@ class CollectProvider with ChangeNotifier {
     clear();
     if (list != null) {
       for (CardCollectDto cardCollect in list) {
-        collectMap[cardCollect.cardImgId]=cardCollect.quantity;
+        collectMapById[cardCollect.cardImgId]=cardCollect.quantity;
       }
     }
     notifyListeners();
     return true;
   }
 
-  int getCardQuantity(int cardImgId) {
-    if(collectMap.containsKey(cardImgId)) {
-      return collectMap[cardImgId]!;
+  int getCardQuantityById(int cardImgId) {
+    if(collectMapById.containsKey(cardImgId)) {
+      return collectMapById[cardImgId]!;
     }
     return 0;
   }
 
-  void addCard(int cardImgId) {
-    collectMap[cardImgId] =( collectMap[cardImgId]??0)+1;
+  int getCardQuantityByCardNo(String cardNo) {
+    if(collectMapByCardNo.containsKey(cardNo)) {
+      return collectMapByCardNo[cardNo]!;
+    }
+    return 0;
+  }
+
+  void addCard(DigimonCard card) {
+    collectMapById[card.cardId!] =( collectMapById[card.cardId!]??0)+1;
+    collectMapByCardNo[card.cardNo!] =( collectMapByCardNo[card.cardNo!]??0)+1;
     notifyListeners();
   }
 
-  void removeCard(int cardImgId) {
-    int? now =  collectMap[cardImgId];
+  void removeCard(DigimonCard card) {
+    int? nowCardId =  collectMapById[card.cardId];
 
-    if(now!=null&&now>0) {
-      collectMap[cardImgId]=now-1;
+    if(nowCardId!=null&&nowCardId>0) {
+      collectMapById[card.cardId!]=nowCardId-1;
+    }
+
+
+    int? nowCardNo=  collectMapByCardNo[card.cardNo!];
+
+    if(nowCardNo!=null&&nowCardNo>0) {
+      collectMapByCardNo[card.cardNo!]=nowCardNo-1;
     }
     notifyListeners();
   }

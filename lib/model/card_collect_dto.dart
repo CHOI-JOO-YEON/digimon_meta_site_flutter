@@ -1,8 +1,9 @@
 class CardCollectDto {
   final int cardImgId;
   final int quantity;
+  final String? cardNo;
 
-  CardCollectDto({required this.cardImgId, required this.quantity});
+  CardCollectDto({required this.cardImgId, required this.quantity,this.cardNo});
 
   Map<String, dynamic> toJson() {
     return {
@@ -15,6 +16,7 @@ class CardCollectDto {
     return CardCollectDto(
       cardImgId: json['cardImgId'],
       quantity: json['quantity'],
+      cardNo: json['cardNo'],
     );
   }
 
