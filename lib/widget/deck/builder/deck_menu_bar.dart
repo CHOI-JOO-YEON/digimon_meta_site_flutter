@@ -54,7 +54,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   void _showRenameDialog(BuildContext context) {
     showDialog(
+
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('덱 이름 수정'),
@@ -76,8 +78,8 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                   setState(() {
                     widget.deck.deckName = _deckNameController.text;
                   });
+                  // FocusScope.of(context).unfocus(); // 키보드 숨기기
                   Navigator.of(context).pop();
-                  FocusScope.of(context).unfocus(); // 키보드 숨기기
                 },
               ),
             ],
