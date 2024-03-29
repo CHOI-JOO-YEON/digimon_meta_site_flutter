@@ -108,8 +108,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
               child: Text('수정'),
               onPressed: () {
                 Navigator.of(context).pop();
-                context.router
-                    .push(DeckBuilderRoute(deck: Deck.responseDto(deck)));
+                context.navigateTo(DeckBuilderRoute(deck: Deck.responseDto(deck)));
               },
             ),
           ],

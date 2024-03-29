@@ -36,7 +36,6 @@ class DeckBuilderMenuBar extends StatefulWidget {
 }
 
 class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
-  // bool _isEditing = false;
   final TextEditingController _deckNameController = TextEditingController();
   @override
   void didUpdateWidget(covariant DeckBuilderMenuBar oldWidget) {
@@ -50,7 +49,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   @override
   void initState() {
     super.initState();
-    _deckNameController.text = widget.deck.deckName; // 덱 이름 초기 설정
+    _deckNameController.text = widget.deck.deckName;
   }
 
   @override
