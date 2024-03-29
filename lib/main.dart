@@ -75,10 +75,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> _initializeCollectProvider() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final collectProvider = Provider.of<CollectProvider>(context, listen: false);
-
-    if (userProvider.isLogin) {
-      await collectProvider.initialize();
-    }
   }
   @override
   Widget build(BuildContext context) {
