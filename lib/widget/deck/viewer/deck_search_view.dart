@@ -23,8 +23,14 @@ class _DeckSearchViewState extends State<DeckSearchView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List<FormatDto> formats = [];
+  FormatDto? selectedFormat;
   bool isLoading = true;
   List<bool> _isDisabled = [false, false];
+
+  void updateSelectFormat(FormatDto formatDto) {
+    selectedFormat = formatDto;
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -34,9 +40,20 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
     Future.delayed(const Duration(seconds: 0), () async {
       formats = await DeckService().getAllFormat();
-      if(formats.isEmpty) {
-        formats.add(new FormatDto(formatId: 1, name: '테스트', startDate: DateTime.now(), endDate: DateTime.now(),isOnlyEn: false));
-
+      if (formats.isEmpty) {
+        formats.add(new FormatDto(
+            formatId: 1,
+            name: '테스트',
+            startDate: DateTime.now(),
+            endDate: DateTime.now(),
+            isOnlyEn: false));
+      }
+      selectedFormat = formats.first;
+      for (var format in formats) {
+        if (!format.isOnlyEn!) {
+          selectedFormat = format;
+          break;
+        }
       }
       isLoading = false;
 
@@ -52,6 +69,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
       });
     }
   }
+
   @override
   void dispose() {
     if (mounted) {
@@ -72,15 +90,14 @@ class _DeckSearchViewState extends State<DeckSearchView>
     return isLoading
         ? const Center(child: CircularProgressIndicator())
         : Consumer<UserProvider>(builder: (context, userProvider, child) {
-          _isDisabled[1]=!userProvider.isLogin;
-          if(!userProvider.isLogin) {
-            _tabController.index=0;
-          }
+            _isDisabled[1] = !userProvider.isLogin;
+            if (!userProvider.isLogin) {
+              _tabController.index = 0;
+            }
             return Column(
               children: [
                 TabBar(
                   controller: _tabController,
-
                   tabs: [
                     Tab(
                       child: Text(
@@ -91,8 +108,9 @@ class _DeckSearchViewState extends State<DeckSearchView>
                     Tab(
                       child: Text(
                         '나의 덱',
-                        style: TextStyle(fontSize: fontSize,color: _isDisabled[1]?Colors.grey:Colors.black
-                        ),
+                        style: TextStyle(
+                            fontSize: fontSize,
+                            color: _isDisabled[1] ? Colors.grey : Colors.black),
                       ),
                     ),
                   ],
@@ -100,10 +118,16 @@ class _DeckSearchViewState extends State<DeckSearchView>
                 Expanded(
                   child: TabBarView(controller: _tabController, children: [
                     DeckListViewer(
-                        formatList: formats, deckUpdate: widget.deckUpdate),
+                      formatList: formats,
+                      deckUpdate: widget.deckUpdate,
+                      selectedFormat: selectedFormat!,
+                      updateSelectFormat: updateSelectFormat
+                    ),
                     MyDeckListViewer(
                       formatList: formats,
                       deckUpdate: widget.deckUpdate,
+                      selectedFormat: selectedFormat!,
+                        updateSelectFormat: updateSelectFormat
                     )
                   ]),
                 )

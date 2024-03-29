@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../../../model/CardQuantityCalculator.dart';
+import '../../../model/card_quantity_calculator.dart';
 import '../../../model/card.dart';
 import '../../../model/deck_response_dto.dart';
 import '../../../model/format.dart';

@@ -14,13 +14,15 @@ import '../../../service/color_service.dart';
 class DeckSearchBar extends StatefulWidget {
   final List<FormatDto> formatList;
   final DeckSearchParameter searchParameter;
+  final FormatDto selectedFormat;
+  final Function(FormatDto) updateSelectFormat;
   final Function(int) search;
 
   const DeckSearchBar(
       {super.key,
       required this.formatList,
       required this.searchParameter,
-      required this.search});
+      required this.search, required this.selectedFormat, required this.updateSelectFormat});
 
   @override
   State<DeckSearchBar> createState() => _DeckSearchBarState();
@@ -44,13 +46,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
     // TODO: implement initState
     super.initState();
 
-    _selectedFormat = widget.formatList.first;
-    for (var format in widget.formatList) {
-      if (!format.isOnlyEn!) {
-        _selectedFormat = format;
-        break;
-      }
-    }
+    _selectedFormat = widget.selectedFormat;
   }
 
   void _showDeckSettingDialog(BuildContext context) {
@@ -220,6 +216,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     setState(() {
                       _selectedFormat = value;
                       widget.searchParameter.formatId = value?.formatId;
+                      widget.updateSelectFormat(_selectedFormat!);
                       widget.search(1);
                     });
                   },

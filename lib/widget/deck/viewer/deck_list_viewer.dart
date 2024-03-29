@@ -12,10 +12,12 @@ import '../../../model/format.dart';
 
 class DeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
+  final FormatDto selectedFormat;
   final Function(DeckResponseDto) deckUpdate;
+  final Function(FormatDto) updateSelectFormat;
 
   const DeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate});
+      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat});
 
   @override
   State<DeckListViewer> createState() => _DeckListViewerState();
@@ -33,13 +35,14 @@ class _DeckListViewerState extends State<DeckListViewer> {
   @override
   void initState() {
     super.initState();
-    deckSearchParameter.formatId = widget.formatList.first.formatId;
-    for (var format in widget.formatList) {
-      if (!format.isOnlyEn!) {
-        deckSearchParameter.formatId = format.formatId;
-        break;
-      }
-    }
+    deckSearchParameter.formatId = widget.selectedFormat.formatId;
+    // deckSearchParameter.formatId = widget.formatList.first.formatId;
+    // for (var format in widget.formatList) {
+    //   if (!format.isOnlyEn!) {
+    //     deckSearchParameter.formatId = format.formatId;
+    //     break;
+    //   }
+    // }
     Future.delayed(const Duration(seconds: 0), () async {
       await searchDecks(1);
     });
@@ -86,6 +89,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
           formatList: widget.formatList,
           searchParameter: deckSearchParameter,
           search: searchDecks,
+          selectedFormat: widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat,
         ),
         SizedBox(
           height: 5,

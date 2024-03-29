@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/format.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_view_widget.dart';
 import 'package:flutter/material.dart';
