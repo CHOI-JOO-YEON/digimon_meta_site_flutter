@@ -31,6 +31,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   List sortedFormats = [];
   List pastFormats = [];
   List currentFormats = [];
+  bool _isAllDecksSelected = false;
 
   @override
   void initState() {
@@ -58,9 +59,14 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
   void _onFormatSelected(int formatId) {
     setState(() {
       _selectedFormatId = formatId;
+      _updateSelectAllCheckbox();
     });
   }
-
+  void _updateSelectAllCheckbox() {
+    setState(() {
+      _isAllDecksSelected = widget.deckMap[_selectedFormatId]!.every((deck) => _checkedDeckIds[_selectedFormatId]!.contains(deck.deckId));
+    });
+  }
   void _onDeckChecked(DeckResponseDto deck, bool isChecked) {
     int formatId = deck.formatId!;
     int deckId = deck.deckId!;
@@ -72,6 +78,28 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
       } else {
         _calculator.removeDeck(deck);
         _checkedDeckIds[formatId]!.remove(deckId);
+      }
+
+    });
+    _updateSelectAllCheckbox();
+  }
+  void _selectAllDecks(bool? isChecked) {
+    if(isChecked==null) {
+      return;
+    }
+    setState(() {
+      if (isChecked) {
+        _isAllDecksSelected=true;
+        widget.deckMap[_selectedFormatId]!.forEach((deck) {
+          _checkedDeckIds[_selectedFormatId]!.add(deck.deckId!);
+          _calculator.addDeck(deck);
+        });
+      } else {
+        _isAllDecksSelected=false;
+        widget.deckMap[_selectedFormatId]!.forEach((deck) {
+          _checkedDeckIds[_selectedFormatId]!.remove(deck.deckId!);
+          _calculator.removeDeck(deck);
+        });
       }
     });
   }
@@ -163,6 +191,13 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                         child: Column(
                           children: [
                             Text('덱 이름', style: TextStyle(fontSize: 30)),
+                            CheckboxListTile(
+                              title: Text('전체 선택'),
+                              value: _isAllDecksSelected,
+                              onChanged: _selectAllDecks,
+                              // controlAffinity: ListTileControlAffinity.leading,
+                            ),
+                            Divider(),
                             Expanded(
                               child: ListView.builder(
                                 itemCount:
@@ -288,7 +323,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                         leading: Image.network(
                                             card.smallImgUrl ?? ''),
                                         title: Text(
-                                            '${card.cardNo} ${card.cardName}' ??
+                                            '${card.cardNo} ${card.cardName} ${card.rarity}' ??
                                                 ''),
                                         subtitle: Text(
                                           '소지: $nowQuantity / 필요: $quantity',
