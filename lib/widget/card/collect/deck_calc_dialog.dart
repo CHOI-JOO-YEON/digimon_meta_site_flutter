@@ -66,6 +66,8 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
     setState(() {
       if(widget.deckMap[_selectedFormatId]!=null) {
         _isAllDecksSelected = widget.deckMap[_selectedFormatId]!.every((deck) => _checkedDeckIds[_selectedFormatId]!.contains(deck.deckId));
+      }else{
+        _isAllDecksSelected=false;
       }
 
     });
