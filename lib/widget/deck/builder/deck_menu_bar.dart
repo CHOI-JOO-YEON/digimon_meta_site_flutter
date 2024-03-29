@@ -7,6 +7,7 @@ import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/random_hand_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -664,24 +665,29 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        flex: 3,
-                        child: Text(
-                          widget.deck.deckName,
-                          // maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontFamily: 'JalnanGothic', fontSize: fontSize),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: IconButton(
-                          iconSize: iconSize,
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.mode),
-                          onPressed: () => _showRenameDialog(context),
-                        ),
-                      )
+                          child: TextField(
+                            controller: _deckNameController,
+
+                          ))
+                      // Expanded(
+                      //   flex: 3,
+                      //   child: Text(
+                      //     widget.deck.deckName,
+                      //     // maxLines: 1,
+                      //     overflow: TextOverflow.ellipsis,
+                      //     style: TextStyle(
+                      //         fontFamily: 'JalnanGothic', fontSize: fontSize),
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   flex: 1,
+                      //   child: IconButton(
+                      //     iconSize: iconSize,
+                      //     padding: EdgeInsets.zero,
+                      //     icon: const Icon(Icons.mode),
+                      //     onPressed: () => _showRenameDialog(context),
+                      //   ),
+                      // )
                     ],
                   ),
                 ),
