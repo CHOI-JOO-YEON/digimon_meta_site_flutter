@@ -9,6 +9,7 @@ import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -28,6 +29,8 @@ class DeckBuilderPage extends StatefulWidget {
 }
 
 class _DeckBuilderPageState extends State<DeckBuilderPage> {
+  bool init = true;
+  String viewMode = 'grid';
   final ScrollController _scrollController = ScrollController();
   final PanelController _panelController = PanelController();
   bool isSearchLoading = true;
@@ -39,6 +42,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   Deck deck = Deck();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
+
+  void onViewModeChanged(String newMode) {
+    viewMode = newMode;
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -62,6 +70,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       initSearch();
     });
   }
+
   @override
   void didUpdateWidget(covariant DeckBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -71,6 +80,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       });
     }
   }
+
   initSearch() async {
     isSearchLoading = true;
     setState(() {});
@@ -120,7 +130,13 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
     if (isPortrait) {
       fontSize *= 2;
+      if(init) {
+        viewMode="list";
+        init=false;
+      }
+
     }
+
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -135,8 +151,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             return Container(
               decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(5)
-                  ),
+                  borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.only(
                     left: MediaQuery.sizeOf(context).width * 0.01,
@@ -155,54 +170,67 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   IconButton(
-                                    onPressed: _panelController.panelPosition > 0.3
+                                    onPressed: _panelController.panelPosition >
+                                            0.3
                                         ? () {
-                                      if (_panelController.panelPosition > 0.7) {
-                                        _panelController.animatePanelToSnapPoint().then((_) {
-                                          setState(() {});
-                                        });
-                                      } else {
-                                        _panelController.close().then((_) {
-                                          setState(() {});
-                                        });
-                                      }
-                                    }
+                                            if (_panelController.panelPosition >
+                                                0.7) {
+                                              _panelController
+                                                  .animatePanelToSnapPoint()
+                                                  .then((_) {
+                                                setState(() {});
+                                              });
+                                            } else {
+                                              _panelController
+                                                  .close()
+                                                  .then((_) {
+                                                setState(() {});
+                                              });
+                                            }
+                                          }
                                         : null,
                                     icon: Icon(
                                       Icons.arrow_drop_down,
-                                      color: _panelController.panelPosition > 0.3
-                                          ? Theme.of(context).primaryColor
-                                          : Colors.grey,
+                                      color:
+                                          _panelController.panelPosition > 0.3
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.grey,
                                     ),
                                   ),
                                   Text(
                                     '검색 패널',
-                                    style: TextStyle(fontSize: fontSize, color:  Theme.of(context).primaryColor),
+                                    style: TextStyle(
+                                        fontSize: fontSize,
+                                        color: Theme.of(context).primaryColor),
                                   ),
                                   IconButton(
-                                    onPressed: _panelController.panelPosition < 0.7
+                                    onPressed: _panelController.panelPosition <
+                                            0.7
                                         ? () {
-                                      if (_panelController.panelPosition < 0.3) {
-                                        _panelController.animatePanelToSnapPoint().then((_) {
-                                          setState(() {});
-                                        });
-                                      } else {
-                                        _panelController.open().then((_) {
-                                          setState(() {});
-                                        });
-                                      }
-                                    }
+                                            if (_panelController.panelPosition <
+                                                0.3) {
+                                              _panelController
+                                                  .animatePanelToSnapPoint()
+                                                  .then((_) {
+                                                setState(() {});
+                                              });
+                                            } else {
+                                              _panelController.open().then((_) {
+                                                setState(() {});
+                                              });
+                                            }
+                                          }
                                         : null,
                                     icon: Icon(
                                       Icons.arrow_drop_up,
-                                      color: _panelController.panelPosition < 0.7
-                                          ?  Theme.of(context).primaryColor
-                                          : Colors.grey,
+                                      color:
+                                          _panelController.panelPosition < 0.7
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.grey,
                                     ),
                                   ),
                                 ],
-                              )
-                          ),
+                              )),
                           Expanded(
                               flex: 1,
                               child: Row(
@@ -249,6 +277,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   notes: notes,
                                   searchParameter: searchParameter,
                                   onSearch: initSearch,
+                                  viewMode: viewMode,
+                                  onViewModeChanged: onViewModeChanged,
                                 )),
                             SizedBox(
                               height: 5,
@@ -256,17 +286,31 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             Expanded(
                                 flex: 9,
                                 child: !isSearchLoading
-                                    ? CardScrollGridView(
-                                        cards: cards,
-                                        rowNumber: 6,
-                                        loadMoreCards: loadMoreCard,
-                                        cardPressEvent: addCardByDeck,
-                                        totalPages: totalPages,
-                                        currentPage: currentPage,
-                                      )
+                                    ? (viewMode == 'grid'
+                                        ? CardScrollGridView(
+                                            cards: cards,
+                                            rowNumber: 6,
+                                            loadMoreCards: loadMoreCard,
+                                            cardPressEvent: addCardByDeck,
+                                            // mouseEnterEvent: changeViewCardInfo,
+                                            totalPages: totalPages,
+                                            currentPage: currentPage,
+                                          )
+                                        : CardScrollListView(
+                                            cards: cards,
+                                            loadMoreCards: loadMoreCard,
+                                            cardPressEvent: addCardByDeck,
+                                            // mouseEnterEvent: changeViewCardInfo,
+                                            totalPages: totalPages,
+                                            currentPage: currentPage,
+                                          ))
                                     : Center(
                                         child: CircularProgressIndicator())),
-                            Expanded(flex: _panelController.panelPosition<0.7? 11:0, child: Container())
+                            Expanded(
+                                flex: _panelController.panelPosition < 0.7
+                                    ? 11
+                                    : 0,
+                                child: Container())
                           ],
                         )),
                   ],
@@ -274,7 +318,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               ),
             );
           },
-
           body: Padding(
             padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
             child: SingleChildScrollView(
@@ -346,19 +389,28 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             notes: notes,
                             searchParameter: searchParameter,
                             onSearch: initSearch,
+                            viewMode: viewMode,
+                            onViewModeChanged: onViewModeChanged,
                           )),
                       Expanded(
                           flex: 9,
                           child: !isSearchLoading
-                              ? CardScrollGridView(
-                                  cards: cards,
-                                  rowNumber: 6,
-                                  loadMoreCards: loadMoreCard,
-                                  cardPressEvent: addCardByDeck,
-                                  // mouseEnterEvent: changeViewCardInfo,
-                                  totalPages: totalPages,
-                                  currentPage: currentPage,
-                                )
+                              ? (viewMode == 'grid'
+                                  ? CardScrollGridView(
+                                      cards: cards,
+                                      rowNumber: 6,
+                                      loadMoreCards: loadMoreCard,
+                                      cardPressEvent: addCardByDeck,
+                                      totalPages: totalPages,
+                                      currentPage: currentPage,
+                                    )
+                                  : CardScrollListView(
+                                      cards: cards,
+                                      loadMoreCards: loadMoreCard,
+                                      cardPressEvent: addCardByDeck,
+                                      totalPages: totalPages,
+                                      currentPage: currentPage,
+                                    ))
                               : Center(child: CircularProgressIndicator()))
                     ],
                   ),

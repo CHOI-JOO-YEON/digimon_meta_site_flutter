@@ -8,12 +8,13 @@ class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;
   final List<NoteDto> notes;
   final VoidCallback onSearch;
-
+  final String? viewMode;
+  final Function(String)? onViewModeChanged;
   const CardSearchBar(
       {super.key,
       required this.onSearch,
       required this.searchParameter,
-      required this.notes});
+      required this.notes, this.viewMode, this.onViewModeChanged});
 
   @override
   State<CardSearchBar> createState() => _CardSearchBarState();
@@ -674,7 +675,25 @@ class _CardSearchBarState extends State<CardSearchBar> {
             child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: _showFilterDialog,
-                icon: Icon(Icons.menu)))
+                icon: Icon(Icons.menu))),
+        if(widget.viewMode!=null)
+        Expanded(
+          flex: 1,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              if(widget.onViewModeChanged!=null) {
+                widget.onViewModeChanged!(
+                  widget.viewMode == 'grid' ? 'list' : 'grid',
+                );
+              }
+
+            },
+            icon: Icon(
+              widget.viewMode == 'grid' ? Icons.view_list : Icons.grid_view,
+            ),
+          ),
+        ),
       ],
     );
   }
