@@ -146,7 +146,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       Text('${card.cardNo} ${card.cardName}'),
 
                       if(card.lv!=null)
-                      Text('\tLv.${card.lv}'),
+                      Text('\tLv.${card.lv==0?'-':card.lv}'),
 
                       Text('\t${card.rarity}',style: TextStyle(color: Colors.red),)
                     ],

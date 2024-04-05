@@ -128,23 +128,6 @@ class DeckService {
       }
     });
 
-    // deck.deckMap.entries.forEach((entry) {
-    //   final card = entry.key;
-    //   final count = entry.value;
-    //   final cardNo = card.cardNo;
-    //   if (mainDeckMap.containsKey(cardNo)) {
-    //     mainDeckMap[cardNo]![4] =
-    //         (int.parse(mainDeckMap[cardNo]![4]) + count).toString();
-    //   } else {
-    //     mainDeckMap[cardNo!] = [
-    //       cardNo,
-    //       card.lv==null?'':card.lv.toString(),
-    //       card.cardName,
-    //       getCardType(card.cardType!),
-    //       count.toString()
-    //     ];
-    //   }
-    // });
     final mainDeckData = mainDeckMap.values.toList().sublist(0,min(31,mainDeckMap.values.toList().length));
 
     final digitamaDeckMap = <String, List<dynamic>>{};
@@ -158,7 +141,7 @@ class DeckService {
       } else {
         digitamaDeckMap[cardNo!] = [
           cardNo,
-          card.lv==null?'':card.lv.toString(),
+          card.lv==null||card.lv==0?'-':card.lv.toString(),
           card.cardName,
           '디지타마',
           count.toString()
