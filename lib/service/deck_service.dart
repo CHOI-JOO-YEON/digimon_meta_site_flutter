@@ -120,7 +120,7 @@ class DeckService {
       } else {
         mainDeckMap[cardNo!] = [
           cardNo,
-          card.lv==null?'':card.lv.toString(),
+          card.lv==null||card.lv==0?'-':card.lv.toString(),
           card.cardName,
           getCardType(card.cardType!),
           count.toString()
@@ -169,7 +169,7 @@ class DeckService {
 
     var font =
         pw.Font.ttf(await rootBundle.load('assets/fonts/JalnanGothicTTF.ttf'));
-    final tableStyle = pw.TextStyle(fontFallback: [font], fontSize: 8);
+    final tableStyle = pw.TextStyle(font:  font, fontSize: 7);
     pdf.addPage(
       pw.Page(
         margin: pw.EdgeInsets.all(5),
@@ -184,14 +184,14 @@ class DeckService {
                       height: pageSizeHeight - 10, fit: pw.BoxFit.fitHeight)),
               pw.Positioned(
                 left: 96,
-                top: 206,
+                top: 206.5,
                 child: pw.Table(
                   columnWidths: {
                     0: pw.FixedColumnWidth(40),
-                    1: pw.FixedColumnWidth(34),
+                    1: pw.FixedColumnWidth(36),
                     2: pw.FixedColumnWidth(141),
-                    3: pw.FixedColumnWidth(129),
-                    4: pw.FixedColumnWidth(44),
+                    3: pw.FixedColumnWidth(130),
+                    4: pw.FixedColumnWidth(45),
                   },
                   children: mainDeckData.map((row) {
                     return pw.TableRow(
@@ -210,14 +210,14 @@ class DeckService {
               ),
               pw.Positioned(
                 left: 96,
-                top: 730,
+                top: 730.5,
                 child: pw.Table(
                   columnWidths: {
                     0: pw.FixedColumnWidth(40),
-                    1: pw.FixedColumnWidth(34),
+                    1: pw.FixedColumnWidth(36),
                     2: pw.FixedColumnWidth(141),
-                    3: pw.FixedColumnWidth(129),
-                    4: pw.FixedColumnWidth(44),
+                    3: pw.FixedColumnWidth(130),
+                    4: pw.FixedColumnWidth(45),
                   },
                   children: digitamaDeckData.map((row) {
                     return pw.TableRow(
