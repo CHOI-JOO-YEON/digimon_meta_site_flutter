@@ -132,10 +132,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       fontSize *= 2;
       if(init) {
         viewMode="list";
-        init=false;
       }
 
     }
+    init=false;
 
     if (isPortrait) {
       return LayoutBuilder(
