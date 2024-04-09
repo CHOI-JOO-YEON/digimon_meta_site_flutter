@@ -6,7 +6,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'dart:ui' as ui;
-import 'dart:html' as html;
 import '../model/card.dart';
 import '../model/deck.dart';
 import '../widget/deck/deck_stat_view.dart';
@@ -21,20 +20,20 @@ class DeckImagePage extends StatefulWidget {
 }
 
 class _DeckImagePageState extends State<DeckImagePage> {
-  Color selectedColor = const Color(0x66c8c8c8); // 초기 색상 설정
+  Color backGroundColor = const Color(0x66c8c8c8); // 초기 색상 설정
 
   void _showColorPicker() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('색상 선택'),
+          title: Text('배경 색상 선택'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: selectedColor,
+              pickerColor: backGroundColor,
               onColorChanged: (Color color) {
                 setState(() {
-                  selectedColor = color;
+                  backGroundColor = color;
                 });
               },
               showLabel: true,
@@ -121,7 +120,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   color: Colors.white,
                   child: Container(
                     decoration: BoxDecoration(
-                        color:  selectedColor,
+                        color:  backGroundColor,
                         // color: Colors.blue[100],
                         // borderRadius: BorderRadius.circular(10)
                     ),
