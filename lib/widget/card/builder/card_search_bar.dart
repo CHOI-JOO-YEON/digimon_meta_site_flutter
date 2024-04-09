@@ -502,7 +502,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     _parallelOption = 0;
                     _dialogSearchStringEditingController =
                         TextEditingController(text: '');
-                    enCardInclude = false;
+                    enCardInclude = true;
                     setState(() {});
                   },
                 ),
