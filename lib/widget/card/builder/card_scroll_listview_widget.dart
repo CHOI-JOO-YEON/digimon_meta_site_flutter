@@ -1,5 +1,8 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:digimon_meta_site_flutter/service/color_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 
 class CardScrollListView extends StatefulWidget {
@@ -9,6 +12,8 @@ class CardScrollListView extends StatefulWidget {
   final int totalPages;
   final int currentPage;
   final Function(DigimonCard)? mouseEnterEvent;
+  final bool isTextSimplify;
+  final Function(bool) updateIsTextSimplify;
 
   const CardScrollListView(
       {super.key,
@@ -17,7 +22,9 @@ class CardScrollListView extends StatefulWidget {
       required this.cardPressEvent,
       this.mouseEnterEvent,
       required this.totalPages,
-      required this.currentPage});
+      required this.currentPage,
+      required this.isTextSimplify,
+      required this.updateIsTextSimplify});
 
   @override
   State<CardScrollListView> createState() => _CardScrollListViewState();
@@ -55,45 +62,6 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     setState(() => isLoading = false);
   }
 
-  OverlayEntry? _overlayEntry;
-
-  void _showBigImage(BuildContext cardContext, String imgUrl) {
-    final RenderBox renderBox = cardContext.findRenderObject() as RenderBox;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    final screenWidth = MediaQuery.of(cardContext).size.width;
-    final screenHeight = MediaQuery.of(cardContext).size.height;
-
-    const double bigImageWidth = 300;
-    const double bigImageHeight = 400;
-
-    final double overlayLeft = 16;
-    final double overlayTop = offset.dy;
-
-    final double correctedTop = overlayTop < 0
-        ? 0
-        : overlayTop + bigImageHeight > screenHeight
-            ? screenHeight - bigImageHeight
-            : overlayTop;
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: overlayLeft,
-        top: correctedTop,
-        width: bigImageWidth,
-        height: bigImageHeight,
-        child: Image.network(imgUrl, fit: BoxFit.cover),
-      ),
-    );
-
-    Overlay.of(cardContext)?.insert(_overlayEntry!);
-  }
-
-  void _hideBigImage() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
   void _showImageDialog(BuildContext context, DigimonCard card) {
     showDialog(
       context: context,
@@ -121,75 +89,106 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: widget.cards.length + (isLoading ? 1 : 0),
-
-      itemBuilder: (context, index) {
-        if (index < widget.cards.length) {
-          final card = widget.cards[index];
-          return Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Container(
-              decoration: BoxDecoration(
-                // border: Border.all(
-                //   color: Colors.grey,
-                //   width: 1.0,
-                // ),
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.grey[200]!
-              ),
-              child: ListTile(
-                leading:Image.network(card.smallImgUrl!),
-                title: Row(
-                    children: [
-                      Text('${card.cardNo} ${card.cardName}'),
-
-                      if(card.lv!=null)
-                      Text('\tLv.${card.lv==0?'-':card.lv}'),
-
-                      Text('\t${card.rarity}',style: TextStyle(color: Colors.red),)
-                    ],
-
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (card.effect != null)
-                      Container(
-                        margin: EdgeInsets.only(top: 4),
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: _buildEffectText(card.effect!, '상단 텍스트'),
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text('텍스트 간소화'),
+            Switch(
+              value: widget.isTextSimplify,
+              onChanged: (v) => widget.updateIsTextSimplify(v),
+              inactiveThumbColor: Colors.red,
+            )
+          ],
+        ),
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: widget.cards.length + (isLoading ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index < widget.cards.length) {
+                final card = widget.cards[index];
+                Color color = ColorService.getColorFromString(card.color1!);
+                if (color == Colors.white) {
+                  color = Colors.grey;
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        // border: Border.all(
+                        //   color: Colors.grey,
+                        //   width: 1.0,
+                        // ),
+                        borderRadius: BorderRadius.circular(5),
+                        color: Theme.of(context).cardColor),
+                    child: ListTile(
+                      leading: Image.network(card.smallImgUrl!),
+                      title: Row(
+                        children: [
+                          Text('${card.cardNo} ${card.cardName}'),
+                          if (card.lv != null)
+                            Text('\tLv.${card.lv == 0 ? '-' : card.lv}'),
+                          Text(
+                            '\t${card.rarity}',
+                            style: TextStyle(color: Colors.red),
+                          )
+                        ],
                       ),
-                    if (card.sourceEffect != null)
-                      Container(
-                        margin: EdgeInsets.only(top: 4),
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: _buildEffectText(card.sourceEffect!, '하단 텍스트'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (card.effect != null)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 4),
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: color.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: _buildEffectText(
+                                        card.effect!, '상단 텍스트'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (card.sourceEffect != null)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 4),
+                                    padding: EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: color.withOpacity(0.6),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: _buildEffectText(
+                                        card.sourceEffect!, '하단 텍스트'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.zoom_in),
-                  onPressed: () => _showImageDialog(context, card),
-                ),
-                onTap: () => widget.cardPressEvent(card),
-              ),
-            ),
-          );
-        } else {
-
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.zoom_in),
+                        onPressed: () => _showImageDialog(context, card),
+                      ),
+                      onTap: () => widget.cardPressEvent(card),
+                    ),
+                  ),
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        )
+      ],
     );
   }
 
@@ -198,20 +197,23 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
     final List<InlineSpan> spans = [];
-    final RegExp regexp = RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉)');
+    final RegExp regexp =
+        RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\))');
     final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
-    spans.add(TextSpan(text: prefix, style: TextStyle(fontWeight: FontWeight.bold)));
+    spans.add(
+        TextSpan(text: prefix, style: TextStyle(fontWeight: FontWeight.bold)));
     spans.add(TextSpan(text: '\n')); // 줄바꿈 추가
 
     int lastIndex = 0;
     for (final match in matches) {
       if (match.start > lastIndex) {
-        spans.add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+        spans
+            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
       }
 
       final String matchedText = match.group(0)!;
-      final String innerText = matchedText.substring(1, matchedText.length - 1);
+      String innerText = matchedText.substring(1, matchedText.length - 1);
       Color backgroundColor;
       if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
         backgroundColor = Color.fromRGBO(33, 37, 131, 1);
@@ -221,6 +223,14 @@ class _CardScrollListViewState extends State<CardScrollListView> {
         backgroundColor = Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
         backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+      } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
+        if (widget.isTextSimplify) {
+          lastIndex = match.end;
+          continue; // 괄호 안 텍스트 숨기기
+        } else {
+          innerText = '(' + innerText + ')';
+          backgroundColor = Colors.transparent;
+        }
       } else {
         backgroundColor = Colors.transparent;
       }
@@ -239,7 +249,9 @@ class _CardScrollListViewState extends State<CardScrollListView> {
               innerText,
               style: TextStyle(
                 fontSize: 12,
-                color: backgroundColor != Colors.transparent ? Colors.white : Colors.black,
+                color: backgroundColor != Colors.transparent
+                    ? Colors.white
+                    : Colors.black,
                 height: 1.6,
               ),
             ),

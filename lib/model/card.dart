@@ -17,6 +17,7 @@ class DigimonCard {
   String? sourceEffect;
   String? color1;
   String? color2;
+  String? color3;
   String? rarity;
   String? cardType;
   String? form;
@@ -51,32 +52,32 @@ class DigimonCard {
     return 'Lv.$digivolveCondition2에서 $digivolveCost2';
   }
 
-  DigimonCard(
-      {this.cardId,
-      this.cardNo,
-      this.cardName,
-      this.lv,
-      this.dp,
-      this.playCost,
-      this.digivolveCost1,
-      this.digivolveCondition1,
-      this.digivolveCost2,
-      this.digivolveCondition2,
-      this.effect,
-      this.sourceEffect,
-      this.color1,
-      this.color2,
-      this.rarity,
-      this.cardType,
-      this.form,
-      this.attributes,
-      this.types,
-      this.imgUrl,
-      this.isParallel,
-      this.sortString,
-      this.smallImgUrl,
-      this.releaseDate,
-      required this.isEn});
+  DigimonCard({this.cardId,
+    this.cardNo,
+    this.cardName,
+    this.lv,
+    this.dp,
+    this.playCost,
+    this.digivolveCost1,
+    this.digivolveCondition1,
+    this.digivolveCost2,
+    this.digivolveCondition2,
+    this.effect,
+    this.sourceEffect,
+    this.color1,
+    this.color2,
+    this.color3,
+    this.rarity,
+    this.cardType,
+    this.form,
+    this.attributes,
+    this.types,
+    this.imgUrl,
+    this.isParallel,
+    this.sortString,
+    this.smallImgUrl,
+    this.releaseDate,
+    required this.isEn});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
@@ -94,6 +95,7 @@ class DigimonCard {
       sourceEffect: json['sourceEffect'],
       color1: json['color1'],
       color2: json['color2'],
+      color3: json['color3'],
       rarity: json['rarity'],
       cardType: json['cardType'],
       form: json['form'],
@@ -110,7 +112,8 @@ class DigimonCard {
     );
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'cardId': cardId,
         'cardNo': cardNo,
         'cardName': cardName,
@@ -125,12 +128,13 @@ class DigimonCard {
         'sourceEffect': sourceEffect,
         'color1': color1,
         'color2': color2,
+        'color3': color3,
         'rarity': rarity,
         'cardType': cardType,
         'form': form,
         'attributes': attributes,
         'types':
-            types != null ? List<dynamic>.from(types!.map((x) => x)) : null,
+        types != null ? List<dynamic>.from(types!.map((x) => x)) : null,
         'imgUrl': imgUrl,
         'isParallel': isParallel,
         'sortString': sortString,

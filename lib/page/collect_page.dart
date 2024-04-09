@@ -13,7 +13,6 @@ import '../model/card_search_response_dto.dart';
 import '../model/note.dart';
 import '../model/search_parameter.dart';
 import '../provider/user_provider.dart';
-import '../router.dart';
 import '../service/deck_service.dart';
 import '../widget/card/builder/card_search_bar.dart';
 import '../widget/card/collect/collect_card_scroll_grdiview_widget.dart';
