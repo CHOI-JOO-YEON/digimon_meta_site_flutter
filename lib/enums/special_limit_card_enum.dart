@@ -1,6 +1,7 @@
 enum SpecialLimitCard {
   BT6_085('BT6-085',50),
   EX2_046('EX2-046',50),
+  BT11_061('BT11_061',50),
   ;
 
 
