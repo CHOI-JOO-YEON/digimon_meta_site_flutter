@@ -22,7 +22,7 @@ class SearchParameter{
 
   String orderOption = "sortString";
   bool isOrderDesc = false;
-  bool isEnglishCardInclude = false;
+  bool isEnglishCardInclude = true;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
