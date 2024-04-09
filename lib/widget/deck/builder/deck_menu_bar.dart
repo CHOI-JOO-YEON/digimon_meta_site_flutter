@@ -439,7 +439,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       controller: _textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: 'Paste your deck.',
+                        hintText: '여기에 덱 코드를 붙여넣으세요',
                       ),
                     ),
                   ],
@@ -448,7 +448,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               actions: <Widget>[
                 if (isLoading) const CircularProgressIndicator(),
                 ElevatedButton(
-                  child: const Text('Submit'),
+                  child: const Text('가져오기'),
                   onPressed: isLoading
                       ? null
                       : () async {
@@ -526,7 +526,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                       controller: _textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: 'Paste your deck.',
+                        // hintText: 'Paste your deck.',
                       ),
                       enabled: false, // 수정 불가능하게 설정
                     ),
