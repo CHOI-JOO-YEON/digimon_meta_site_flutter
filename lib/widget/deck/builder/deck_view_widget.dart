@@ -1,9 +1,12 @@
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../model/card.dart';
 import '../../../model/deck.dart';
@@ -27,6 +30,7 @@ class DeckBuilderView extends StatefulWidget {
 }
 
 class _DeckBuilderViewState extends State<DeckBuilderView> {
+  TextEditingController textEditingController = TextEditingController();
   bool isInit = true;
   int _rowNumber = 9;
 
@@ -37,11 +41,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   clearDeck() {
     widget.deck.clear();
+
     setState(() {});
   }
 
   initDeck() {
     widget.deck.init();
+    textEditingController.text='My Deck';
     setState(() {});
   }
 
@@ -50,6 +56,14 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     setState(() {
 
     });
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    if(mounted) {
+      textEditingController.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -64,34 +78,41 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     return Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
+              child: Column(
                 children: [
-                  //메뉴바
                   Expanded(
-                      flex: 2,
-                      child: DeckBuilderMenuBar(
-                        deck: widget.deck,
-                        clear: clearDeck,
-                        init: initDeck,
-                        import: widget.import,
-                      )),
+                    flex: 4,
+                    child: Row(
+                      children: [
+                        //메뉴바
+                        Expanded(
+                            flex: 2,
+                            child: DeckBuilderMenuBar(
+                              deck: widget.deck,
+                              textEditingController: textEditingController,
+                            )),
 
-                  Expanded(
-                      flex: 1,
-                      child: DeckCount(
-                        deck: widget.deck,
-                      )),
 
-                  //행에 한번에 표시되는 카드
-                  Expanded(
-                    flex: 1,
-                    child: CustomSlider(
-                        sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                        //행에 한번에 표시되는 카드
+                        Expanded(
+                          flex: 2,
+                          child: CustomSlider(
+                              sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                        ),
+                        Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                      ],
+                    ),
                   ),
-                  Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                  Expanded(flex: 2, child: DeckMenuButtons(
+                    deck: widget.deck,
+                    clear: clearDeck,
+                    init: initDeck,
+                    import: widget.import,
+                  )),
+
                 ],
               ),
             ),

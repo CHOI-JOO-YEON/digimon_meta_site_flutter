@@ -226,7 +226,7 @@ class _CollectPageState extends State<CollectPage> {
                                 child: !isSearchLoading
                                     ? CardScrollGridView(
                                   cards: cards,
-                                  rowNumber: isPortrait ? 6 : 8,
+                                  rowNumber: isPortrait ? 5 : 8,
                                   loadMoreCards: loadMoreCard,
                                   cardPressEvent: (card) {},
                                   totalPages: totalPages,

@@ -349,7 +349,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                   ),
                 );
               },
-              body: Padding(
+              body: Container(
+                color: Theme
+                    .of(context)
+                    .highlightColor,
                 padding: EdgeInsets.all(MediaQuery
                     .sizeOf(context)
                     .height * 0.01),

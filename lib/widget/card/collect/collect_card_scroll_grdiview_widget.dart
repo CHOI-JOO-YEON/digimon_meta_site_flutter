@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -144,17 +146,28 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery
+            .of(context)
+            .orientation == Orientation.portrait;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        double fontSize = constraints.maxWidth * 0.015;
-        double iconSize = constraints.maxWidth * 0.02;
+        // double fontSize = min(constraints.maxWidth * 0.02,20);
+        // double iconSize = min(constraints.maxWidth * 0.04,30);
+        double fontSize= constraints.maxWidth*0.02;
+        double iconSize= constraints.maxWidth*0.04;
+        if(isPortrait){
+          fontSize*=1.5;
+          iconSize*=1.5;
+        }
+
         return GridView.builder(
           controller: _scrollController,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             crossAxisSpacing: constraints.maxWidth / 100,
             mainAxisSpacing: fontSize / 2,
-            childAspectRatio: 0.6,
+            childAspectRatio: 0.5,
           ),
           itemCount: widget.cards.length + (isLoading ? 1 : 0),
           itemBuilder: (context, index) {
@@ -183,6 +196,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
 
                               children: [
                                 ConstrainedBox(
@@ -198,21 +212,27 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                                     icon: const Icon(Icons.remove),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: iconSize,
-                                ),
-                                ConstrainedBox(
-                                  constraints:
-                                      BoxConstraints.tightFor(height: iconSize),
-                                  child: Text(
-                                    '$quantity',
-                                    style: TextStyle(fontSize: fontSize),
-                                  ),
+                                // SizedBox(
+                                //   width: iconSize,
+                                // ),
 
+                                // ConstrainedBox(
+                                //
+                                //   constraints:
+                                //       BoxConstraints.tightFor(height: iconSize),
+                                //   child: Text(
+                                //     '$quantity',
+                                //     style: TextStyle(fontSize: fontSize),
+                                //   ),
+                                //
+                                // ),
+                                Text(
+                                  '$quantity',
+                                  style: TextStyle(fontSize: fontSize),
                                 ),
-                                SizedBox(
-                                  width: iconSize,
-                                ),
+                                // SizedBox(
+                                //   width: iconSize,
+                                // ),
                                 ConstrainedBox(
                                   constraints: BoxConstraints.tightFor(
                                       width: iconSize, height: iconSize),

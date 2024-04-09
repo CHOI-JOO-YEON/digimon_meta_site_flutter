@@ -15,42 +15,34 @@ class DeckCount extends StatelessWidget {
     if(isPortrait) {
       fontSize*=2;
     }
-    // deckCount에 따른 색상 결정
     Color deckCountColor = deck.deckCount == 50 ? Colors.green : Colors.red;
-    // tamaCount에 따른 색상 결정
     Color tamaCountColor = deck.tamaCount <= 5 ? Colors.green : Colors.red;
 
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-        return Center(
-          child: Container(
-            padding: EdgeInsets.all(0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  '덱',
-                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${deck.deckCount}/50',
-                  style: TextStyle(color: deckCountColor, fontSize:fontSize, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '디지타마 덱',
-                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${deck.tamaCount}/5',
-                  style: TextStyle(color: tamaCountColor, fontSize: fontSize, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          '덱: ',
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+        ),
+        // SizedBox(width: 20,),
+        Text(
+          '${deck.deckCount}/50',
+          style: TextStyle(color: deckCountColor, fontSize:fontSize, fontWeight: FontWeight.bold),
+        ),
+        // SizedBox(width: 100,),
+        Text(
+          '디지타마 덱: ',
+          style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+        ),
+        // SizedBox(width: 20,),
+        Text(
+          '${deck.tamaCount}/5',
+          style: TextStyle(color: tamaCountColor, fontSize: fontSize, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 }
