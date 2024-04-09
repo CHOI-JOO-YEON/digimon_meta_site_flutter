@@ -171,6 +171,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     const Divider(),
                     const Text('포맷', style: TextStyle(fontSize: 25)),
                     DropdownButton<int>(
+                      isExpanded: true,
                       value: widget.deck.formatId,
                       hint: Text(formats[widget.deck.formatId]?.name ?? "포맷 "),
                       items: [
