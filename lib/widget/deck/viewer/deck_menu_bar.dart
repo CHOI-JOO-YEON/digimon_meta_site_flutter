@@ -4,8 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../../enums/site_enum.dart';
@@ -149,16 +151,20 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.all(0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('작성자: ${widget.deck.author}',
-                      style: TextStyle(fontSize: fontSize),),
-                    Text(
-                      '덱 이름: ${widget.deck.deckName}',
-                      style: TextStyle(fontSize: fontSize),
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('작성자: ${widget.deck.author}',
+                        style: TextStyle(fontSize: fontSize),),
+                      Text(
+                        '덱 이름: ${widget.deck.deckName}',
+                        style: TextStyle(fontSize: fontSize
+                        // ,overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               )),
           Expanded(
