@@ -47,6 +47,22 @@ class DeckApi {
     return null;
   }
 
+  Future<DeckResponseDto?> importDeckThisSite(Map<String, dynamic> deckCode) async {
+    try {
+      var response = await dioClient.dio
+          .post('$baseUrl/api/deck/import/this', data: {'deck': deckCode});
+      if (response.statusCode == 200) {
+        return DeckResponseDto.fromJson(response.data);
+      } else if (response.statusCode == 401) {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
+    return null;
+  }
+
   Map<DigimonCard, int> parseJsonToCardAndCntMap(String jsonString) {
     final parsedJson = json.decode(jsonString);
     final List<dynamic> cardsJson = parsedJson['cards'];

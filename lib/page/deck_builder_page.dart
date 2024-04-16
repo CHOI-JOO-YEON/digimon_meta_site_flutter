@@ -8,11 +8,13 @@ import 'package:digimon_meta_site_flutter/model/deck.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
+import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'dart:html' as html;
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -65,8 +67,67 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
-      // notes.add(NoteDto(noteId: null, name: '모든 카드'));
       notes.addAll(await CardApi().getNotes());
+      String? deckJsonString = html.window.localStorage['deck'];
+
+      if (deckJsonString != null) {
+        bool isLoading = false;
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return AlertDialog(
+                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                  title: Text('저장된 덱 불러오기'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('이전에 작성 중이던 덱이 있습니다. 불러오시겠습니까?'),
+                      if (isLoading)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    if (!isLoading)
+                      TextButton(
+                        child: Text('아니오'),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                          html.window.localStorage.remove('deck');
+                        },
+                      ),
+                    if (!isLoading)
+                      TextButton(
+                        child: Text('예'),
+                        onPressed: () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+
+                          Deck? savedDeck = await DeckService().createDeckByLocalJsonString(deckJsonString);
+                          if (savedDeck != null) {
+                            deck = savedDeck;
+                          }
+
+                          setState(() {
+                            isLoading = false;
+                          });
+
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      }
 
       initSearch();
     });

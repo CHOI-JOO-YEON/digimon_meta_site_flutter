@@ -120,7 +120,7 @@ class DeckService {
       } else {
         mainDeckMap[cardNo!] = [
           cardNo,
-          card.lv==null||card.lv==0?'-':card.lv.toString(),
+          card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
           card.cardName,
           getCardType(card.cardType!),
           count.toString()
@@ -128,7 +128,9 @@ class DeckService {
       }
     });
 
-    final mainDeckData = mainDeckMap.values.toList().sublist(0,min(31,mainDeckMap.values.toList().length));
+    final mainDeckData = mainDeckMap.values
+        .toList()
+        .sublist(0, min(31, mainDeckMap.values.toList().length));
 
     final digitamaDeckMap = <String, List<dynamic>>{};
 
@@ -141,18 +143,20 @@ class DeckService {
       } else {
         digitamaDeckMap[cardNo!] = [
           cardNo,
-          card.lv==null||card.lv==0?'-':card.lv.toString(),
+          card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
           card.cardName,
           '디지타마',
           count.toString()
         ];
       }
     });
-    final digitamaDeckData = digitamaDeckMap.values.toList().sublist(0,min(5,digitamaDeckMap.values.toList().length));
+    final digitamaDeckData = digitamaDeckMap.values
+        .toList()
+        .sublist(0, min(5, digitamaDeckMap.values.toList().length));
 
     var font =
         pw.Font.ttf(await rootBundle.load('assets/fonts/JalnanGothicTTF.ttf'));
-    final tableStyle = pw.TextStyle(font:  font, fontSize: 7);
+    final tableStyle = pw.TextStyle(font: font, fontSize: 7);
     pdf.addPage(
       pw.Page(
         margin: pw.EdgeInsets.all(5),
@@ -238,5 +242,23 @@ class DeckService {
     anchor.click();
     html.document.body?.children.remove(anchor);
     html.Url.revokeObjectUrl(url);
+  }
+
+  Future<Deck?> createDeckByLocalJsonString(String jsonString) async {
+    Map<String, dynamic> map = jsonDecode(jsonString);
+    String deckName = map['deckName'];
+    Map<String, dynamic> deckMapJson =
+        Map<String, dynamic>.from(map['deckMap']);
+
+
+    DeckResponseDto? deckResponseDto =
+        await DeckApi().importDeckThisSite(deckMapJson);
+    if (deckResponseDto == null) {
+      return null;
+    }
+    Deck deck = Deck();
+    deck.deckName=deckName;
+    deck.import(deckResponseDto);
+    return deck;
   }
 }

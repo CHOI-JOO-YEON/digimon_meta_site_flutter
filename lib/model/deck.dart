@@ -1,81 +1,15 @@
+import 'dart:convert';
+
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-
+import 'dart:html' as html;
 import 'card.dart';
 
 class Deck {
-  void init() {
-    clear();
-    deckId = null;
-    deckName = "My Deck";
-    author = null;
-    authorId = null;
-
-    formatId = null;
-    isPublic = false;
-    colors={};
-  }
-
-
-
-
-  Deck.responseDto(DeckResponseDto deckResponseDto) {
-    deckId = deckResponseDto.deckId;
-    deckName = deckResponseDto.deckName!;
-    author = deckResponseDto.authorName;
-    authorId = deckResponseDto.authorId;
-    if (deckResponseDto.cardAndCntMap != null) {
-      for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
-        DigimonCard card = cardEntry.key;
-
-        cardMap[card.cardId!] = card;
-        if(card.cardType=='DIGITAMA') {
-          tamaMap[card] = cardEntry.value;
-          tamaCards.add(card);
-
-          tamaCount+=cardEntry.value;
-        }
-        else {
-          deckMap[card] = cardEntry.value;
-          deckCards.add(card);
-
-          deckCount+=cardEntry.value;
-        }
-      }
-    }
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
-  }
-  Deck.deck(Deck deck) {
-    deckName = deck.deckName+' Copy';
-    formatId = deck.formatId;
-    for (var tama in deck.tamaMap.entries) {
-      cardMap[tama.key.cardId!] = tama.key;
-      tamaMap[tama.key] = tama.value;
-      tamaCards.add(tama.key);
-
-      tamaCount+=tama.value;
-    }
-
-    for (var card in deck.deckMap.entries) {
-      cardMap[card.key.cardId!] = card.key;
-      deckMap[card.key] = card.value;
-      deckCards.add(card.key);
-
-      deckCount+=card.value;
-    }
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
-  }
-
-  Deck();
-
-
-
   int? deckId;
   Map<DigimonCard, int> deckMap = {};
   List<DigimonCard> deckCards = [];
@@ -92,6 +26,89 @@ class Deck {
 
   int? formatId;
   bool isPublic = false;
+
+  void init() {
+    clear();
+    deckId = null;
+    deckName = "My Deck";
+    author = null;
+    authorId = null;
+    formatId = null;
+    isPublic = false;
+    colors = {};
+    html.window.localStorage.remove('deck');
+  }
+
+  void saveMapToLocalStorage() {
+    Map<String, int> encodableMap = {
+      ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
+      ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
+    };
+    if(encodableMap.isEmpty) {
+      html.window.localStorage.remove('deck');
+      return;
+    }
+
+    Map<String, dynamic> map = {
+      'deckName': deckName,
+      'deckMap': encodableMap,
+    };
+
+    String jsonString = jsonEncode(map);
+    html.window.localStorage['deck'] = jsonString;
+  }
+
+  Deck.responseDto(DeckResponseDto deckResponseDto) {
+    deckId = deckResponseDto.deckId;
+    deckName = deckResponseDto.deckName!;
+    author = deckResponseDto.authorName;
+    authorId = deckResponseDto.authorId;
+    if (deckResponseDto.cardAndCntMap != null) {
+      for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
+        DigimonCard card = cardEntry.key;
+        cardMap[card.cardId!] = card;
+        if (card.cardType == 'DIGITAMA') {
+          tamaMap[card] = cardEntry.value;
+          tamaCards.add(card);
+
+          tamaCount += cardEntry.value;
+        } else {
+          deckMap[card] = cardEntry.value;
+          deckCards.add(card);
+
+          deckCount += cardEntry.value;
+        }
+      }
+    }
+    tamaCards.sort(digimonCardComparator);
+    deckCards.sort(digimonCardComparator);
+    saveMapToLocalStorage();
+  }
+
+  Deck.deck(Deck deck) {
+    deckName = deck.deckName + ' Copy';
+    formatId = deck.formatId;
+    for (var tama in deck.tamaMap.entries) {
+      cardMap[tama.key.cardId!] = tama.key;
+      tamaMap[tama.key] = tama.value;
+      tamaCards.add(tama.key);
+
+      tamaCount += tama.value;
+    }
+
+    for (var card in deck.deckMap.entries) {
+      cardMap[card.key.cardId!] = card.key;
+      deckMap[card.key] = card.value;
+      deckCards.add(card.key);
+
+      deckCount += card.value;
+    }
+    tamaCards.sort(digimonCardComparator);
+    deckCards.sort(digimonCardComparator);
+    saveMapToLocalStorage();
+  }
+
+  Deck();
 
   Set<String> getCardColorSet() {
     Set<String> colorSet = {};
@@ -127,30 +144,31 @@ class Deck {
           DigimonCard card = cardEntry.key;
 
           cardMap[card.cardId!] = card;
-          if(card.cardType=='DIGITAMA') {
+          if (card.cardType == 'DIGITAMA') {
             tamaMap[card] = cardEntry.value;
             tamaCards.add(card);
 
-            tamaCount+=cardEntry.value;
-          }
-          else {
+            tamaCount += cardEntry.value;
+          } else {
             deckMap[card] = cardEntry.value;
             deckCards.add(card);
 
-            deckCount+=cardEntry.value;
+            deckCount += cardEntry.value;
           }
         }
       }
       tamaCards.sort(digimonCardComparator);
       deckCards.sort(digimonCardComparator);
+      saveMapToLocalStorage();
     }
   }
 
-  DateTime getLatestCardDate(){
+  DateTime getLatestCardDate() {
     DateTime latestReleaseDate = DateTime.fromMillisecondsSinceEpoch(0);
 
     cardMap.forEach((key, card) {
-      if (card.releaseDate != null && card.releaseDate!.isAfter(latestReleaseDate)) {
+      if (card.releaseDate != null &&
+          card.releaseDate!.isAfter(latestReleaseDate)) {
         latestReleaseDate = card.releaseDate!;
       }
     });
@@ -166,10 +184,11 @@ class Deck {
     cardMap.clear();
     deckCount = 0;
     tamaCount = 0;
+    html.window.localStorage.remove('deck');
   }
 
-  addCard(DigimonCard card,BuildContext context) {
-    LimitProvider limitProvider = Provider.of(context,listen: false);
+  addCard(DigimonCard card, BuildContext context) {
+    LimitProvider limitProvider = Provider.of(context, listen: false);
 
     if (cardMap.containsKey(card.cardId)) {
       card = cardMap[card.cardId]!;
@@ -178,12 +197,14 @@ class Deck {
     }
     if (card.cardType == 'DIGITAMA') {
       if (tamaMap.containsKey(card)) {
-        if (tamaMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)&&tamaMap[card]!<limitProvider.getCardAllowedQuantity(card.cardNo!)) {
+        if (tamaMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!) &&
+            tamaMap[card]! <
+                limitProvider.getCardAllowedQuantity(card.cardNo!)) {
           tamaMap[card] = tamaMap[card]! + 1;
           tamaCount++;
         }
       } else {
-        if(limitProvider.getCardAllowedQuantity(card.cardNo!)>0) {
+        if (limitProvider.getCardAllowedQuantity(card.cardNo!) > 0) {
           tamaMap[card] = 1;
           tamaCards.add(card);
           tamaCards.sort(digimonCardComparator);
@@ -192,20 +213,22 @@ class Deck {
       }
     } else {
       if (deckMap.containsKey(card)) {
-        if (deckMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!)&&deckMap[card]!<limitProvider.getCardAllowedQuantity(card.cardNo!)) {
+        if (deckMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!) &&
+            deckMap[card]! <
+                limitProvider.getCardAllowedQuantity(card.cardNo!)) {
           deckMap[card] = deckMap[card]! + 1;
           deckCount++;
         }
       } else {
-        if(limitProvider.getCardAllowedQuantity(card.cardNo!)>0) {
+        if (limitProvider.getCardAllowedQuantity(card.cardNo!) > 0) {
           deckMap[card] = 1;
           deckCards.add(card);
           deckCards.sort(digimonCardComparator);
           deckCount++;
         }
-
       }
     }
+    saveMapToLocalStorage();
   }
 
   removeCard(DigimonCard card) {
@@ -236,6 +259,7 @@ class Deck {
         }
       }
     }
+    saveMapToLocalStorage();
   }
 
   static final Map<String, int> _colorOrder = {
@@ -287,9 +311,9 @@ class Deck {
   }
 
   void colorArrange(Set<String> set) {
-    var removeSet=[];
+    var removeSet = [];
     for (var o in colors) {
-      if(!set.contains(o)) {
+      if (!set.contains(o)) {
         removeSet.add(o);
       }
     }
@@ -297,6 +321,5 @@ class Deck {
       colors.remove(o);
     }
   }
-
 
 }
