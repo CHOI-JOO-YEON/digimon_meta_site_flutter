@@ -82,7 +82,6 @@ class Deck {
     }
     tamaCards.sort(digimonCardComparator);
     deckCards.sort(digimonCardComparator);
-    saveMapToLocalStorage();
   }
 
   Deck.deck(Deck deck) {
@@ -105,7 +104,6 @@ class Deck {
     }
     tamaCards.sort(digimonCardComparator);
     deckCards.sort(digimonCardComparator);
-    saveMapToLocalStorage();
   }
 
   Deck();

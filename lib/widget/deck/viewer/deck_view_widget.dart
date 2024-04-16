@@ -4,6 +4,8 @@ import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_bar.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_buttons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/card.dart';
@@ -45,30 +47,41 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     return Column(
       children: [
         Expanded(
-          flex: 4,
+          flex: 6,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
+            child: Column(
               children: [
-                //메뉴바
                 Expanded(
-                    flex: 2,
-                    child: DeckViewerMenuBar(
-                      deck: widget.deck,
-                    )),
+                  flex:  4,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //메뉴바
+                      Expanded(
+                          flex: 2,
+                          child: DeckViewerMenuBar(
+                            deck: widget.deck,
+                          )),
 
-                Expanded(
-                    flex: 1,
-                    child: Container(),
-                ),
+                      // Expanded(
+                      //     flex: 1,
+                      //     child: Container(),
+                      // ),
 
-                //행에 한번에 표시되는 카드
-                Expanded(
-                  flex: 1,
-                  child: CustomSlider(
-                      sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                      //행에 한번에 표시되는 카드
+                      Expanded(
+                        flex: 2,
+                        child: CustomSlider(
+                            sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                      ),
+                      Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                    ],
+                  ),
                 ),
-                Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                Expanded(flex: 2, child: DeckMenuButtons(
+                  deck: widget.deck,
+                ))
               ],
             ),
           ),

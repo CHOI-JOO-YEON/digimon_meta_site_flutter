@@ -26,112 +26,6 @@ class DeckViewerMenuBar extends StatefulWidget {
 
 class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
 
-  void _showExportDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        SiteName selectedButton = SiteName.values.first;
-        TextEditingController textEditingController = TextEditingController(
-          text: selectedButton.ExportToSiteDeckCode(widget.deck), // 초기값 설정
-        );
-
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Export to'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: SiteName.values.map((siteName) {
-                        String name = siteName.toString().split('.').last;
-                        return Expanded(
-                          child: ListTile(
-                            title: Text(name),
-                            leading: Radio<SiteName>(
-                              value: siteName,
-                              groupValue: selectedButton,
-                              onChanged: (SiteName? value) {
-                                setState(() {
-                                  selectedButton = value!;
-                                  textEditingController.text =
-                                      selectedButton.ExportToSiteDeckCode(
-                                          widget.deck);
-                                });
-                              },
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    TextField(
-                      controller: textEditingController,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: 'Paste your deck.',
-                      ),
-                      enabled: false,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.copy),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(
-                                    text: textEditingController.text))
-                                .then((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Copied to clipboard'),
-                                ),
-                              );
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-  void _showDeckCopyDialog(
-      BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('덱 복사'),
-          content: Text('이 덱을 카피하여 새로운 덱을 만들겠습니까?'),
-          actions: [
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('예'),
-              onPressed: () {
-
-               Deck deck = Deck.deck(widget.deck);
-                Navigator.of(context).pop();
-
-               context.navigateTo(DeckBuilderRoute(deck: deck));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,95 +36,24 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
       fontSize*=2;
       iconSize*=1.2;
     }
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('작성자: ${widget.deck.author}',
-                        style: TextStyle(fontSize: fontSize),),
-                      Text(
-                        '덱 이름: ${widget.deck.deckName}',
-                        style: TextStyle(fontSize: fontSize
-                        // ,overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )),
-          Expanded(
-            flex: 1,
-            child: Consumer<UserProvider>(builder: (BuildContext context,
-                UserProvider userProvider, Widget? child) {
-              bool hasManagerRole = userProvider.hasManagerRole(); // 권한 확인
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: iconSize, height: iconSize),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => _showExportDialog(context),
-                      iconSize: iconSize,
-                      icon: const Icon(Icons.upload),
-                      tooltip: '내보내기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: iconSize, height: iconSize),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        context.router.push(DeckImageRoute(deck: widget.deck));
-                      },
-                      iconSize: iconSize,
-                      icon: const Icon(Icons.image),
-                      tooltip: '이미지 저장',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                        width: iconSize, height: iconSize),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => _showDeckCopyDialog(context),
-                      iconSize: iconSize,
-                      icon: const Icon(Icons.copy),
-                      tooltip: '복사해서 새로운 덱 만들기',
-                    ),
-                  ),
-                  if (hasManagerRole) // 권한 체크 조건
-                    ConstrainedBox(
-                      constraints: BoxConstraints.tightFor(
-                          width: iconSize, height: iconSize),
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () async {
-                          await DeckService().exportToTTSFile(widget.deck);
-                        },
-                        iconSize: iconSize,
-                        icon: const Icon(Icons.videogame_asset_outlined),
-                        // 예시 아이콘, 실제 사용할 아이콘으로 변경
-                        tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
-                      ),
-                    ),
-                ],
-              );
-            }),
-          ),
-        ],
-      );
-    });
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('작성자: ${widget.deck.author}',
+              style: TextStyle(fontSize: fontSize),),
+            Text(
+              '덱 이름: ${widget.deck.deckName}',
+              style: TextStyle(fontSize: fontSize
+              // ,overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
