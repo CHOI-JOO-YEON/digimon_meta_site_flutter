@@ -198,7 +198,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
     final List<InlineSpan> spans = [];
     final RegExp regexp =
-        RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\))');
+    RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕)');
     final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
     spans.add(
@@ -221,10 +221,9 @@ class _CardScrollListViewState extends State<CardScrollListView> {
         backgroundColor = Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
         backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-      }
-      else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
+      } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
         backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-      }else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
+      } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
         backgroundColor = Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
         if (widget.isTextSimplify) {
