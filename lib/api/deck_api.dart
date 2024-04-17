@@ -5,7 +5,6 @@ import 'package:digimon_meta_site_flutter/model/deck_request_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/format.dart';
-import 'package:digimon_meta_site_flutter/model/note.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
 import 'package:intl/intl.dart';
 

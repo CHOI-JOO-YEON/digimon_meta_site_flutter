@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/api/deck_api.dart';
@@ -13,7 +12,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:html' as html;
 import '../model/deck.dart';
-import 'dart:html' as html;
 
 import '../model/format.dart';
 import '../provider/limit_provider.dart';

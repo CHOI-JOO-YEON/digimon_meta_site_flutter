@@ -26,6 +26,18 @@ class Deck {
 
   int? formatId;
   bool isPublic = false;
+  bool isStrict = true;
+
+  void clear() {
+    deckMap.clear();
+    tamaMap.clear();
+    deckCards.clear();
+    tamaCards.clear();
+    cardMap.clear();
+    deckCount = 0;
+    tamaCount = 0;
+    html.window.localStorage.remove('deck');
+  }
 
   void init() {
     clear();
@@ -44,7 +56,7 @@ class Deck {
       ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
       ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
     };
-    if(encodableMap.isEmpty) {
+    if (encodableMap.isEmpty) {
       html.window.localStorage.remove('deck');
       return;
     }
@@ -174,89 +186,80 @@ class Deck {
     return latestReleaseDate;
   }
 
-  void clear() {
-    deckMap.clear();
-    tamaMap.clear();
-    deckCards.clear();
-    tamaCards.clear();
-    cardMap.clear();
-    deckCount = 0;
-    tamaCount = 0;
-    html.window.localStorage.remove('deck');
+  void _add(DigimonCard card, int regulationLimit, int quantityLimit,
+      Map<DigimonCard, int> map, List<DigimonCard> cards) {
+    if (map.containsKey(card)) {
+      if (map[card]! < quantityLimit && map[card]! < regulationLimit) {
+        map[card] = map[card]! + 1;
+        _incrementCount(card.cardType!);
+      }
+    } else {
+      if (regulationLimit > 0) {
+        map[card] = 1;
+        cards.add(card);
+        cards.sort(digimonCardComparator);
+        _incrementCount(card.cardType!);
+      }
+    }
+  }
+
+  void _incrementCount(String cardType) {
+    if (cardType == 'DIGITAMA') {
+      tamaCount++;
+    } else {
+      deckCount++;
+    }
   }
 
   addCard(DigimonCard card, BuildContext context) {
     LimitProvider limitProvider = Provider.of(context, listen: false);
+    int regulationLimit =
+        isStrict ? limitProvider.getCardAllowedQuantity(card.cardNo!) : 100;
+    int quantityLimit =
+        isStrict ? SpecialLimitCard.getLimitByCardNo(card.cardNo!) : 100;
 
     if (cardMap.containsKey(card.cardId)) {
       card = cardMap[card.cardId]!;
     } else {
       cardMap[card.cardId!] = card;
     }
-    if (card.cardType == 'DIGITAMA') {
-      if (tamaMap.containsKey(card)) {
-        if (tamaMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!) &&
-            tamaMap[card]! <
-                limitProvider.getCardAllowedQuantity(card.cardNo!)) {
-          tamaMap[card] = tamaMap[card]! + 1;
-          tamaCount++;
-        }
-      } else {
-        if (limitProvider.getCardAllowedQuantity(card.cardNo!) > 0) {
-          tamaMap[card] = 1;
-          tamaCards.add(card);
-          tamaCards.sort(digimonCardComparator);
-          tamaCount++;
-        }
-      }
-    } else {
-      if (deckMap.containsKey(card)) {
-        if (deckMap[card]! < SpecialLimitCard.getLimitByCardNo(card.cardNo!) &&
-            deckMap[card]! <
-                limitProvider.getCardAllowedQuantity(card.cardNo!)) {
-          deckMap[card] = deckMap[card]! + 1;
-          deckCount++;
-        }
-      } else {
-        if (limitProvider.getCardAllowedQuantity(card.cardNo!) > 0) {
-          deckMap[card] = 1;
-          deckCards.add(card);
-          deckCards.sort(digimonCardComparator);
-          deckCount++;
-        }
-      }
-    }
+
+    card.cardType == 'DIGITAMA'
+        ? _add(card, regulationLimit, quantityLimit, tamaMap, tamaCards)
+        : _add(card, regulationLimit, quantityLimit, deckMap, deckCards);
+
     saveMapToLocalStorage();
   }
 
-  removeCard(DigimonCard card) {
-    if (card.cardType == 'DIGITAMA') {
-      if (tamaMap.containsKey(card)) {
-        if (tamaMap[card] == 1) {
-          tamaMap.remove(card);
-          tamaCards.remove(card);
-          tamaCards.sort(digimonCardComparator);
-          tamaCount--;
-          cardMap.remove(card.cardId);
-        } else {
-          tamaMap[card] = tamaMap[card]! - 1;
-          tamaCount--;
-        }
-      }
-    } else {
-      if (deckMap.containsKey(card)) {
-        if (deckMap[card] == 1) {
-          deckMap.remove(card);
-          deckCards.remove(card);
-          deckCards.sort(digimonCardComparator);
-          deckCount--;
-          cardMap.remove(card.cardId);
-        } else {
-          deckMap[card] = deckMap[card]! - 1;
-          deckCount--;
-        }
-      }
+  void _remove(
+      DigimonCard card, Map<DigimonCard, int> map, List<DigimonCard> cards) {
+    if (!map.containsKey(card)) {
+      return;
     }
+
+    if (map[card] == 1) {
+      map.remove(card);
+      cards.remove(card);
+      cards.sort(digimonCardComparator);
+      cardMap.remove(card.cardId);
+    } else {
+      map[card] = map[card]! - 1;
+    }
+    _decrementCount(card.cardType!);
+  }
+
+  void _decrementCount(String cardType) {
+    if (cardType == 'DIGITAMA') {
+      tamaCount--;
+    } else {
+      deckCount--;
+    }
+  }
+
+  removeCard(DigimonCard card) {
+    card.cardType == 'DIGITAMA'
+        ? _remove(card, tamaMap, tamaCards)
+        : _remove(card, deckMap, deckCards);
     saveMapToLocalStorage();
   }
 
@@ -319,5 +322,4 @@ class Deck {
       colors.remove(o);
     }
   }
-
 }
