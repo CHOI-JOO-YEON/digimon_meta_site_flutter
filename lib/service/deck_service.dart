@@ -245,6 +245,7 @@ class DeckService {
   Future<Deck?> createDeckByLocalJsonString(String jsonString) async {
     Map<String, dynamic> map = jsonDecode(jsonString);
     String deckName = map['deckName'];
+    bool isStrict = map['isStrict'];
     Map<String, dynamic> deckMapJson =
         Map<String, dynamic>.from(map['deckMap']);
 
@@ -256,6 +257,7 @@ class DeckService {
     }
     Deck deck = Deck();
     deck.deckName=deckName;
+    deck.isStrict=isStrict;
     deck.import(deckResponseDto);
     return deck;
   }

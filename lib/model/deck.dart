@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
@@ -24,6 +25,7 @@ class Deck {
   int? authorId;
   LimitDto? limitDto = LimitProvider().getCurrentLimit();
 
+  Map<String, int> cardNoCntMap = {};
   int? formatId;
   bool isPublic = false;
   bool isStrict = true;
@@ -51,6 +53,10 @@ class Deck {
     html.window.localStorage.remove('deck');
   }
 
+  void updateIsStrict(bool v){
+    isStrict =v;
+    saveMapToLocalStorage();
+  }
   void saveMapToLocalStorage() {
     Map<String, int> encodableMap = {
       ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
@@ -64,6 +70,7 @@ class Deck {
     Map<String, dynamic> map = {
       'deckName': deckName,
       'deckMap': encodableMap,
+      'isStrict' : isStrict
     };
 
     String jsonString = jsonEncode(map);
@@ -186,19 +193,21 @@ class Deck {
     return latestReleaseDate;
   }
 
-  void _add(DigimonCard card, int regulationLimit, int quantityLimit,
-      Map<DigimonCard, int> map, List<DigimonCard> cards) {
+  void _add(DigimonCard card, int limit, Map<DigimonCard, int> map,
+      List<DigimonCard> cards) {
     if (map.containsKey(card)) {
-      if (map[card]! < quantityLimit && map[card]! < regulationLimit) {
+      if (map[card]! < limit) {
         map[card] = map[card]! + 1;
         _incrementCount(card.cardType!);
+        _incrementCardNoCount(card);
       }
     } else {
-      if (regulationLimit > 0) {
+      if (limit > 0) {
         map[card] = 1;
         cards.add(card);
         cards.sort(digimonCardComparator);
         _incrementCount(card.cardType!);
+        _incrementCardNoCount(card);
       }
     }
   }
@@ -210,23 +219,35 @@ class Deck {
       deckCount++;
     }
   }
-
+  void _incrementCardNoCount(DigimonCard card)
+  {
+    if(cardNoCntMap.containsKey(card.cardNo)) {
+      cardNoCntMap[card.cardNo!]= cardNoCntMap[card.cardNo]!+1;
+    } else{
+      cardNoCntMap[card.cardNo!]=1;
+    }
+  }
   addCard(DigimonCard card, BuildContext context) {
     LimitProvider limitProvider = Provider.of(context, listen: false);
-    int regulationLimit =
-        isStrict ? limitProvider.getCardAllowedQuantity(card.cardNo!) : 100;
-    int quantityLimit =
-        isStrict ? SpecialLimitCard.getLimitByCardNo(card.cardNo!) : 100;
+    int limit = isStrict
+        ? min(limitProvider.getCardAllowedQuantity(card.cardNo!),
+            SpecialLimitCard.getLimitByCardNo(card.cardNo!))
+        : 100;
 
     if (cardMap.containsKey(card.cardId)) {
       card = cardMap[card.cardId]!;
     } else {
       cardMap[card.cardId!] = card;
     }
-
+    if (isStrict) {
+      int cnt = cardNoCntMap[card.cardNo] ?? 0;
+      if (cnt >= limit) {
+        return;
+      }
+    }
     card.cardType == 'DIGITAMA'
-        ? _add(card, regulationLimit, quantityLimit, tamaMap, tamaCards)
-        : _add(card, regulationLimit, quantityLimit, deckMap, deckCards);
+        ? _add(card, limit, tamaMap, tamaCards)
+        : _add(card, limit, deckMap, deckCards);
 
     saveMapToLocalStorage();
   }
@@ -246,6 +267,7 @@ class Deck {
       map[card] = map[card]! - 1;
     }
     _decrementCount(card.cardType!);
+    _decrementCardNoCount(card);
   }
 
   void _decrementCount(String cardType) {
@@ -255,7 +277,18 @@ class Deck {
       deckCount--;
     }
   }
+  void _decrementCardNoCount(DigimonCard card)
+  {
+    if (!cardNoCntMap.containsKey(card.cardNo)) {
+      return;
+    }
 
+    if (cardNoCntMap[card.cardNo] == 1) {
+      cardNoCntMap.remove(card.cardNo);
+    } else {
+      cardNoCntMap[card.cardNo!] = cardNoCntMap[card.cardNo]! - 1;
+    }
+  }
   removeCard(DigimonCard card) {
     card.cardType == 'DIGITAMA'
         ? _remove(card, tamaMap, tamaCards)

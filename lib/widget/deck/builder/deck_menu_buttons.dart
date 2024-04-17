@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -543,66 +544,124 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
         return Consumer<LimitProvider>(
           builder: (context, limitProvider, child) {
             LimitDto? selectedLimit = limitProvider.selectedLimit;
+            bool isStrict = widget.deck.isStrict;
 
-            return AlertDialog(
-              actions: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('취소'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (selectedLimit != null) {
-                          limitProvider.updateSelectLimit(
-                              selectedLimit!.restrictionBeginDate);
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: const Text('확인'),
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                return AlertDialog(
+                  actions: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('취소'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (selectedLimit != null) {
+                              limitProvider.updateSelectLimit(
+                                  selectedLimit!.restrictionBeginDate);
+                              if(!widget.deck.isStrict&&isStrict){
+                                widget.clear();
+                              }
+                              widget.deck.updateIsStrict(isStrict);
+
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: const Text('확인'),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        '금지/제한: ',
-                        style: TextStyle(fontSize: 20),
+                      Row(
+                        children: [
+                          const Text(
+                            '금지/제한: ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: DropdownButtonFormField<LimitDto>(
+                              value: selectedLimit,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedLimit = newValue;
+                                });
+                              },
+                              items: limitProvider.limits.values.map((limitDto) {
+                                return DropdownMenuItem<LimitDto>(
+                                  value: limitDto,
+                                  child: Text(
+                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(
-                        width: 10,
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            '엄격한 덱 작성 모드',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          Switch(
+                            inactiveThumbColor: Colors.red,
+                            value: isStrict,
+                            onChanged: (bool v) {
+                              if (v) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('경고'),
+                                      content: Text('엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('취소'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('확인'),
+                                          onPressed: () {
+                                            setState(() {
+                                              isStrict = v;
+                                            });
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                setState(() {
+                                  isStrict = v;
+                                });
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: DropdownButtonFormField<LimitDto>(
-                          value: selectedLimit,
-                          onChanged: (newValue) {
-                            setState(() {
-                              selectedLimit = newValue;
-                            });
-                          },
-                          items: limitProvider.limits.values.map((limitDto) {
-                            return DropdownMenuItem<LimitDto>(
-                              value: limitDto,
-                              child: Text(
-                                '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+                );
+              }
             );
           },
         );
