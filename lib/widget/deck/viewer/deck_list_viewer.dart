@@ -108,8 +108,8 @@ class _DeckListViewerState extends State<DeckListViewer> {
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? '',
                       style: TextStyle(fontSize: fontSize)),
-                  subtitle: Text('작성자: ${deck.authorName}',
-                      style: TextStyle(fontSize: fontSize)),
+                  subtitle: Text('${deck.authorName}#${(deck.authorId!-3).toString().padLeft(4,'0')}',
+                      style: TextStyle(fontSize: fontSize*0.8)),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);

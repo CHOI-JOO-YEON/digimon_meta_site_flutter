@@ -194,13 +194,10 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                     colors: deck.colors!,
                   ),
                   selected: index == _selectedIndex,
-                  title: Text(
-                    deck.deckName ?? '',
-                    style: TextStyle(fontSize: fontSize),
-                  ),
-                  subtitle: Text('작성자: ${deck.authorName}',
+                  title: Text(deck.deckName ?? '',
                       style: TextStyle(fontSize: fontSize)),
-                  // 덱 아이템을 탭했을 때의 동작 처리
+                  subtitle: Text('${deck.authorName}#${(deck.authorId!-3).toString().padLeft(4,'0')}',
+                      style: TextStyle(fontSize: fontSize*0.8)),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);

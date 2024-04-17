@@ -8,11 +8,13 @@ import 'dart:html' as html;
 class UserProvider with ChangeNotifier {
   String? _nickname;
   String? _role;
+  int? _userNo;
   bool _isAuthError = false;
 
   String? get nickname => _nickname;
 
   String? get role => _role;
+  int? get userNo => _userNo;
   bool get isAuthError => _isAuthError;
   bool _isLogin = false;
 
@@ -21,9 +23,10 @@ class UserProvider with ChangeNotifier {
     _loadUser();
   }
 
-  void saveUserInfoToLocalStorage(String nickname, String role) {
+  void saveUserInfoToLocalStorage(String nickname, String role, int userNo) {
     html.window.localStorage['nickname'] = nickname;
     html.window.localStorage['role'] = role;
+    html.window.localStorage['userNo'] = userNo.toString();
   }
 
   Future<bool> loginCheck() async {
@@ -37,6 +40,7 @@ class UserProvider with ChangeNotifier {
   Future<void> _loadUser() async {
     _nickname = html.window.localStorage['nickname'];
     _role = html.window.localStorage['role'];
+    _userNo = int.parse( html.window.localStorage['userNo']??'0');
     if(_nickname!=null) {
       _isLogin=true;
     }
@@ -46,7 +50,8 @@ class UserProvider with ChangeNotifier {
   Future<void> setUser(LoginResponseDto loginResponseDto) async {
     _nickname = loginResponseDto.nickname;
     _role = loginResponseDto.role;
-    saveUserInfoToLocalStorage(_nickname!, _role!);
+    _userNo = loginResponseDto.userNo;
+    saveUserInfoToLocalStorage(_nickname!, _role!,_userNo!);
     _isLogin=true;
     notifyListeners();
   }
@@ -58,6 +63,7 @@ class UserProvider with ChangeNotifier {
       _role = null;
       html.window.localStorage.remove('nickname');
       html.window.localStorage.remove('role');
+      html.window.localStorage.remove('userNo');
       _isLogin=false;
       notifyListeners();
     }
@@ -69,6 +75,7 @@ class UserProvider with ChangeNotifier {
     _role = null;
     html.window.localStorage.remove('nickname');
     html.window.localStorage.remove('role');
+    html.window.localStorage.remove('userNo');
     _isAuthError=true;
     _isLogin=false;
     notifyListeners();

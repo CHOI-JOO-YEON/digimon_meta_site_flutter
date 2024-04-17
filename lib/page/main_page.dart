@@ -19,23 +19,23 @@ class MainPage extends StatelessWidget {
     html.window.open(url, windowName, windowFeatures);
   }
 
-  String _subject = '';
-  String _category = '버그 제보';
-  String _body = '';
+  // String _subject = '';
+  // String _category = '버그 제보';
+  // String _body = '';
 
-  void _launchEmail(String nickname) async {
-    final Uri params = Uri(
-      scheme: 'mailto',
-      path: 'developer@example.com',
-      query: 'subject=$_subject&body=카테고리: $_category\n\n$_body\n\n보낸 사람: $nickname',
-    );
-    String url = params.toString();
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      print('메일을 발송할 수 없습니다.');
-    }
-  }
+  // void _launchEmail(String nickname) async {
+  //   final Uri params = Uri(
+  //     scheme: 'mailto',
+  //     path: 'developer@example.com',
+  //     query: 'subject=$_subject&body=카테고리: $_category\n\n$_body\n\n보낸 사람: $nickname',
+  //   );
+  //   String url = params.toString();
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     print('메일을 발송할 수 없습니다.');
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
@@ -66,13 +66,26 @@ class MainPage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       if (userProvider.isLogin)
-                                        Text(
-                                          '${userProvider.nickname}',
-                                          style: TextStyle(
-                                              fontSize: min(
-                                                  MediaQuery.sizeOf(context).width *
-                                                      0.02,
-                                                  15)),
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${userProvider.nickname}',
+                                              style: TextStyle(
+                                                  fontSize: min(
+                                                      MediaQuery.sizeOf(context).width *
+                                                          0.02,
+                                                      15)),
+                                            ),
+                                            Text(
+                                              '#${(userProvider.userNo!-3).toString().padLeft(4,'0')}',
+                                              style: TextStyle(
+                                                  fontSize: min(
+                                                      MediaQuery.sizeOf(context).width *
+                                                          0.02,
+                                                      15)),
+                                            ),
+                                          ],
                                         ),
                                       SizedBox(
                                           width: MediaQuery.sizeOf(context).width *

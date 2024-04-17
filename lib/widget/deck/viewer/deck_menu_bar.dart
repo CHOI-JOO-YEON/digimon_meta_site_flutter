@@ -43,14 +43,15 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('작성자: ${widget.deck.author}',
-              style: TextStyle(fontSize: fontSize),),
             Text(
-              '덱 이름: ${widget.deck.deckName}',
+              '${widget.deck.deckName}',
               style: TextStyle(fontSize: fontSize
-              // ,overflow: TextOverflow.ellipsis,
+                // ,overflow: TextOverflow.ellipsis,
               ),
             ),
+            Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
+              style: TextStyle(fontSize: fontSize*0.8),),
+
           ],
         ),
       ),
