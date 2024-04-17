@@ -221,7 +221,10 @@ class _CardScrollListViewState extends State<CardScrollListView> {
         backgroundColor = Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
         backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-      } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
+      }
+      else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
+        backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+      }else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
         backgroundColor = Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
         if (widget.isTextSimplify) {
