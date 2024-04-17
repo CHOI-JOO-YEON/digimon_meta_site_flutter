@@ -36,6 +36,7 @@ class Deck {
     deckCards.clear();
     tamaCards.clear();
     cardMap.clear();
+    cardNoCntMap.clear();
     deckCount = 0;
     tamaCount = 0;
     html.window.localStorage.remove('deck');
