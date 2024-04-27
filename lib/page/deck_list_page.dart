@@ -105,7 +105,7 @@ class _DeckListPageState extends State<DeckListPage> {
                                         ),
                                       ),
                                       Text(
-                                        '검색 패널',
+                                        '덱 검색 패널',
                                         style: TextStyle(fontSize: fontSize, color:  Theme.of(context).primaryColor),
                                       ),
                                       IconButton(

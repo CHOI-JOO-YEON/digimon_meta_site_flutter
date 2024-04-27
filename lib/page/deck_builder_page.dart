@@ -263,7 +263,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                     ),
                                   ),
                                   Text(
-                                    '검색 패널',
+                                    '카드 검색 패널',
                                     style: TextStyle(
                                         fontSize: fontSize,
                                         color: Theme.of(context).primaryColor),
