@@ -149,8 +149,10 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    double iconSize = MediaQuery.sizeOf(context).width * 0.02;
     if (isPortrait) {
       fontSize *= 2;
+      iconSize *=2;
     }
     return Column(
       children: [
@@ -278,8 +280,8 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   });
                 },
                 child: Container(
-                  width: MediaQuery.sizeOf(context).width * 0.02,
-                  height: MediaQuery.sizeOf(context).width * 0.02,
+                  width: iconSize,
+                  height: iconSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: widget.searchParameter.colors.contains(color)
