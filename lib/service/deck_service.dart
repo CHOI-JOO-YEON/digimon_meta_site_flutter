@@ -195,7 +195,7 @@ class DeckService {
               ),
               pw.Positioned(
                 left: 96,
-                top: 730.5,
+                top: 731.5,
                 child: pw.Table(
                   columnWidths: {
                     0: pw.FixedColumnWidth(40),
