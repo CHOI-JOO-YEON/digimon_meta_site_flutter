@@ -212,7 +212,7 @@ class DeckService {
                           child: pw.Text(cell!,
                               style: tableStyle,
                               textAlign: pw.TextAlign.center),
-                          padding: const pw.EdgeInsets.all(4),
+                          padding: const pw.EdgeInsets.all(2),
                         );
                       }).toList(),
                     );
