@@ -15,17 +15,18 @@ class DeckListViewer extends StatefulWidget {
   final FormatDto selectedFormat;
   final Function(DeckResponseDto) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
+  final DeckSearchParameter deckSearchParameter;
 
   const DeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat});
+      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter});
 
   @override
   State<DeckListViewer> createState() => _DeckListViewerState();
 }
 
 class _DeckListViewerState extends State<DeckListViewer> {
-  DeckSearchParameter deckSearchParameter =
-      DeckSearchParameter(isMyDeck: false);
+  // DeckSearchParameter deckSearchParameter =
+  //     DeckSearchParameter(isMyDeck: false);
   List<DeckResponseDto> decks = [];
   int currentPage = 1;
   int maxPage = 0;
@@ -35,7 +36,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
   @override
   void initState() {
     super.initState();
-    deckSearchParameter.formatId = widget.selectedFormat.formatId;
+    widget.deckSearchParameter.formatId = widget.selectedFormat.formatId;
     // deckSearchParameter.formatId = widget.formatList.first.formatId;
     // for (var format in widget.formatList) {
     //   if (!format.isOnlyEn!) {
@@ -54,11 +55,11 @@ class _DeckListViewerState extends State<DeckListViewer> {
     }
 
     isLoading = true;
-
+    widget.deckSearchParameter.isMyDeck=false;
     currentPage = page;
-    deckSearchParameter.updatePage(page);
+    widget.deckSearchParameter.updatePage(page);
     PagedResponseDeckDto? pagedDeck =
-        await DeckService().getDeck(deckSearchParameter,context);
+        await DeckService().getDeck(widget.deckSearchParameter,context);
 
     if (pagedDeck != null) {
       decks = pagedDeck.decks;
@@ -87,7 +88,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
       children: [
         DeckSearchBar(
           formatList: widget.formatList,
-          searchParameter: deckSearchParameter,
+          searchParameter: widget.deckSearchParameter,
           search: searchDecks,
           selectedFormat: widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat,
         ),

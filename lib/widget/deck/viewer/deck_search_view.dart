@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_list_viewer.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/my_deck_list_viewer.dart';
@@ -12,8 +13,10 @@ import '../../../provider/user_provider.dart';
 
 class DeckSearchView extends StatefulWidget {
   final Function(DeckResponseDto) deckUpdate;
+  final DeckSearchParameter deckSearchParameter;
 
-  const DeckSearchView({super.key, required this.deckUpdate});
+  const DeckSearchView(
+      {super.key, required this.deckUpdate, required this.deckSearchParameter});
 
   @override
   State<DeckSearchView> createState() => _DeckSearchViewState();
@@ -121,13 +124,15 @@ class _DeckSearchViewState extends State<DeckSearchView>
                       formatList: formats,
                       deckUpdate: widget.deckUpdate,
                       selectedFormat: selectedFormat!,
-                      updateSelectFormat: updateSelectFormat
+                      updateSelectFormat: updateSelectFormat,
+                      deckSearchParameter: widget.deckSearchParameter,
                     ),
                     MyDeckListViewer(
                       formatList: formats,
                       deckUpdate: widget.deckUpdate,
                       selectedFormat: selectedFormat!,
-                        updateSelectFormat: updateSelectFormat
+                      updateSelectFormat: updateSelectFormat,
+                      deckSearchParameter: widget.deckSearchParameter,
                     )
                   ]),
                 )

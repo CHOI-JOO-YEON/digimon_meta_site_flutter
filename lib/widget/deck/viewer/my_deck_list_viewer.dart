@@ -18,15 +18,15 @@ class MyDeckListViewer extends StatefulWidget {
   final FormatDto selectedFormat;
   final Function(DeckResponseDto) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
+  final DeckSearchParameter deckSearchParameter;
   const MyDeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat});
+      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter});
 
   @override
   State<MyDeckListViewer> createState() => _MyDeckListViewerState();
 }
 
 class _MyDeckListViewerState extends State<MyDeckListViewer> {
-  DeckSearchParameter deckSearchParameter = DeckSearchParameter(isMyDeck: true);
   List<DeckResponseDto> decks = [];
   int currentPage = 1;
   int maxPage = 0;
@@ -35,7 +35,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   @override
   void initState() {
     super.initState();
-    deckSearchParameter.formatId = widget.selectedFormat.formatId;
+    widget.deckSearchParameter.formatId = widget.selectedFormat.formatId;
 
 
 
@@ -50,10 +50,10 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
     }
 
     isLoading =true;
-
+    widget.deckSearchParameter.isMyDeck=true;
     currentPage = page;
-    deckSearchParameter.updatePage(page);
-    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(deckSearchParameter,context);
+    widget.deckSearchParameter.updatePage(page);
+    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(widget.deckSearchParameter,context);
 
 
     if (pagedDeck != null) {
@@ -83,7 +83,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       if(decks.length==1) {
         await searchDecks(1);
       }else{
-        await searchDecks(deckSearchParameter.page);
+        await searchDecks(widget.deckSearchParameter.page);
       }
 
     }
@@ -156,7 +156,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       children: [
         DeckSearchBar(
           formatList: widget.formatList,
-          searchParameter: deckSearchParameter,
+          searchParameter: widget.deckSearchParameter,
           search: searchDecks,
           selectedFormat:  widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat,
         ),

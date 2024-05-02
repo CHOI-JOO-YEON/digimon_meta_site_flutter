@@ -1,9 +1,8 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
-import 'package:digimon_meta_site_flutter/model/format.dart';
+import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_view_widget.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,7 @@ class DeckListPage extends StatefulWidget {
 class _DeckListPageState extends State<DeckListPage> {
   final ScrollController _scrollController = ScrollController();
   final PanelController _panelController = PanelController();
+  DeckSearchParameter deckSearchParameter = DeckSearchParameter(isMyDeck: false);
   Deck? _selectedDeck;
 
   @override
@@ -177,6 +177,7 @@ class _DeckListPageState extends State<DeckListPage> {
                             flex: 5,
                             child: DeckSearchView(
                               deckUpdate: updateSelectedDeck,
+                              deckSearchParameter: deckSearchParameter,
                             ),
                           ),
                           Expanded(
@@ -254,6 +255,7 @@ class _DeckListPageState extends State<DeckListPage> {
                           EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
                       child: DeckSearchView(
                         deckUpdate: updateSelectedDeck,
+                        deckSearchParameter: deckSearchParameter,
                       ),
                     ),
                   ),
