@@ -6,6 +6,9 @@ class SearchParameter{
   Set<int>? lvs;
 
   Set<String>? cardTypes;
+  int typeOperation =1; //0 = and, 1 = or
+
+  Map<int, String> types = {};
 
   int? minPlayCost=0; //
   int? maxPlayCost=20;
@@ -45,6 +48,9 @@ class SearchParameter{
     data['orderOption'] = orderOption;
     data['isOrderDesc'] = isOrderDesc;
     data['isEnglishCardInclude'] = isEnglishCardInclude;
+    data['typeIds'] = types.keys.toList();
+    data['typeOperation'] = typeOperation;
+
     return data;
   }
 

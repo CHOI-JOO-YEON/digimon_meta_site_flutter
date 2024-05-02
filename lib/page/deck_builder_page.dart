@@ -7,8 +7,10 @@ import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/model/type.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
+import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
@@ -66,6 +68,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
       notes.addAll(await CardApi().getNotes());
+      List<TypeDto> types = await CardApi().getTypes();
+      for (var type in types) {
+        TypeService().insert(type);
+      }
+
       if (widget.deck != null) {
         deck = widget.deck!;
         deck.saveMapToLocalStorage();
