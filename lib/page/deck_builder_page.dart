@@ -24,9 +24,10 @@ import '../widget/card/builder/card_search_bar.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
+  final SearchParameter? searchParameter;
   final Deck? deck;
 
-  const DeckBuilderPage({super.key, this.deck});
+  const DeckBuilderPage({super.key, this.deck, this.searchParameter});
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -71,6 +72,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       List<TypeDto> types = await CardApi().getTypes();
       for (var type in types) {
         TypeService().insert(type);
+      }
+      if(widget.searchParameter!=null) {
+        searchParameter = widget.searchParameter!;
       }
 
       if (widget.deck != null) {
@@ -151,6 +155,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       setState(() {
         deck = widget.deck ?? Deck();
       });
+    }
+    if(widget.searchParameter!=null&& widget.searchParameter!=oldWidget.searchParameter) {
+      searchParameter = widget.searchParameter!;
+      initSearch();
     }
   }
 
@@ -416,6 +424,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       deck: deck,
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
+                      searchNote: searchNote,
+
                     ),
                   ),
                   Container(
@@ -448,6 +458,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       // mouseEnterEvent: ,
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
+                      searchNote: searchNote,
                     ),
                   ),
                 ),

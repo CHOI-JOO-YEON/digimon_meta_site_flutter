@@ -133,8 +133,9 @@ class CardService {
                             flex: 4,
                             child: Column(
                               children: [
+                                if(card.form!=null)
                                 _attributeWidget(
-                                    context, [card.getKorForm()!], '형태',
+                                    context, [card.getKorForm()], '형태',
                                     ColorService.getColorFromString(
                                         card.color1!)),
                                 if(card.attributes != null)
@@ -142,7 +143,7 @@ class CardService {
                                       context, [card.attributes!], '속성',
                                       ColorService.getColorFromString(
                                           card.color1!)),
-                                if(card.types != null)
+                                if(card.types != null&&card.types!.isNotEmpty)
                                   _attributeWidget(context, card.types!, '유형',
                                       ColorService.getColorFromString(
                                           card.color1!)),
@@ -169,10 +170,9 @@ class CardService {
                       onPressed: () {
                         if (searchNote != null) {
                           Navigator.pop(context);
+                          print(card.noteId);
                           searchNote(card.noteId!)!;
-
                         }
-
                       },
 
 

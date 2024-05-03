@@ -31,10 +31,10 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
   Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     double fontSize = min(MediaQuery.sizeOf(context).width*0.01,25);
-    double iconSize  = min(MediaQuery.sizeOf(context).width*0.03,25);
+    // double iconSize  = min(MediaQuery.sizeOf(context).width*0.03,25);
     if(isPortrait) {
       fontSize*=2;
-      iconSize*=1.2;
+      // iconSize*=1.2;
     }
     return Padding(
       padding: const EdgeInsets.all(8.0),

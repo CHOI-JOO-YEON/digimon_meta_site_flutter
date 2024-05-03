@@ -8,19 +8,15 @@ import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_buttons.d
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/card.dart';
 import '../../../model/deck.dart';
-import '../../../model/deck_response_dto.dart';
 
 class DeckViewerView extends StatefulWidget {
   final Deck deck;
-
-  // final Function(DigimonCard)? mouseEnterEvent;
+  final Function(int)? searchNote;
 
   const DeckViewerView({
     super.key,
-    required this.deck,
-    // this.mouseEnterEvent,
+    required this.deck, this.searchNote,
   });
 
   @override
@@ -64,10 +60,6 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                             deck: widget.deck,
                           )),
 
-                      // Expanded(
-                      //     flex: 1,
-                      //     child: Container(),
-                      // ),
 
                       //행에 한번에 표시되는 카드
                       Expanded(
@@ -99,6 +91,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                 deckCount: widget.deck.deckMap,
                 deck: widget.deck.deckCards,
                 rowNumber: _rowNumber,
+                searchNote: widget.searchNote,
                 // mouseEnterEvent: widget.mouseEnterEvent,
               ),
             )),
@@ -113,6 +106,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                 deckCount: widget.deck.tamaMap,
                 deck: widget.deck.tamaCards,
                 rowNumber: _rowNumber,
+                searchNote: widget.searchNote,
                 // mouseEnterEvent: widget.mouseEnterEvent,
               ),
             ))

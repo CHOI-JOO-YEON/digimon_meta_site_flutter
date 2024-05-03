@@ -29,6 +29,7 @@ abstract class _$AppRouter extends RootStackRouter {
         child: DeckBuilderPage(
           key: args.key,
           deck: args.deck,
+          searchParameter: args.searchParameter,
         ),
       );
     },
@@ -83,12 +84,14 @@ class DeckBuilderRoute extends PageRouteInfo<DeckBuilderRouteArgs> {
   DeckBuilderRoute({
     Key? key,
     Deck? deck,
+    SearchParameter? searchParameter,
     List<PageRouteInfo>? children,
   }) : super(
           DeckBuilderRoute.name,
           args: DeckBuilderRouteArgs(
             key: key,
             deck: deck,
+            searchParameter: searchParameter,
           ),
           initialChildren: children,
         );
@@ -103,15 +106,18 @@ class DeckBuilderRouteArgs {
   const DeckBuilderRouteArgs({
     this.key,
     this.deck,
+    this.searchParameter,
   });
 
   final Key? key;
 
   final Deck? deck;
 
+  final SearchParameter? searchParameter;
+
   @override
   String toString() {
-    return 'DeckBuilderRouteArgs{key: $key, deck: $deck}';
+    return 'DeckBuilderRouteArgs{key: $key, deck: $deck, searchParameter: $searchParameter}';
   }
 }
 

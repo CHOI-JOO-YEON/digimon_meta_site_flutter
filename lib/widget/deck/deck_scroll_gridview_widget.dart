@@ -11,12 +11,13 @@ class DeckScrollGridView extends StatefulWidget {
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard)? cardPressEvent;
   final Function(DigimonCard)? onLongPress;
+  final Function(int)? searchNote;
 
   const DeckScrollGridView(
       {super.key,
       required this.deckCount,
       required this.rowNumber,
-      this.mouseEnterEvent,   this.cardPressEvent, required this.deck,  this.onLongPress});
+      this.mouseEnterEvent,   this.cardPressEvent, required this.deck,  this.onLongPress, this.searchNote});
 
   @override
   State<DeckScrollGridView> createState() => _DeckScrollGridViewState();
@@ -98,7 +99,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView> {
                       onHover: (context) =>
                           _showBigImage(context, card.imgUrl!, index),
                       onExit: _hideBigImage,
-
+                      searchNote: widget.searchNote,
                     ),
                     Positioned(
                       left:

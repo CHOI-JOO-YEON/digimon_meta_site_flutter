@@ -3,12 +3,15 @@ import 'dart:math';
 import 'package:auto_route/annotations.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../model/deck.dart';
+import '../router.dart';
+import 'package:auto_route/auto_route.dart';
 
 @RoutePage()
 class DeckListPage extends StatefulWidget {
@@ -21,7 +24,8 @@ class DeckListPage extends StatefulWidget {
 class _DeckListPageState extends State<DeckListPage> {
   final ScrollController _scrollController = ScrollController();
   final PanelController _panelController = PanelController();
-  DeckSearchParameter deckSearchParameter = DeckSearchParameter(isMyDeck: false);
+  DeckSearchParameter deckSearchParameter =
+      DeckSearchParameter(isMyDeck: false);
   Deck? _selectedDeck;
 
   @override
@@ -42,6 +46,13 @@ class _DeckListPageState extends State<DeckListPage> {
     }
     super.dispose();
   }
+
+  void searchNote(int noteId) {
+    SearchParameter searchParameter = SearchParameter();
+    searchParameter.noteId = noteId;
+    context.navigateTo(DeckBuilderRoute(searchParameter: searchParameter));
+  }
+
   @override
   Widget build(BuildContext context) {
     final isPortrait =
@@ -60,7 +71,7 @@ class _DeckListPageState extends State<DeckListPage> {
                 maxHeight: constraints.maxHeight,
                 snapPoint: 0.5,
                 isDraggable: false,
-                panelBuilder: (ScrollController sc){
+                panelBuilder: (ScrollController sc) {
                   return Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
@@ -79,59 +90,82 @@ class _DeckListPageState extends State<DeckListPage> {
                               children: [
                                 Expanded(flex: 1, child: Container()),
                                 Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        onPressed: _panelController.panelPosition > 0.3
-                                            ? () {
-                                          if (_panelController.panelPosition > 0.7) {
-                                            _panelController.animatePanelToSnapPoint().then((_) {
-                                              setState(() {});
-                                            });
-                                          } else {
-                                            _panelController.close().then((_) {
-                                              setState(() {});
-                                            });
-                                          }
-                                        }
-                                            : null,
-                                        icon: Icon(
-                                          Icons.arrow_drop_down,
-                                          color: _panelController.panelPosition > 0.3
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
+                                    flex: 1,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          onPressed:
+                                              _panelController.panelPosition >
+                                                      0.3
+                                                  ? () {
+                                                      if (_panelController
+                                                              .panelPosition >
+                                                          0.7) {
+                                                        _panelController
+                                                            .animatePanelToSnapPoint()
+                                                            .then((_) {
+                                                          setState(() {});
+                                                        });
+                                                      } else {
+                                                        _panelController
+                                                            .close()
+                                                            .then((_) {
+                                                          setState(() {});
+                                                        });
+                                                      }
+                                                    }
+                                                  : null,
+                                          icon: Icon(
+                                            Icons.arrow_drop_down,
+                                            color: _panelController
+                                                        .panelPosition >
+                                                    0.3
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.grey,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        '덱 검색 패널',
-                                        style: TextStyle(fontSize: fontSize, color:  Theme.of(context).primaryColor),
-                                      ),
-                                      IconButton(
-                                        onPressed: _panelController.panelPosition < 0.7
-                                            ? () {
-                                          if (_panelController.panelPosition < 0.3) {
-                                            _panelController.animatePanelToSnapPoint().then((_) {
-                                              setState(() {});
-                                            });
-                                          } else {
-                                            _panelController.open().then((_) {
-                                              setState(() {});
-                                            });
-                                          }
-                                        }
-                                            : null,
-                                        icon: Icon(
-                                          Icons.arrow_drop_up,
-                                          color: _panelController.panelPosition < 0.7
-                                              ?  Theme.of(context).primaryColor
-                                              : Colors.grey,
+                                        Text(
+                                          '덱 검색 패널',
+                                          style: TextStyle(
+                                              fontSize: fontSize,
+                                              color: Theme.of(context)
+                                                  .primaryColor),
                                         ),
-                                      ),
-                                    ],
-                                  )
-                                ),
+                                        IconButton(
+                                          onPressed:
+                                              _panelController.panelPosition <
+                                                      0.7
+                                                  ? () {
+                                                      if (_panelController
+                                                              .panelPosition <
+                                                          0.3) {
+                                                        _panelController
+                                                            .animatePanelToSnapPoint()
+                                                            .then((_) {
+                                                          setState(() {});
+                                                        });
+                                                      } else {
+                                                        _panelController
+                                                            .open()
+                                                            .then((_) {
+                                                          setState(() {});
+                                                        });
+                                                      }
+                                                    }
+                                                  : null,
+                                          icon: Icon(
+                                            Icons.arrow_drop_up,
+                                            color: _panelController
+                                                        .panelPosition <
+                                                    0.7
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
                                 Expanded(
                                     flex: 1,
                                     child: Row(
@@ -139,34 +173,32 @@ class _DeckListPageState extends State<DeckListPage> {
                                       children: [
                                         TextButton(
                                             onPressed: () {
-
                                               _scrollController.animateTo(
                                                 0,
                                                 duration:
-                                                Duration(milliseconds: 500),
+                                                    Duration(milliseconds: 500),
                                                 curve: Curves.easeInOut,
                                               );
                                             },
                                             child: Text(
                                               '메인덱 보기',
                                               style:
-                                              TextStyle(fontSize: fontSize),
+                                                  TextStyle(fontSize: fontSize),
                                             )),
                                         TextButton(
                                             onPressed: () {
-
                                               _scrollController.animateTo(
                                                 _scrollController
                                                     .position.maxScrollExtent,
                                                 duration:
-                                                Duration(milliseconds: 500),
+                                                    Duration(milliseconds: 500),
                                                 curve: Curves.easeInOut,
                                               );
                                             },
                                             child: Text(
                                               '타마덱 보기',
                                               style:
-                                              TextStyle(fontSize: fontSize),
+                                                  TextStyle(fontSize: fontSize),
                                             ))
                                       ],
                                     ))
@@ -181,14 +213,14 @@ class _DeckListPageState extends State<DeckListPage> {
                             ),
                           ),
                           Expanded(
-                              flex: _panelController.panelPosition<0.7?5:0,
+                              flex:
+                                  _panelController.panelPosition < 0.7 ? 5 : 0,
                               child: Container())
                         ],
                       ),
                     ),
                   );
                 },
-
                 body: Padding(
                   padding:
                       EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
@@ -202,6 +234,7 @@ class _DeckListPageState extends State<DeckListPage> {
                               ? Container()
                               : DeckViewerView(
                                   deck: _selectedDeck!,
+                                  searchNote: searchNote,
                                 ),
                         ),
                         Container(
@@ -212,10 +245,9 @@ class _DeckListPageState extends State<DeckListPage> {
                   ),
                 ));
           })
-
         : Padding(
-      padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
-          child: Row(
+            padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
@@ -234,6 +266,7 @@ class _DeckListPageState extends State<DeckListPage> {
                             ? Container()
                             : DeckViewerView(
                                 deck: _selectedDeck!,
+                                searchNote: searchNote,
                               ),
                       ),
                     ),
@@ -251,8 +284,8 @@ class _DeckListPageState extends State<DeckListPage> {
                       // border: Border.all()
                     ),
                     child: Padding(
-                      padding:
-                          EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                      padding: EdgeInsets.all(
+                          MediaQuery.sizeOf(context).width * 0.01),
                       child: DeckSearchView(
                         deckUpdate: updateSelectedDeck,
                         deckSearchParameter: deckSearchParameter,
@@ -262,6 +295,6 @@ class _DeckListPageState extends State<DeckListPage> {
                 ),
               ],
             ),
-        );
+          );
   }
 }

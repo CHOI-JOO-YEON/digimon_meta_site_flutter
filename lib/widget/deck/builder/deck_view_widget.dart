@@ -1,6 +1,5 @@
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
-import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
@@ -17,13 +16,14 @@ class DeckBuilderView extends StatefulWidget {
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
   final Function(DeckResponseDto) import;
+  final Function(int)? searchNote;
 
   const DeckBuilderView(
       {super.key,
       required this.deck,
       this.mouseEnterEvent,
       required this.cardPressEvent,
-      required this.import});
+      required this.import, this.searchNote});
 
   @override
   State<DeckBuilderView> createState() => _DeckBuilderViewState();
@@ -134,7 +134,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                   mouseEnterEvent: widget.mouseEnterEvent,
                   cardPressEvent: widget.cardPressEvent,
                   onLongPress: addCard,
-
+                  searchNote: widget.searchNote,
                 ),
               )),
           Expanded(flex: 1, child: Container()),
@@ -151,6 +151,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                   mouseEnterEvent: widget.mouseEnterEvent,
                   cardPressEvent: widget.cardPressEvent,
                   onLongPress: addCard,
+                  searchNote: widget.searchNote,
                 ),
               ))
         ],
