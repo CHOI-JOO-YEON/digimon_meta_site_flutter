@@ -475,7 +475,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       ),
                       Divider(),
                       Text(
-                        '특징',
+                        '유형',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Row(
@@ -491,7 +491,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                                 decoration: InputDecoration(
-                                  labelText: '특징 검색',
+                                  labelText: '유형 검색',
                                 ),
                               ),
                             ),

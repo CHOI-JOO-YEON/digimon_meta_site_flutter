@@ -154,6 +154,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
   }
 
+  void searchNote(int noteId) {
+    searchParameter = SearchParameter();
+    searchParameter.noteId = noteId;
+    initSearch();
+  }
+
   initSearch() async {
     isSearchLoading = true;
     setState(() {});
@@ -367,6 +373,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             // mouseEnterEvent: changeViewCardInfo,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
+                                            searchNote: searchNote,
                                           )
                                         : CardScrollListView(
                                             cards: cards,
@@ -380,6 +387,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                               setState(() {});
                                             },
                                             isTextSimplify: isTextSimplify,
+                                            searchNote: searchNote,
                                           ))
                                     : Center(
                                         child: CircularProgressIndicator())),
@@ -481,6 +489,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
                                       currentPage: currentPage,
+                                      searchNote: searchNote,
                                     )
                                   : CardScrollListView(
                                       cards: cards,
@@ -493,6 +502,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                         setState(() {});
                                       },
                                       isTextSimplify: isTextSimplify,
+                                      searchNote: searchNote,
                                     ))
                               : Center(child: CircularProgressIndicator()))
                     ],

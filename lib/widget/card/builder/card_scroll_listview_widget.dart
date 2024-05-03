@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ class CardScrollListView extends StatefulWidget {
   final Function(DigimonCard)? mouseEnterEvent;
   final bool isTextSimplify;
   final Function(bool) updateIsTextSimplify;
+  final Function(int)? searchNote;
 
   const CardScrollListView(
       {super.key,
@@ -24,7 +26,7 @@ class CardScrollListView extends StatefulWidget {
       required this.totalPages,
       required this.currentPage,
       required this.isTextSimplify,
-      required this.updateIsTextSimplify});
+      required this.updateIsTextSimplify, this.searchNote});
 
   @override
   State<CardScrollListView> createState() => _CardScrollListViewState();
@@ -176,7 +178,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.zoom_in),
-                        onPressed: () => _showImageDialog(context, card),
+                        onPressed: () => CardService().showImageDialog(context, card,widget.searchNote),
                       ),
                       onTap: () => widget.cardPressEvent(card),
                     ),

@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'package:digimon_meta_site_flutter/service/card_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/limit_provider.dart';
+import '../../service/color_service.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
@@ -17,7 +21,7 @@ class CustomCard extends StatefulWidget {
   final Function? onHover;
   final Function? onExit;
   final Function? onLongPress;
-
+  final Function(int)? searchNote;
   const CustomCard({
     super.key,
     required this.width,
@@ -25,7 +29,9 @@ class CustomCard extends StatefulWidget {
     required this.card,
     this.onHover,
     this.onExit,
-    this.onLongPress, this.isActive, this.zoomActive,
+    this.onLongPress,
+    this.isActive,
+    this.zoomActive, this.searchNote,
   });
 
   @override
@@ -86,7 +92,8 @@ class _CustomCardState extends State<CustomCard> {
         onLongPressEnd: _handleLongPressEnd,
         child: Consumer<LimitProvider>(
           builder: (context, limitProvider, child) {
-            int allowedQuantity = limitProvider.getCardAllowedQuantity(widget.card.cardNo!);
+            int allowedQuantity =
+                limitProvider.getCardAllowedQuantity(widget.card.cardNo!);
             return Stack(
               alignment: Alignment.bottomRight,
               children: [
@@ -94,13 +101,30 @@ class _CustomCardState extends State<CustomCard> {
                   width: widget.width,
                   child: ColorFiltered(
                     colorFilter: widget.isActive ?? true
-                        ? ColorFilter.mode(Colors.transparent, BlendMode.srcATop)
+                        ? ColorFilter.mode(
+                            Colors.transparent, BlendMode.srcATop)
                         : ColorFilter.matrix(<double>[
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0,      0,      0,      1, 0,
-                    ]),
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                          ]),
                     child: Image.network(
                       widget.card.smallImgUrl ?? '',
                       fit: BoxFit.fill,
@@ -160,30 +184,30 @@ class _CustomCardState extends State<CustomCard> {
                       },
                     ),
                   ),
-                if(widget.zoomActive!=false)
-                Positioned(
-                  right: widget.width * 0.05,
-                  bottom: widget.width * 0.05,
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints.tightFor(
-                        width: widget.width * 0.2,
-                        height: widget.width * 0.2,
-                      ),
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        iconSize: widget.width * 0.16,
-                        icon: Icon(
-                          Icons.zoom_in,
-                          color: color == 'BLACK' ? Colors.white : Colors.black,
+                if (widget.zoomActive != false)
+                  Positioned(
+                    right: widget.width * 0.05,
+                    bottom: widget.width * 0.05,
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                          width: widget.width * 0.2,
+                          height: widget.width * 0.2,
                         ),
-                        onPressed: () {
-                          _showImageDialog(context, widget.card);
-                        },
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          iconSize: widget.width * 0.16,
+                          icon: Icon(
+                            Icons.zoom_in,
+                            color:
+                                color == 'BLACK' ? Colors.white : Colors.black,
+                          ),
+                          onPressed: () {CardService().showImageDialog(context, widget.card, widget.searchNote);
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             );
           },
@@ -192,25 +216,4 @@ class _CustomCardState extends State<CustomCard> {
     );
   }
 
-  void _showImageDialog(BuildContext context, DigimonCard card) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Image.network(card.imgUrl ?? '', fit: BoxFit.fill),
-          actions: [
-            IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () async {
-                  if(card.imgUrl!=null) {
-                    await WebImageDownloader.downloadImageFromWeb(card.imgUrl!,name: '${card.cardNo}_${card.cardName}.png');
-                  }
-
-
-                }, icon: Icon(Icons.download)),
-          ],
-        );
-      },
-    );
-  }
 }

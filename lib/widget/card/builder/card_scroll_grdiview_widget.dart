@@ -11,6 +11,7 @@ class CardScrollGridView extends StatefulWidget {
   final int totalPages;
   final int currentPage;
   final Function(DigimonCard)? mouseEnterEvent;
+  final Function(int)? searchNote;
 
   const CardScrollGridView(
       {super.key,
@@ -20,7 +21,7 @@ class CardScrollGridView extends StatefulWidget {
       required this.cardPressEvent,
       this.mouseEnterEvent,
       required this.totalPages,
-      required this.currentPage});
+      required this.currentPage, this.searchNote});
 
   @override
   State<CardScrollGridView> createState() => _CardScrollGridViewState();
@@ -126,6 +127,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 onHover: (context) =>
                     _showBigImage(context, widget.cards[index].imgUrl!, index),
                 onExit: _hideBigImage,
+                searchNote: widget.searchNote,
               ),
             );
           } else {

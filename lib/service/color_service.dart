@@ -9,7 +9,7 @@ class ColorService{
       case 'BLUE':
         return Colors.blue;
       case 'YELLOW':
-        return Colors.yellow;
+        return Colors.amber;
       case 'GREEN':
         return Colors.green;
       case 'BLACK':
