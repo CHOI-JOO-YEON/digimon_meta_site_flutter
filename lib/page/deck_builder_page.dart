@@ -54,7 +54,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   void updateSearchParameter()
   {
-    AutoRouter.of(context).replace(
+    AutoRouter.of(context).navigate(
       DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson())),
     );
   }
