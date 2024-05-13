@@ -620,7 +620,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.searchParameter.typeOperation = typeOperation;
                     widget.searchParameter.types = _selectedTypes;
-                    widget.onSearch();
 
 
                     Navigator.pop(context);
