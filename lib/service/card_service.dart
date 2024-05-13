@@ -170,7 +170,6 @@ class CardService {
                       onPressed: () {
                         if (searchNote != null) {
                           Navigator.pop(context);
-                          print(card.noteId);
                           searchNote(card.noteId!)!;
                         }
                       },

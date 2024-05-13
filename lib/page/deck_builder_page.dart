@@ -174,6 +174,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void searchNote(int noteId) {
     searchParameter = SearchParameter();
     searchParameter.noteId = noteId;
+    AutoRouter.of(context).navigate(
+      DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson()),deck: widget.deck),
+    );
     initSearch();
   }
 
