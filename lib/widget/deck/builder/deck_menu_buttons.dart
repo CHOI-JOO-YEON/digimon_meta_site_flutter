@@ -105,15 +105,18 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     var korFormats = formats.entries
         .where((entry) => entry.value.isOnlyEn == false)
         .toList();
-    if (!korFormats.isEmpty) {
-      widget.deck.formatId = korFormats.first.key;
-    } else {
-      var enFormats = formats.entries
-          .where((entry) => entry.value.isOnlyEn == true)
-          .toList()
-          .reversed;
-      widget.deck.formatId = enFormats.first.key;
+    if(!formats.keys.contains(widget.deck.formatId)) {
+      if (!korFormats.isEmpty) {
+        widget.deck.formatId = korFormats.first.key;
+      } else {
+        var enFormats = formats.entries
+            .where((entry) => entry.value.isOnlyEn == true)
+            .toList()
+            .reversed;
+        widget.deck.formatId = enFormats.first.key;
+      }
     }
+
 
     showDialog(
       context: context,
