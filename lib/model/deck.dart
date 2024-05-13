@@ -102,6 +102,9 @@ class Deck {
     }
     tamaCards.sort(digimonCardComparator);
     deckCards.sort(digimonCardComparator);
+    for (var color in  deckResponseDto.colors!) {
+      colors.add(color);
+    }
   }
 
   Deck.deck(Deck deck) {
@@ -124,6 +127,9 @@ class Deck {
     }
     tamaCards.sort(digimonCardComparator);
     deckCards.sort(digimonCardComparator);
+    for (var color in  deck.colors) {
+      colors.add(color);
+    }
   }
 
   Deck();

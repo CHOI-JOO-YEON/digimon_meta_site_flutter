@@ -1,6 +1,5 @@
-import 'dart:math';
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -42,27 +41,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     );
   }
 
-  Color _getColorFromString(String colorString) {
-    switch (colorString) {
-      case 'RED':
-        return Colors.red;
-      case 'BLUE':
-        return Colors.blue;
-      case 'YELLOW':
-        return Colors.yellow;
-      case 'GREEN':
-        return Colors.green;
-      case 'BLACK':
-        return Colors.black;
-      case 'PURPLE':
-        return Colors.purple;
-      case 'WHITE':
-        return Colors.white;
-      default:
-        return Colors.grey;
-    }
-  }
-
   Widget _colorSelectionWidget(Deck deck) {
     List<String> cardColorList = deck.getOrderedCardColorList();
     return StatefulBuilder(
@@ -76,7 +54,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 cardColorList.length,
                     (index) {
                   String color = cardColorList[index];
-                  Color buttonColor = _getColorFromString(color);
+                  Color buttonColor = ColorService.getColorFromString(color);
 
                   return GestureDetector(
                     onTap: () {
