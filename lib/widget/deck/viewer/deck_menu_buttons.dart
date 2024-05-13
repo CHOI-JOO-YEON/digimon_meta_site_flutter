@@ -42,7 +42,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: SiteName.values.map((siteName) {
-                        String name = siteName.toString().split('.').last;
+                        String name = siteName.getName;
                         return Expanded(
                           child: ListTile(
                             title: Text(name),

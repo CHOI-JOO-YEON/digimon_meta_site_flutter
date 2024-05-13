@@ -3,8 +3,8 @@ import 'dart:convert';
 import '../model/deck.dart';
 
 enum SiteName {
-  dev('Digimon-Dev'),
-  tts('테이블탑시뮬레이터');
+  dev('Dev/DCGO'),
+  tts('테이블탑 시뮬레이터');
 
   final String name;
 
