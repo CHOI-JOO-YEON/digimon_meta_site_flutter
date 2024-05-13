@@ -83,6 +83,7 @@ class Deck {
     deckName = deckResponseDto.deckName!;
     author = deckResponseDto.authorName;
     authorId = deckResponseDto.authorId;
+    formatId = deckResponseDto.formatId;
     if (deckResponseDto.cardAndCntMap != null) {
       for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
         DigimonCard card = cardEntry.key;
@@ -105,6 +106,7 @@ class Deck {
     for (var color in  deckResponseDto.colors!) {
       colors.add(color);
     }
+
   }
 
   Deck.deck(Deck deck) {
