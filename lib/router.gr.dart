@@ -22,14 +22,16 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     DeckBuilderRoute.name: (routeData) {
+      final queryParams = routeData.queryParams;
       final args = routeData.argsAs<DeckBuilderRouteArgs>(
-          orElse: () => const DeckBuilderRouteArgs());
+          orElse: () => DeckBuilderRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: DeckBuilderPage(
           key: args.key,
           deck: args.deck,
-          searchParameter: args.searchParameter,
+          searchParameterString: args.searchParameterString,
         ),
       );
     },
@@ -84,15 +86,16 @@ class DeckBuilderRoute extends PageRouteInfo<DeckBuilderRouteArgs> {
   DeckBuilderRoute({
     Key? key,
     Deck? deck,
-    SearchParameter? searchParameter,
+    String? searchParameterString,
     List<PageRouteInfo>? children,
   }) : super(
           DeckBuilderRoute.name,
           args: DeckBuilderRouteArgs(
             key: key,
             deck: deck,
-            searchParameter: searchParameter,
+            searchParameterString: searchParameterString,
           ),
+          rawQueryParams: {'searchParameter': searchParameterString},
           initialChildren: children,
         );
 
@@ -106,18 +109,18 @@ class DeckBuilderRouteArgs {
   const DeckBuilderRouteArgs({
     this.key,
     this.deck,
-    this.searchParameter,
+    this.searchParameterString,
   });
 
   final Key? key;
 
   final Deck? deck;
 
-  final SearchParameter? searchParameter;
+  final String? searchParameterString;
 
   @override
   String toString() {
-    return 'DeckBuilderRouteArgs{key: $key, deck: $deck, searchParameter: $searchParameter}';
+    return 'DeckBuilderRouteArgs{key: $key, deck: $deck, searchParameterString: $searchParameterString}';
   }
 }
 

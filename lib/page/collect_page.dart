@@ -20,7 +20,7 @@ import '../widget/card/collect/deck_calc_dialog.dart';
 
 @RoutePage()
 class CollectPage extends StatefulWidget {
-  const CollectPage({super.key});
+  const CollectPage({super.key, });
 
   @override
   State<CollectPage> createState() => _CollectPageState();
@@ -217,7 +217,7 @@ class _CollectPageState extends State<CollectPage> {
                                 child: CardSearchBar(
                                   notes: notes,
                                   searchParameter: searchParameter,
-                                  onSearch: initSearch,
+                                  onSearch: initSearch, updateSearchParameter: (){},
                                 ),
                               ),
                               const SizedBox(height: 5),

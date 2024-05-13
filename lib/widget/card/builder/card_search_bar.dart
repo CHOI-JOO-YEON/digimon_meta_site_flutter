@@ -15,13 +15,15 @@ class CardSearchBar extends StatefulWidget {
   final String? viewMode;
   final Function(String)? onViewModeChanged;
 
+  final VoidCallback updateSearchParameter;
+
   const CardSearchBar(
       {super.key,
       required this.onSearch,
       required this.searchParameter,
       required this.notes,
       this.viewMode,
-      this.onViewModeChanged});
+      this.onViewModeChanged, required this.updateSearchParameter});
 
   @override
   State<CardSearchBar> createState() => _CardSearchBarState();
@@ -96,21 +98,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
     }
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    // if (_searchStringEditingController != null) {
-    //   _searchStringEditingController!.dispose();
-    // }
-    // if (_dialogSearchStringEditingController != null) {
-    //   _dialogSearchStringEditingController!.dispose();
-    // }
-    // if(_trieSearchController!=null) {
-    //   _trieSearchController!.dispose();
-    // }
-
-    super.dispose();
-  }
 
   void _showFilterDialog() {
     List<TypeDto> _searchResults = TypeService().search("");
@@ -165,12 +152,11 @@ class _CardSearchBarState extends State<CardSearchBar> {
     _dialogSearchStringEditingController =
         TextEditingController(text: _searchStringEditingController?.value.text);
     _trieSearchController = TextEditingController();
-    int _parallelOption = widget.searchParameter.parallelOption;
+    int parallelOption = widget.searchParameter.parallelOption;
     bool enCardInclude = widget.searchParameter.isEnglishCardInclude;
     int typeOperation = widget.searchParameter.typeOperation;
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = 15;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -331,10 +317,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Checkbox(
-                                  value: _parallelOption == 0,
+                                  value: parallelOption == 0,
                                   onChanged: (value) {
                                     setState(() {
-                                      _parallelOption = 0;
+                                      parallelOption = 0;
                                     });
                                   },
                                 ),
@@ -345,10 +331,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Checkbox(
-                                  value: _parallelOption == 1,
+                                  value: parallelOption == 1,
                                   onChanged: (value) {
                                     setState(() {
-                                      _parallelOption = 1;
+                                      parallelOption = 1;
                                     });
                                   },
                                 ),
@@ -359,10 +345,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Checkbox(
-                                  value: _parallelOption == 2,
+                                  value: parallelOption == 2,
                                   onChanged: (value) {
                                     setState(() {
-                                      _parallelOption = 2;
+                                      parallelOption = 2;
                                     });
                                   },
                                 ),
@@ -630,7 +616,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         _dialogSearchStringEditingController?.value.text;
                     _searchStringEditingController?.text =
                         _dialogSearchStringEditingController!.value.text;
-                    widget.searchParameter.parallelOption = _parallelOption;
+                    widget.searchParameter.parallelOption = parallelOption;
                     widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.searchParameter.typeOperation = typeOperation;
                     widget.searchParameter.types = _selectedTypes;
@@ -638,6 +624,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
 
                     Navigator.pop(context);
+
+                    widget.updateSearchParameter();
                   },
                 ),
                 TextButton(
@@ -664,12 +652,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
                     currentPlayCostRange = RangeValues(0, 20);
                     currentDigivolutionCostRange = RangeValues(0, 8);
-                    _parallelOption = 0;
+                    parallelOption = 0;
                     _dialogSearchStringEditingController =
                         TextEditingController(text: '');
                     enCardInclude = true;
                     _selectedTypes={};
                     typeOperation=1;
+
                     setState(() {});
                   },
                 ),
@@ -827,6 +816,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
               },
               onSubmitted: (value) {
                 widget.onSearch();
+                widget.updateSearchParameter();
               },
             )),
         Expanded(

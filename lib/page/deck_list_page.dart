@@ -50,7 +50,7 @@ class _DeckListPageState extends State<DeckListPage> {
   void searchNote(int noteId) {
     SearchParameter searchParameter = SearchParameter();
     searchParameter.noteId = noteId;
-    context.navigateTo(DeckBuilderRoute(searchParameter: searchParameter));
+    context.navigateTo(DeckBuilderRoute(searchParameterString: searchParameter.toJson().toString()));
   }
 
   @override

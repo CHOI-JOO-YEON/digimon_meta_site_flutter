@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
@@ -9,6 +10,7 @@ import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/type.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
+import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
@@ -24,10 +26,10 @@ import '../widget/card/builder/card_search_bar.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
-  final SearchParameter? searchParameter;
+  final String? searchParameterString;
   final Deck? deck;
 
-  const DeckBuilderPage({super.key, this.deck, this.searchParameter});
+  const DeckBuilderPage({super.key, this.deck,@QueryParam('searchParameter') this.searchParameterString});
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -45,10 +47,17 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   int currentPage = 0;
   bool isTextSimplify = true;
 
+
   Deck deck = Deck();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
 
+  void updateSearchParameter()
+  {
+    AutoRouter.of(context).replace(
+      DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson())),
+    );
+  }
   void onViewModeChanged(String newMode) {
     viewMode = newMode;
     setState(() {});
@@ -73,8 +82,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       for (var type in types) {
         TypeService().insert(type);
       }
-      if(widget.searchParameter!=null) {
-        searchParameter = widget.searchParameter!;
+      if (widget.searchParameterString != null) {
+        searchParameter = SearchParameter.fromJson(json.decode(widget.searchParameterString!));
       }
 
       if (widget.deck != null) {
@@ -156,8 +165,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         deck = widget.deck ?? Deck();
       });
     }
-    if(widget.searchParameter!=null&& widget.searchParameter!=oldWidget.searchParameter) {
-      searchParameter = widget.searchParameter!;
+    if(widget.searchParameterString!=null&& widget.searchParameterString!=oldWidget.searchParameterString) {
+      searchParameter = SearchParameter.fromJson(json.decode(widget.searchParameterString!));
       initSearch();
     }
   }
@@ -364,7 +373,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   searchParameter: searchParameter,
                                   onSearch: initSearch,
                                   viewMode: viewMode,
-                                  onViewModeChanged: onViewModeChanged,
+                                  onViewModeChanged: onViewModeChanged, updateSearchParameter: updateSearchParameter,
                                 )),
                             SizedBox(
                               height: 5,
@@ -452,10 +461,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 child: SingleChildScrollView(
                   child: SizedBox(
                     height: MediaQuery.sizeOf(context).height * 0.88,
-                    // height: 1000,
                     child: DeckBuilderView(
                       deck: deck,
-                      // mouseEnterEvent: ,
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
                       searchNote: searchNote,
@@ -487,7 +494,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             searchParameter: searchParameter,
                             onSearch: initSearch,
                             viewMode: viewMode,
-                            onViewModeChanged: onViewModeChanged,
+                            onViewModeChanged: onViewModeChanged, updateSearchParameter: updateSearchParameter,
                           )),
                       Expanded(
                           flex: 9,

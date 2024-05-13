@@ -26,8 +26,12 @@ class AppRouter extends _$AppRouter {
       path: '/',
       page: MainRoute.page,
       children: [
-        AutoRoute(path: 'deck-builder', page: DeckBuilderRoute.page),
-        AutoRoute(path: 'deck-list', page: DeckListRoute.page),
+        AutoRoute(path: 'deck-builder', page: DeckBuilderRoute.page
+        ,meta: {'searchParameter': 'String',},
+
+        ),
+        AutoRoute(path: 'deck-list', page: DeckListRoute.page
+        ),
         AutoRoute(path: 'collect', page: CollectRoute.page),
       ],
     ),

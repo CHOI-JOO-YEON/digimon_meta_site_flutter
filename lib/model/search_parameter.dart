@@ -27,6 +27,32 @@ class SearchParameter{
   bool isOrderDesc = false;
   bool isEnglishCardInclude = true;
 
+  SearchParameter();
+
+  factory SearchParameter.fromJson(Map<String, dynamic> json) {
+    return SearchParameter()
+      ..searchString = json['searchString'] as String?
+      ..noteId = json['noteId'] as int?
+      ..colors = json['colors'] != null ? Set<String>.from(json['colors']) : null
+      ..colorOperation = json['colorOperation'] as int?
+      ..lvs = json['lvs'] != null ? Set<int>.from(json['lvs']) : null
+      ..cardTypes = json['cardTypes'] != null ? Set<String>.from(json['cardTypes']) : null
+      ..typeOperation = json['typeOperation'] as int? ?? 1
+      ..types = (json['typeIds'] as List<dynamic>?)?.asMap().map((key, value) => MapEntry(value as int, '')) ?? {}
+      ..minPlayCost = json['minPlayCost'] as int?
+      ..maxPlayCost = json['maxPlayCost'] as int?
+      ..minDp = json['minDp'] as int?
+      ..maxDp = json['maxDp'] as int?
+      ..minDigivolutionCost = json['minDigivolutionCost'] as int?
+      ..maxDigivolutionCost = json['MaxDigivolutionCost'] as int?
+      ..rarities = json['rarities'] != null ? Set<String>.from(json['rarities']) : null
+      ..page = json['page'] as int? ?? 1
+      ..size = json['size'] as int? ?? 84
+      ..parallelOption = json['parallelOption'] as int? ?? 0
+      ..orderOption = json['orderOption'] as String? ?? 'sortString'
+      ..isOrderDesc = json['isOrderDesc'] as bool? ?? false
+      ..isEnglishCardInclude = json['isEnglishCardInclude'] as bool? ?? true;
+  }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
     if (searchString != null) data['searchString'] = searchString;
