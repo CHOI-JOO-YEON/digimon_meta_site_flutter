@@ -90,7 +90,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
           formatList: widget.formatList,
           searchParameter: widget.deckSearchParameter,
           search: searchDecks,
-          selectedFormat: widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat,
+          selectedFormat: widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat, isMyDeck: false,
         ),
         SizedBox(
           height: 5,

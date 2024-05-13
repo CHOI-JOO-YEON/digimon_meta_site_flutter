@@ -12,6 +12,7 @@ import '../../../provider/limit_provider.dart';
 import '../../../service/color_service.dart';
 
 class DeckSearchBar extends StatefulWidget {
+  final bool isMyDeck;
   final List<FormatDto> formatList;
   final DeckSearchParameter searchParameter;
   final FormatDto selectedFormat;
@@ -22,7 +23,7 @@ class DeckSearchBar extends StatefulWidget {
       {super.key,
       required this.formatList,
       required this.searchParameter,
-      required this.search, required this.selectedFormat, required this.updateSelectFormat});
+      required this.search, required this.selectedFormat, required this.updateSelectFormat, required this.isMyDeck});
 
   @override
   State<DeckSearchBar> createState() => _DeckSearchBarState();
@@ -56,7 +57,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
         return Consumer<LimitProvider>(
           builder: (context, limitProvider, child) {
             LimitDto? selectedLimit = limitProvider.selectedLimit;
-            bool isChecked = widget.searchParameter.isOnlyValidDeck;
+            bool isChecked = widget.isMyDeck?widget.searchParameter.isOnlyValidDeckMy: widget.searchParameter.isOnlyValidDeckAll;
 
             return StatefulBuilder(
               builder: (context, setState) {
@@ -64,7 +65,11 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   actions: [
                     ElevatedButton(
                       onPressed: () {
-                        widget.searchParameter.isOnlyValidDeck = isChecked;
+                        if(widget.isMyDeck) {
+                          widget.searchParameter.isOnlyValidDeckMy=isChecked;
+                        }else{
+                          widget.searchParameter.isOnlyValidDeckAll=isChecked;
+                        }
                         if (selectedLimit != null) {
                           limitProvider.updateSelectLimit(
                               selectedLimit!.restrictionBeginDate);

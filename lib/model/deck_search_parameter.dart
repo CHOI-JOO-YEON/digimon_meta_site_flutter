@@ -9,7 +9,8 @@ class DeckSearchParameter {
   int size = 10;
   int? formatId;
   int? limitId;
-  bool isOnlyValidDeck = true;
+  bool isOnlyValidDeckAll = true;
+  bool isOnlyValidDeckMy = false;
 
   DeckSearchParameter({required this.isMyDeck});
 
@@ -31,7 +32,7 @@ class DeckSearchParameter {
       'formatId': formatId,
       'colorOperation': colorOperation,
       'limitId':limitId,
-      'isOnlyValidDeck' : isOnlyValidDeck
+      'isOnlyValidDeck' : isMyDeck?isOnlyValidDeckMy:isOnlyValidDeckAll
     };
     return data;
   }
