@@ -14,9 +14,13 @@ import '../../../provider/user_provider.dart';
 class DeckSearchView extends StatefulWidget {
   final Function(DeckResponseDto) deckUpdate;
   final DeckSearchParameter deckSearchParameter;
+  final VoidCallback updateSearchParameter;
 
   const DeckSearchView(
-      {super.key, required this.deckUpdate, required this.deckSearchParameter});
+      {super.key,
+      required this.deckUpdate,
+      required this.deckSearchParameter,
+      required this.updateSearchParameter});
 
   @override
   State<DeckSearchView> createState() => _DeckSearchViewState();
@@ -94,9 +98,11 @@ class _DeckSearchViewState extends State<DeckSearchView>
         ? const Center(child: CircularProgressIndicator())
         : Consumer<UserProvider>(builder: (context, userProvider, child) {
             _isDisabled[1] = !userProvider.isLogin;
+            _tabController.index=widget.deckSearchParameter.isMyDeck?1:0;
             if (!userProvider.isLogin) {
               _tabController.index = 0;
             }
+
             return Column(
               children: [
                 TabBar(
@@ -126,6 +132,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
                       selectedFormat: selectedFormat!,
                       updateSelectFormat: updateSelectFormat,
                       deckSearchParameter: widget.deckSearchParameter,
+                      updateSearchParameter: widget.updateSearchParameter,
                     ),
                     MyDeckListViewer(
                       formatList: formats,
@@ -133,6 +140,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
                       selectedFormat: selectedFormat!,
                       updateSelectFormat: updateSelectFormat,
                       deckSearchParameter: widget.deckSearchParameter,
+                      updateSearchParameter: widget.updateSearchParameter,
                     )
                   ]),
                 )

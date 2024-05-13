@@ -36,4 +36,17 @@ class DeckSearchParameter {
     };
     return data;
   }
+
+  factory DeckSearchParameter.fromJson(Map<String, dynamic> json) {
+    return DeckSearchParameter(isMyDeck: json['isMyDeck'] as bool)
+      ..searchString = json['searchString'] as String? ?? ""
+      ..colors = (json['colors'] as List<dynamic>?)?.map((color) => color.toString()).toList() ?? ["RED", "BLUE", "YELLOW", "GREEN", "BLACK", "PURPLE", "WHITE"]
+      ..colorOperation = json['colorOperation'] as int? ?? 0
+      ..page = json['page'] as int? ?? 1
+      ..size = json['size'] as int? ?? 10
+      ..formatId = json['formatId'] as int?
+      ..limitId = json['limitId'] as int?
+      ..isOnlyValidDeckAll = json['isOnlyValidDeck'] as bool? ?? true
+      ..isOnlyValidDeckMy = json['isOnlyValidDeck'] as bool? ?? false;
+  }
 }

@@ -46,9 +46,16 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     DeckListRoute.name: (routeData) {
+      final queryParams = routeData.queryParams;
+      final args = routeData.argsAs<DeckListRouteArgs>(
+          orElse: () => DeckListRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const DeckListPage(),
+        child: DeckListPage(
+          key: args.key,
+          searchParameterString: args.searchParameterString,
+        ),
       );
     },
     KakaoLoginRoute.name: (routeData) {
@@ -164,16 +171,41 @@ class DeckImageRouteArgs {
 
 /// generated route for
 /// [DeckListPage]
-class DeckListRoute extends PageRouteInfo<void> {
-  const DeckListRoute({List<PageRouteInfo>? children})
-      : super(
+class DeckListRoute extends PageRouteInfo<DeckListRouteArgs> {
+  DeckListRoute({
+    Key? key,
+    String? searchParameterString,
+    List<PageRouteInfo>? children,
+  }) : super(
           DeckListRoute.name,
+          args: DeckListRouteArgs(
+            key: key,
+            searchParameterString: searchParameterString,
+          ),
+          rawQueryParams: {'searchParameter': searchParameterString},
           initialChildren: children,
         );
 
   static const String name = 'DeckListRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<DeckListRouteArgs> page =
+      PageInfo<DeckListRouteArgs>(name);
+}
+
+class DeckListRouteArgs {
+  const DeckListRouteArgs({
+    this.key,
+    this.searchParameterString,
+  });
+
+  final Key? key;
+
+  final String? searchParameterString;
+
+  @override
+  String toString() {
+    return 'DeckListRouteArgs{key: $key, searchParameterString: $searchParameterString}';
+  }
 }
 
 /// generated route for

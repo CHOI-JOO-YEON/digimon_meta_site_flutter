@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
@@ -15,7 +16,8 @@ import 'package:auto_route/auto_route.dart';
 
 @RoutePage()
 class DeckListPage extends StatefulWidget {
-  const DeckListPage({super.key});
+  final String? searchParameterString;
+  const DeckListPage({super.key,@QueryParam('searchParameter') this.searchParameterString});
 
   @override
   State<DeckListPage> createState() => _DeckListPageState();
@@ -32,8 +34,17 @@ class _DeckListPageState extends State<DeckListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    if(widget.searchParameterString!=null) {
+      deckSearchParameter=DeckSearchParameter.fromJson(json.decode(widget.searchParameterString!));
+    }
   }
 
+  void updateSearchParameter(){
+    AutoRouter.of(context).navigate(
+      DeckListRoute(searchParameterString: json.encode(deckSearchParameter.toJson())),
+    );
+
+  }
   void updateSelectedDeck(DeckResponseDto deckResponseDto) {
     _selectedDeck = Deck.responseDto(deckResponseDto);
     setState(() {});
@@ -209,7 +220,8 @@ class _DeckListPageState extends State<DeckListPage> {
                             flex: 5,
                             child: DeckSearchView(
                               deckUpdate: updateSelectedDeck,
-                              deckSearchParameter: deckSearchParameter,
+                              deckSearchParameter: deckSearchParameter, updateSearchParameter: updateSearchParameter,
+
                             ),
                           ),
                           Expanded(
@@ -289,6 +301,7 @@ class _DeckListPageState extends State<DeckListPage> {
                       child: DeckSearchView(
                         deckUpdate: updateSelectedDeck,
                         deckSearchParameter: deckSearchParameter,
+                        updateSearchParameter: updateSearchParameter,
                       ),
                     ),
                   ),

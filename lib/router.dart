@@ -30,7 +30,8 @@ class AppRouter extends _$AppRouter {
         ,meta: {'searchParameter': 'String',},
 
         ),
-        AutoRoute(path: 'deck-list', page: DeckListRoute.page
+        AutoRoute(path: 'deck-list', page: DeckListRoute.page,
+          meta: {'searchParameter': 'String'}
         ),
         AutoRoute(path: 'collect', page: CollectRoute.page),
       ],

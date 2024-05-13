@@ -16,17 +16,16 @@ class DeckListViewer extends StatefulWidget {
   final Function(DeckResponseDto) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
   final DeckSearchParameter deckSearchParameter;
+  final VoidCallback updateSearchParameter;
 
   const DeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter});
+      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter, required this.updateSearchParameter});
 
   @override
   State<DeckListViewer> createState() => _DeckListViewerState();
 }
 
 class _DeckListViewerState extends State<DeckListViewer> {
-  // DeckSearchParameter deckSearchParameter =
-  //     DeckSearchParameter(isMyDeck: false);
   List<DeckResponseDto> decks = [];
   int currentPage = 1;
   int maxPage = 0;
@@ -37,15 +36,8 @@ class _DeckListViewerState extends State<DeckListViewer> {
   void initState() {
     super.initState();
     widget.deckSearchParameter.formatId = widget.selectedFormat.formatId;
-    // deckSearchParameter.formatId = widget.formatList.first.formatId;
-    // for (var format in widget.formatList) {
-    //   if (!format.isOnlyEn!) {
-    //     deckSearchParameter.formatId = format.formatId;
-    //     break;
-    //   }
-    // }
     Future.delayed(const Duration(seconds: 0), () async {
-      await searchDecks(1);
+      await searchDecks(widget.deckSearchParameter.page);
     });
   }
 
@@ -72,6 +64,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
       }
     }
     setState(() {
+      widget.updateSearchParameter();
       isLoading = false;
     });
   }

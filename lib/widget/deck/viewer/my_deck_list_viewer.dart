@@ -19,8 +19,10 @@ class MyDeckListViewer extends StatefulWidget {
   final Function(DeckResponseDto) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
   final DeckSearchParameter deckSearchParameter;
+  final VoidCallback updateSearchParameter;
+
   const MyDeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter});
+      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter, required this.updateSearchParameter});
 
   @override
   State<MyDeckListViewer> createState() => _MyDeckListViewerState();
@@ -40,7 +42,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
 
 
     Future.delayed(const Duration(seconds: 0), () async {
-      await searchDecks(1);
+      await searchDecks(widget.deckSearchParameter.page);
     });
   }
 
@@ -68,6 +70,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
 
     }
     setState(() {
+      widget.updateSearchParameter();
       isLoading =false;
     });
 
