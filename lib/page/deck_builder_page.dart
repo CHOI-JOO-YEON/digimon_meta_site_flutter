@@ -54,9 +54,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   void updateSearchParameter()
   {
-    AutoRouter.of(context).navigate(
-      DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson()),deck: widget.deck),
-    );
+    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson())));
   }
   void onViewModeChanged(String newMode) {
     viewMode = newMode;
@@ -212,10 +210,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     currentPage = searchParameter.page++;
   }
 
-  searchMethod(SearchParameter searchParameter) {
-    this.searchParameter = searchParameter;
-    loadMoreCard();
-  }
 
   deckUpdate(DeckResponseDto deckResponseDto) {
     deck.import(deckResponseDto);
