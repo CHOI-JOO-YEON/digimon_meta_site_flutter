@@ -685,8 +685,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
       return releaseDateComparison;
     }
 
-    // releaseDate가 같은 경우 name 오름차순으로 정렬
-    return a.name.compareTo(b.name);
+    // releaseDate가 같은 경우 priority 오름차순으로 정렬
+    if (a.priority == null && b.priority == null) {
+      return 0;
+    } else if (a.priority == null) {
+      return 1;
+    } else if (b.priority == null) {
+      return -1;
+    }
+
+    return b.priority!.compareTo(a.priority!);
   };
 
   List<DropdownMenuItem<NoteDto>> generateDropDownMenuItems() {
