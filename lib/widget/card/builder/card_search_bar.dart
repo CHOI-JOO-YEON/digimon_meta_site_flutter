@@ -822,7 +822,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 widget.searchParameter.searchString = value;
               },
               onSubmitted: (value) {
-                widget.onSearch();
                 widget.updateSearchParameter();
               },
             )),
@@ -831,7 +830,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
             child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  widget.onSearch();
+                  widget.updateSearchParameter();
                 },
                 icon: const Icon(Icons.search))),
         Expanded(

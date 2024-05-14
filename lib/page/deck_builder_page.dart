@@ -54,7 +54,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   void updateSearchParameter()
   {
-    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson())));
+    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson()),deck: widget.deck));
   }
   void onViewModeChanged(String newMode) {
     viewMode = newMode;
