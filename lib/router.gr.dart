@@ -16,9 +16,16 @@ abstract class _$AppRouter extends RootStackRouter {
   @override
   final Map<String, PageFactory> pagesMap = {
     CollectRoute.name: (routeData) {
+      final queryParams = routeData.queryParams;
+      final args = routeData.argsAs<CollectRouteArgs>(
+          orElse: () => CollectRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const CollectPage(),
+        child: CollectPage(
+          key: args.key,
+          searchParameterString: args.searchParameterString,
+        ),
       );
     },
     DeckBuilderRoute.name: (routeData) {
@@ -75,16 +82,41 @@ abstract class _$AppRouter extends RootStackRouter {
 
 /// generated route for
 /// [CollectPage]
-class CollectRoute extends PageRouteInfo<void> {
-  const CollectRoute({List<PageRouteInfo>? children})
-      : super(
+class CollectRoute extends PageRouteInfo<CollectRouteArgs> {
+  CollectRoute({
+    Key? key,
+    String? searchParameterString,
+    List<PageRouteInfo>? children,
+  }) : super(
           CollectRoute.name,
+          args: CollectRouteArgs(
+            key: key,
+            searchParameterString: searchParameterString,
+          ),
+          rawQueryParams: {'searchParameter': searchParameterString},
           initialChildren: children,
         );
 
   static const String name = 'CollectRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static const PageInfo<CollectRouteArgs> page =
+      PageInfo<CollectRouteArgs>(name);
+}
+
+class CollectRouteArgs {
+  const CollectRouteArgs({
+    this.key,
+    this.searchParameterString,
+  });
+
+  final Key? key;
+
+  final String? searchParameterString;
+
+  @override
+  String toString() {
+    return 'CollectRouteArgs{key: $key, searchParameterString: $searchParameterString}';
+  }
 }
 
 /// generated route for

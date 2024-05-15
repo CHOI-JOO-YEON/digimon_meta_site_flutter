@@ -1,8 +1,10 @@
+import 'dart:convert';
 
 import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/format.dart';
 import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
+import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +22,12 @@ import '../widget/card/collect/deck_calc_dialog.dart';
 
 @RoutePage()
 class CollectPage extends StatefulWidget {
-  const CollectPage({super.key, });
+  final String? searchParameterString;
+
+  const CollectPage({
+    super.key,
+    @QueryParam('searchParameter') this.searchParameterString,
+  });
 
   @override
   State<CollectPage> createState() => _CollectPageState();
@@ -34,17 +41,25 @@ class _CollectPageState extends State<CollectPage> {
   List<FormatDto> formats = [];
   int totalPages = 0;
   int currentPage = 0;
-  bool _isSearchInitialized = false;
   SearchParameter searchParameter = SearchParameter();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final userProvider = Provider.of<UserProvider>(context);
-    if (userProvider.isLogin && !_isSearchInitialized) {
-      initSearch();
-      _isSearchInitialized = true;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initSearch();
+  }
+
+  @override
+  void didUpdateWidget(covariant CollectPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchParameterString != null &&
+        widget.searchParameterString != oldWidget.searchParameterString) {
+      searchParameter =
+          SearchParameter.fromJson(json.decode(widget.searchParameterString!));
     }
+    initSearch();
+
   }
 
   @override
@@ -53,15 +68,25 @@ class _CollectPageState extends State<CollectPage> {
     super.dispose();
   }
 
+  void updateSearchParameter() {
+    context.navigateTo(CollectRoute(
+        searchParameterString: json.encode(searchParameter.toJson())));
+  }
+
   Future<void> initSearch() async {
     isSearchLoading = true;
+    if (widget.searchParameterString != null) {
+      searchParameter =
+          SearchParameter.fromJson(json.decode(widget.searchParameterString!));
+    }
+
     setState(() {});
-    if(notes.isEmpty) {
+    if (notes.isEmpty) {
       notes.add(NoteDto(noteId: null, name: '모든 카드'));
       notes.addAll(await CardApi().getNotes());
     }
 
-    if(formats.isEmpty) {
+    if (formats.isEmpty) {
       formats = await DeckService().getAllFormat();
     }
 
@@ -76,7 +101,7 @@ class _CollectPageState extends State<CollectPage> {
     }
     searchParameter.page = 1;
     CardResponseDto cardResponseDto =
-    await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardApi().getCardsBySearchParameter(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
 
@@ -87,7 +112,7 @@ class _CollectPageState extends State<CollectPage> {
 
   Future<void> loadMoreCard() async {
     CardResponseDto cardResponseDto =
-    await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardApi().getCardsBySearchParameter(searchParameter);
     cards.addAll(cardResponseDto.cards!);
     currentPage = searchParameter.page++;
     setState(() {});
@@ -174,7 +199,7 @@ class _CollectPageState extends State<CollectPage> {
                   ElevatedButton(
                     onPressed: () async {
                       List<DeckResponseDto>? decks =
-                      await DeckApi().findAllMyDecks();
+                          await DeckApi().findAllMyDecks();
                       if (decks != null && decks.isNotEmpty) {
                         _showCalcDialog(context, decks);
                       }
@@ -184,8 +209,7 @@ class _CollectPageState extends State<CollectPage> {
                   SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      CollectProvider p =
-                      Provider.of(context, listen: false);
+                      CollectProvider p = Provider.of(context, listen: false);
                       bool isSave = await p.save();
                       _showSaveCollectDialog(context, isSave);
                     },
@@ -217,7 +241,8 @@ class _CollectPageState extends State<CollectPage> {
                                 child: CardSearchBar(
                                   notes: notes,
                                   searchParameter: searchParameter,
-                                  onSearch: initSearch, updateSearchParameter: (){},
+                                  onSearch: initSearch,
+                                  updateSearchParameter: updateSearchParameter,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -225,16 +250,16 @@ class _CollectPageState extends State<CollectPage> {
                                 flex: 9,
                                 child: !isSearchLoading
                                     ? CardScrollGridView(
-                                  cards: cards,
-                                  rowNumber: isPortrait ? 5 : 8,
-                                  loadMoreCards: loadMoreCard,
-                                  cardPressEvent: (card) {},
-                                  totalPages: totalPages,
-                                  currentPage: currentPage,
-                                )
+                                        cards: cards,
+                                        rowNumber: isPortrait ? 5 : 8,
+                                        loadMoreCards: loadMoreCard,
+                                        cardPressEvent: (card) {},
+                                        totalPages: totalPages,
+                                        currentPage: currentPage,
+                                      )
                                     : const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
+                                        child: CircularProgressIndicator(),
+                                      ),
                               ),
                             ],
                           ),
@@ -253,18 +278,23 @@ class _CollectPageState extends State<CollectPage> {
   }
 
   Widget buildLogoutContent() {
-    searchParameter= SearchParameter();
-    notes=[];
-    formats=[];
-    _isSearchInitialized=false;
-    return const Center(child: Text('로그인이 필요합니다.', style: TextStyle(fontSize: 20),));
+    searchParameter = SearchParameter();
+    notes = [];
+    formats = [];
+    return const Center(
+        child: Text(
+      '로그인이 필요합니다.',
+      style: TextStyle(fontSize: 20),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
-        return userProvider.isLogin ? buildLoginContent() : buildLogoutContent();
+        return userProvider.isLogin
+            ? buildLoginContent()
+            : buildLogoutContent();
       },
     );
   }
