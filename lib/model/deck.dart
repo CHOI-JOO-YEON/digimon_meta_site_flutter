@@ -24,6 +24,7 @@ class Deck {
   String? author;
   int? authorId;
   LimitDto? limitDto = LimitProvider().getCurrentLimit();
+  bool isSave=false;
 
   Map<String, int> cardNoCntMap = {};
   int? formatId;
@@ -40,6 +41,7 @@ class Deck {
     deckCount = 0;
     tamaCount = 0;
     html.window.localStorage.remove('deck');
+    isSave=false;
   }
 
   void init() {
@@ -52,6 +54,13 @@ class Deck {
     isPublic = false;
     colors = {};
     html.window.localStorage.remove('deck');
+  }
+
+  void newCopy(){
+    deckId = null;
+    deckName = deckName+" Copy";
+    isPublic = false;
+    isSave=false;
   }
 
   void updateIsStrict(bool v){
@@ -204,6 +213,7 @@ class Deck {
 
   void _add(DigimonCard card, int limit, Map<DigimonCard, int> map,
       List<DigimonCard> cards) {
+    isSave=false;
     if (map.containsKey(card)) {
       if (map[card]! < limit) {
         map[card] = map[card]! + 1;
@@ -263,6 +273,7 @@ class Deck {
 
   void _remove(
       DigimonCard card, Map<DigimonCard, int> map, List<DigimonCard> cards) {
+    isSave=false;
     if (!map.containsKey(card)) {
       return;
     }

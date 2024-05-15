@@ -20,8 +20,10 @@ class DeckMenuButtons extends StatefulWidget {
   final Deck deck;
   final Function() clear;
   final Function() init;
+  final Function() newCopy;
+  final Function() reload;
   final Function(DeckResponseDto) import;
-  const DeckMenuButtons({super.key, required this.deck, required this.clear, required this.init, required this.import});
+  const DeckMenuButtons({super.key, required this.deck, required this.clear, required this.init, required this.import, required this.newCopy, required this.reload});
 
   @override
   State<DeckMenuButtons> createState() => _DeckMenuButtonsState();
@@ -98,7 +100,35 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
+  void _showDeckCopyDialog(
+      BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('덱 복사'),
+          content: Text('이 덱을 카피하여 새로운 덱을 만들겠습니까?'),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('예'),
+              onPressed: () {
 
+
+                Navigator.of(context).pop();
+                widget.newCopy();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
     LimitProvider limitProvider = Provider.of(context, listen: false);
 
@@ -227,7 +257,11 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     Deck? deck = await DeckService().save(widget.deck);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
+                      widget.deck.isSave = true;
+                      widget.reload();
+                      Navigator.of(context).pop();
                       _showShortDialog(context, "저장 성공");
+
                     } else {
                       _showShortDialog(context, "저장 실패");
                     }
@@ -247,7 +281,16 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text(text),
+          title: Text(text),
+          // content:
+            actions: [
+              ElevatedButton(
+                child: const Text('닫기'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ]
         );
       },
     );
@@ -729,6 +772,17 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           iconSize: iconSize,
                           icon: const Icon(Icons.clear),
                           tooltip: '비우기',
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                            width: iconSize, height: iconSize),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () => _showDeckCopyDialog(context),
+                          iconSize: iconSize,
+                          icon: const Icon(Icons.copy),
+                          tooltip: '복사해서 새로운 덱 만들기',
                         ),
                       ),
                       ConstrainedBox(

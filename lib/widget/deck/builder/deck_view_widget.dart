@@ -51,6 +51,15 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     setState(() {});
   }
 
+  newCopy(){
+    widget.deck.newCopy();
+
+    textEditingController.text=widget.deck.deckName;
+    setState(() {
+
+    });
+  }
+
   addCard(DigimonCard digimonCard) {
     widget.deck.addCard(digimonCard,context);
     setState(() {
@@ -111,6 +120,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                     clear: clearDeck,
                     init: initDeck,
                     import: widget.import,
+                    newCopy: newCopy, reload: () {setState(() {
+
+                    });  },
                   )),
 
                 ],

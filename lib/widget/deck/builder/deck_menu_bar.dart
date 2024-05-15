@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/tab_tooltip.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/deck.dart';
@@ -19,6 +22,8 @@ class DeckBuilderMenuBar extends StatefulWidget {
 }
 
 class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
+  final GlobalKey<State<Tooltip>> tooltipKey = GlobalKey<State<Tooltip>>();
+
   @override
   void didUpdateWidget(covariant DeckBuilderMenuBar oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -55,14 +60,22 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // Expanded(flex: 1, child: Container(),),
                       Expanded(
+                          flex: 12,
                           child: TextField(
-                        style: TextStyle(fontSize: fontSize),
-                        controller: widget.textEditingController,
-                        onChanged: (v) {
-                          widget.deck.deckName = v;
-                        },
-                      ))
+                            style: TextStyle(fontSize: fontSize),
+                            controller: widget.textEditingController,
+                            onChanged: (v) {
+                              widget.deck.deckName = v;
+                            },
+                          )),
+                        Expanded(
+                            flex: 2,
+                            child: widget.deck.isSave?Container():const TabTooltip(
+                              message: '변경 사항이 저장되지 않았습니다.',
+                              child: Icon(Icons.warning, color: Colors.amber),
+                            )),
                     ],
                   ),
                 ),
