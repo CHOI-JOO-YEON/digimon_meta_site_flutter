@@ -647,7 +647,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       selectedRarityMap[rarity] = false;
                     }
 
-                    currentDpRange = RangeValues(1000, 16000);
+                    currentDpRange = RangeValues(1000, 17000);
 
                     currentPlayCostRange = RangeValues(0, 20);
                     currentDigivolutionCostRange = RangeValues(0, 8);
