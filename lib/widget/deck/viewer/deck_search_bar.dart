@@ -23,7 +23,10 @@ class DeckSearchBar extends StatefulWidget {
       {super.key,
       required this.formatList,
       required this.searchParameter,
-      required this.search, required this.selectedFormat, required this.updateSelectFormat, required this.isMyDeck});
+      required this.search,
+      required this.selectedFormat,
+      required this.updateSelectFormat,
+      required this.isMyDeck});
 
   @override
   State<DeckSearchBar> createState() => _DeckSearchBarState();
@@ -57,7 +60,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
         return Consumer<LimitProvider>(
           builder: (context, limitProvider, child) {
             LimitDto? selectedLimit = limitProvider.selectedLimit;
-            bool isChecked = widget.isMyDeck?widget.searchParameter.isOnlyValidDeckMy: widget.searchParameter.isOnlyValidDeckAll;
+            bool isChecked = widget.isMyDeck
+                ? widget.searchParameter.isOnlyValidDeckMy
+                : widget.searchParameter.isOnlyValidDeckAll;
 
             return StatefulBuilder(
               builder: (context, setState) {
@@ -65,10 +70,10 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   actions: [
                     ElevatedButton(
                       onPressed: () {
-                        if(widget.isMyDeck) {
-                          widget.searchParameter.isOnlyValidDeckMy=isChecked;
-                        }else{
-                          widget.searchParameter.isOnlyValidDeckAll=isChecked;
+                        if (widget.isMyDeck) {
+                          widget.searchParameter.isOnlyValidDeckMy = isChecked;
+                        } else {
+                          widget.searchParameter.isOnlyValidDeckAll = isChecked;
                         }
                         if (selectedLimit != null) {
                           limitProvider.updateSelectLimit(
@@ -157,7 +162,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
     double iconSize = MediaQuery.sizeOf(context).width * 0.02;
     if (isPortrait) {
       fontSize *= 2;
-      iconSize *=2;
+      iconSize *= 2;
     }
     return Column(
       children: [
@@ -250,6 +255,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   setState(() {
                     widget.searchParameter.searchString = value;
                   });
+                },
+                onSubmitted: (value) {
+                  widget.search(1);
                 },
               ),
             ),
