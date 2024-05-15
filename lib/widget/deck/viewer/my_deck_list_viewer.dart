@@ -42,7 +42,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
 
 
     Future.delayed(const Duration(seconds: 0), () async {
-      await searchDecks(widget.deckSearchParameter.page);
+      await searchDecks(widget.deckSearchParameter.myPage);
     });
   }
 
@@ -54,7 +54,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
     isLoading =true;
     widget.deckSearchParameter.isMyDeck=true;
     currentPage = page;
-    widget.deckSearchParameter.updatePage(page);
+    widget.deckSearchParameter.updatePage(page,true);
     PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(widget.deckSearchParameter,context);
 
 
@@ -86,7 +86,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       if(decks.length==1) {
         await searchDecks(1);
       }else{
-        await searchDecks(widget.deckSearchParameter.page);
+        await searchDecks(widget.deckSearchParameter.myPage);
       }
 
     }

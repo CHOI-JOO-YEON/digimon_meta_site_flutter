@@ -37,7 +37,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
     super.initState();
     widget.deckSearchParameter.formatId = widget.selectedFormat.formatId;
     Future.delayed(const Duration(seconds: 0), () async {
-      await searchDecks(widget.deckSearchParameter.page);
+      await searchDecks(widget.deckSearchParameter.allPage);
     });
   }
 
@@ -49,7 +49,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
     isLoading = true;
     widget.deckSearchParameter.isMyDeck=false;
     currentPage = page;
-    widget.deckSearchParameter.updatePage(page);
+    widget.deckSearchParameter.updatePage(page,false);
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(widget.deckSearchParameter,context);
 

@@ -5,7 +5,8 @@ class DeckSearchParameter {
   String searchString = "";
   var colors = ["RED", "BLUE", "YELLOW", "GREEN", "BLACK", "PURPLE", "WHITE"];
   int colorOperation = 0;
-  int page = 1;
+  int myPage = 1;
+  int allPage = 1;
   int size = 10;
   int? formatId;
   int? limitId;
@@ -18,8 +19,13 @@ class DeckSearchParameter {
     formatId = newFormatId;
   }
 
-  void updatePage(int newPage) {
-    page = newPage;
+  void updatePage(int newPage, bool isMine) {
+    if(isMine) {
+      myPage = newPage;
+      return;
+    }
+
+    allPage = newPage;
   }
 
   Map<String, dynamic> toJson() {
@@ -27,12 +33,14 @@ class DeckSearchParameter {
       'isMyDeck': isMyDeck,
       'searchString': searchString,
       'colors': colors,
-      'page': page,
+      'page': isMyDeck?myPage:allPage,
       'size': size,
       'formatId': formatId,
       'colorOperation': colorOperation,
-      'limitId':limitId,
-      'isOnlyValidDeck' : isMyDeck?isOnlyValidDeckMy:isOnlyValidDeckAll
+      'limitId': limitId,
+      'isOnlyValidDeck': isMyDeck ? isOnlyValidDeckMy : isOnlyValidDeckAll,
+      'myPage' : myPage,
+      'allPage': allPage
     };
     return data;
   }
@@ -40,9 +48,14 @@ class DeckSearchParameter {
   factory DeckSearchParameter.fromJson(Map<String, dynamic> json) {
     return DeckSearchParameter(isMyDeck: json['isMyDeck'] as bool)
       ..searchString = json['searchString'] as String? ?? ""
-      ..colors = (json['colors'] as List<dynamic>?)?.map((color) => color.toString()).toList() ?? ["RED", "BLUE", "YELLOW", "GREEN", "BLACK", "PURPLE", "WHITE"]
+      ..colors = (json['colors'] as List<dynamic>?)
+              ?.map((color) => color.toString())
+              .toList() ??
+          ["RED", "BLUE", "YELLOW", "GREEN", "BLACK", "PURPLE", "WHITE"]
       ..colorOperation = json['colorOperation'] as int? ?? 0
-      ..page = json['page'] as int? ?? 1
+      ..allPage = json['allPage'] as int ?? 1
+      ..myPage = json['myPage'] as int ?? 1
+      // ..page = json['page'] as int? ?? 1
       ..size = json['size'] as int? ?? 10
       ..formatId = json['formatId'] as int?
       ..limitId = json['limitId'] as int?
