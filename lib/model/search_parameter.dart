@@ -13,7 +13,7 @@ class SearchParameter{
   int? minPlayCost=0; //
   int? maxPlayCost=20;
   int? minDp=1000;
-  int? maxDp=16000;
+  int? maxDp=17000;
   int? minDigivolutionCost=0;
   int? maxDigivolutionCost=8;
   Set<String>? rarities;

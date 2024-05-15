@@ -404,8 +404,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       RangeSlider(
                         values: currentDpRange,
                         min: 1000,
-                        max: 16000,
-                        divisions: 15,
+                        max: 17000,
+                        divisions: 16,
                         labels: RangeLabels(
                           currentDpRange.start.round().toString(),
                           currentDpRange.end.round().toString(),
