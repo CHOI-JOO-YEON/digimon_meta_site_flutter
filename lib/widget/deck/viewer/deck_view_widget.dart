@@ -37,7 +37,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     if(isPortrait&&isInit){
-      _rowNumber=6;
+      _rowNumber=4;
     }
     isInit=false;
     return Column(
