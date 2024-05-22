@@ -9,9 +9,14 @@ class DeckStat extends StatelessWidget {
   final Deck deck;
   final Color? textColor;
   final Color? barColor;
+  final Color? backGroundColor;
 
   const DeckStat(
-      {super.key, required this.deck, this.textColor, this.barColor});
+      {super.key,
+      required this.deck,
+      this.textColor,
+      this.barColor,
+      this.backGroundColor});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +32,7 @@ class DeckStat extends StatelessWidget {
         height: constraints.maxHeight,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            color: Theme.of(context).cardColor),
+            color: backGroundColor ?? Theme.of(context).cardColor),
         child: Center(
           child: Container(
             padding: EdgeInsets.all(constraints.maxHeight * 0.05),

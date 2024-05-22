@@ -363,7 +363,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                     flex: 1,
                                     child: SizedBox(
                                       height: 150 * scaleFactor,
-                                      child: DeckStat(deck: widget.deck, textColor: textColor, barColor: barColor),
+                                      child: DeckStat(deck: widget.deck, textColor: textColor, barColor: barColor, backGroundColor: cardColor),
                                     ),
                                   ),
                                 ],
