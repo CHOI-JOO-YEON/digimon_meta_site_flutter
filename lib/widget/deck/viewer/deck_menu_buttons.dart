@@ -186,6 +186,17 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                             width: iconSize, height: iconSize),
                         child: IconButton(
                           padding: EdgeInsets.zero,
+                          onPressed: () => _showDeckCopyDialog(context),
+                          iconSize: iconSize,
+                          icon: const Icon(Icons.copy),
+                          tooltip: '복사해서 새로운 덱 만들기',
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                            width: iconSize, height: iconSize),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
                           onPressed: () => _showExportDialog(context),
                           iconSize: iconSize,
                           icon: const Icon(Icons.upload),
@@ -216,17 +227,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           tooltip: '대회 제출용 레시피',
                         ),
                       ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showDeckCopyDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.copy),
-                          tooltip: '복사해서 새로운 덱 만들기',
-                        ),
-                      ),
+
                       if (hasManagerRole) // 권한 체크 조건
                         ConstrainedBox(
                           constraints: BoxConstraints.tightFor(

@@ -839,17 +839,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           tooltip: '이미지 저장',
                         ),
                       ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showDeckSettingDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.settings),
-                          tooltip: '덱 설정',
-                        ),
-                      ),
+
                       // ConstrainedBox(
                       //   constraints: BoxConstraints.tightFor(
                       //       width: iconSize, height: iconSize),
@@ -870,6 +860,17 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           iconSize: iconSize,
                           icon: const Icon(Icons.receipt_long),
                           tooltip: '대회 제출용 레시피',
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                            width: iconSize, height: iconSize),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () => _showDeckSettingDialog(context),
+                          iconSize: iconSize,
+                          icon: const Icon(Icons.settings),
+                          tooltip: '덱 설정',
                         ),
                       ),
                       if (hasManagerRole) // 권한 체크 조건

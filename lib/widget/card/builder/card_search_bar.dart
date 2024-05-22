@@ -192,7 +192,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                             setState(() {
                               selectedNote = newValue;
                               if (newValue!.cardOrigin == 'ENGLISH') {
-                                print('!');
                                 enCardInclude = true;
                               }
                             });

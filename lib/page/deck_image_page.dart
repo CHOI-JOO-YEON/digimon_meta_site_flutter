@@ -23,41 +23,11 @@ class DeckImagePage extends StatefulWidget {
 }
 
 class _DeckImagePageState extends State<DeckImagePage> {
-  Color backGroundColor = const Color(0x66c8c8c8); // 초기 색상 설정
-  Color textColor = Colors.black; // 초기 색상 설정
-  Color cardColor = Colors.white; // 초기 색상 설정
-  Color barColor = const  Color(0xff1a237e); // 초기 색상 설정
+  Color backGroundColor = const Color(0x66c8c8c8);
+  Color textColor = Colors.black;
+  Color cardColor = Colors.white;
+  Color barColor = const  Color(0xff1a237e);
 
-  // void _showColorPicker() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('배경 색상 선택'),
-  //         content: SingleChildScrollView(
-  //           child: ColorPicker(
-  //             pickerColor: backGroundColor,
-  //             onColorChanged: (Color color) {
-  //               setState(() {
-  //                 backGroundColor = color;
-  //               });
-  //             },
-  //             showLabel: true,
-  //             pickerAreaHeightPercent: 0.8,
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             child: Text('확인'),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
   void _showColorPicker() {
     List<Color> exampleColors = [
       Colors.red,
@@ -144,7 +114,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
                 child: Container(
                   width: 30,
                   height: 30,
-                  margin: EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
                     color: color,
                     shape: BoxShape.circle,
@@ -269,7 +238,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
               child: Container(
                 width: 30,
                 height: 30,
-                margin: EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
