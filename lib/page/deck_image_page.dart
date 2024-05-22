@@ -26,7 +26,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   Color backGroundColor = const Color(0x66c8c8c8);
   Color textColor = Colors.black;
   Color cardColor = Colors.white;
-  Color barColor = const  Color(0xff1a237e);
+  Color barColor = const Color(0xff1a237e);
 
   void _showColorPicker() {
     List<Color> exampleColors = [
@@ -131,10 +131,17 @@ class _DeckImagePageState extends State<DeckImagePage> {
                       title: Text('커스텀 색상 선택'),
                       content: SingleChildScrollView(
                         child: StatefulBuilder(
-                          builder: (BuildContext context, StateSetter setState) {
-                            final TextEditingController rController = TextEditingController(text: pickedColor.red.toString());
-                            final TextEditingController gController = TextEditingController(text: pickedColor.green.toString());
-                            final TextEditingController bController = TextEditingController(text: pickedColor.blue.toString());
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            final TextEditingController rController =
+                                TextEditingController(
+                                    text: pickedColor.red.toString());
+                            final TextEditingController gController =
+                                TextEditingController(
+                                    text: pickedColor.green.toString());
+                            final TextEditingController bController =
+                                TextEditingController(
+                                    text: pickedColor.blue.toString());
 
                             final FocusNode rFocusNode = FocusNode();
                             final FocusNode gFocusNode = FocusNode();
@@ -159,7 +166,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                     gController.text = color.green.toString();
                                     bController.text = color.blue.toString();
                                     onColorSelected(pickedColor);
-
                                   },
                                   pickerAreaHeightPercent: 0.8,
                                 ),
@@ -263,7 +269,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
   @override
   Widget build(BuildContext context) {
-
     GlobalKey globalKey = GlobalKey();
     Future<void> captureAndDownloadImage(BuildContext context) async {
       try {
@@ -363,27 +368,35 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                     flex: 1,
                                     child: SizedBox(
                                       height: 150 * scaleFactor,
-                                      child: DeckStat(deck: widget.deck, textColor: textColor, barColor: barColor, backGroundColor: cardColor),
+                                      child: DeckStat(
+                                          deck: widget.deck,
+                                          textColor: textColor,
+                                          barColor: barColor,
+                                          backGroundColor: cardColor),
                                     ),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 5 * scaleFactor),
-                              _buildGridView(
-                                  context,
-                                  displayTamas,
-                                  10,
-                                 cardColor,
-                                  '디지타마 덱',
-                                  scaleFactor),
+                              _buildGridView(context, displayTamas, 10,
+                                  cardColor, '디지타마 덱', scaleFactor),
                               SizedBox(height: 5 * scaleFactor),
-                              _buildGridView(
-                                  context,
-                                  displayDecks,
-                                  10,
-                                  cardColor,
-                                  '메인 덱',
-                                  scaleFactor),
+                              _buildGridView(context, displayDecks, 10,
+                                  cardColor, '메인 덱', scaleFactor),
+                              SizedBox(height: 5 * scaleFactor),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Image created using Digimon Meta (https://www.digimon-meta.site)',
+                                    style: TextStyle(
+                                        fontSize: 10 * scaleFactor,
+                                        color: textColor
+
+                                    ),
+                                  )
+                                ],
+                              )
                             ],
                           ),
                         ),
