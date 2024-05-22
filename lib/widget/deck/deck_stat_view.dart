@@ -140,7 +140,9 @@ class DeckStat extends StatelessWidget {
                 child: Text(
                   cardType,
                   style: TextStyle(
-                      fontSize: height * 0.1, fontFamily: 'JalnanGothic'),
+                      fontSize: height * 0.1,
+                      fontFamily: 'JalnanGothic',
+                      color: textColor ?? Colors.black),
                 ),
               ),
             ),
