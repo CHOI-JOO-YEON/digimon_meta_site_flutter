@@ -63,7 +63,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
 
                       //행에 한번에 표시되는 카드
                       Expanded(
-                        flex: 2,
+                        flex: isPortrait?1:2,
                         child: CustomSlider(
                             sliderValue: _rowNumber, sliderAction: updateRowNumber),
                       ),

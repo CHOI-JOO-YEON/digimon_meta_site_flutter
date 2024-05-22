@@ -81,7 +81,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     if(isPortrait&&isInit){
-      _rowNumber=6;
+      _rowNumber=5;
     }
     isInit= false;
     return Column(
@@ -107,7 +107,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
                         //행에 한번에 표시되는 카드
                         Expanded(
-                          flex: 2,
+                          flex: isPortrait?1:2,
                           child: CustomSlider(
                               sliderValue: _rowNumber, sliderAction: updateRowNumber),
                         ),

@@ -16,7 +16,9 @@ import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:html' as html;
 
@@ -219,7 +221,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.012, 15);
     if (isPortrait) {
       fontSize *= 2;
       if (init) {
@@ -254,9 +256,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       height: 50,
                       child: Row(
                         children: [
-                          Expanded(flex: 1, child: Container()),
+                          Expanded(flex: 2, child: Container()),
                           Expanded(
-                              flex: 1,
+                              flex: 3,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -323,35 +325,40 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                 ],
                               )),
                           Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        _scrollController.animateTo(
-                                          0,
-                                          duration: Duration(milliseconds: 500),
-                                          curve: Curves.easeInOut,
-                                        );
-                                      },
-                                      child: Text(
-                                        '메인덱 보기',
-                                        style: TextStyle(fontSize: fontSize),
-                                      )),
-                                  TextButton(
-                                      onPressed: () {
-                                        _scrollController.animateTo(
-                                          _scrollController
-                                              .position.maxScrollExtent,
-                                          duration: Duration(milliseconds: 500),
-                                          curve: Curves.easeInOut,
-                                        );
-                                      },
-                                      child: Text(
-                                        '타마덱 보기',
-                                        style: TextStyle(fontSize: fontSize),
-                                      ))
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextButton(
+                                        onPressed: () {
+                                          _scrollController.animateTo(
+                                            0,
+                                            duration: Duration(milliseconds: 500),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        },
+                                        child: Text(
+                                          '메인덱',
+                                          style: TextStyle(fontSize: fontSize),
+                                        )),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextButton(
+                                        onPressed: () {
+                                          _scrollController.animateTo(
+                                            _scrollController
+                                                .position.maxScrollExtent,
+                                            duration: Duration(milliseconds: 500),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        },
+                                        child: Text(
+                                          '타마덱',
+                                          style: TextStyle(fontSize: fontSize),
+                                        )),
+                                  )
                                 ],
                               ))
                         ],

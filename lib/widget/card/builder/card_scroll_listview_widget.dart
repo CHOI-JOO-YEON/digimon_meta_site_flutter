@@ -125,16 +125,17 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                         borderRadius: BorderRadius.circular(5),
                         color: Theme.of(context).cardColor),
                     child: ListTile(
+
                       leading: Image.network(card.smallImgUrl!),
                       title: Row(
                         children: [
                           Text('${card.cardNo} ${card.cardName}'),
-                          if (card.lv != null)
-                            Text('\tLv.${card.lv == 0 ? '-' : card.lv}'),
-                          Text(
-                            '\t${card.rarity}',
-                            style: TextStyle(color: Colors.red),
-                          )
+                          // if (card.lv != null)
+                          //   Text('\tLv.${card.lv == 0 ? '-' : card.lv}'),
+                          // Text(
+                          //   '\t${card.rarity}',
+                          //   style: TextStyle(color: Colors.red),
+                          // )
                         ],
                       ),
                       subtitle: Column(

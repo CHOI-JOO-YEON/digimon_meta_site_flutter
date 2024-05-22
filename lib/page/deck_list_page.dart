@@ -7,7 +7,9 @@ import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_view_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../model/deck.dart';
@@ -17,7 +19,9 @@ import 'package:auto_route/auto_route.dart';
 @RoutePage()
 class DeckListPage extends StatefulWidget {
   final String? searchParameterString;
-  const DeckListPage({super.key,@QueryParam('searchParameter') this.searchParameterString});
+
+  const DeckListPage(
+      {super.key, @QueryParam('searchParameter') this.searchParameterString});
 
   @override
   State<DeckListPage> createState() => _DeckListPageState();
@@ -34,17 +38,19 @@ class _DeckListPageState extends State<DeckListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.searchParameterString!=null) {
-      deckSearchParameter=DeckSearchParameter.fromJson(json.decode(widget.searchParameterString!));
+    if (widget.searchParameterString != null) {
+      deckSearchParameter = DeckSearchParameter.fromJson(
+          json.decode(widget.searchParameterString!));
     }
   }
 
-  void updateSearchParameter(){
+  void updateSearchParameter() {
     AutoRouter.of(context).navigate(
-      DeckListRoute(searchParameterString: json.encode(deckSearchParameter.toJson())),
+      DeckListRoute(
+          searchParameterString: json.encode(deckSearchParameter.toJson())),
     );
-
   }
+
   void updateSelectedDeck(DeckResponseDto deckResponseDto) {
     _selectedDeck = Deck.responseDto(deckResponseDto);
     setState(() {});
@@ -61,14 +67,15 @@ class _DeckListPageState extends State<DeckListPage> {
   void searchNote(int noteId) {
     SearchParameter searchParameter = SearchParameter();
     searchParameter.noteId = noteId;
-    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson())));
+    context.navigateTo(DeckBuilderRoute(
+        searchParameterString: json.encode(searchParameter.toJson())));
   }
 
   @override
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    double fontSize = min(MediaQuery.sizeOf(context).width * 0.012, 15);
     if (isPortrait) {
       fontSize *= 2;
     }
@@ -99,9 +106,9 @@ class _DeckListPageState extends State<DeckListPage> {
                             height: 50,
                             child: Row(
                               children: [
-                                Expanded(flex: 1, child: Container()),
+                                Expanded(flex: 2, child: Container()),
                                 Expanded(
-                                    flex: 1,
+                                    flex: 3,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -178,39 +185,44 @@ class _DeckListPageState extends State<DeckListPage> {
                                       ],
                                     )),
                                 Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        TextButton(
-                                            onPressed: () {
-                                              _scrollController.animateTo(
-                                                0,
-                                                duration:
-                                                    Duration(milliseconds: 500),
-                                                curve: Curves.easeInOut,
-                                              );
-                                            },
-                                            child: Text(
-                                              '메인덱 보기',
-                                              style:
-                                                  TextStyle(fontSize: fontSize),
-                                            )),
-                                        TextButton(
-                                            onPressed: () {
-                                              _scrollController.animateTo(
-                                                _scrollController
-                                                    .position.maxScrollExtent,
-                                                duration:
-                                                    Duration(milliseconds: 500),
-                                                curve: Curves.easeInOut,
-                                              );
-                                            },
-                                            child: Text(
-                                              '타마덱 보기',
-                                              style:
-                                                  TextStyle(fontSize: fontSize),
-                                            ))
+                                        Expanded(
+                                          flex: 1,
+                                          child: TextButton(
+                                              onPressed: () {
+                                                _scrollController.animateTo(
+                                                  0,
+                                                  duration:
+                                                      Duration(milliseconds: 500),
+                                                  curve: Curves.easeInOut,
+                                                );
+                                              },
+                                              child: Text(
+                                                '메인덱',
+                                                style:
+                                                    TextStyle(fontSize: fontSize),
+                                              )),
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: TextButton(
+                                              onPressed: () {
+                                                _scrollController.animateTo(
+                                                  _scrollController
+                                                      .position.maxScrollExtent,
+                                                  duration:
+                                                      Duration(milliseconds: 500),
+                                                  curve: Curves.easeInOut,
+                                                );
+                                              },
+                                              child: Text(
+                                                '타마덱',
+                                                style:
+                                                    TextStyle(fontSize: fontSize),
+                                              )),
+                                        )
                                       ],
                                     ))
                               ],
@@ -220,8 +232,8 @@ class _DeckListPageState extends State<DeckListPage> {
                             flex: 5,
                             child: DeckSearchView(
                               deckUpdate: updateSelectedDeck,
-                              deckSearchParameter: deckSearchParameter, updateSearchParameter: updateSearchParameter,
-
+                              deckSearchParameter: deckSearchParameter,
+                              updateSearchParameter: updateSearchParameter,
                             ),
                           ),
                           Expanded(
@@ -233,7 +245,8 @@ class _DeckListPageState extends State<DeckListPage> {
                     ),
                   );
                 },
-                body: Padding(
+                body: Container(
+                  color: Theme.of(context).highlightColor,
                   padding:
                       EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
                   child: SingleChildScrollView(

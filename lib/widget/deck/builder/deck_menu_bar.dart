@@ -1,6 +1,4 @@
-import 'dart:async';
 
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/tab_tooltip.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +79,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                 ),
               )),
           Expanded(
-              flex: 4,
+              flex: 2,
               child: SizedBox(
                   width: constraints.maxWidth,
                   child: DeckCount(

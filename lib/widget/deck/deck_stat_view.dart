@@ -7,13 +7,15 @@ import '../../model/deck.dart';
 
 class DeckStat extends StatelessWidget {
   final Deck deck;
+  final Color? textColor;
+  final Color? barColor;
 
-  const DeckStat({Key? key, required this.deck}) : super(key: key);
+  const DeckStat(
+      {super.key, required this.deck, this.textColor, this.barColor});
 
   @override
   Widget build(BuildContext context) {
     Map<String, int> cardCounts = _calculateCardCounts();
-
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -24,16 +26,16 @@ class DeckStat extends StatelessWidget {
       return Container(
         height: constraints.maxHeight,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5), color: Theme.of(context).cardColor),
+            borderRadius: BorderRadius.circular(5),
+            color: Theme.of(context).cardColor),
         child: Center(
-            child: Container(
-              padding: EdgeInsets.all(constraints.maxHeight * 0.05),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: indicators,
-              ),
+          child: Container(
+            padding: EdgeInsets.all(constraints.maxHeight * 0.05),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: indicators,
             ),
-
+          ),
         ),
       );
     });
@@ -91,13 +93,15 @@ class DeckStat extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SizedBox(
-              height: height*0.2,
+              height: height * 0.2,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   count.toString(),
                   style: TextStyle(
-                      fontSize: height * 0.1, fontFamily: 'JalnanGothic'),
+                      fontSize: height * 0.1,
+                      fontFamily: 'JalnanGothic',
+                      color: textColor ?? Colors.black),
                 ),
               ),
             ),
@@ -111,12 +115,10 @@ class DeckStat extends StatelessWidget {
                       width: double.infinity,
                       height: barHeight,
                       decoration: BoxDecoration(
-                        // color: count > 0 ? Colors.white10 : Colors.white60,
-                        // color: Colors.white60,
-                        color:  Theme.of(context).primaryColor,
+                        color: barColor ?? Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(width*0.02),
-                          topRight: Radius.circular(width*0.02),
+                          topLeft: Radius.circular(width * 0.02),
+                          topRight: Radius.circular(width * 0.02),
                         ),
                         // border: Border.all(color: Colors.white),
                       ),
@@ -127,7 +129,7 @@ class DeckStat extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: height*0.2,
+              height: height * 0.2,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(

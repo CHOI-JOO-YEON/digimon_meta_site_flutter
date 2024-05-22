@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../model/deck.dart';
+import '../deck_count_widget.dart';
 
 class DeckViewerMenuBar extends StatefulWidget {
   final Deck deck;
@@ -28,25 +29,49 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
     if(isPortrait) {
       fontSize*=2;
     }
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SingleChildScrollView(
-        child: Column(
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final fontSize = constraints.maxHeight * 0.15; // 텍스트 크기를 높이의 10%로 설정
+        return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
-            Text(
-              '${widget.deck.deckName}',
-              style: TextStyle(fontSize: fontSize
-                // ,overflow: TextOverflow.ellipsis,
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
+                        style: TextStyle(fontSize: fontSize*0.8),),
+                      Text(
+                        '${widget.deck.deckName}',
+                        style: TextStyle(fontSize: fontSize
+                          // ,overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+
+
+                    ],
+                  ),
+                ),
               ),
             ),
-            Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
-              style: TextStyle(fontSize: fontSize*0.8),),
-
+            Expanded(
+                flex: 2,
+                child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: DeckCount(
+                      deck: widget.deck,
+                    )))
           ],
-        ),
-      ),
+        );
+      }
     );
   }
 }

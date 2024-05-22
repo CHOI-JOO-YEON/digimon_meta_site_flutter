@@ -5,7 +5,6 @@ import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:html' as html;
 import '../provider/user_provider.dart';
 
@@ -19,28 +18,13 @@ class MainPage extends StatelessWidget {
     html.window.open(url, windowName, windowFeatures);
   }
 
-  // String _subject = '';
-  // String _category = '버그 제보';
-  // String _body = '';
-
-  // void _launchEmail(String nickname) async {
-  //   final Uri params = Uri(
-  //     scheme: 'mailto',
-  //     path: 'developer@example.com',
-  //     query: 'subject=$_subject&body=카테고리: $_category\n\n$_body\n\n보낸 사람: $nickname',
-  //   );
-  //   String url = params.toString();
-  //   if (await canLaunch(url)) {
-  //     await launch(url);
-  //   } else {
-  //     print('메일을 발송할 수 없습니다.');
-  //   }
-  // }
   @override
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return AutoTabsRouter.tabBar(
+
       routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute()],
       builder: (context, child, controller) {
         return Scaffold(
@@ -63,33 +47,38 @@ class MainPage extends StatelessWidget {
                                   padding: const EdgeInsets.all(10),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       if (userProvider.isLogin)
                                         Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               '${userProvider.nickname}',
                                               style: TextStyle(
                                                   fontSize: min(
-                                                      MediaQuery.sizeOf(context).width *
+                                                      MediaQuery.sizeOf(context)
+                                                              .width *
                                                           0.02,
                                                       15)),
                                             ),
                                             Text(
-                                              '#${(userProvider.userNo!-3).toString().padLeft(4,'0')}',
+                                              '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
                                               style: TextStyle(
                                                   fontSize: min(
-                                                      MediaQuery.sizeOf(context).width *
+                                                      MediaQuery.sizeOf(context)
+                                                              .width *
                                                           0.02,
                                                       15)),
                                             ),
                                           ],
                                         ),
                                       SizedBox(
-                                          width: MediaQuery.sizeOf(context).width *
-                                              0.009),
+                                          width:
+                                              MediaQuery.sizeOf(context).width *
+                                                  0.009),
                                       userProvider.isLogin
                                           ? Center(
                                               child: TextButton(
@@ -98,8 +87,8 @@ class MainPage extends StatelessWidget {
                                                 },
                                                 child: Text(
                                                   '로그아웃',
-                                                  style:
-                                                      TextStyle(fontSize: fontSize),
+                                                  style: TextStyle(
+                                                      fontSize: fontSize),
                                                 ),
                                               ),
                                             )
@@ -110,8 +99,8 @@ class MainPage extends StatelessWidget {
                                                 },
                                                 child: Text(
                                                   '로그인',
-                                                  style:
-                                                      TextStyle(fontSize: fontSize),
+                                                  style: TextStyle(
+                                                      fontSize: fontSize),
                                                 ),
                                               ),
                                             ),
@@ -122,30 +111,41 @@ class MainPage extends StatelessWidget {
                               Expanded(
                                 flex: 1,
                                 child: TabBar(
+
                                   controller: controller,
                                   tabs: [
                                     Tab(
-                                      icon: Center(child: Icon(Icons.build)),
-                                      child: isPortrait?null:Text(
-                                        'Builder',
-                                        style: TextStyle(fontSize: fontSize * 0.9),
-                                      ),
-                                      iconMargin: EdgeInsets.zero,
 
+                                      icon: Center(child: Icon(Icons.build,
+                                      )),
+
+                                      child: isPortrait
+                                          ? null
+                                          : Text(
+                                              'Builder',
+                                              style: TextStyle(
+                                                  fontSize: fontSize * 0.9),
+                                            ),
+                                      iconMargin: EdgeInsets.zero,
                                     ),
                                     Tab(
                                       icon: Center(child: Icon(Icons.list)),
-                                      child: isPortrait?null:Text('List',
-                                          style: TextStyle(fontSize: fontSize * 0.9)
-                                      ),
+                                      child: isPortrait
+                                          ? null
+                                          : Text('List',
+                                              style: TextStyle(
+                                                  fontSize: fontSize * 0.9)),
                                       iconMargin: EdgeInsets.zero,
                                     ),
                                     Tab(
-                                      icon: Center(child: Icon(Icons.collections_bookmark_rounded)),
-                                      child: isPortrait?null:Text(
-
-                                          'Collect',
-                                          style: TextStyle(fontSize: fontSize * 0.9)),
+                                      icon: Center(
+                                          child: Icon(Icons
+                                              .collections_bookmark_rounded)),
+                                      child: isPortrait
+                                          ? null
+                                          : Text('Collect',
+                                              style: TextStyle(
+                                                  fontSize: fontSize * 0.9)),
                                       iconMargin: EdgeInsets.zero,
                                     )
                                   ],
@@ -176,7 +176,6 @@ class MainPage extends StatelessWidget {
                         },
                       ),
                     ),
-
                   ],
                 ),
               ),
