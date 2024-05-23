@@ -244,8 +244,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            margin: EdgeInsets.only(top: 2, bottom: 2),
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+            // margin: EdgeInsets.only(top: 2, bottom: 2),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(4),
@@ -257,7 +257,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                 color: backgroundColor != Colors.transparent
                     ? Colors.white
                     : Colors.black,
-                height: 1.6,
+                height: 1.4,
               ),
             ),
           ),
