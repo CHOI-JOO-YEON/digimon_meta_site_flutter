@@ -727,7 +727,7 @@ class CardService {
   }
 
  Color getColor(double ratio) {
-    if(ratio>0.8){
+    if(ratio>=0.8){
       return Colors.green;
     }
     if(ratio>= 0.5){
