@@ -101,7 +101,7 @@ class CardService {
                                   '${card.cardName}',
                                   style: TextStyle(
                                       fontSize:
-                                          fontSize * 1.2), // 카드 이름은 폰트 크기를 1.2배로 설정
+                                          fontSize * 1.2),
                                 ),
                               ],
                             ),
@@ -112,12 +112,15 @@ class CardService {
                                 Expanded(
                                   flex: 6,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    // crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Stack(
                                         children: [
-                                          Image.network(card.imgUrl ?? '',
-                                              fit: BoxFit.fill),
+                                          SizedBox(
+                                            height: MediaQuery.of(context).size.height * 0.6,
+                                            child: Image.network(card.imgUrl ?? '',
+                                                fit: BoxFit.contain),
+                                          ),
                                           Positioned(
                                             right: 0,
                                             bottom: 0,
