@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
-
 import '../model/card.dart';
 import 'color_service.dart';
 
@@ -112,40 +111,44 @@ class CardService {
                                 Expanded(
                                   flex: 6,
                                   child: Column(
-                                    // crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Stack(
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context).size.height * 0.6,
-                                            child: Image.network(card.imgUrl ?? '',
-                                                fit: BoxFit.contain),
-                                          ),
-                                          Positioned(
-                                            right: 0,
-                                            bottom: 0,
-                                            child: IconButton(
-                                              padding: EdgeInsets.zero,
-                                              tooltip: '이미지 다운로드',
-                                              onPressed: () async {
-                                                if (card.imgUrl != null) {
-                                                  await WebImageDownloader
-                                                      .downloadImageFromWeb(
-                                                    card.imgUrl!,
-                                                    name:
-                                                        '${card.cardNo}_${card.cardName}.png',
-                                                  );
-                                                }
-                                              },
-                                              icon: Icon(
-                                                Icons.download,
-                                                color: Theme.of(context).primaryColor,
-                                                size: fontSize *
-                                                    1.5, // 아이콘 크기도 폰트 크기에 비례하게 조정
-                                              ),
+                                      LayoutBuilder(
+                                          builder: (BuildContext context, BoxConstraints constraints) {
+                                          return SizedBox(
+                                            width: constraints.maxWidth,
+                                            // height: MediaQuery.of(context).size.height * 0.6,
+                                            child: Stack(
+                                              children: [
+                                                Image.network(card.imgUrl ?? '',
+                                                    fit: BoxFit.contain),
+                                                Positioned(
+                                                  right: 0,
+                                                  bottom: 0,
+                                                  child: IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    tooltip: '이미지 다운로드',
+                                                    onPressed: () async {
+                                                      if (card.imgUrl != null) {
+                                                        await WebImageDownloader
+                                                            .downloadImageFromWeb(
+                                                          card.imgUrl!,
+                                                          name:
+                                                              '${card.cardNo}_${card.cardName}.png',
+                                                        );
+                                                      }
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.download,
+                                                      color: Theme.of(context).primaryColor,
+                                                      size: fontSize *
+                                                          1.5, // 아이콘 크기도 폰트 크기에 비례하게 조정
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
+                                          );
+                                        }
                                       ),
                                     ],
                                   ),
