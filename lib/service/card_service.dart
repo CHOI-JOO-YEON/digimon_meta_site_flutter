@@ -116,8 +116,12 @@ class CardService {
                                           // height: MediaQuery.of(context).size.height * 0.6,
                                           child: Stack(
                                             children: [
-                                              Image.network(card.imgUrl ?? '',
-                                                  fit: BoxFit.fitWidth),
+                                              SizedBox(
+                                                  child: Image.network(
+                                                      card.imgUrl ?? '',
+                                                      fit: BoxFit.fitWidth),
+                                              width: constraints.maxWidth,
+                                                ),
                                               Positioned(
                                                 right: 0,
                                                 bottom: 0,
