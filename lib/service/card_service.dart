@@ -37,9 +37,7 @@ class CardService {
                   ),
                   Text(
                     '총 ${_useCardResponseDto.totalCount}개의 덱에서 이 카드가 사용되었습니다.',
-                    style: TextStyle(
-                        fontSize: fontSize
-                    ),
+                    style: TextStyle(fontSize: fontSize),
                   ),
                   SizedBox(height: 10),
                 ],
@@ -98,9 +96,7 @@ class CardService {
                               children: [
                                 Text(
                                   '${card.cardName}',
-                                  style: TextStyle(
-                                      fontSize:
-                                          fontSize * 1.2),
+                                  style: TextStyle(fontSize: fontSize * 1.2),
                                 ),
                               ],
                             ),
@@ -112,44 +108,45 @@ class CardService {
                                   flex: 6,
                                   child: Column(
                                     children: [
-                                      LayoutBuilder(
-                                          builder: (BuildContext context, BoxConstraints constraints) {
-                                          return SizedBox(
-                                            width: constraints.maxWidth,
-                                            // height: MediaQuery.of(context).size.height * 0.6,
-                                            child: Stack(
-                                              children: [
-                                                Image.network(card.imgUrl ?? '',
-                                                    fit: BoxFit.contain),
-                                                Positioned(
-                                                  right: 0,
-                                                  bottom: 0,
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    tooltip: '이미지 다운로드',
-                                                    onPressed: () async {
-                                                      if (card.imgUrl != null) {
-                                                        await WebImageDownloader
-                                                            .downloadImageFromWeb(
-                                                          card.imgUrl!,
-                                                          name:
-                                                              '${card.cardNo}_${card.cardName}.png',
-                                                        );
-                                                      }
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.download,
-                                                      color: Theme.of(context).primaryColor,
-                                                      size: fontSize *
-                                                          1.5, // 아이콘 크기도 폰트 크기에 비례하게 조정
-                                                    ),
+                                      LayoutBuilder(builder:
+                                          (BuildContext context,
+                                              BoxConstraints constraints) {
+                                        return SizedBox(
+                                          width: constraints.maxWidth,
+                                          // height: MediaQuery.of(context).size.height * 0.6,
+                                          child: Stack(
+                                            children: [
+                                              Image.network(card.imgUrl ?? '',
+                                                  fit: BoxFit.fitWidth),
+                                              Positioned(
+                                                right: 0,
+                                                bottom: 0,
+                                                child: IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  tooltip: '이미지 다운로드',
+                                                  onPressed: () async {
+                                                    if (card.imgUrl != null) {
+                                                      await WebImageDownloader
+                                                          .downloadImageFromWeb(
+                                                        card.imgUrl!,
+                                                        name:
+                                                            '${card.cardNo}_${card.cardName}.png',
+                                                      );
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.download,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                    size: fontSize *
+                                                        1.5, // 아이콘 크기도 폰트 크기에 비례하게 조정
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
                                     ],
                                   ),
                                 ),
@@ -196,21 +193,25 @@ class CardService {
                                         context,
                                         [card.getKorForm()],
                                         '형태',
-                                        ColorService.getColorFromString(card.color1!),
+                                        ColorService.getColorFromString(
+                                            card.color1!),
                                         fontSize),
                                   if (card.attributes != null)
                                     _attributeWidget(
                                         context,
                                         [card.attributes!],
                                         '속성',
-                                        ColorService.getColorFromString(card.color1!),
+                                        ColorService.getColorFromString(
+                                            card.color1!),
                                         fontSize),
-                                  if (card.types != null && card.types!.isNotEmpty)
+                                  if (card.types != null &&
+                                      card.types!.isNotEmpty)
                                     _attributeWidget(
                                         context,
                                         card.types!,
                                         '유형',
-                                        ColorService.getColorFromString(card.color1!),
+                                        ColorService.getColorFromString(
+                                            card.color1!),
                                         fontSize),
                                 ],
                               ),
@@ -271,7 +272,8 @@ class CardService {
                             ListView.builder(
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
-                              itemCount: _useCardResponseDto.usedCardList.length,
+                              itemCount:
+                                  _useCardResponseDto.usedCardList.length,
                               itemBuilder: (BuildContext context, int index) {
                                 final usedCardInfo =
                                     _useCardResponseDto.usedCardList[index];
@@ -279,25 +281,32 @@ class CardService {
                                 return Container(
                                   margin: EdgeInsets.all(5),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5)
-                                  ),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5)),
                                   child: ListTile(
-                                    leading: Image.network(usedCard.smallImgUrl ?? ''),
-                                    title: Text(usedCard.cardName ?? '',style: TextStyle(color: getColor(usedCardInfo.ratio)),),
+                                    leading: Image.network(
+                                        usedCard.smallImgUrl ?? ''),
+                                    title: Text(
+                                      usedCard.cardName ?? '',
+                                      style: TextStyle(
+                                          color: getColor(usedCardInfo.ratio)),
+                                    ),
                                     subtitle: Text(
                                         '덱: ${usedCardInfo.count}, 비율: ${(usedCardInfo.ratio * 100).toStringAsFixed(0)}%'),
                                     onTap: () {
                                       Navigator.pop(context);
-                                      showImageDialog(context,usedCard,searchNote);
+                                      showImageDialog(
+                                          context, usedCard, searchNote);
                                     },
-                                    trailing: Text('${usedCardInfo.rank}위',style: TextStyle(fontSize: fontSize),),
+                                    trailing: Text(
+                                      '${usedCardInfo.rank}위',
+                                      style: TextStyle(fontSize: fontSize),
+                                    ),
                                   ),
                                 );
                               },
                             ),
                           ],
-
                         ],
                       ),
                     ),
@@ -310,7 +319,7 @@ class CardService {
                     if (_showUsedCards) {
                       if (!_useCardResponseDto.initialize) {
                         _useCardResponseDto =
-                        await CardApi().getUseCard(card.cardId!);
+                            await CardApi().getUseCard(card.cardId!);
                       }
                     }
                     setState(() {});
@@ -321,202 +330,12 @@ class CardService {
                   ),
                 ),
               ],
-
             ),
           );
         });
       },
     );
   }
-
-  // void showImageDialog(BuildContext context, DigimonCard card,
-  //     Function(int)? searchNote) {
-  //   final isPortrait =
-  //       MediaQuery
-  //           .of(context)
-  //           .orientation == Orientation.portrait;
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: isPortrait
-  //               ? MediaQuery
-  //               .of(context)
-  //               .size
-  //               .width * 0.8
-  //               : MediaQuery
-  //               .of(context)
-  //               .size
-  //               .width * 0.3,
-  //           child: SingleChildScrollView(
-  //             child: Container(
-  //               child: Column(
-  //                 children: [
-  //                   Container(
-  //                     width: double.infinity,
-  //                     child: Row(
-  //                       children: [
-  //                         Text(
-  //                           '${card.cardNo}',
-  //                           style: TextStyle(
-  //                               fontSize: 18,
-  //                               color: Theme
-  //                                   .of(context)
-  //                                   .hintColor),
-  //                         ),
-  //                         SizedBox(
-  //                           width: 10,
-  //                         ),
-  //                         Text(
-  //                           '${card.rarity}',
-  //                           style: TextStyle(
-  //                               fontSize: 18,
-  //                               color: Theme
-  //                                   .of(context)
-  //                                   .primaryColor),
-  //                         ),
-  //                         SizedBox(
-  //                           width: 10,
-  //                         ),
-  //                         Text(
-  //                           '${card.getKorCardType()}',
-  //                           style: TextStyle(
-  //                               fontSize: 18,
-  //                               color: ColorService.getColorFromString(
-  //                                   card.color1!)),
-  //                         ),
-  //                         SizedBox(
-  //                           width: 10,
-  //                         ),
-  //                         if (card.lv != null)
-  //                           ElevatedButton(
-  //
-  //                             onPressed: null,
-  //                             style: ElevatedButton.styleFrom(
-  //                                 disabledBackgroundColor: Theme
-  //                                     .of(context)
-  //                                     .cardColor,
-  //                                 disabledForegroundColor: Colors.black
-  //                             ),
-  //                             child: Text(
-  //                               'Lv.${card.lv}',
-  //                               style: TextStyle(fontSize: 18),
-  //                             ),
-  //                           )
-  //                       ],
-  //                     ),
-  //                   ),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.start,
-  //                     children: [
-  //                       Text(
-  //                         '${card.cardName}',
-  //                         style: TextStyle(fontSize: 22),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   Row(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Expanded(
-  //                           flex: 6,
-  //                           child: Column(
-  //                             crossAxisAlignment: CrossAxisAlignment.end,
-  //                             children: [
-  //                               Stack(
-  //                                 children: [
-  //                                   Image.network(card.imgUrl ?? '',
-  //                                       fit: BoxFit.fill),
-  //                                   Positioned(
-  //                                     right: 0,
-  //                                     bottom: 0,
-  //                                     child: IconButton(
-  //                                         padding: EdgeInsets.zero,
-  //                                         tooltip: '이미지 다운로드',
-  //                                         onPressed: () async {
-  //                                           if (card.imgUrl != null) {
-  //                                             await WebImageDownloader
-  //                                                 .downloadImageFromWeb(card.imgUrl!,
-  //                                                 name:
-  //                                                 '${card.cardNo}_${card
-  //                                                     .cardName}.png');
-  //                                           }
-  //                                         },
-  //                                         icon: Icon(Icons.download,color: Theme.of(context).primaryColor,
-  //                                         )),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //
-  //                             ],
-  //                           )),
-  //                       Expanded(
-  //                           flex: 4,
-  //                           child: Column(
-  //                             children: [
-  //                               if(card.form!=null)
-  //                               _attributeWidget(
-  //                                   context, [card.getKorForm()], '형태',
-  //                                   ColorService.getColorFromString(
-  //                                       card.color1!)),
-  //                               if(card.attributes != null)
-  //                                 _attributeWidget(
-  //                                     context, [card.attributes!], '속성',
-  //                                     ColorService.getColorFromString(
-  //                                         card.color1!)),
-  //                               if(card.types != null&&card.types!.isNotEmpty)
-  //                                 _attributeWidget(context, card.types!, '유형',
-  //                                     ColorService.getColorFromString(
-  //                                         card.color1!)),
-  //                             ],
-  //                           )),
-  //                     ],
-  //                   ),
-  //                   SizedBox(
-  //                     height: 5,
-  //                   ),
-  //                   if (card.effect != null)
-  //                     _effectWidget(context, card.effect!, '상단 텍스트',
-  //                         ColorService.getColorFromString(card.color1!)),
-  //                   SizedBox(
-  //                     height: 5,
-  //                   ),
-  //                   if (card.sourceEffect != null)
-  //                     _effectWidget(context, card.sourceEffect!, '하단 텍스트',
-  //                         ColorService.getColorFromString(card.color1!)),
-  //                   SizedBox(
-  //                     height: 10,
-  //                   ),
-  //                   TextButton(
-  //                     onPressed: () {
-  //                       if (searchNote != null) {
-  //                         Navigator.pop(context);
-  //                         searchNote(card.noteId!)!;
-  //                       }
-  //                     },
-  //
-  //
-  //                     child: Row(
-  //                       children: [
-  //                         Text(
-  //                           '입수 정보: ${card.noteName}',
-  //                           style: TextStyle(color: Colors.black),
-  //                         ),
-  //
-  //                       ],
-  //                     ),
-  //                   )
-  //
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Widget _effectWidget(BuildContext context, String text, String category,
       Color categoryColor, double fontSize) {
@@ -544,33 +363,6 @@ class CardService {
     );
   }
 
-  // Widget _effectWidget(BuildContext context, String text, String category,
-  //     Color categoryColor) {
-  //   return Container(
-  //     width: double.infinity,
-  //     decoration: BoxDecoration(
-  //         color: Theme
-  //             .of(context)
-  //             .splashColor,
-  //         borderRadius: BorderRadius.circular(10)),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(8.0),
-  //           child: Text(
-  //             category,
-  //             style: TextStyle(color: categoryColor),
-  //           ),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.all(8.0),
-  //           child: buildEffectText(text),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget _attributeWidget(BuildContext context, List<String> attributes,
       String category, Color categoryColor, double fontSize) {
     return Padding(
@@ -610,44 +402,6 @@ class CardService {
       ),
     );
   }
-
-  // Widget _attributeWidget(BuildContext context, List<String> attributes,
-  //     String category, Color categoryColor) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(8.0),
-  //     child: Container(
-  //       width: double.infinity,
-  //       decoration: BoxDecoration(
-  //           color: Theme
-  //               .of(context)
-  //               .splashColor,
-  //           borderRadius: BorderRadius.circular(10)),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Padding(
-  //             padding: const EdgeInsets.all(8.0),
-  //             child: Text(
-  //               category,
-  //               style: TextStyle(color: categoryColor),
-  //             ),
-  //           ),
-  //           Padding(
-  //               padding: const EdgeInsets.all(8.0),
-  //               child: Wrap(
-  //                   spacing: 8,
-  //                   runSpacing: 4,
-  //                   children: attributes.map((attribute) =>
-  //                       Chip(label: Text(attribute),
-  //
-  //                       )).toList()
-  //               )
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget buildEffectText(String text, double fontSize) {
     // 줄바꿈 후 시작하는 공백 제거
@@ -693,7 +447,7 @@ class CardService {
           alignment: PlaceholderAlignment.middle,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-            // margin: EdgeInsets.only(top: 2, bottom: 2),
+            margin: EdgeInsets.only(left: 2, right: 2),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(4),
@@ -732,18 +486,17 @@ class CardService {
     );
   }
 
- Color getColor(double ratio) {
-    if(ratio>=0.8){
+  Color getColor(double ratio) {
+    if (ratio >= 0.8) {
       return Colors.green;
     }
-    if(ratio>= 0.5){
+    if (ratio >= 0.5) {
       return Colors.orange;
     }
-    if(ratio> 0.2){
+    if (ratio > 0.2) {
       return Colors.yellow;
     }
 
     return Colors.black;
-
   }
 }
