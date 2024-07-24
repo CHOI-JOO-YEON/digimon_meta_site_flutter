@@ -4,11 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/widgets.dart';
-import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/limit_provider.dart';
-import '../../service/color_service.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
@@ -21,7 +19,7 @@ class CustomCard extends StatefulWidget {
   final Function? onHover;
   final Function? onExit;
   final Function? onLongPress;
-  final Function? onLongPressSingle;
+  final Function? onDoubleTab;
   final Function(int)? searchNote;
 
   const CustomCard({
@@ -35,7 +33,7 @@ class CustomCard extends StatefulWidget {
     this.isActive,
     this.zoomActive,
     this.searchNote,
-    this.onLongPressSingle,
+    this.onDoubleTab,
   });
 
   @override
@@ -72,9 +70,9 @@ class _CustomCardState extends State<CustomCard> {
     _timer?.cancel();
   }
 
-  void _handleLongPress() {
-    if(widget.onLongPressSingle!=null) {
-      widget.onLongPressSingle!();
+  void _handleDoubleTap() {
+    if(widget.onDoubleTab!=null) {
+      widget.onDoubleTab!();
     }
   }
 
@@ -98,7 +96,8 @@ class _CustomCardState extends State<CustomCard> {
             widget.cardPressEvent!(widget.card);
           }
         },
-        onLongPress: _handleLongPress,
+        onDoubleTap: _handleDoubleTap,
+        // onLongPress: _handleLongPress,
         onLongPressStart: _handleLongPressStart,
         onLongPressEnd: _handleLongPressEnd,
         child: Consumer<LimitProvider>(

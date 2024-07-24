@@ -129,8 +129,9 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                     _showBigImage(context, widget.cards[index].imgUrl!, index),
                 onExit: _hideBigImage,
                 searchNote: widget.searchNote,
-                onLongPressSingle: () => CardService().showImageDialog(
+                onDoubleTab: () => CardService().showImageDialog(
                   context,widget.cards[index], widget.searchNote),
+                onLongPress: widget.cardPressEvent,
               ),
             );
           } else {

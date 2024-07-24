@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../model/card.dart';
+import '../../service/card_service.dart';
 import '../card/card_widget.dart';
 
 class DeckScrollGridView extends StatefulWidget {
@@ -100,6 +101,8 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView> {
                           _showBigImage(context, card.imgUrl!, index),
                       onExit: _hideBigImage,
                       searchNote: widget.searchNote,
+                      onDoubleTab: () => CardService().showImageDialog(
+                          context,card, widget.searchNote),
                     ),
                     Positioned(
                       left:
