@@ -196,7 +196,6 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   }
 
   Widget _buildEffectText(String text, String prefix) {
-    // 줄바꿈 후 시작하는 공백 제거
     final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
     final List<InlineSpan> spans = [];
@@ -206,7 +205,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
     spans.add(
         TextSpan(text: prefix, style: TextStyle(fontWeight: FontWeight.bold)));
-    spans.add(TextSpan(text: '\n')); // 줄바꿈 추가
+    spans.add(TextSpan(text: '\n'));
 
     int lastIndex = 0;
     for (final match in matches) {
@@ -231,38 +230,15 @@ class _CardScrollListViewState extends State<CardScrollListView> {
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
         if (widget.isTextSimplify) {
           lastIndex = match.end;
-          continue; // 괄호 안 텍스트 숨기기
+          continue;
         } else {
           innerText = '(' + innerText + ')';
-          backgroundColor = Colors.transparent;
+          backgroundColor = Colors.black54;
         }
       } else {
-        backgroundColor = Colors.transparent;
+        backgroundColor = Colors.black54;
       }
-
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-            // margin: EdgeInsets.only(top: 2, bottom: 2),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              innerText,
-              style: TextStyle(
-                fontSize: 12,
-                color: backgroundColor != Colors.transparent
-                    ? Colors.white
-                    : Colors.black,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ),
-      );
+      spans.add(TextSpan(text: matchedText, style: TextStyle(color: backgroundColor)));
 
       lastIndex = match.end;
     }
@@ -283,4 +259,92 @@ class _CardScrollListViewState extends State<CardScrollListView> {
       ),
     );
   }
+  // Widget _buildEffectText(String text, String prefix) {
+  //   // 줄바꿈 후 시작하는 공백 제거
+  //   final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
+  //
+  //   final List<InlineSpan> spans = [];
+  //   final RegExp regexp =
+  //   RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕)');
+  //   final Iterable<Match> matches = regexp.allMatches(trimmedText);
+  //
+  //   spans.add(
+  //       TextSpan(text: prefix, style: TextStyle(fontWeight: FontWeight.bold)));
+  //   spans.add(TextSpan(text: '\n')); // 줄바꿈 추가
+  //
+  //   int lastIndex = 0;
+  //   for (final match in matches) {
+  //     if (match.start > lastIndex) {
+  //       spans
+  //           .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+  //     }
+  //
+  //     final String matchedText = match.group(0)!;
+  //     String innerText = matchedText.substring(1, matchedText.length - 1);
+  //     Color backgroundColor;
+  //     if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
+  //       backgroundColor = Color.fromRGBO(33, 37, 131, 1);
+  //     } else if (matchedText.startsWith('《') && matchedText.endsWith('》')) {
+  //       backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+  //     } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
+  //       backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+  //     } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
+  //       backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+  //     } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
+  //       backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+  //     } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
+  //       if (widget.isTextSimplify) {
+  //         lastIndex = match.end;
+  //         continue; // 괄호 안 텍스트 숨기기
+  //       } else {
+  //         innerText = '(' + innerText + ')';
+  //         backgroundColor = Colors.transparent;
+  //       }
+  //     } else {
+  //       backgroundColor = Colors.transparent;
+  //     }
+  //
+  //     spans.add(
+  //       WidgetSpan(
+  //         alignment: PlaceholderAlignment.middle,
+  //         child: Container(
+  //           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+  //           // margin: EdgeInsets.only(top: 2, bottom: 2),
+  //           decoration: BoxDecoration(
+  //             color: backgroundColor,
+  //             borderRadius: BorderRadius.circular(4),
+  //           ),
+  //           child: Text(
+  //             innerText,
+  //             style: TextStyle(
+  //               fontSize: 12,
+  //               color: backgroundColor != Colors.transparent
+  //                   ? Colors.white
+  //                   : Colors.black,
+  //               height: 1.4,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //
+  //     lastIndex = match.end;
+  //   }
+  //
+  //   if (lastIndex < trimmedText.length) {
+  //     spans.add(TextSpan(text: trimmedText.substring(lastIndex)));
+  //   }
+  //
+  //   return RichText(
+  //     text: TextSpan(
+  //       children: spans,
+  //       style: TextStyle(
+  //         fontSize: 12,
+  //         color: Colors.black,
+  //         height: 1.4,
+  //         fontFamily: 'JalnanGothic',
+  //       ),
+  //     ),
+  //   );
+  // }
 }
