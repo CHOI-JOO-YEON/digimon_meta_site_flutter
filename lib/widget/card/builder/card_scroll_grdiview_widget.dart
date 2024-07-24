@@ -1,6 +1,7 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/material.dart';
 
+import '../../../service/card_service.dart';
 import '../card_widget.dart';
 
 class CardScrollGridView extends StatefulWidget {
@@ -128,6 +129,8 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                     _showBigImage(context, widget.cards[index].imgUrl!, index),
                 onExit: _hideBigImage,
                 searchNote: widget.searchNote,
+                onLongPressSingle: () => CardService().showImageDialog(
+                  context,widget.cards[index], widget.searchNote),
               ),
             );
           } else {

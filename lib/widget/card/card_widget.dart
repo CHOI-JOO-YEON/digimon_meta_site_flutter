@@ -21,7 +21,9 @@ class CustomCard extends StatefulWidget {
   final Function? onHover;
   final Function? onExit;
   final Function? onLongPress;
+  final Function? onLongPressSingle;
   final Function(int)? searchNote;
+
   const CustomCard({
     super.key,
     required this.width,
@@ -31,7 +33,9 @@ class CustomCard extends StatefulWidget {
     this.onExit,
     this.onLongPress,
     this.isActive,
-    this.zoomActive, this.searchNote,
+    this.zoomActive,
+    this.searchNote,
+    this.onLongPressSingle,
   });
 
   @override
@@ -68,6 +72,12 @@ class _CustomCardState extends State<CustomCard> {
     _timer?.cancel();
   }
 
+  void _handleLongPress() {
+    if(widget.onLongPressSingle!=null) {
+      widget.onLongPressSingle!();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String color = widget.card.color2 ?? widget.card.color1!;
@@ -88,6 +98,7 @@ class _CustomCardState extends State<CustomCard> {
             widget.cardPressEvent!(widget.card);
           }
         },
+        onLongPress: _handleLongPress,
         onLongPressStart: _handleLongPressStart,
         onLongPressEnd: _handleLongPressEnd,
         child: Consumer<LimitProvider>(
@@ -202,7 +213,9 @@ class _CustomCardState extends State<CustomCard> {
                             color:
                                 color == 'BLACK' ? Colors.white : Colors.black,
                           ),
-                          onPressed: () {CardService().showImageDialog(context, widget.card, widget.searchNote);
+                          onPressed: () {
+                            CardService().showImageDialog(
+                                context, widget.card, widget.searchNote);
                           },
                         ),
                       ),
@@ -215,5 +228,4 @@ class _CustomCardState extends State<CustomCard> {
       ),
     );
   }
-
 }
