@@ -18,21 +18,20 @@ class DeckBuilderView extends StatefulWidget {
   final Function(DigimonCard) cardPressEvent;
   final Function(DeckResponseDto) import;
   final Function(int)? searchNote;
-
+  final CardOverlayService cardOverlayService;
   const DeckBuilderView(
       {super.key,
       required this.deck,
       this.mouseEnterEvent,
       required this.cardPressEvent,
       required this.import,
-      this.searchNote});
+      this.searchNote, required this.cardOverlayService});
 
   @override
   State<DeckBuilderView> createState() => _DeckBuilderViewState();
 }
 
 class _DeckBuilderViewState extends State<DeckBuilderView> {
-  final CardOverlayService _cardOverlayService = CardOverlayService();
   TextEditingController textEditingController = TextEditingController();
   bool isInit = true;
   int _rowNumber = 9;
@@ -154,7 +153,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 addCard: addCard,
                 removeCard: removeCard,
                 isTama: false,
-                cardOverlayService: _cardOverlayService,
+                cardOverlayService: widget.cardOverlayService,
               ),
             )),
         Expanded(flex: 1, child: Container()),
@@ -172,7 +171,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 addCard: addCard,
                 removeCard: removeCard,
                 isTama: true,
-                cardOverlayService: _cardOverlayService,
+                cardOverlayService: widget.cardOverlayService,
               ),
             ))
       ],

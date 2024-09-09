@@ -4,12 +4,17 @@ class CardOverlayService {
 
   OverlayEntry? _imageOverlayEntry;
   OverlayEntry? _buttonOverlayEntry;
-  RenderBox? _lastRenderBox;
-  Offset? _lastOffset;
+  bool isPanelOpen = false;
+  void updatePanelStatus(bool panelOpenStatus){
+    isPanelOpen=panelOpenStatus;
+  }
 
   // 큰 이미지 표시
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
       int rowNumber, int index) {
+    if(isPanelOpen){
+      return;
+    }
     final offset = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -68,9 +73,12 @@ class CardOverlayService {
 
   void showCardOptions(BuildContext context, RenderBox renderBox,
       Function onMinusTap, Function onPlusTap, bool isTama) {
+
     // 기존 오버레이 제거
     removeAllOverlays();
-
+    if(isPanelOpen){
+      return;
+    }
     final offset = renderBox.localToGlobal(Offset.zero); // 카드 위치 가져오기
     final screenHeight = MediaQuery.of(context).size.height;
     final cardWidth = renderBox.size.width;
@@ -107,8 +115,9 @@ class CardOverlayService {
                   onPressed: () => onMinusTap(),
                   style: ElevatedButton.styleFrom(
                     shape: CircleBorder(),
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.zero,
                   ),
+
                   child: Icon(Icons.remove, color: Colors.red),
                 ),
               ),
@@ -119,7 +128,7 @@ class CardOverlayService {
                   onPressed: () => onPlusTap(), // 외부에서 주입된 함수 호출
                   style: ElevatedButton.styleFrom(
                     shape: CircleBorder(),
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.zero,
                   ),
                   child: Icon(Icons.add, color: Colors.green),
                 ),

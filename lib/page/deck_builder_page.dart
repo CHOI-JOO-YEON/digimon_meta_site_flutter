@@ -11,6 +11,7 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/type.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
@@ -38,6 +39,7 @@ class DeckBuilderPage extends StatefulWidget {
 }
 
 class _DeckBuilderPageState extends State<DeckBuilderPage> {
+  final CardOverlayService _cardOverlayService = CardOverlayService();
   bool init = true;
   String viewMode = 'grid';
   final ScrollController _scrollController = ScrollController();
@@ -216,6 +218,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     deck.import(deckResponseDto);
     setState(() {});
   }
+  bool _overlayRemoved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -234,6 +237,19 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
         return SlidingUpPanel(
+          onPanelSlide: (v){
+            if (v > 0.1) {
+              _cardOverlayService.updatePanelStatus(true);
+            } else {
+              _cardOverlayService.updatePanelStatus(false);
+            }
+            if (v > 0.1 && !_overlayRemoved) {
+              _cardOverlayService.removeAllOverlays();
+              _overlayRemoved = true; // 오버레이가 제거되었음을 기록
+            } else if (v <= 0.1) {
+              _overlayRemoved = false; // 슬라이드가 최소로 돌아오면 다시 오버레이 생성 가능하게 설정
+            }
+          },
           controller: _panelController,
           renderPanelSheet: false,
           minHeight: 50,
@@ -434,7 +450,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       deck: deck,
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
-                      searchNote: searchNote,
+                      searchNote: searchNote, cardOverlayService: _cardOverlayService,
 
                     ),
                   ),
@@ -467,6 +483,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       cardPressEvent: removeCardByDeck,
                       import: deckUpdate,
                       searchNote: searchNote,
+                      cardOverlayService: _cardOverlayService,
                     ),
                   ),
                 ),
