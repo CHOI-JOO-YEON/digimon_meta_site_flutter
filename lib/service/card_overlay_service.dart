@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 
 class CardOverlayService {
+  static final CardOverlayService _instance = CardOverlayService._internal();
+
+  factory CardOverlayService() {
+    return _instance;
+  }
+
+  CardOverlayService._internal();
 
   OverlayEntry? _imageOverlayEntry;
   OverlayEntry? _buttonOverlayEntry;
   bool isPanelOpen = false;
-  void updatePanelStatus(bool panelOpenStatus){
-    isPanelOpen=panelOpenStatus;
+
+  void updatePanelStatus(bool panelOpenStatus) {
+    isPanelOpen = panelOpenStatus;
   }
 
   // 큰 이미지 표시
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
       int rowNumber, int index) {
-    if(isPanelOpen){
+    if (isPanelOpen) {
       return;
     }
     final offset = renderBox.localToGlobal(Offset.zero);
@@ -25,7 +33,7 @@ class CardOverlayService {
 
     final bool onRightSide = (index % rowNumber) < rowNumber / 2;
     final double overlayLeft =
-        onRightSide ? offset.dx + renderBox.size.width : offset.dx - maxWidth;
+    onRightSide ? offset.dx + renderBox.size.width : offset.dx - maxWidth;
 
     final double overlayTop = (offset.dy + maxHeight > screenHeight)
         ? screenHeight - maxHeight
@@ -76,7 +84,7 @@ class CardOverlayService {
 
     // 기존 오버레이 제거
     removeAllOverlays();
-    if(isPanelOpen){
+    if (isPanelOpen) {
       return;
     }
     final offset = renderBox.localToGlobal(Offset.zero); // 카드 위치 가져오기
@@ -117,7 +125,6 @@ class CardOverlayService {
                     shape: CircleBorder(),
                     padding: EdgeInsets.zero,
                   ),
-
                   child: Icon(Icons.remove, color: Colors.red),
                 ),
               ),

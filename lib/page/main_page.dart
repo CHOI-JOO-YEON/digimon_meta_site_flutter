@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,7 @@ class MainPage extends StatelessWidget {
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);
   }
-
+  final CardOverlayService _cardOverlayService = CardOverlayService();
   @override
   Widget build(BuildContext context) {
     double fontSize = min(MediaQuery.sizeOf(context).width * 0.02, 20);
@@ -27,6 +28,12 @@ class MainPage extends StatelessWidget {
 
       routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute()],
       builder: (context, child, controller) {
+        controller.addListener(() {
+          if (controller.indexIsChanging) {
+            // 탭이 변경될 때 모든 오버레이 제거
+            _cardOverlayService.removeAllOverlays();
+          }
+        });
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Column(
