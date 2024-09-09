@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/limit_provider.dart';
+import '../../service/color_service.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
@@ -71,7 +72,7 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   void _handleDoubleTap() {
-    if(widget.onDoubleTab!=null) {
+    if (widget.onDoubleTab != null) {
       widget.onDoubleTab!();
     }
   }
@@ -141,6 +142,40 @@ class _CustomCardState extends State<CustomCard> {
                     ),
                   ),
                 ),
+                if (widget.card.isParallel ?? false)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Builder(
+                      builder: (context) {
+                        double containerSize = widget.width * 0.2;
+                        double iconSize = widget.width * 0.15;
+                        double fontSize = widget.width * 0.12;
+
+                        return Container(
+                          padding: EdgeInsets.only(
+                              left: widget.width * 0.02,
+                              right: widget.width * 0.02),
+                          height: containerSize,
+                          decoration: BoxDecoration(
+                              color: ColorService.getColorFromString(
+                                  widget.card.color1!),
+                              borderRadius:
+                                  BorderRadius.circular(widget.width * 0.05)),
+                          child: Center(
+                            child: Text(
+                              '패럴렐',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: fontSize * 0.8,
+                                // fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 if (allowedQuantity == 1 || allowedQuantity == 0)
                   Positioned(
                     top: widget.width * 0.08,
