@@ -171,7 +171,7 @@ class _CustomCardState extends State<CustomCard> {
                             child: Text(
                               '패럴렐',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: widget.card.color1=='WHITE'?Colors.black: Colors.white,
                                 fontSize: fontSize * 0.8,
                                 // fontWeight: FontWeight.bold,
                               ),
