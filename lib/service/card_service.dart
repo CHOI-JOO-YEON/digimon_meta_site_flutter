@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/api/card_api.dart';
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
+import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +13,8 @@ import 'color_service.dart';
 class CardService {
   void showImageDialog(
       BuildContext context, DigimonCard card, Function(int)? searchNote) {
+    CardOverlayService cardOverlayService = CardOverlayService();
+    cardOverlayService.removeAllOverlays();
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenWidth = MediaQuery.of(context).size.width;
