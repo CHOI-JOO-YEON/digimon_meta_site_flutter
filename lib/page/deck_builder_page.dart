@@ -390,7 +390,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             rowNumber: 6,
                                             loadMoreCards: loadMoreCard,
                                             cardPressEvent: addCardByDeck,
-                                            // mouseEnterEvent: changeViewCardInfo,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
                                             searchNote: searchNote,
@@ -399,7 +398,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             cards: cards,
                                             loadMoreCards: loadMoreCard,
                                             cardPressEvent: addCardByDeck,
-                                            // mouseEnterEvent: changeViewCardInfo,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
                                             updateIsTextSimplify: (v) {

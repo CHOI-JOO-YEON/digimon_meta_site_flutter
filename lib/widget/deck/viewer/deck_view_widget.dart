@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
@@ -33,7 +34,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
 
   @override
   Widget build(BuildContext context) {
-
+    CardOverlayService _cardOverlayService = CardOverlayService();
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     if(isPortrait&&isInit){
@@ -92,6 +93,8 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                 deck: widget.deck.deckCards,
                 rowNumber: _rowNumber,
                 searchNote: widget.searchNote,
+                isTama: false,
+                cardOverlayService: _cardOverlayService,
                 // mouseEnterEvent: widget.mouseEnterEvent,
               ),
             )),
@@ -107,6 +110,8 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                 deck: widget.deck.tamaCards,
                 rowNumber: _rowNumber,
                 searchNote: widget.searchNote,
+                isTama: true,
+                cardOverlayService: _cardOverlayService,
                 // mouseEnterEvent: widget.mouseEnterEvent,
               ),
             ))

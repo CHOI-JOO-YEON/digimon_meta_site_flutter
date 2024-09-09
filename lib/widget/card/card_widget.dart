@@ -97,10 +97,15 @@ class _CustomCardState extends State<CustomCard> {
             widget.cardPressEvent!(widget.card);
           }
         },
-        onDoubleTap: _handleDoubleTap,
-        // onLongPress: _handleLongPress,
-        onLongPressStart: _handleLongPressStart,
-        onLongPressEnd: _handleLongPressEnd,
+        // onDoubleTap: _handleDoubleTap,
+        onLongPress: (){
+          if(widget.onLongPress!=null) {
+            widget.onLongPress!();
+          }
+
+        } ,
+        // onLongPressStart: _handleLongPressStart,
+        // onLongPressEnd: _handleLongPressEnd,
         child: Consumer<LimitProvider>(
           builder: (context, limitProvider, child) {
             int allowedQuantity =

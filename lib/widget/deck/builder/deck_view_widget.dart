@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
@@ -23,13 +24,15 @@ class DeckBuilderView extends StatefulWidget {
       required this.deck,
       this.mouseEnterEvent,
       required this.cardPressEvent,
-      required this.import, this.searchNote});
+      required this.import,
+      this.searchNote});
 
   @override
   State<DeckBuilderView> createState() => _DeckBuilderViewState();
 }
 
 class _DeckBuilderViewState extends State<DeckBuilderView> {
+  final CardOverlayService _cardOverlayService = CardOverlayService();
   TextEditingController textEditingController = TextEditingController();
   bool isInit = true;
   int _rowNumber = 9;
@@ -47,29 +50,31 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   initDeck() {
     widget.deck.init();
-    textEditingController.text='My Deck';
+    textEditingController.text = 'My Deck';
     setState(() {});
   }
 
-  newCopy(){
+  newCopy() {
     widget.deck.newCopy();
 
-    textEditingController.text=widget.deck.deckName;
-    setState(() {
-
-    });
+    textEditingController.text = widget.deck.deckName;
+    setState(() {});
   }
 
-  addCard(DigimonCard digimonCard) {
-    widget.deck.addCard(digimonCard,context);
-    setState(() {
-
-    });
+  addCard(DigimonCard card) {
+    widget.deck.addCard(card, context);
+    setState(() {});
   }
+
+  removeCard(DigimonCard card) {
+    widget.deck.removeCard(card);
+    setState(() {});
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
-    if(mounted) {
+    if (mounted) {
       textEditingController.dispose();
     }
     super.dispose();
@@ -77,97 +82,100 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
 
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-
-    if(isPortrait&&isInit){
-      _rowNumber=4;
+    if (isPortrait && isInit) {
+      _rowNumber = 4;
     }
-    isInit= false;
+    isInit = false;
     return Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: Row(
-                      children: [
-                        //메뉴바
-                        Expanded(
-                            flex: 2,
-                            child: DeckBuilderMenuBar(
-                              deck: widget.deck,
-                              textEditingController: textEditingController,
-                            )),
+      children: [
+        Expanded(
+          flex: 6,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    children: [
+                      //메뉴바
+                      Expanded(
+                          flex: 2,
+                          child: DeckBuilderMenuBar(
+                            deck: widget.deck,
+                            textEditingController: textEditingController,
+                          )),
 
-
-                        //행에 한번에 표시되는 카드
-                        Expanded(
-                          flex: isPortrait?1:2,
-                          child: CustomSlider(
-                              sliderValue: _rowNumber, sliderAction: updateRowNumber),
-                        ),
-                        Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
-                      ],
-                    ),
+                      //행에 한번에 표시되는 카드
+                      Expanded(
+                        flex: isPortrait ? 1 : 2,
+                        child: CustomSlider(
+                            sliderValue: _rowNumber,
+                            sliderAction: updateRowNumber),
+                      ),
+                      Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                    ],
                   ),
-                  Expanded(flex: 2, child: DeckMenuButtons(
-                    deck: widget.deck,
-                    clear: clearDeck,
-                    init: initDeck,
-                    import: widget.import,
-                    newCopy: newCopy, reload: () {setState(() {
-
-                    });  },
-                  )),
-
-                ],
-              ),
+                ),
+                Expanded(
+                    flex: 2,
+                    child: DeckMenuButtons(
+                      deck: widget.deck,
+                      clear: clearDeck,
+                      init: initDeck,
+                      import: widget.import,
+                      newCopy: newCopy,
+                      reload: () {
+                        setState(() {});
+                      },
+                    )),
+              ],
             ),
           ),
+        ),
 
-          //덱그리드뷰
-          Expanded(
-              flex: 14,
-              child: Container(
-                decoration: BoxDecoration(
-                color:  Theme.of(context).cardColor,
-                    // color: Color.fromRGBO(255, 255, 240, 1),
-                    //   color: Color(0xFFFFF9E3),
-                    borderRadius: BorderRadius.circular(5)),
-                child: DeckScrollGridView(
-                  deckCount: widget.deck.deckMap,
-                  deck: widget.deck.deckCards,
-                  rowNumber: _rowNumber,
-                  mouseEnterEvent: widget.mouseEnterEvent,
-                  cardPressEvent: widget.cardPressEvent,
-                  onLongPress: addCard,
-                  searchNote: widget.searchNote,
-                ),
-              )),
-          Expanded(flex: 1, child: Container()),
-          Expanded(
-              flex: 6,
-              child: Container(
-                decoration: BoxDecoration(
-                    color:  Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(5)),
-                child: DeckScrollGridView(
-                  deckCount: widget.deck.tamaMap,
-                  deck: widget.deck.tamaCards,
-                  rowNumber: _rowNumber,
-                  mouseEnterEvent: widget.mouseEnterEvent,
-                  cardPressEvent: widget.cardPressEvent,
-                  onLongPress: addCard,
-                  searchNote: widget.searchNote,
-                ),
-              ))
-        ],
-
+        //덱그리드뷰
+        Expanded(
+            flex: 14,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  // color: Color.fromRGBO(255, 255, 240, 1),
+                  //   color: Color(0xFFFFF9E3),
+                  borderRadius: BorderRadius.circular(5)),
+              child: DeckScrollGridView(
+                deckCount: widget.deck.deckMap,
+                deck: widget.deck.deckCards,
+                rowNumber: _rowNumber,
+                searchNote: widget.searchNote,
+                addCard: addCard,
+                removeCard: removeCard,
+                isTama: false,
+                cardOverlayService: _cardOverlayService,
+              ),
+            )),
+        Expanded(flex: 1, child: Container()),
+        Expanded(
+            flex: 6,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(5)),
+              child: DeckScrollGridView(
+                deckCount: widget.deck.tamaMap,
+                deck: widget.deck.tamaCards,
+                rowNumber: _rowNumber,
+                searchNote: widget.searchNote,
+                addCard: addCard,
+                removeCard: removeCard,
+                isTama: true,
+                cardOverlayService: _cardOverlayService,
+              ),
+            ))
+      ],
     );
   }
 }

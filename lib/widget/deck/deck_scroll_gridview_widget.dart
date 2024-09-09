@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../model/card.dart';
+import '../../service/card_overlay_service.dart';
 import '../../service/card_service.dart';
 import '../card/card_widget.dart';
 
@@ -9,125 +10,139 @@ class DeckScrollGridView extends StatefulWidget {
   final Map<DigimonCard, int> deckCount;
   final List<DigimonCard> deck;
   final int rowNumber;
-  final Function(DigimonCard)? mouseEnterEvent;
-  final Function(DigimonCard)? cardPressEvent;
-  final Function(DigimonCard)? onLongPress;
   final Function(int)? searchNote;
-
+  final Function(DigimonCard)? addCard;
+  final Function(DigimonCard)? removeCard;
+  final CardOverlayService cardOverlayService;
+  final bool isTama;
   const DeckScrollGridView(
       {super.key,
       required this.deckCount,
       required this.rowNumber,
-      this.mouseEnterEvent,   this.cardPressEvent, required this.deck,  this.onLongPress, this.searchNote});
+      required this.deck,
+      this.searchNote,
+      this.addCard,
+      this.removeCard, required this.cardOverlayService, required this.isTama, });
 
   @override
   State<DeckScrollGridView> createState() => _DeckScrollGridViewState();
 }
 
-
-class _DeckScrollGridViewState extends State<DeckScrollGridView> {
-
-  OverlayEntry? _overlayEntry;
-
-  void _showBigImage(BuildContext cardContext, String imgUrl, int index) {
-    final RenderBox renderBox = cardContext.findRenderObject() as RenderBox;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    final screenHeight = MediaQuery.of(cardContext).size.height;
-    final screenWidth = MediaQuery.of(cardContext).size.width;
-    final maxHeight = screenHeight * 0.5; // 화면 높이의 절반을 최대 높이로 설정
-
-    final aspectRatio = renderBox.size.width / renderBox.size.height;
-    final maxWidth = maxHeight * aspectRatio; // 최대 높이에 맞는 너비 계산
-
-    final bool onRightSide = (index % widget.rowNumber) < widget.rowNumber / 2;
-    final double overlayLeft = onRightSide
-        ? offset.dx + renderBox.size.width
-        : offset.dx - maxWidth;
-
-    final double overlayTop = (offset.dy + maxHeight > screenHeight)
-        ? screenHeight - maxHeight
-        : offset.dy;
-
-    final double correctedLeft = overlayLeft < 0 ? 0 : overlayLeft;
-
-    final double correctedWidth =
-    correctedLeft + maxWidth > screenWidth ? screenWidth - correctedLeft : maxWidth;
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: correctedLeft,
-        top: overlayTop,
-        width: correctedWidth,
-        height: correctedWidth / aspectRatio,
-        child: Image.network(imgUrl, fit: BoxFit.cover),
-      ),
-    );
-
-    Overlay.of(cardContext)?.insert(_overlayEntry!);
+class _DeckScrollGridViewState extends State<DeckScrollGridView>
+    with WidgetsBindingObserver {
+  Size _lastSize = Size.zero; // 이전 화면 크기를 저장하는 변수
+  @override
+  void initState() {
+    super.initState();
+   
+    WidgetsBinding.instance.addObserver(this); // Observer 등록
+    _scrollController.addListener(() {
+      // 스크롤이 발생할 때 오버레이 위치 업데이트
+      widget.cardOverlayService.removeAllOverlays();
+    });
   }
-  void _hideBigImage() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+
+  final ScrollController _scrollController = ScrollController(); // 스크롤 컨트롤러 추가
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    WidgetsBinding.instance.removeObserver(this); // Observer 해제
+    super.dispose();
   }
+
+  @override
+  void didUpdateWidget(DeckScrollGridView oldWidget) {
+    if (oldWidget.rowNumber != widget.rowNumber) {
+      widget.cardOverlayService.removeAllOverlays();
+    }
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    final Size newSize = MediaQuery.of(context).size;
+
+    if (newSize != _lastSize) {
+      widget.cardOverlayService.removeAllOverlays(); // 오버레이 제거
+      _lastSize = newSize; // 새로운 사이즈로 업데이트
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return GridView.builder(
+          controller: _scrollController, // ScrollController 연결
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,
-            // crossAxisSpacing:  (constraints.maxWidth / widget.rowNumber) * 0.1,
-            // mainAxisSpacing:  (constraints.maxWidth / widget.rowNumber) * 0.1,
           ),
           itemCount: widget.deck.length,
           itemBuilder: (context, index) {
             DigimonCard card = widget.deck[index];
             int count = widget.deckCount[card]!;
 
+            GlobalKey cardKey = GlobalKey();
+
             return Padding(
-              // padding: EdgeInsets.all( (constraints.maxWidth / widget.rowNumber) * 0.08),
-              padding: EdgeInsets.all( 0),
+              padding: EdgeInsets.all(0),
               child: Stack(
-                  children: [
-                    CustomCard(
-                      // mouseEnterEvent: widget.mouseEnterEvent,
-                      card: card,
-                      width: (constraints.maxWidth / widget.rowNumber) * 0.99,
-                      cardPressEvent: widget.cardPressEvent,
-                      onLongPress: widget.onLongPress,
-                      onHover: (context) =>
-                          _showBigImage(context, card.imgUrl!, index),
-                      onExit: _hideBigImage,
-                      searchNote: widget.searchNote,
-                      onDoubleTab: () => CardService().showImageDialog(
-                          context,card, widget.searchNote),
-                    ),
-                    Positioned(
-                      left:
-                          ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
-                      bottom:
-                          ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown, // 텍스트가 너무 커지는 것을 방지합니다.
-                        child: StrokeText(
-                          text: '$count',
-                          textStyle: TextStyle(
-                              fontSize:
-                                  ((constraints.maxWidth / widget.rowNumber) *
-                                          0.9) /
-                                      6,
-                              color: Colors.black),
-                          strokeColor: Colors.white,
-                          strokeWidth:
-                              ((constraints.maxWidth / widget.rowNumber) * 0.9) /
-                                  30,
+                children: [
+                  CustomCard(
+                    key: cardKey,
+                    card: card,
+                    width: (constraints.maxWidth / widget.rowNumber) * 0.99,
+                    cardPressEvent: (card) {
+                      if (widget.removeCard != null) {
+                        final RenderBox renderBox = cardKey.currentContext!
+                            .findRenderObject() as RenderBox;
+                        widget.cardOverlayService.showCardOptions(
+                            context,
+                            renderBox,
+                            () => {
+                                  widget.removeCard!(card),
+                                  if (widget.deckCount[card] == null)
+                                    {widget.cardOverlayService.removeAllOverlays()}
+                                },
+                            () => widget.addCard!(card),widget.isTama);
+                      }
+                    },
+                    onLongPress: () => CardService()
+                        .showImageDialog(context, card, widget.searchNote),
+                    onHover: (context) {
+                      final RenderBox renderBox = cardKey.currentContext!
+                          .findRenderObject() as RenderBox;
+                      widget.cardOverlayService.showBigImage(context, card.imgUrl!,
+                          renderBox, widget.rowNumber, index);
+                    },
+                    onExit: widget.cardOverlayService.hideBigImage,
+                    searchNote: widget.searchNote,
+                  ),
+                  Positioned(
+                    left: ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
+                    bottom:
+                        ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: StrokeText(
+                        text: '$count',
+                        textStyle: TextStyle(
+                          fontSize: ((constraints.maxWidth / widget.rowNumber) *
+                                  0.9) /
+                              6,
+                          color: Colors.black,
                         ),
+                        strokeColor: Colors.white,
+                        strokeWidth:
+                            ((constraints.maxWidth / widget.rowNumber) * 0.9) /
+                                30,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             );
           },
         );
