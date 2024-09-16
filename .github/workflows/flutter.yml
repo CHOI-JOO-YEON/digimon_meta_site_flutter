@@ -24,19 +24,19 @@ jobs:
     - name: Build Flutter Web with environment variable
       run: flutter build web --release --dart-define=SERVER_URL=https://www.digimon-meta.site
 
-    - name: Deploy to S3
-      run: |
-        aws s3 sync build/web s3://$AWS_BUCKET_NAME --region $AWS_REGION --delete
-      env:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_REGION: ${{secrets.AWS_REGION}}
+
+    - name: Deploy to S3
+      run: |
+        aws s3 sync build/web s3://$AWS_BUCKET_NAME --delete
 
     - name: Invalidate CloudFront cache
       run: |
         aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
