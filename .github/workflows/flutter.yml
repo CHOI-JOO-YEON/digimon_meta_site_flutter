@@ -3,7 +3,7 @@ name: Build and Deploy Flutter Web to S3
 on:
   push:
     branches:
-      - master
+      - main  # main 브랜치에 push될 때 트리거
 
 jobs:
   build:
@@ -16,8 +16,8 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.4'
-        
+        flutter-version: 'stable'
+
     - name: Install Flutter dependencies
       run: flutter pub get
 
@@ -32,11 +32,3 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-
-    - name: Invalidate CloudFront cache (if using CloudFront)
-      run: |
-        aws cloudfront create-invalidation --distribution-id $AWS_DISTRIBUTION_ID --paths "/*"
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DISTRIBUTION_ID: ${{ secrets.AWS_DISTRIBUTION_ID }}
