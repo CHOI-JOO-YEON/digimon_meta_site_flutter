@@ -3,7 +3,7 @@ name: Build and Deploy Flutter Web to S3
 on:
   push:
     branches:
-      - main  # main 브랜치에 push될 때 트리거
+      - master
 
 jobs:
   build:
