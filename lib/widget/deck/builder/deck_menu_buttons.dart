@@ -132,6 +132,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
     LimitProvider limitProvider = Provider.of(context, listen: false);
 
+
+
     var korFormats = formats.entries
         .where((entry) => entry.value.isOnlyEn == false)
         .toList();
@@ -139,11 +141,17 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       if (!korFormats.isEmpty) {
         widget.deck.formatId = korFormats.first.key;
       } else {
+
         var enFormats = formats.entries
             .where((entry) => entry.value.isOnlyEn == true)
             .toList()
             .reversed;
-        widget.deck.formatId = enFormats.first.key;
+        if(enFormats.length==0) {
+          widget.deck.formatId = korFormats.first.key;
+        }else{
+          widget.deck.formatId = enFormats.first.key;
+        }
+
       }
     }
 
