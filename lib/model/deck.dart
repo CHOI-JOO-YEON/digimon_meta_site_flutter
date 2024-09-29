@@ -272,7 +272,6 @@ class Deck {
         : _add(card, limit, deckMap, deckCards);
 
     saveMapToLocalStorage();
-    print(cardNoCntMap);
   }
 
   void _remove(
