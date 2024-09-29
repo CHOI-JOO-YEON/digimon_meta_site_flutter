@@ -228,7 +228,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                         ),
                       ),
 
-                      if (hasManagerRole) // 권한 체크 조건
+                      if (hasManagerRole)
                         ConstrainedBox(
                           constraints: BoxConstraints.tightFor(
                               width: iconSize, height: iconSize),
@@ -239,8 +239,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                             },
                             iconSize: iconSize,
                             icon: const Icon(Icons.videogame_asset_outlined),
-                            // 예시 아이콘, 실제 사용할 아이콘으로 변경
-                            tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
+                            tooltip: 'TTS 파일 내보내기',
                           ),
                         ),
                     ],

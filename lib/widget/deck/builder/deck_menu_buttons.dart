@@ -13,6 +13,7 @@ import '../../../model/limit_dto.dart';
 import '../../../provider/limit_provider.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
+import '../../../service/card_overlay_service.dart';
 import '../../../service/deck_service.dart';
 import '../../random_hand_widget.dart';
 
@@ -23,16 +24,23 @@ class DeckMenuButtons extends StatefulWidget {
   final Function() newCopy;
   final Function() reload;
   final Function(DeckResponseDto) import;
-  const DeckMenuButtons({super.key, required this.deck, required this.clear, required this.init, required this.import, required this.newCopy, required this.reload});
+
+  const DeckMenuButtons(
+      {super.key,
+      required this.deck,
+      required this.clear,
+      required this.init,
+      required this.import,
+      required this.newCopy,
+      required this.reload});
 
   @override
   State<DeckMenuButtons> createState() => _DeckMenuButtonsState();
 }
 
 class _DeckMenuButtonsState extends State<DeckMenuButtons> {
-
-
   void _showLoginDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -44,6 +52,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   Widget _colorSelectionWidget(Deck deck) {
+    CardOverlayService().removeAllOverlays();
     List<String> cardColorList = deck.getOrderedCardColorList();
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
@@ -54,7 +63,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
                 cardColorList.length,
-                    (index) {
+                (index) {
                   String color = cardColorList[index];
                   Color buttonColor = ColorService.getColorFromString(color);
 
@@ -100,8 +109,9 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
-  void _showDeckCopyDialog(
-      BuildContext context) {
+
+  void _showDeckCopyDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -118,8 +128,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             TextButton(
               child: Text('예'),
               onPressed: () {
-
-
                 Navigator.of(context).pop();
                 widget.newCopy();
               },
@@ -129,32 +137,29 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
+
   void _showSaveDialog(BuildContext context, Map<int, FormatDto> formats) {
+    CardOverlayService().removeAllOverlays();
     LimitProvider limitProvider = Provider.of(context, listen: false);
-
-
 
     var korFormats = formats.entries
         .where((entry) => entry.value.isOnlyEn == false)
         .toList();
-    if(!formats.keys.contains(widget.deck.formatId)) {
+    if (!formats.keys.contains(widget.deck.formatId)) {
       if (!korFormats.isEmpty) {
         widget.deck.formatId = korFormats.first.key;
       } else {
-
         var enFormats = formats.entries
             .where((entry) => entry.value.isOnlyEn == true)
             .toList()
             .reversed;
-        if(enFormats.length==0) {
+        if (enFormats.length == 0) {
           widget.deck.formatId = korFormats.first.key;
-        }else{
+        } else {
           widget.deck.formatId = enFormats.first.key;
         }
-
       }
     }
-
 
     showDialog(
       context: context,
@@ -209,8 +214,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                             value: entry.key,
                             child: Text(
                               '${entry.value.name} ['
-                                  '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                                  '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
                               // overflow: TextOverflow.ellipsis,
                             ),
                           );
@@ -251,7 +256,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ElevatedButton(
                   onPressed: () async {
                     List<String> cardColorList =
-                    widget.deck.getOrderedCardColorList();
+                        widget.deck.getOrderedCardColorList();
                     Set<String> set = cardColorList.toSet();
                     widget.deck.colorArrange(set);
                     if (widget.deck.colors.isEmpty) {
@@ -269,7 +274,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       widget.reload();
                       Navigator.of(context).pop();
                       _showShortDialog(context, "저장 성공");
-
                     } else {
                       _showShortDialog(context, "저장 실패");
                     }
@@ -285,12 +289,13 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showShortDialog(BuildContext context, String text) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(text),
-          // content:
+            title: Text(text),
+            // content:
             actions: [
               ElevatedButton(
                 child: const Text('닫기'),
@@ -298,13 +303,13 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   Navigator.of(context).pop();
                 },
               ),
-            ]
-        );
+            ]);
       },
     );
   }
 
   void showDeckResetDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -336,6 +341,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void showDeckClearDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -367,6 +373,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showImportDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -419,26 +426,26 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   onPressed: isLoading
                       ? null
                       : () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    try {
-                      var deckResponseDto = await DeckService().import(
-                          _selectedButton.convertStringToMap(
-                              _textEditingController.value.text));
-                      if (deckResponseDto != null) {
-                        widget.import(deckResponseDto);
-                      }
-                      setState(() {
-                        isLoading = false;
-                      });
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      setState(() {
-                        isLoading = false;
-                      });
-                    }
-                  },
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            var deckResponseDto = await DeckService().import(
+                                _selectedButton.convertStringToMap(
+                                    _textEditingController.value.text));
+                            if (deckResponseDto != null) {
+                              widget.import(deckResponseDto);
+                            }
+                            setState(() {
+                              isLoading = false;
+                            });
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        },
                 ),
               ],
             );
@@ -449,6 +456,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showExportDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -493,8 +501,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       controller: _textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        // hintText: 'Paste your deck.',
-                      ),
+                          // hintText: 'Paste your deck.',
+                          ),
                       enabled: false, // 수정 불가능하게 설정
                     ),
                     Row(
@@ -504,7 +512,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
-                                text: _textEditingController.text))
+                                    text: _textEditingController.text))
                                 .then((_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -570,6 +578,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showDeckSettingDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -580,121 +589,121 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
 
             return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
-                return AlertDialog(
-                  actions: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('취소'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (selectedLimit != null) {
-                              limitProvider.updateSelectLimit(
-                                  selectedLimit!.restrictionBeginDate);
-                              if(!widget.deck.isStrict&&isStrict){
-                                widget.clear();
-                              }
-                              widget.deck.updateIsStrict(isStrict);
-
-                              Navigator.of(context).pop();
+              return AlertDialog(
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('취소'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (selectedLimit != null) {
+                            limitProvider.updateSelectLimit(
+                                selectedLimit!.restrictionBeginDate);
+                            if (!widget.deck.isStrict && isStrict) {
+                              widget.clear();
                             }
-                          },
-                          child: const Text('확인'),
+                            widget.deck.updateIsStrict(isStrict);
+
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('확인'),
+                      ),
+                    ],
+                  ),
+                ],
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          '금지/제한: ',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: DropdownButtonFormField<LimitDto>(
+                            value: selectedLimit,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedLimit = newValue;
+                              });
+                            },
+                            items: limitProvider.limits.values.map((limitDto) {
+                              return DropdownMenuItem<LimitDto>(
+                                value: limitDto,
+                                child: Text(
+                                  '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ],
                     ),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          '엄격한 덱 작성 모드',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        Switch(
+                          inactiveThumbColor: Colors.red,
+                          value: isStrict,
+                          onChanged: (bool v) {
+                            if (v) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('경고'),
+                                    content: Text(
+                                        '엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('확인'),
+                                        onPressed: () {
+                                          setState(() {
+                                            isStrict = v;
+                                          });
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              setState(() {
+                                isStrict = v;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                   ],
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            '금지/제한: ',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: DropdownButtonFormField<LimitDto>(
-                              value: selectedLimit,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedLimit = newValue;
-                                });
-                              },
-                              items: limitProvider.limits.values.map((limitDto) {
-                                return DropdownMenuItem<LimitDto>(
-                                  value: limitDto,
-                                  child: Text(
-                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            '엄격한 덱 작성 모드',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Switch(
-                            inactiveThumbColor: Colors.red,
-                            value: isStrict,
-                            onChanged: (bool v) {
-                              if (v) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('경고'),
-                                      content: Text('엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
-                                      actions: [
-                                        TextButton(
-                                          child: Text('취소'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text('확인'),
-                                          onPressed: () {
-                                            setState(() {
-                                              isStrict = v;
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              } else {
-                                setState(() {
-                                  isStrict = v;
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                );
-              }
-            );
+                ),
+              );
+            });
           },
         );
       },
@@ -702,12 +711,13 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void showDeckReceiptDialog(BuildContext context) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('대회 제출용 레시피 다운로드'),
-          content:const SizedBox(
+          content: const SizedBox(
             width: 300,
             child: Text(
               '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 넘는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
@@ -738,170 +748,168 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          double iconSize = constraints.maxHeight*0.6;
-          return Column(
-            children: [
-
-              Expanded(
-                flex: 1,
-                child: Consumer<UserProvider>(builder: (BuildContext context,
-                    UserProvider userProvider, Widget? child) {
-                  bool hasManagerRole = userProvider.hasManagerRole();
-                  // bool isLogin = userProvider.isLogin; // 권한 확인
-                  return Row(
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            showDeckResetDialog(context);
-                          },
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.add_box),
-                          tooltip: '새로 만들기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            showDeckClearDialog(context);
-                          },
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.clear),
-                          tooltip: '비우기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showDeckCopyDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.copy),
-                          tooltip: '복사해서 새로운 덱 만들기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () async {
-                            if (userProvider.isLogin) {
-                              Map<int, FormatDto> formats =
+      double iconSize = constraints.maxHeight * 0.6;
+      return Column(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Consumer<UserProvider>(builder: (BuildContext context,
+                UserProvider userProvider, Widget? child) {
+              bool hasManagerRole = userProvider.hasManagerRole();
+              // bool isLogin = userProvider.isLogin; // 권한 확인
+              return Row(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        showDeckResetDialog(context);
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.add_box),
+                      tooltip: '새로 만들기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        showDeckClearDialog(context);
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.clear),
+                      tooltip: '비우기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckCopyDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.copy),
+                      tooltip: '복사해서 새로운 덱 만들기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        if (userProvider.isLogin) {
+                          Map<int, FormatDto> formats =
                               await DeckService().getFormats(widget.deck);
-                              _showSaveDialog(context, formats);
-                            } else {
-                              _showLoginDialog(context);
-                            }
-                          },
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.save),
-                          tooltip: '저장',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showImportDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.download),
-                          tooltip: '가져오기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showExportDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.upload),
-                          tooltip: '내보내기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            context.router.push(DeckImageRoute(deck: widget.deck));
-                          },
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.image),
-                          tooltip: '이미지 저장',
-                        ),
-                      ),
+                          _showSaveDialog(context, formats);
+                        } else {
+                          _showLoginDialog(context);
+                        }
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.save),
+                      tooltip: '저장',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showImportDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.download),
+                      tooltip: '가져오기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showExportDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.upload),
+                      tooltip: '내보내기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        CardOverlayService().removeAllOverlays();
+                        context.router.push(DeckImageRoute(deck: widget.deck));
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.image),
+                      tooltip: '이미지 저장',
+                    ),
+                  ),
 
-                      // ConstrainedBox(
-                      //   constraints: BoxConstraints.tightFor(
-                      //       width: iconSize, height: iconSize),
-                      //   child: IconButton(
-                      //     padding: EdgeInsets.zero,
-                      //     onPressed: () => _showRandomHandDialog(context),
-                      //     iconSize: iconSize,
-                      //     icon: const Icon(Icons.back_hand_rounded),
-                      //     tooltip: '랜덤 핸드',
-                      //   ),
-                      // ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => showDeckReceiptDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.receipt_long),
-                          tooltip: '대회 제출용 레시피',
-                        ),
+                  // ConstrainedBox(
+                  //   constraints: BoxConstraints.tightFor(
+                  //       width: iconSize, height: iconSize),
+                  //   child: IconButton(
+                  //     padding: EdgeInsets.zero,
+                  //     onPressed: () => _showRandomHandDialog(context),
+                  //     iconSize: iconSize,
+                  //     icon: const Icon(Icons.back_hand_rounded),
+                  //     tooltip: '랜덤 핸드',
+                  //   ),
+                  // ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => showDeckReceiptDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.receipt_long),
+                      tooltip: '대회 제출용 레시피',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckSettingDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.settings),
+                      tooltip: '덱 설정',
+                    ),
+                  ),
+                  if (hasManagerRole) // 권한 체크 조건
+                    ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                          width: iconSize, height: iconSize),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () async {
+                          await DeckService().exportToTTSFile(widget.deck);
+                        },
+                        iconSize: iconSize,
+                        icon: const Icon(Icons.videogame_asset_outlined),
+                        // 예시 아이콘, 실제 사용할 아이콘으로 변경
+                        tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
                       ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showDeckSettingDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.settings),
-                          tooltip: '덱 설정',
-                        ),
-                      ),
-                      if (hasManagerRole) // 권한 체크 조건
-                        ConstrainedBox(
-                          constraints: BoxConstraints.tightFor(
-                              width: iconSize, height: iconSize),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () async {
-                              await DeckService().exportToTTSFile(widget.deck);
-                            },
-                            iconSize: iconSize,
-                            icon: const Icon(Icons.videogame_asset_outlined),
-                            // 예시 아이콘, 실제 사용할 아이콘으로 변경
-                            tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
-                          ),
-                        ),
-                    ],
-                  );
-                }),
-              ),
-            ],
-          );
-        });
+                    ),
+                ],
+              );
+            }),
+          ),
+        ],
+      );
+    });
   }
 }

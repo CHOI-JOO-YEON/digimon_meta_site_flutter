@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
+import '../service/card_overlay_service.dart';
 import 'card.dart';
 
 class Deck {
@@ -213,6 +214,7 @@ class Deck {
 
   void _add(DigimonCard card, int limit, Map<DigimonCard, int> map,
       List<DigimonCard> cards) {
+    CardOverlayService().removeAllOverlays();
     isSave=false;
     if (map.containsKey(card)) {
       if (map[card]! < limit) {
@@ -247,6 +249,7 @@ class Deck {
     }
   }
   addCard(DigimonCard card, BuildContext context) {
+
     LimitProvider limitProvider = Provider.of(context, listen: false);
     int limit = isStrict
         ? min(limitProvider.getCardAllowedQuantity(card.cardNo!),
@@ -269,6 +272,7 @@ class Deck {
         : _add(card, limit, deckMap, deckCards);
 
     saveMapToLocalStorage();
+    print(cardNoCntMap);
   }
 
   void _remove(
