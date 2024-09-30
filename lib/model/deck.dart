@@ -214,7 +214,6 @@ class Deck {
 
   void _add(DigimonCard card, int limit, Map<DigimonCard, int> map,
       List<DigimonCard> cards) {
-    CardOverlayService().removeAllOverlays();
     isSave=false;
     if (map.containsKey(card)) {
       if (map[card]! < limit) {
@@ -224,6 +223,7 @@ class Deck {
       }
     } else {
       if (limit > 0) {
+        CardOverlayService().removeAllOverlays();
         map[card] = 1;
         cards.add(card);
         cards.sort(digimonCardComparator);

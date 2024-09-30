@@ -17,7 +17,6 @@ class CardOverlayService {
     isPanelOpen = panelOpenStatus;
   }
 
-  // 큰 이미지 표시
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
       int rowNumber, int index) {
     if (isPanelOpen) {
@@ -33,7 +32,7 @@ class CardOverlayService {
 
     final bool onRightSide = (index % rowNumber) < rowNumber / 2;
     final double overlayLeft =
-    onRightSide ? offset.dx + renderBox.size.width : offset.dx - maxWidth;
+        onRightSide ? offset.dx + renderBox.size.width : offset.dx - maxWidth;
 
     final double overlayTop = (offset.dy + maxHeight > screenHeight)
         ? screenHeight - maxHeight
@@ -63,7 +62,6 @@ class CardOverlayService {
     _removeCurrentButtonOverlay();
   }
 
-  // 큰 이미지 숨기기
   void hideBigImage() {
     _imageOverlayEntry?.remove();
     _imageOverlayEntry = null;
@@ -81,8 +79,6 @@ class CardOverlayService {
 
   void showCardOptions(BuildContext context, RenderBox renderBox,
       Function onMinusTap, Function onPlusTap, bool isTama) {
-
-    // 기존 오버레이 제거
     removeAllOverlays();
     if (isPanelOpen) {
       return;
@@ -93,7 +89,7 @@ class CardOverlayService {
     final cardHeight = renderBox.size.height;
 
     // 버튼 크기 및 높이 조정
-    final buttonHeight = cardHeight * 0.15;
+    final buttonHeight = cardHeight * 0.2;
     final buttonWidth = cardWidth / 3;
     double? overlayTop;
     double? overlayBottom;
@@ -113,34 +109,42 @@ class CardOverlayService {
         height: buttonHeight,
         child: Material(
           color: Colors.transparent,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: buttonWidth,
-                height: buttonHeight,
-                child: ElevatedButton(
-                  onPressed: () => onMinusTap(),
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.zero,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              double buttonSize =
+                  constraints.maxWidth * 0.3; // 버튼 크기를 화면 비율에 맞게 설정
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: buttonSize,
+                    height: buttonSize,
+                    child: ElevatedButton(
+                      onPressed: () => onMinusTap(),
+                      style: ElevatedButton.styleFrom(
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.zero,
+                          backgroundColor: Colors.red),
+                      child: Icon(Icons.remove,
+                          color: Colors.white, size: buttonSize * 0.5),
+                    ),
                   ),
-                  child: Icon(Icons.remove, color: Colors.red),
-                ),
-              ),
-              SizedBox(
-                width: buttonWidth,
-                height: buttonHeight,
-                child: ElevatedButton(
-                  onPressed: () => onPlusTap(), // 외부에서 주입된 함수 호출
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.zero,
+                  SizedBox(
+                    width: buttonSize,
+                    height: buttonSize,
+                    child: ElevatedButton(
+                      onPressed: () => onPlusTap(),
+                      style: ElevatedButton.styleFrom(
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.zero,
+                          backgroundColor: Colors.green),
+                      child: Icon(Icons.add,
+                          color: Colors.white, size: buttonSize * 0.5),
+                    ),
                   ),
-                  child: Icon(Icons.add, color: Colors.green),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
         ),
       ),

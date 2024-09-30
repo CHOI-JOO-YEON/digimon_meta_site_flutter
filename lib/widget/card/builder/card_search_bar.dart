@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../model/note.dart';
 import '../../../model/type.dart';
+import '../../../service/card_overlay_service.dart';
 
 class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;
@@ -100,6 +101,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
 
   void _showFilterDialog() {
+    CardOverlayService().removeAllOverlays();
     List<TypeDto> _searchResults = TypeService().search("");
     Map<int, String> _selectedTypes = widget.searchParameter.types;
 
