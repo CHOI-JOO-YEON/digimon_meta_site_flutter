@@ -253,15 +253,12 @@ class _DeckListPageState extends State<DeckListPage> {
                     controller: _scrollController,
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: MediaQuery.sizeOf(context).height * 0.9,
-                          child: _selectedDeck == null
-                              ? Container()
-                              : DeckViewerView(
-                                  deck: _selectedDeck!,
-                                  searchNote: searchNote,
-                                ),
-                        ),
+                        _selectedDeck == null
+                            ? Container()
+                            : DeckViewerView(
+                                deck: _selectedDeck!,
+                                searchNote: searchNote,
+                              ),
                         Container(
                           height: MediaQuery.sizeOf(context).height * 0.6,
                         ),
@@ -280,13 +277,9 @@ class _DeckListPageState extends State<DeckListPage> {
                   child: Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-
-                        // color: Colors.blueAccent
                         color: Theme.of(context).highlightColor),
                     child: SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.sizeOf(context).height * 0.88,
-                        // height: 1000,
+                      child: Expanded(
                         child: _selectedDeck == null
                             ? Container()
                             : DeckViewerView(

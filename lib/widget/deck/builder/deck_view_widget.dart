@@ -138,6 +138,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
+        SizedBox(
+          height: height*0.03,
+          child: Text('메인', style: TextStyle(fontSize: height*0.02)),
+        ),
         Container(
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
@@ -156,8 +160,8 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         SizedBox(
-          height: height*0.02,
-          child: Container(),
+          height: height*0.03,
+          child: Container(child: Text('디지타마', style: TextStyle(fontSize: height*0.02))),
         ),
         Container(
           decoration: BoxDecoration(
