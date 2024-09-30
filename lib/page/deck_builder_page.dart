@@ -55,6 +55,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   Deck deck = Deck();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
+  Timer? _debounce; // 디바운스를 위한 타이머
 
   void updateSearchParameter()
   {
@@ -69,7 +70,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void dispose() {
     if (mounted) {
       _scrollController.dispose();
+      _debounce?.cancel(); // 타이머가 남아 있으면 해제
     }
+
     super.dispose();
   }
 
@@ -157,8 +160,22 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
       initSearch();
     });
-  }
 
+    _scrollController.addListener(() {
+      CardOverlayService().removeAllOverlays();
+      _onScroll();
+    });
+  }
+  void _onScroll() {
+    // 기존 타이머가 있으면 취소
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+    // 타이머 설정, 지정된 시간이 지나면 콜백 실행
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      // 스크롤이 끝난 후 300ms 지나면 추가 처리 가능
+      // 여기서 추가 로직이 필요하면 넣을 수 있습니다.
+    });
+  }
   @override
   void didUpdateWidget(covariant DeckBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -441,18 +458,16 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             color: Theme.of(context).highlightColor,
             padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
             child: SingleChildScrollView(
+
               controller: _scrollController,
               child: Column(
                 children: [
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.88,
-                    child: DeckBuilderView(
-                      deck: deck,
-                      cardPressEvent: removeCardByDeck,
-                      import: deckUpdate,
-                      searchNote: searchNote, cardOverlayService: _cardOverlayService,
+                  DeckBuilderView(
+                    deck: deck,
+                    cardPressEvent: removeCardByDeck,
+                    import: deckUpdate,
+                    searchNote: searchNote, cardOverlayService: _cardOverlayService,
 
-                    ),
                   ),
                   Container(
                     height: MediaQuery.sizeOf(context).height * 0.6,
@@ -476,8 +491,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     borderRadius: BorderRadius.circular(5),
                     color: Theme.of(context).highlightColor),
                 child: SingleChildScrollView(
-                  child: SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.88,
+                  child: Expanded(
                     child: DeckBuilderView(
                       deck: deck,
                       cardPressEvent: removeCardByDeck,

@@ -74,7 +74,9 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return GridView.builder(
+          shrinkWrap: true, // 내부 요소에 따라 그리드 높이 조절
           controller: _scrollController, // ScrollController 연결
+          physics: NeverScrollableScrollPhysics(), // 그리드뷰 자체 스크롤 비활성화
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,

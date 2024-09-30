@@ -19,13 +19,15 @@ class DeckBuilderView extends StatefulWidget {
   final Function(DeckResponseDto) import;
   final Function(int)? searchNote;
   final CardOverlayService cardOverlayService;
+
   const DeckBuilderView(
       {super.key,
       required this.deck,
       this.mouseEnterEvent,
       required this.cardPressEvent,
       required this.import,
-      this.searchNote, required this.cardOverlayService});
+      this.searchNote,
+      required this.cardOverlayService});
 
   @override
   State<DeckBuilderView> createState() => _DeckBuilderViewState();
@@ -84,14 +86,15 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
+    double height = MediaQuery.of(context).size.height * 0.88;
     if (isPortrait && isInit) {
       _rowNumber = 4;
     }
     isInit = false;
     return Column(
       children: [
-        Expanded(
-          flex: 6,
+        SizedBox(
+          height: height*0.3,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -135,45 +138,43 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
-
+        Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              // color: Color.fromRGBO(255, 255, 240, 1),
+              //   color: Color(0xFFFFF9E3),
+              borderRadius: BorderRadius.circular(5)),
+          child: DeckScrollGridView(
+            deckCount: widget.deck.deckMap,
+            deck: widget.deck.deckCards,
+            rowNumber: _rowNumber,
+            searchNote: widget.searchNote,
+            addCard: addCard,
+            removeCard: removeCard,
+            isTama: false,
+            cardOverlayService: widget.cardOverlayService,
+          ),
+        ),
+        SizedBox(
+          height: height*0.02,
+          child: Container(),
+        ),
+        Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(5)),
+          child: DeckScrollGridView(
+            deckCount: widget.deck.tamaMap,
+            deck: widget.deck.tamaCards,
+            rowNumber: _rowNumber,
+            searchNote: widget.searchNote,
+            addCard: addCard,
+            removeCard: removeCard,
+            isTama: true,
+            cardOverlayService: widget.cardOverlayService,
+          ),
+        )
         //덱그리드뷰
-        Expanded(
-            flex: 14,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  // color: Color.fromRGBO(255, 255, 240, 1),
-                  //   color: Color(0xFFFFF9E3),
-                  borderRadius: BorderRadius.circular(5)),
-              child: DeckScrollGridView(
-                deckCount: widget.deck.deckMap,
-                deck: widget.deck.deckCards,
-                rowNumber: _rowNumber,
-                searchNote: widget.searchNote,
-                addCard: addCard,
-                removeCard: removeCard,
-                isTama: false,
-                cardOverlayService: widget.cardOverlayService,
-              ),
-            )),
-        Expanded(flex: 1, child: Container()),
-        Expanded(
-            flex: 6,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(5)),
-              child: DeckScrollGridView(
-                deckCount: widget.deck.tamaMap,
-                deck: widget.deck.tamaCards,
-                rowNumber: _rowNumber,
-                searchNote: widget.searchNote,
-                addCard: addCard,
-                removeCard: removeCard,
-                isTama: true,
-                cardOverlayService: widget.cardOverlayService,
-              ),
-            ))
       ],
     );
   }
