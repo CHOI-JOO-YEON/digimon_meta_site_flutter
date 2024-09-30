@@ -460,19 +460,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             child: SingleChildScrollView(
 
               controller: _scrollController,
-              child: Column(
-                children: [
-                  DeckBuilderView(
-                    deck: deck,
-                    cardPressEvent: removeCardByDeck,
-                    import: deckUpdate,
-                    searchNote: searchNote, cardOverlayService: _cardOverlayService,
+              child: DeckBuilderView(
+                deck: deck,
+                cardPressEvent: removeCardByDeck,
+                import: deckUpdate,
+                searchNote: searchNote, cardOverlayService: _cardOverlayService,
 
-                  ),
-                  Container(
-                    height: MediaQuery.sizeOf(context).height * 0.6,
-                  ),
-                ],
               ),
             ),
           ),
@@ -491,14 +484,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     borderRadius: BorderRadius.circular(5),
                     color: Theme.of(context).highlightColor),
                 child: SingleChildScrollView(
-                  child: Expanded(
-                    child: DeckBuilderView(
-                      deck: deck,
-                      cardPressEvent: removeCardByDeck,
-                      import: deckUpdate,
-                      searchNote: searchNote,
-                      cardOverlayService: _cardOverlayService,
-                    ),
+                  child: DeckBuilderView(
+                    deck: deck,
+                    cardPressEvent: removeCardByDeck,
+                    import: deckUpdate,
+                    searchNote: searchNote,
+                    cardOverlayService: _cardOverlayService,
                   ),
                 ),
               ),

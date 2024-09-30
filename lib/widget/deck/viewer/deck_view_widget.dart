@@ -1,7 +1,5 @@
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
-import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
-import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_bar.dart';

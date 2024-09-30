@@ -251,19 +251,12 @@ class _DeckListPageState extends State<DeckListPage> {
                       EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    child: Column(
-                      children: [
-                        _selectedDeck == null
-                            ? Container()
-                            : DeckViewerView(
-                                deck: _selectedDeck!,
-                                searchNote: searchNote,
-                              ),
-                        Container(
-                          height: MediaQuery.sizeOf(context).height * 0.6,
-                        ),
-                      ],
-                    ),
+                    child: _selectedDeck == null
+                        ? Container()
+                        : DeckViewerView(
+                            deck: _selectedDeck!,
+                            searchNote: searchNote,
+                          ),
                   ),
                 ));
           })
@@ -279,14 +272,12 @@ class _DeckListPageState extends State<DeckListPage> {
                         borderRadius: BorderRadius.circular(5),
                         color: Theme.of(context).highlightColor),
                     child: SingleChildScrollView(
-                      child: Expanded(
-                        child: _selectedDeck == null
-                            ? Container()
-                            : DeckViewerView(
-                                deck: _selectedDeck!,
-                                searchNote: searchNote,
-                              ),
-                      ),
+                      child: _selectedDeck == null
+                          ? Container()
+                          : DeckViewerView(
+                              deck: _selectedDeck!,
+                              searchNote: searchNote,
+                            ),
                     ),
                   ),
                 ),

@@ -90,7 +90,6 @@ class CardOverlayService {
 
     // 버튼 크기 및 높이 조정
     final buttonHeight = cardHeight * 0.2;
-    final buttonWidth = cardWidth / 3;
     double? overlayTop;
     double? overlayBottom;
 

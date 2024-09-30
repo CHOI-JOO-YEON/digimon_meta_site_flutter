@@ -53,6 +53,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
 
   @override
   void didUpdateWidget(DeckScrollGridView oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (oldWidget.rowNumber != widget.rowNumber) {
       widget.cardOverlayService.removeAllOverlays();
     }
@@ -76,7 +77,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
         return GridView.builder(
           shrinkWrap: true, // 내부 요소에 따라 그리드 높이 조절
           controller: _scrollController, // ScrollController 연결
-          physics: NeverScrollableScrollPhysics(), // 그리드뷰 자체 스크롤 비활성화
+          physics: const NeverScrollableScrollPhysics(), // 그리드뷰 자체 스크롤 비활성화
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,
@@ -88,63 +89,60 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
 
             GlobalKey cardKey = GlobalKey();
 
-            return Padding(
-              padding: EdgeInsets.all(0),
-              child: Stack(
-                children: [
-                  CustomCard(
-                    key: cardKey,
-                    card: card,
-                    width: (constraints.maxWidth / widget.rowNumber) * 0.99,
-                    cardPressEvent: (card) {
-                      if (widget.removeCard != null) {
-                        final RenderBox renderBox = cardKey.currentContext!
-                            .findRenderObject() as RenderBox;
-                        widget.cardOverlayService.showCardOptions(
-                            context,
-                            renderBox,
-                            () => {
-                                  widget.removeCard!(card),
-                                  if (widget.deckCount[card] == null)
-                                    {widget.cardOverlayService.removeAllOverlays()}
-                                },
-                            () => widget.addCard!(card),widget.isTama);
-                      }
-                    },
-                    onLongPress: () => CardService()
-                        .showImageDialog(context, card, widget.searchNote),
-                    onHover: (context) {
+            return Stack(
+              children: [
+                CustomCard(
+                  key: cardKey,
+                  card: card,
+                  width: (constraints.maxWidth / widget.rowNumber) * 0.99,
+                  cardPressEvent: (card) {
+                    if (widget.removeCard != null) {
                       final RenderBox renderBox = cardKey.currentContext!
                           .findRenderObject() as RenderBox;
-                      widget.cardOverlayService.showBigImage(context, card.imgUrl!,
-                          renderBox, widget.rowNumber, index);
-                    },
-                    onExit: widget.cardOverlayService.hideBigImage,
-                    searchNote: widget.searchNote,
-                  ),
-                  Positioned(
-                    left: ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
-                    bottom:
-                        ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: StrokeText(
-                        text: '$count',
-                        textStyle: TextStyle(
-                          fontSize: ((constraints.maxWidth / widget.rowNumber) *
-                                  0.9) /
-                              6,
-                          color: Colors.black,
-                        ),
-                        strokeColor: Colors.white,
-                        strokeWidth:
-                            ((constraints.maxWidth / widget.rowNumber) * 0.9) /
-                                30,
+                      widget.cardOverlayService.showCardOptions(
+                          context,
+                          renderBox,
+                          () => {
+                                widget.removeCard!(card),
+                                if (widget.deckCount[card] == null)
+                                  {widget.cardOverlayService.removeAllOverlays()}
+                              },
+                          () => widget.addCard!(card),widget.isTama);
+                    }
+                  },
+                  onLongPress: () => CardService()
+                      .showImageDialog(context, card, widget.searchNote),
+                  onHover: (context) {
+                    final RenderBox renderBox = cardKey.currentContext!
+                        .findRenderObject() as RenderBox;
+                    widget.cardOverlayService.showBigImage(context, card.imgUrl!,
+                        renderBox, widget.rowNumber, index);
+                  },
+                  onExit: widget.cardOverlayService.hideBigImage,
+                  searchNote: widget.searchNote,
+                ),
+                Positioned(
+                  left: ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
+                  bottom:
+                      ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: StrokeText(
+                      text: '$count',
+                      textStyle: TextStyle(
+                        fontSize: ((constraints.maxWidth / widget.rowNumber) *
+                                0.9) /
+                            6,
+                        color: Colors.black,
                       ),
+                      strokeColor: Colors.white,
+                      strokeWidth:
+                          ((constraints.maxWidth / widget.rowNumber) * 0.9) /
+                              30,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         );
