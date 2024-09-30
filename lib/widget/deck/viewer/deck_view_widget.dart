@@ -116,7 +116,8 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             cardOverlayService: _cardOverlayService,
             // mouseEnterEvent: widget.mouseEnterEvent,
           ),
-        )
+        ),
+
       ],
     );
   }

@@ -253,10 +253,15 @@ class _DeckListPageState extends State<DeckListPage> {
                     controller: _scrollController,
                     child: _selectedDeck == null
                         ? Container()
-                        : DeckViewerView(
-                            deck: _selectedDeck!,
-                            searchNote: searchNote,
-                          ),
+                        : Column(
+                          children: [
+                            DeckViewerView(
+                                deck: _selectedDeck!,
+                                searchNote: searchNote,
+                              ),
+                            SizedBox(height: MediaQuery.sizeOf(context).height*0.2,)
+                          ],
+                        ),
                   ),
                 ));
           })

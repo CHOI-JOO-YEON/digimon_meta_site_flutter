@@ -144,8 +144,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
         Container(
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              // color: Color.fromRGBO(255, 255, 240, 1),
-              //   color: Color(0xFFFFF9E3),
               borderRadius: BorderRadius.circular(5)),
           child: DeckScrollGridView(
             deckCount: widget.deck.deckMap,
@@ -176,7 +174,8 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             isTama: true,
             cardOverlayService: widget.cardOverlayService,
           ),
-        )
+        ),
+
         //덱그리드뷰
       ],
     );

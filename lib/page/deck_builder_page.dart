@@ -458,14 +458,18 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             color: Theme.of(context).highlightColor,
             padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
             child: SingleChildScrollView(
-
               controller: _scrollController,
-              child: DeckBuilderView(
-                deck: deck,
-                cardPressEvent: removeCardByDeck,
-                import: deckUpdate,
-                searchNote: searchNote, cardOverlayService: _cardOverlayService,
+              child: Column(
+                children: [
+                  DeckBuilderView(
+                    deck: deck,
+                    cardPressEvent: removeCardByDeck,
+                    import: deckUpdate,
+                    searchNote: searchNote, cardOverlayService: _cardOverlayService,
 
+                  ),
+                  SizedBox(height: MediaQuery.sizeOf(context).height*0.2,)
+                ],
               ),
             ),
           ),
