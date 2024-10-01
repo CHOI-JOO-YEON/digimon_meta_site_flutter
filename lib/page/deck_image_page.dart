@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'dart:ui' as ui;
@@ -23,10 +24,28 @@ class DeckImagePage extends StatefulWidget {
 }
 
 class _DeckImagePageState extends State<DeckImagePage> {
-  Color backGroundColor = const Color(0x66c8c8c8);
+  Color backGroundColor = Color.fromRGBO(233, 233, 233, 1);
   Color textColor = Colors.black;
   Color cardColor = Colors.white;
   Color barColor = const Color(0xff1a237e);
+  bool isHorizontal = false;
+  final GlobalKey gridKey = GlobalKey();
+  DigimonCard? _selectedCard;
+  double size = 1000;
+  double horizontalSize = 1650;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.deck.deckCards.isEmpty) {
+      _selectedCard = DigimonCard(isEn: false);
+    } else {
+      _selectedCard = widget.deck.deckCards.first;
+    }
+
+  }
+
+
 
   void _showColorPicker() {
     List<Color> exampleColors = [
@@ -275,11 +294,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
         RenderRepaintBoundary boundary = globalKey.currentContext!
             .findRenderObject() as RenderRepaintBoundary;
 
-        final size = boundary.size;
+        final boundarySize = boundary.size;
 
-        const targetWidth = 1000;
+        double targetWidth = isHorizontal?horizontalSize:size;
 
-        final pixelRatio = targetWidth / size.width;
+
+        var pixelRatio = targetWidth / boundarySize.width;
 
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
@@ -296,18 +316,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
       }
     }
 
-    List<DigimonCard> displayDecks =
-        _generateDisplayList(widget.deck.deckCards, widget.deck.deckMap);
-    List<DigimonCard> displayTamas =
-        _generateDisplayList(widget.deck.tamaCards, widget.deck.tamaMap);
-    print(Theme.of(context).primaryColor);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
-            width: 960,
+            width: 1000,
             child: AppBar(
               backgroundColor: Theme.of(context).colorScheme.background,
               title: Text('이미지 내보내기',
@@ -320,6 +335,14 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   icon: const Icon(Icons.download),
                   onPressed: () => captureAndDownloadImage(context),
                 ),
+                Switch(
+                  value: isHorizontal,
+                  onChanged: (value) {
+                    setState(() {
+                      isHorizontal = value;
+                    });
+                  },
+                ),
               ],
             ),
           ),
@@ -327,81 +350,47 @@ class _DeckImagePageState extends State<DeckImagePage> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          double screenWidth = min(960, constraints.maxWidth);
-          double scaleFactor = screenWidth / 960; // 기준 크기인 960px에 대한 비율 계산
-
+          double screenWidth =
+              min(constraints.maxWidth, isHorizontal ? horizontalSize : size);
+          double scaleFactor =
+              screenWidth / (isHorizontal ? horizontalSize : size);
           return SingleChildScrollView(
             child: Align(
               alignment: Alignment.topCenter,
-              child: Padding(
-                padding: EdgeInsets.all(8.0 * scaleFactor),
-                child: SizedBox(
-                  width: 960,
-                  child: RepaintBoundary(
-                    key: globalKey,
-                    child: Container(
-                      color: Colors.white,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: backGroundColor,
-                          // borderRadius: BorderRadius.circular(10 * scaleFactor),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0 * scaleFactor),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: Center(
-                                      child: Text(
-                                        widget.deck.deckName,
-                                        style: TextStyle(
-                                            fontSize: 25 * scaleFactor,
-                                            fontFamily: 'JalnanGothic',
-                                            color: textColor),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: SizedBox(
-                                      height: 150 * scaleFactor,
-                                      child: DeckStat(
-                                          deck: widget.deck,
-                                          textColor: textColor,
-                                          barColor: barColor,
-                                          backGroundColor: cardColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 5 * scaleFactor),
-                              _buildGridView(context, displayTamas, 10,
-                                  cardColor, '디지타마 덱', scaleFactor),
-                              SizedBox(height: 5 * scaleFactor),
-                              _buildGridView(context, displayDecks, 10,
-                                  cardColor, '메인 덱', scaleFactor),
-                              SizedBox(height: 5 * scaleFactor),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Image created using Digimon Meta (digimon-meta.site)',
-                                    style: TextStyle(
-                                        fontSize: 10 * scaleFactor,
-                                        color: textColor
+              child: RepaintBoundary(
+                key: globalKey,
+                child: Container(
+                  width: screenWidth,
+                  padding: EdgeInsets.all(8 * scaleFactor),
+                  decoration: BoxDecoration(
+                    color: backGroundColor,
+                    borderRadius: BorderRadius.circular(10 * scaleFactor),
+                  ),
+                  child: Column(
+                    children: [
+                      _deckImageHeaderWidget(scaleFactor),
+                      Row(
+                        children: [
+                          if (isHorizontal)
+                            SizedBox(
+                              width: 640 * scaleFactor,
+                              child: Image.network(
+                                  fit: BoxFit.contain,
+                                  _selectedCard?.imgUrl ?? ''),
+                            ),
 
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
+                          if (isHorizontal)
+                            SizedBox(
+                              width: 10 * scaleFactor,
+                            ),
+                          SizedBox(
+                            width: 984 * scaleFactor,
+                            child: _deckImageCenterWidget(scaleFactor, context),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
+                      _deckImageFooterWidget(scaleFactor)
+                    ],
                   ),
                 ),
               ),
@@ -422,6 +411,67 @@ class _DeckImagePageState extends State<DeckImagePage> {
       }
     }
     return displayList;
+  }
+
+  Widget _deckImageHeaderWidget(double scaleFactor) {
+    return Row(
+      children: [
+        SizedBox(
+          width: (isHorizontal ? 1142 : 492) * scaleFactor,
+          child: Center(
+            child: Text(
+              widget.deck.deckName,
+              style: TextStyle(
+                  fontSize: 25 * scaleFactor,
+                  fontFamily: 'JalnanGothic',
+                  color: textColor),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 492 * scaleFactor,
+          child: SizedBox(
+            height: 150 * scaleFactor,
+            child: DeckStat(
+                deck: widget.deck,
+                textColor: textColor,
+                barColor: barColor,
+                backGroundColor: cardColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _deckImageFooterWidget(double scaleFactor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(
+          'Image created using Digimon Meta (digimon-meta.site)',
+          style: TextStyle(fontSize: 10 * scaleFactor, color: textColor),
+        )
+      ],
+    );
+  }
+
+  Widget _deckImageCenterWidget(double scaleFactor, BuildContext context) {
+    List<DigimonCard> displayDecks =
+        _generateDisplayList(widget.deck.deckCards, widget.deck.deckMap);
+    List<DigimonCard> displayTamas =
+        _generateDisplayList(widget.deck.tamaCards, widget.deck.tamaMap);
+    return Column(
+      key: gridKey,
+      children: [
+        SizedBox(height: 5 * scaleFactor),
+        _buildGridView(
+            context, displayTamas, 10, cardColor, '디지타마 덱', scaleFactor),
+        SizedBox(height: 5 * scaleFactor),
+        _buildGridView(
+            context, displayDecks, 10, cardColor, '메인 덱', scaleFactor),
+        SizedBox(height: 5 * scaleFactor),
+      ],
+    );
   }
 
   Widget _buildGridView(
@@ -457,9 +507,15 @@ class _DeckImagePageState extends State<DeckImagePage> {
               shrinkWrap: true,
               itemCount: cards.length,
               itemBuilder: (context, index) {
-                return Image.network(
-                  cards[index].smallImgUrl ?? '',
-                  fit: BoxFit.contain,
+                return GestureDetector(
+                  onTap: () {
+                    _selectedCard = cards[index];
+                    setState(() {});
+                  },
+                  child: Image.network(
+                    cards[index].smallImgUrl ?? '',
+                    fit: BoxFit.contain,
+                  ),
                 );
               },
             ),
