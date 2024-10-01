@@ -335,7 +335,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   icon: const Icon(Icons.download),
                   onPressed: () => captureAndDownloadImage(context),
                 ),
+                Text('대표 카드 보이기'),
                 Switch(
+                  inactiveThumbColor: Colors.red, // 비활성화 시 thumb 색상
                   value: isHorizontal,
                   onChanged: (value) {
                     setState(() {
