@@ -199,8 +199,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
     final List<InlineSpan> spans = [];
-    final RegExp regexp =
-    RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕)');
+    final RegExp regexp = RegExp(
+        r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
     final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
     spans.add(
@@ -210,39 +210,37 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     int lastIndex = 0;
     for (final match in matches) {
       if (match.start > lastIndex) {
-        spans
-            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+        spans.add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
       }
 
       final String matchedText = match.group(0)!;
       String innerText = matchedText.substring(1, matchedText.length - 1);
       Color backgroundColor;
       if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
-        backgroundColor = Color.fromRGBO(33, 37, 131, 1);
+        backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
       } else if (matchedText.startsWith('《') && matchedText.endsWith('》')) {
-        backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
-        backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+        backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-      } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
-        backgroundColor = Color.fromRGBO(206, 101, 1, 1);
-      } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-        if (widget.isTextSimplify) {
-          lastIndex = match.end;
-          continue;
-        } else {
-          innerText = '(' + innerText + ')';
-          backgroundColor = Colors.black54;
+        if(matchedText.contains('조그레스')||matchedText.contains('진화')){
+          backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
+        }else{
+          backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
         }
-      } else {
+      } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
+        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
+      } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
+        innerText = '($innerText)';
         backgroundColor = Colors.black54;
+      }  else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
+        backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
+      }else {
+        backgroundColor = Colors.black;
       }
       spans.add(TextSpan(text: matchedText, style: TextStyle(color: backgroundColor)));
-
       lastIndex = match.end;
     }
-
     if (lastIndex < trimmedText.length) {
       spans.add(TextSpan(text: trimmedText.substring(lastIndex)));
     }
