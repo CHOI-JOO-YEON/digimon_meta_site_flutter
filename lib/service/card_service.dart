@@ -412,9 +412,10 @@ class CardService {
   Widget buildEffectText(String text, double fontSize) {
     final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
     final List<InlineSpan> spans = [];
-
     final RegExp regexp = RegExp(
-        r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕)');
+        r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
+
+
     final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
     int lastIndex = 0;
@@ -427,44 +428,28 @@ class CardService {
       String innerText = matchedText.substring(1, matchedText.length - 1);
       Color backgroundColor;
       if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
-        backgroundColor = Color.fromRGBO(33, 37, 131, 1);
+        backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
       } else if (matchedText.startsWith('《') && matchedText.endsWith('》')) {
-        backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
-        backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+        backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        backgroundColor = Color.fromRGBO(163, 23, 99, 1);
+        if(matchedText.contains('조그레스')||matchedText.contains('진화')){
+          backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
+        }else{
+          backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
+        }
       } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
-        backgroundColor = Color.fromRGBO(206, 101, 1, 1);
+        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-        innerText = '(' + innerText + ')';
+        innerText = '($innerText)';
         backgroundColor = Colors.black54;
-      } else {
+      }  else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
+        backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
+      }else {
         backgroundColor = Colors.black;
       }
       spans.add(TextSpan(text: matchedText, style: TextStyle(color: backgroundColor)));
-      // spans.add(
-      //   WidgetSpan(
-      //     alignment: PlaceholderAlignment.middle,
-      //     child: Container(
-      //       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-      //       margin: EdgeInsets.only(left: 2, right: 2),
-      //       decoration: BoxDecoration(
-      //         color: backgroundColor,
-      //         borderRadius: BorderRadius.circular(4),
-      //       ),
-      //       child: Text(
-      //         innerText,
-      //         style: TextStyle(
-      //           fontSize: fontSize,
-      //           color: textColor,
-      //           height: 1.4,
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // );
-
       lastIndex = match.end;
     }
 
