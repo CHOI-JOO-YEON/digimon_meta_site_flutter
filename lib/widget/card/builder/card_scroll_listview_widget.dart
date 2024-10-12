@@ -231,8 +231,13 @@ class _CardScrollListViewState extends State<CardScrollListView> {
       } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
         backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-        innerText = '($innerText)';
-        backgroundColor = Colors.black54;
+        if (widget.isTextSimplify) {
+          lastIndex = match.end;
+          continue;
+        } else {
+          innerText = '(' + innerText + ')';
+          backgroundColor = Colors.black54;
+        }
       }  else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
         backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
       }else {
