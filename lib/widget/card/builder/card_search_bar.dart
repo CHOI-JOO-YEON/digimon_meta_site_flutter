@@ -102,10 +102,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   void _showFilterDialog() {
     CardOverlayService().removeAllOverlays();
-    List<TypeDto> _searchResults = TypeService().search("");
+    Map<int, TypeDto> _searchResults = TypeService().search("");
     Map<int, String> _selectedTypes = widget.searchParameter.types;
-
     NoteDto? selectedNote;
+
+    widget.searchParameter.types.keys.forEach((typeId) {
+      _selectedTypes[typeId] = _searchResults[typeId]!.name;
+
+    });
     if (widget.searchParameter.noteId == null) {
       selectedNote = all;
     } else {
@@ -532,9 +536,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               flex: 1,
                               child: ListView.builder(
                                 shrinkWrap: true,
-                                itemCount: _searchResults.length,
+                                itemCount: _searchResults.values.length,
                                 itemBuilder: (context, index) {
-                                  final type = _searchResults[index];
+                                  final type = _searchResults.values.elementAt(index);
                                   return ListTile(
                                     title: Text(type.name),
                                     onTap: () {

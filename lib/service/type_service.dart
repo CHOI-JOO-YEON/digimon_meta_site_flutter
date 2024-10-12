@@ -18,12 +18,12 @@ class TypeService {
     map[typeDto.name]=typeDto;
   }
 
-  List<TypeDto> search(String word) {
-    List<TypeDto> result = [];
+  Map<int, TypeDto> search(String word) {
+    Map<int, TypeDto> result = {};
 
     for (MapEntry<String,TypeDto> entry in map.entries) {
       if(entry.key.contains(word)) {
-        result.add(entry.value);
+        result[entry.value.typeId] = entry.value;
       }
     }
     return result;
