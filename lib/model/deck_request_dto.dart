@@ -1,4 +1,4 @@
-import 'deck.dart';
+import 'deck-build.dart';
 
 class DeckRequestDto{
   int? deckId;
@@ -8,7 +8,7 @@ class DeckRequestDto{
   bool? isPublic;
   Map<int,int> cardAndCntMap ={};
 
-  DeckRequestDto(Deck deck){
+  DeckRequestDto(DeckBuild deck){
     deckId=deck.deckId;
     deckName=deck.deckName;
     colors= deck.colors.toList();

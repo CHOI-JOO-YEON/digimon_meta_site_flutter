@@ -5,8 +5,8 @@ import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/api/card_api.dart';
 import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
-import 'package:digimon_meta_site_flutter/model/deck.dart';
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck-build.dart';
+import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/type.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
@@ -30,7 +30,7 @@ import '../widget/card/builder/card_search_bar.dart';
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
   final String? searchParameterString;
-  final Deck? deck;
+  final DeckBuild? deck;
 
   const DeckBuilderPage({super.key, this.deck,@QueryParam('searchParameter') this.searchParameterString});
 
@@ -52,7 +52,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   bool isTextSimplify = true;
 
 
-  Deck deck = Deck();
+  DeckBuild deck = DeckBuild();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
   Timer? _debounce; // 디바운스를 위한 타이머
@@ -136,7 +136,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               isLoading = true;
                             });
 
-                            Deck? savedDeck = await DeckService()
+                            DeckBuild? savedDeck = await DeckService()
                                 .createDeckByLocalJsonString(deckJsonString);
                             if (savedDeck != null) {
                               deck = savedDeck;
@@ -181,7 +181,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     super.didUpdateWidget(oldWidget);
     if (widget.deck != oldWidget.deck) {
       setState(() {
-        deck = widget.deck ?? Deck();
+        deck = widget.deck ?? DeckBuild();
       });
     }
     if(widget.searchParameterString!=null&& widget.searchParameterString!=oldWidget.searchParameterString) {
@@ -214,12 +214,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   addCardByDeck(DigimonCard card) {
-    deck.addCard(card, context);
+    deck.addSingleCard(card);
     setState(() {});
   }
 
   removeCardByDeck(DigimonCard card) {
-    deck.removeCard(card);
+    deck.removeSingleCard(card);
     setState(() {});
   }
 
@@ -231,7 +231,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
 
-  deckUpdate(DeckResponseDto deckResponseDto) {
+  deckUpdate(DeckView deckResponseDto) {
     deck.import(deckResponseDto);
     setState(() {});
   }

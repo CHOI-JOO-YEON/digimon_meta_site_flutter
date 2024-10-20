@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:digimon_meta_site_flutter/service/limit_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
 import '../service/card_overlay_service.dart';
 import 'card.dart';
 
-class Deck {
+class DeckBuild {
   int? deckId;
   Map<DigimonCard, int> deckMap = {};
   List<DigimonCard> deckCards = [];
@@ -22,10 +23,12 @@ class Deck {
   int tamaCount = 0;
   String deckName = 'My Deck';
   Set<String> colors = {};
+
   String? author;
   int? authorId;
   LimitDto? limitDto = LimitProvider().getCurrentLimit();
-  bool isSave=false;
+
+  bool isSave = false;
 
   Map<String, int> cardNoCntMap = {};
   int? formatId;
@@ -42,7 +45,7 @@ class Deck {
     deckCount = 0;
     tamaCount = 0;
     html.window.localStorage.remove('deck');
-    isSave=false;
+    isSave = false;
   }
 
   void init() {
@@ -57,94 +60,76 @@ class Deck {
     html.window.localStorage.remove('deck');
   }
 
-  void newCopy(){
+  void newCopy() {
     deckId = null;
-    deckName = deckName+" Copy";
+    deckName = "$deckName Copy";
     isPublic = false;
-    isSave=false;
+    isSave = false;
   }
 
-  void updateIsStrict(bool v){
-    isStrict =v;
+  void updateIsStrict(bool v) {
+    isStrict = v;
     saveMapToLocalStorage();
   }
-  void saveMapToLocalStorage() {
-    Map<String, int> encodableMap = {
-      ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
-      ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
-    };
-    if (encodableMap.isEmpty) {
-      html.window.localStorage.remove('deck');
-      return;
-    }
 
-    Map<String, dynamic> map = {
-      'deckName': deckName,
-      'deckMap': encodableMap,
-      'isStrict' : isStrict
-    };
+  DeckBuild.deckView(DeckView deckView) {
+    deckId = deckView.deckId;
+    deckName = deckView.deckName!;
+    author = deckView.authorName;
+    authorId = deckView.authorId;
+    formatId = deckView.formatId;
+    isPublic = deckView.isPublic ?? false;
 
-    String jsonString = jsonEncode(map);
-    html.window.localStorage['deck'] = jsonString;
-  }
-
-  Deck.responseDto(DeckResponseDto deckResponseDto) {
-    deckId = deckResponseDto.deckId;
-    deckName = deckResponseDto.deckName!;
-    author = deckResponseDto.authorName;
-    authorId = deckResponseDto.authorId;
-    formatId = deckResponseDto.formatId;
-    if (deckResponseDto.cardAndCntMap != null) {
-      for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
+    if (deckView.cardAndCntMap != null) {
+      for (var cardEntry in deckView.cardAndCntMap!.entries) {
         DigimonCard card = cardEntry.key;
-        cardMap[card.cardId!] = card;
-        if (card.cardType == 'DIGITAMA') {
-          tamaMap[card] = cardEntry.value;
-          tamaCards.add(card);
-
-          tamaCount += cardEntry.value;
-        } else {
-          deckMap[card] = cardEntry.value;
-          deckCards.add(card);
-
-          deckCount += cardEntry.value;
+        for (int i = 0; i < cardEntry.value; i++) {
+          if (!isCanAdd(card)) {
+            return;
+          }
+          _addCard(card);
         }
       }
+      _postDeckChanged();
     }
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
-    for (var color in  deckResponseDto.colors!) {
+
+    for (var color in deckView.colors!) {
       colors.add(color);
     }
-
   }
 
-  Deck.deck(Deck deck) {
-    deckName = deck.deckName + ' Copy';
+  DeckBuild.deckBuild(DeckBuild deck) {
+    deckName = '${deck.deckName} Copy';
     formatId = deck.formatId;
-    for (var tama in deck.tamaMap.entries) {
-      cardMap[tama.key.cardId!] = tama.key;
-      tamaMap[tama.key] = tama.value;
-      tamaCards.add(tama.key);
 
-      tamaCount += tama.value;
+    for (var tamaEntry in deck.tamaMap.entries) {
+      DigimonCard card = tamaEntry.key;
+      int cnt = tamaEntry.value;
+      for (int i = 0; i < cnt; i++) {
+        if (!isCanAdd(card)) {
+          return;
+        }
+        _addCard(card);
+      }
     }
 
-    for (var card in deck.deckMap.entries) {
-      cardMap[card.key.cardId!] = card.key;
-      deckMap[card.key] = card.value;
-      deckCards.add(card.key);
-
-      deckCount += card.value;
+    for (var cardEntry in deck.deckMap.entries) {
+      DigimonCard card = cardEntry.key;
+      int cnt = cardEntry.value;
+      for (int i = 0; i < cnt; i++) {
+        if (!isCanAdd(card)) {
+          return;
+        }
+        _addCard(card);
+      }
     }
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
-    for (var color in  deck.colors) {
+    _postDeckChanged();
+    for (var color in deck.colors) {
       colors.add(color);
     }
   }
 
-  Deck();
+  DeckBuild();
 
   Set<String> getCardColorSet() {
     Set<String> colorSet = {};
@@ -172,30 +157,21 @@ class Deck {
     return colorList;
   }
 
-  void import(DeckResponseDto? deckResponseDto) {
-    if (deckResponseDto != null) {
+  void import(DeckView? deckView) {
+    if (deckView != null) {
       clear();
-      if (deckResponseDto.cardAndCntMap != null) {
-        for (var cardEntry in deckResponseDto.cardAndCntMap!.entries) {
+      if (deckView.cardAndCntMap != null) {
+        for (var cardEntry in deckView.cardAndCntMap!.entries) {
           DigimonCard card = cardEntry.key;
-
-          cardMap[card.cardId!] = card;
-          if (card.cardType == 'DIGITAMA') {
-            tamaMap[card] = cardEntry.value;
-            tamaCards.add(card);
-
-            tamaCount += cardEntry.value;
-          } else {
-            deckMap[card] = cardEntry.value;
-            deckCards.add(card);
-
-            deckCount += cardEntry.value;
+          for (int i = 0; i < cardEntry.value; i++) {
+            if (!isCanAdd(card)) {
+              return;
+            }
+            _addCard(card);
           }
         }
+        _postDeckChanged();
       }
-      tamaCards.sort(digimonCardComparator);
-      deckCards.sort(digimonCardComparator);
-      saveMapToLocalStorage();
     }
   }
 
@@ -212,25 +188,19 @@ class Deck {
     return latestReleaseDate;
   }
 
-  void _add(DigimonCard card, int limit, Map<DigimonCard, int> map,
-      List<DigimonCard> cards) {
-    isSave=false;
-    if (map.containsKey(card)) {
-      if (map[card]! < limit) {
-        map[card] = map[card]! + 1;
-        _incrementCount(card.cardType!);
-        _incrementCardNoCount(card);
-      }
+  void _add(
+      DigimonCard card, Map<DigimonCard, int> map, List<DigimonCard> cards) {
+    if (!map.containsKey(card)) {
+      CardOverlayService().removeAllOverlays();
+      map[card] = 1;
+      cards.add(card);
+      cards.sort(digimonCardComparator);
     } else {
-      if (limit > 0) {
-        CardOverlayService().removeAllOverlays();
-        map[card] = 1;
-        cards.add(card);
-        cards.sort(digimonCardComparator);
-        _incrementCount(card.cardType!);
-        _incrementCardNoCount(card);
-      }
+      map[card] = map[card]! + 1;
     }
+
+    _incrementCount(card.cardType!);
+    _incrementCardNoCount(card);
   }
 
   void _incrementCount(String cardType) {
@@ -240,47 +210,46 @@ class Deck {
       deckCount++;
     }
   }
-  void _incrementCardNoCount(DigimonCard card)
-  {
-    if(cardNoCntMap.containsKey(card.cardNo)) {
-      cardNoCntMap[card.cardNo!]= cardNoCntMap[card.cardNo]!+1;
-    } else{
-      cardNoCntMap[card.cardNo!]=1;
+
+  void _incrementCardNoCount(DigimonCard card) {
+    if (cardNoCntMap.containsKey(card.cardNo)) {
+      cardNoCntMap[card.cardNo!] = cardNoCntMap[card.cardNo]! + 1;
+    } else {
+      cardNoCntMap[card.cardNo!] = 1;
     }
   }
-  addCard(DigimonCard card, BuildContext context) {
 
-    LimitProvider limitProvider = Provider.of(context, listen: false);
-    int limit = isStrict
-        ? min(limitProvider.getCardAllowedQuantity(card.cardNo!),
-            SpecialLimitCard.getLimitByCardNo(card.cardNo!))
-        : 100;
+  bool isCanAdd(card) {
+    int limit = LimitService().getCardLimit(card);
+    int cnt = cardNoCntMap[card.cardNo] ?? 0;
+    if (cnt >= limit) {
+      return false;
+    }
+    return true;
+  }
 
-    if (cardMap.containsKey(card.cardId)) {
-      card = cardMap[card.cardId]!;
-    } else {
-      cardMap[card.cardId!] = card;
+  addSingleCard(DigimonCard card) {
+    if (!isCanAdd(card)) {
+      return;
     }
-    if (isStrict) {
-      int cnt = cardNoCntMap[card.cardNo] ?? 0;
-      if (cnt >= limit) {
-        return;
-      }
-    }
+    _addCard(card);
+    _postDeckChanged();
+  }
+
+  void _addCard(DigimonCard card) {
+    card = cardMap.putIfAbsent(card.cardId!, () => card);
     card.cardType == 'DIGITAMA'
-        ? _add(card, limit, tamaMap, tamaCards)
-        : _add(card, limit, deckMap, deckCards);
+        ? _add(card, tamaMap, tamaCards)
+        : _add(card, deckMap, deckCards);
+  }
 
+  void _postDeckChanged() {
+    isSave = false;
     saveMapToLocalStorage();
   }
 
   void _remove(
       DigimonCard card, Map<DigimonCard, int> map, List<DigimonCard> cards) {
-    isSave=false;
-    if (!map.containsKey(card)) {
-      return;
-    }
-
     if (map[card] == 1) {
       map.remove(card);
       cards.remove(card);
@@ -300,8 +269,8 @@ class Deck {
       deckCount--;
     }
   }
-  void _decrementCardNoCount(DigimonCard card)
-  {
+
+  void _decrementCardNoCount(DigimonCard card) {
     if (!cardNoCntMap.containsKey(card.cardNo)) {
       return;
     }
@@ -312,11 +281,26 @@ class Deck {
       cardNoCntMap[card.cardNo!] = cardNoCntMap[card.cardNo]! - 1;
     }
   }
-  removeCard(DigimonCard card) {
+
+  bool isCanRemove(DigimonCard card) {
+    if ((cardNoCntMap[card.cardNo] ?? 0) < 1) {
+      return false;
+    }
+    return true;
+  }
+
+  void removeSingleCard(DigimonCard card) {
+    if (!isCanRemove(card)) {
+      return;
+    }
+    _removeCard(card);
+    _postDeckChanged();
+  }
+
+  void _removeCard(DigimonCard card) {
     card.cardType == 'DIGITAMA'
         ? _remove(card, tamaMap, tamaCards)
         : _remove(card, deckMap, deckCards);
-    saveMapToLocalStorage();
   }
 
   static final Map<String, int> _colorOrder = {
@@ -328,6 +312,7 @@ class Deck {
     'PURPLE': 6,
     'WHITE': 7
   };
+
   static final Map<String, int> _cardTypeOrder = {
     'DIGIMON': 1,
     'TAMER': 2,
@@ -335,17 +320,14 @@ class Deck {
   };
 
   int digimonCardComparator(DigimonCard a, DigimonCard b) {
-    // cardType 정렬
     if (a.cardType != b.cardType) {
       return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
     }
 
-    // lv 오름차순
     if (a.lv != null && b.lv != null && a.lv != b.lv) {
       return a.lv!.compareTo(b.lv!);
     }
 
-    // color1 정렬
     if (a.color1 != null && b.color1 != null && a.color1 != b.color1) {
       return _colorOrder[a.color1]!.compareTo(_colorOrder[b.color1]!);
     }
@@ -354,12 +336,10 @@ class Deck {
       return a.playCost!.compareTo(b.playCost!);
     }
 
-    // sortString 오름차순
     if (a.sortString != b.sortString) {
       return a.sortString!.compareTo(b.sortString!);
     }
 
-    // isParallel
     if (a.isParallel != b.isParallel) {
       return a.isParallel! ? 1 : -1;
     }
@@ -377,5 +357,29 @@ class Deck {
     for (var o in removeSet) {
       colors.remove(o);
     }
+  }
+
+  void deckSort() {
+    tamaCards.sort(digimonCardComparator);
+    deckCards.sort(digimonCardComparator);
+  }
+
+  void saveMapToLocalStorage() {
+    Map<String, int> encodableMap = {
+      ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
+      ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
+    };
+    if (encodableMap.isEmpty) {
+      html.window.localStorage.remove('deck');
+      return;
+    }
+
+    Map<String, dynamic> map = {
+      'deckName': deckName,
+      'deckMap': encodableMap,
+      'isStrict': isStrict
+    };
+    String jsonString = jsonEncode(map);
+    html.window.localStorage['deck'] = jsonString;
   }
 }

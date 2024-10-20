@@ -5,14 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../enums/site_enum.dart';
-import '../../../model/deck.dart';
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-build.dart';
+import '../../../model/deck-view.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
 import '../../../service/deck_service.dart';
 
 class DeckMenuButtons extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
   const DeckMenuButtons({super.key, required this.deck});
 
   @override
@@ -117,7 +117,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
               child: Text('예'),
               onPressed: () {
 
-                Deck deck = Deck.deck(widget.deck);
+                DeckBuild deck = DeckBuild.deckBuild(widget.deck);
                 Navigator.of(context).pop();
 
                 context.navigateTo(DeckBuilderRoute(deck: deck));

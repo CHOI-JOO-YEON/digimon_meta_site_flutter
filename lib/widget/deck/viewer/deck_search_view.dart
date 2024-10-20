@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_list_viewer.dart';
@@ -12,7 +12,7 @@ import '../../../model/format.dart';
 import '../../../provider/user_provider.dart';
 
 class DeckSearchView extends StatefulWidget {
-  final Function(DeckResponseDto) deckUpdate;
+  final Function(DeckView) deckUpdate;
   final DeckSearchParameter deckSearchParameter;
   final VoidCallback updateSearchParameter;
 

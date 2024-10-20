@@ -5,11 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../model/deck.dart';
+import '../../../model/deck-build.dart';
 import '../deck_count_widget.dart';
 
 class DeckViewerMenuBar extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
 
   const DeckViewerMenuBar(
       {super.key,

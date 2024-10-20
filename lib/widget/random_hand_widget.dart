@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:digimon_meta_site_flutter/model/deck.dart';
+import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/stack_hand.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import '../model/card.dart';
 
 class RandomHandWidget extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
 
   const RandomHandWidget({super.key, required this.deck});
 

@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'card.dart';
-import 'deck_response_dto.dart';
+import 'deck-view.dart';
 
 class CardQuantityCalculator {
   Map<int, Map<int, int>> _formatCardQuantitiesById = {};
@@ -12,7 +12,7 @@ class CardQuantityCalculator {
   Map<int, DigimonCard> _cardMap = {};
   Map<String, DigimonCard> _cardNoMap = {};
 
-  void addDeck(DeckResponseDto deck) {
+  void addDeck(DeckView deck) {
     int formatId = deck.formatId!;
     int deckId = deck.deckId!;
 
@@ -30,7 +30,7 @@ class CardQuantityCalculator {
     _updateMaxQuantities();
   }
 
-  void removeDeck(DeckResponseDto deck) {
+  void removeDeck(DeckView deck) {
     int formatId = deck.formatId!;
     int deckId = deck.deckId!;
 
@@ -42,7 +42,7 @@ class CardQuantityCalculator {
     _updateMaxQuantities();
   }
 
-  void _addQuantitiesForDeck(DeckResponseDto deck) {
+  void _addQuantitiesForDeck(DeckView deck) {
     int formatId = deck.formatId!;
 
     if (!_formatCardQuantitiesById.containsKey(formatId)) {
@@ -76,7 +76,7 @@ class CardQuantityCalculator {
     });
   }
 
-  void _removeQuantitiesForDeck(DeckResponseDto deck) {
+  void _removeQuantitiesForDeck(DeckView deck) {
     int formatId = deck.formatId!;
     Map<int, int> cardQuantities = _formatCardQuantitiesById[formatId]!;
     Map<String, int> cardQuantitiesByCardNo = _formatCardQuantitiesByCardNo[formatId]!;

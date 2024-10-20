@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_view.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../model/deck.dart';
+import '../model/deck-build.dart';
 import '../router.dart';
 import 'package:auto_route/auto_route.dart';
 
@@ -32,7 +32,7 @@ class _DeckListPageState extends State<DeckListPage> {
   final PanelController _panelController = PanelController();
   DeckSearchParameter deckSearchParameter =
       DeckSearchParameter(isMyDeck: false);
-  Deck? _selectedDeck;
+  DeckBuild? _selectedDeck;
 
   @override
   void initState() {
@@ -51,8 +51,8 @@ class _DeckListPageState extends State<DeckListPage> {
     );
   }
 
-  void updateSelectedDeck(DeckResponseDto deckResponseDto) {
-    _selectedDeck = Deck.responseDto(deckResponseDto);
+  void updateSelectedDeck(DeckView deckView) {
+    _selectedDeck = DeckBuild.deckView(deckView);
     setState(() {});
   }
 

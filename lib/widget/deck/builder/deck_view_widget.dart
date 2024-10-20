@@ -9,14 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../model/card.dart';
-import '../../../model/deck.dart';
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-build.dart';
+import '../../../model/deck-view.dart';
 
 class DeckBuilderView extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
-  final Function(DeckResponseDto) import;
+  final Function(DeckView) import;
   final Function(int)? searchNote;
   final CardOverlayService cardOverlayService;
 
@@ -63,12 +63,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   }
 
   addCard(DigimonCard card) {
-    widget.deck.addCard(card, context);
+    widget.deck.addSingleCard(card);
     setState(() {});
   }
 
   removeCard(DigimonCard card) {
-    widget.deck.removeCard(card);
+    widget.deck.removeSingleCard(card);
     setState(() {});
   }
 

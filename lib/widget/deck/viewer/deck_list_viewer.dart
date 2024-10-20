@@ -7,13 +7,13 @@ import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 
 class DeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
   final FormatDto selectedFormat;
-  final Function(DeckResponseDto) deckUpdate;
+  final Function(DeckView) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
   final DeckSearchParameter deckSearchParameter;
   final VoidCallback updateSearchParameter;
@@ -26,7 +26,7 @@ class DeckListViewer extends StatefulWidget {
 }
 
 class _DeckListViewerState extends State<DeckListViewer> {
-  List<DeckResponseDto> decks = [];
+  List<DeckView> decks = [];
   int currentPage = 1;
   int maxPage = 0;
   int _selectedIndex = -1;

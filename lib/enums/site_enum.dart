@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../model/deck.dart';
+import '../model/deck-build.dart';
 
 enum SiteName {
   dev('Dev/DCGO'),
@@ -23,7 +23,7 @@ extension SiteNameMapExtension on SiteName {
         return {};
     }
   }
-  String ExportToSiteDeckCode(Deck deck) {
+  String ExportToSiteDeckCode(DeckBuild deck) {
     switch (this) {
       case SiteName.dev:
         return _convertDeckToDeckCodeByDev(deck);
@@ -78,7 +78,7 @@ extension SiteNameMapExtension on SiteName {
     return result;
   }
 
-  String _convertDeckToDeckCodeByTTS(Deck deck) {
+  String _convertDeckToDeckCodeByTTS(DeckBuild deck) {
     List<String> returnStrings = [];
     returnStrings.add("Exported from Digimon-Meta");
     for (var entry in deck.deckMap.entries) {
@@ -96,7 +96,7 @@ extension SiteNameMapExtension on SiteName {
     return jsonEncode(returnStrings);
   }
 
-  String _convertDeckToDeckCodeByDev(Deck deck) {
+  String _convertDeckToDeckCodeByDev(DeckBuild deck) {
     StringBuffer stringBuffer = StringBuffer();
 
     for (var entry in deck.deckMap.entries) {

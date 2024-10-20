@@ -3,10 +3,10 @@ import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/tab_tooltip.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/deck.dart';
+import '../../../model/deck-build.dart';
 
 class DeckBuilderMenuBar extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
   final TextEditingController textEditingController;
 
   const DeckBuilderMenuBar({

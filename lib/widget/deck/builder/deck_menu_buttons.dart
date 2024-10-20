@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../enums/site_enum.dart';
-import '../../../model/deck.dart';
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-build.dart';
+import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 import '../../../model/limit_dto.dart';
 import '../../../provider/limit_provider.dart';
@@ -18,12 +18,12 @@ import '../../../service/deck_service.dart';
 import '../../random_hand_widget.dart';
 
 class DeckMenuButtons extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
   final Function() clear;
   final Function() init;
   final Function() newCopy;
   final Function() reload;
-  final Function(DeckResponseDto) import;
+  final Function(DeckView) import;
 
   const DeckMenuButtons(
       {super.key,
@@ -51,7 +51,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     );
   }
 
-  Widget _colorSelectionWidget(Deck deck) {
+  Widget _colorSelectionWidget(DeckBuild deck) {
     CardOverlayService().removeAllOverlays();
     List<String> cardColorList = deck.getOrderedCardColorList();
     return StatefulBuilder(
@@ -267,7 +267,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       _showShortDialog(context, "포맷을 골라야 합니다.");
                       return;
                     }
-                    Deck? deck = await DeckService().save(widget.deck);
+                    DeckBuild? deck = await DeckService().save(widget.deck);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
                       widget.deck.isSave = true;

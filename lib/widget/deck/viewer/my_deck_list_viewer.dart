@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:digimon_meta_site_flutter/model/deck.dart';
+import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
@@ -10,13 +10,13 @@ import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
 
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 
 class MyDeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
   final FormatDto selectedFormat;
-  final Function(DeckResponseDto) deckUpdate;
+  final Function(DeckView) deckUpdate;
   final Function(FormatDto) updateSelectFormat;
   final DeckSearchParameter deckSearchParameter;
   final VoidCallback updateSearchParameter;
@@ -29,7 +29,7 @@ class MyDeckListViewer extends StatefulWidget {
 }
 
 class _MyDeckListViewerState extends State<MyDeckListViewer> {
-  List<DeckResponseDto> decks = [];
+  List<DeckView> decks = [];
   int currentPage = 1;
   int maxPage = 0;
   int _selectedIndex = -1;
@@ -93,7 +93,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   }
 
   void showModifyConfirmationDialog(
-      BuildContext context, DeckResponseDto deck) {
+      BuildContext context, DeckView deck) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -111,7 +111,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
               child: Text('수정'),
               onPressed: () {
                 Navigator.of(context).pop();
-                Deck newDeck = Deck.responseDto(deck);
+                DeckBuild newDeck = DeckBuild.deckView(deck);
                 newDeck.isSave=true;
                 context.navigateTo(DeckBuilderRoute(deck: newDeck));
               },

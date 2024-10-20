@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:digimon_meta_site_flutter/api/deck_api.dart';
-import 'package:digimon_meta_site_flutter/model/deck_response_dto.dart';
+import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/format.dart';
 import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
@@ -135,8 +135,8 @@ class _CollectPageState extends State<CollectPage> {
     );
   }
 
-  void _showCalcDialog(BuildContext context, List<DeckResponseDto> decks) {
-    Map<int, List<DeckResponseDto>> deckMap = {};
+  void _showCalcDialog(BuildContext context, List<DeckView> decks) {
+    Map<int, List<DeckView>> deckMap = {};
 
     for (var deck in decks) {
       if (deckMap[deck.formatId] == null) {
@@ -198,7 +198,7 @@ class _CollectPageState extends State<CollectPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      List<DeckResponseDto>? decks =
+                      List<DeckView>? decks =
                           await DeckApi().findAllMyDecks();
                       if (decks != null && decks.isNotEmpty) {
                         _showCalcDialog(context, decks);

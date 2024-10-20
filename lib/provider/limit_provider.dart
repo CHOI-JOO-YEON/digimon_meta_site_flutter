@@ -4,10 +4,19 @@ import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import '../model/limit_dto.dart';
 
 class LimitProvider with ChangeNotifier {
+  static final LimitProvider _instance = LimitProvider._internal();
+
+  factory LimitProvider() {
+    return _instance;
+  }
+
+  LimitProvider._internal();
+
   Map<DateTime, LimitDto> _limits = {};
   LimitDto? _selectedLimit;
 
   Map<DateTime, LimitDto> get limits => _limits;
+
   LimitDto? get selectedLimit => _selectedLimit;
 
   Future<void> initialize() async {
@@ -42,7 +51,8 @@ class LimitProvider with ChangeNotifier {
     LimitDto? latestLimit;
     for (var limitDate in _limits.keys) {
       if (limitDate.isBefore(currentDate) || limitDate == currentDate) {
-        if (latestLimit == null || limitDate.isAfter(latestLimit.restrictionBeginDate)) {
+        if (latestLimit == null ||
+            limitDate.isAfter(latestLimit.restrictionBeginDate)) {
           latestLimit = _limits[limitDate];
         }
       }

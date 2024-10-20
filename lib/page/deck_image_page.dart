@@ -10,12 +10,12 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'dart:ui' as ui;
 import '../model/card.dart';
-import '../model/deck.dart';
+import '../model/deck-build.dart';
 import '../widget/deck/deck_stat_view.dart';
 
 @RoutePage()
 class DeckImagePage extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
 
   const DeckImagePage({super.key, required this.deck});
 

@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../model/card.dart';
-import '../../model/deck.dart';
+import '../../model/deck-build.dart';
 
 class DeckStat extends StatelessWidget {
-  final Deck deck;
+  final DeckBuild deck;
   final Color? textColor;
   final Color? barColor;
   final Color? backGroundColor;

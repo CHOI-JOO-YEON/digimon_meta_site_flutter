@@ -7,7 +7,7 @@ import 'package:digimon_meta_site_flutter/page/kakao_login_page.dart';
 import 'package:digimon_meta_site_flutter/page/main_page.dart';
 import 'package:flutter/material.dart';
 
-import 'model/deck.dart';
+import 'model/deck-build.dart';
 import 'model/search_parameter.dart';
 
 part 'router.gr.dart';

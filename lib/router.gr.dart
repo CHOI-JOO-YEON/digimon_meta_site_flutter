@@ -124,7 +124,7 @@ class CollectRouteArgs {
 class DeckBuilderRoute extends PageRouteInfo<DeckBuilderRouteArgs> {
   DeckBuilderRoute({
     Key? key,
-    Deck? deck,
+    DeckBuild? deck,
     String? searchParameterString,
     List<PageRouteInfo>? children,
   }) : super(
@@ -153,7 +153,7 @@ class DeckBuilderRouteArgs {
 
   final Key? key;
 
-  final Deck? deck;
+  final DeckBuild? deck;
 
   final String? searchParameterString;
 
@@ -168,7 +168,7 @@ class DeckBuilderRouteArgs {
 class DeckImageRoute extends PageRouteInfo<DeckImageRouteArgs> {
   DeckImageRoute({
     Key? key,
-    required Deck deck,
+    required DeckBuild deck,
     List<PageRouteInfo>? children,
   }) : super(
           DeckImageRoute.name,
@@ -193,7 +193,7 @@ class DeckImageRouteArgs {
 
   final Key? key;
 
-  final Deck deck;
+  final DeckBuild deck;
 
   @override
   String toString() {

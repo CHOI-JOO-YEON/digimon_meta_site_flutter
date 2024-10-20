@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../model/deck.dart';
+import '../../model/deck-build.dart';
 
 class DeckCount extends StatelessWidget {
-  final Deck deck;
+  final DeckBuild deck;
   const DeckCount({super.key, required this.deck});
 
   @override

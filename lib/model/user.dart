@@ -12,7 +12,6 @@ class User {
     );
   }
 
-  // User 객체에서 Map으로 변환
   Map<String, String?> toMap() {
     return {
       'name': name,

@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../../../model/card_quantity_calculator.dart';
 import '../../../model/card.dart';
-import '../../../model/deck_response_dto.dart';
+import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 import '../../../provider/collect_provider.dart';
 import '../../deck/color_palette.dart';
 
 class DeckCalcDialog extends StatefulWidget {
   final List<FormatDto> formats;
-  final Map<int, List<DeckResponseDto>> deckMap;
+  final Map<int, List<DeckView>> deckMap;
 
   const DeckCalcDialog(
       {super.key, required this.formats, required this.deckMap});
@@ -72,7 +72,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
 
     });
   }
-  void _onDeckChecked(DeckResponseDto deck, bool isChecked) {
+  void _onDeckChecked(DeckView deck, bool isChecked) {
     int formatId = deck.formatId!;
     int deckId = deck.deckId!;
 

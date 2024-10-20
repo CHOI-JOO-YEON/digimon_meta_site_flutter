@@ -8,10 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../model/deck.dart';
+import '../../../model/deck-build.dart';
 
 class DeckViewerView extends StatefulWidget {
-  final Deck deck;
+  final DeckBuild deck;
   final Function(int)? searchNote;
 
   const DeckViewerView({
