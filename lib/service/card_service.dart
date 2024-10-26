@@ -120,33 +120,41 @@ class CardService {
                                           child: Stack(
                                             children: [
                                               SizedBox(
-                                                  child: Image.network(
-                                                      card.imgUrl ?? '',
-                                                      fit: BoxFit.fitWidth),
-                                              width: constraints.maxWidth,
-                                                ),
+                                                child: Image.network(
+                                                    card.imgUrl ?? '',
+                                                    fit: BoxFit.fitWidth),
+                                                width: constraints.maxWidth,
+                                              ),
                                               Positioned(
                                                 right: 0,
                                                 bottom: 0,
-                                                child: IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  tooltip: '이미지 다운로드',
-                                                  onPressed: () async {
-                                                    if (card.imgUrl != null) {
-                                                      await WebImageDownloader
-                                                          .downloadImageFromWeb(
-                                                        card.imgUrl!,
-                                                        name:
-                                                            '${card.cardNo}_${card.cardName}.png',
-                                                      );
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.download,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
                                                     color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: fontSize *
-                                                        1.5, // 아이콘 크기도 폰트 크기에 비례하게 조정
+                                                          .canvasColor,
+                                                    // 원하는 배경색
+                                                    shape: BoxShape
+                                                        .circle, // 원형 모양 (선택 사항)
+                                                  ),
+                                                  child: IconButton(
+                                                    padding: EdgeInsets.zero,
+                                                    tooltip: '이미지 다운로드',
+                                                    onPressed: () async {
+                                                      if (card.imgUrl != null) {
+                                                        await WebImageDownloader
+                                                            .downloadImageFromWeb(
+                                                          card.imgUrl!,
+                                                          name:
+                                                              '${card.cardNo}_${card.cardName}.png',
+                                                        );
+                                                      }
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.download,
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
+                                                      size: fontSize * 1.5,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -409,19 +417,20 @@ class CardService {
       ),
     );
   }
+
   Widget buildEffectText(String text, double fontSize) {
     final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
     final List<InlineSpan> spans = [];
     final RegExp regexp = RegExp(
         r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
 
-
     final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
     int lastIndex = 0;
     for (final match in matches) {
       if (match.start > lastIndex) {
-        spans.add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+        spans
+            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
       }
 
       final String matchedText = match.group(0)!;
@@ -434,9 +443,9 @@ class CardService {
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
         backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        if(matchedText.contains('조그레스')||matchedText.contains('진화')){
+        if (matchedText.contains('조그레스') || matchedText.contains('진화')) {
           backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
-        }else{
+        } else {
           backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
         }
       } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
@@ -444,12 +453,13 @@ class CardService {
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
         innerText = '($innerText)';
         backgroundColor = Colors.black54;
-      }  else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
+      } else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
         backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
-      }else {
+      } else {
         backgroundColor = Colors.black;
       }
-      spans.add(TextSpan(text: matchedText, style: TextStyle(color: backgroundColor)));
+      spans.add(TextSpan(
+          text: matchedText, style: TextStyle(color: backgroundColor)));
       lastIndex = match.end;
     }
 
@@ -472,7 +482,6 @@ class CardService {
       semanticsLabel: trimmedText.replaceAll(RegExp(r'[【】《》\[\]〈〉()〔〕]'), ''),
     );
   }
-
 
   // Widget buildEffectText(String text, double fontSize, bool isEn) {
   //   // 줄바꿈 후 시작하는 공백 제거
