@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/service/deck_image_color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -11,6 +12,7 @@ import 'package:image_downloader_web/image_downloader_web.dart';
 import 'dart:ui' as ui;
 import '../model/card.dart';
 import '../model/deck-build.dart';
+import '../service/color_service.dart';
 import '../widget/deck/deck_stat_view.dart';
 
 @RoutePage()
@@ -24,15 +26,18 @@ class DeckImagePage extends StatefulWidget {
 }
 
 class _DeckImagePageState extends State<DeckImagePage> {
-  Color backGroundColor = Color.fromRGBO(233, 233, 233, 1);
-  Color textColor = Colors.black;
-  Color cardColor = Colors.white;
-  Color barColor = const Color(0xff1a237e);
+  // Color backGroundColor = Color.fromRGBO(233, 233, 233, 1);
+  // Color textColor = Colors.black;
+  // Color cardColor = Colors.white;
+  // Color barColor = const Color(0xff1a237e);
+  DeckImageColorService deckImageColorService = DeckImageColorService();
   bool isHorizontal = false;
+  bool showInfo = true;
   final GlobalKey gridKey = GlobalKey();
   DigimonCard? _selectedCard;
   double size = 1000;
   double horizontalSize = 1650;
+  String selectColorSetKey = "RED";
 
   @override
   void initState() {
@@ -42,10 +47,149 @@ class _DeckImagePageState extends State<DeckImagePage> {
     } else {
       _selectedCard = widget.deck.deckCards.first;
     }
-
   }
 
-
+  void _showColorSetsBottomSheet() {
+    showModalBottomSheet(
+      barrierColor: Colors.transparent,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        List<String> colorKeys =
+            deckImageColorService.selectableColorMap.keys.toList();
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '컬러 테마 선택',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Wrap(
+                      spacing: 10.0, // 가로 간격
+                      runSpacing: 10.0, // 세로 간격
+                      children: List.generate(
+                        colorKeys.length,
+                        (index) {
+                          String color = colorKeys[index];
+                          Color buttonColor =
+                              ColorService.getColorFromString(color);
+                          return GestureDetector(
+                            onTap: () {
+                              setModalState(() {
+                                selectColorSetKey = color;
+                              });
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: selectColorSetKey == color
+                                    ? buttonColor
+                                    : buttonColor.withOpacity(0.3),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Divider(thickness: 2),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: deckImageColorService
+                            .selectableColorMap[selectColorSetKey]!.length,
+                        itemBuilder: (context, index) {
+                          var deckImageColor = deckImageColorService
+                              .selectableColorMap[selectColorSetKey]![index];
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                deckImageColorService
+                                    .updateColor(deckImageColor);
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '컬러 세트 ${index+1}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.backGroundColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      SizedBox(width: 8), // 간격 추가
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.textColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.cardColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.barColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: 30,
+                                        height: 30,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   void _showColorPicker() {
     List<Color> exampleColors = [
@@ -70,31 +214,40 @@ class _DeckImagePageState extends State<DeckImagePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildColorSelector('배경 색상', backGroundColor, exampleColors,
-                    (Color color) {
+                _buildColorSelector(
+                    '배경 색상',
+                    deckImageColorService
+                        .selectedDeckImageColor.backGroundColor,
+                    exampleColors, (Color color) {
                   setState(() {
-                    backGroundColor = color;
+                    deckImageColorService.updateBackGroundColor(color);
                   });
                 }),
                 Divider(),
-                _buildColorSelector('텍스트 색상', textColor, exampleColors,
-                    (Color color) {
+                _buildColorSelector(
+                    '텍스트 색상',
+                    deckImageColorService.selectedDeckImageColor.textColor,
+                    exampleColors, (Color color) {
                   setState(() {
-                    textColor = color;
+                    deckImageColorService.updateTextColor(color);
                   });
                 }),
                 Divider(),
-                _buildColorSelector('카드 색상', cardColor, exampleColors,
-                    (Color color) {
+                _buildColorSelector(
+                    '카드 색상',
+                    deckImageColorService.selectedDeckImageColor.cardColor,
+                    exampleColors, (Color color) {
                   setState(() {
-                    cardColor = color;
+                    deckImageColorService.updateCardColor(color);
                   });
                 }),
                 Divider(),
-                _buildColorSelector('바 색상', barColor, exampleColors,
-                    (Color color) {
+                _buildColorSelector(
+                    '바 색상',
+                    deckImageColorService.selectedDeckImageColor.barColor,
+                    exampleColors, (Color color) {
                   setState(() {
-                    barColor = color;
+                    deckImageColorService.updateCardColor(color);
                   });
                 }),
               ],
@@ -296,8 +449,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
         final boundarySize = boundary.size;
 
-        double targetWidth = isHorizontal?horizontalSize:size;
-
+        double targetWidth = isHorizontal ? horizontalSize : size;
 
         var pixelRatio = targetWidth / boundarySize.width;
 
@@ -329,15 +481,29 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   style: const TextStyle(fontFamily: 'JalnanGothic')),
               actions: [
                 IconButton(
+                    // onPressed: () => _showColorSets(),
+                    onPressed: () => _showColorSetsBottomSheet(),
+                    icon: Icon(Icons.style_outlined)),
+                IconButton(
                     onPressed: () => _showColorPicker(),
                     icon: Icon(Icons.color_lens_outlined)),
                 IconButton(
                   icon: const Icon(Icons.download),
                   onPressed: () => captureAndDownloadImage(context),
                 ),
-                Text('대표 카드 보이기'),
+                Text('덱 정보 표시'),
                 Switch(
-                  inactiveThumbColor: Colors.red, // 비활성화 시 thumb 색상
+                  inactiveThumbColor: Colors.red,
+                  value: showInfo,
+                  onChanged: (value) {
+                    setState(() {
+                      showInfo = value;
+                    });
+                  },
+                ),
+                Text('대표 카드 표시'),
+                Switch(
+                  inactiveThumbColor: Colors.red,
                   value: isHorizontal,
                   onChanged: (value) {
                     setState(() {
@@ -365,12 +531,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   width: screenWidth,
                   padding: EdgeInsets.all(8 * scaleFactor),
                   decoration: BoxDecoration(
-                    color: backGroundColor,
+                    color: deckImageColorService
+                        .selectedDeckImageColor.backGroundColor,
                     borderRadius: BorderRadius.circular(10 * scaleFactor),
                   ),
                   child: Column(
                     children: [
-                      _deckImageHeaderWidget(scaleFactor),
+                      if (showInfo) _deckImageHeaderWidget(scaleFactor),
                       Row(
                         children: [
                           if (isHorizontal)
@@ -380,7 +547,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                   fit: BoxFit.contain,
                                   _selectedCard?.imgUrl ?? ''),
                             ),
-
                           if (isHorizontal)
                             SizedBox(
                               width: 10 * scaleFactor,
@@ -426,7 +592,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
               style: TextStyle(
                   fontSize: 25 * scaleFactor,
                   fontFamily: 'JalnanGothic',
-                  color: textColor),
+                  color:
+                      deckImageColorService.selectedDeckImageColor.textColor),
             ),
           ),
         ),
@@ -436,9 +603,11 @@ class _DeckImagePageState extends State<DeckImagePage> {
             height: 150 * scaleFactor,
             child: DeckStat(
                 deck: widget.deck,
-                textColor: textColor,
-                barColor: barColor,
-                backGroundColor: cardColor),
+                textColor:
+                    deckImageColorService.selectedDeckImageColor.textColor,
+                barColor: deckImageColorService.selectedDeckImageColor.barColor,
+                backGroundColor:
+                    deckImageColorService.selectedDeckImageColor.cardColor),
           ),
         ),
       ],
@@ -451,7 +620,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
       children: [
         Text(
           'Image created using Digimon Meta (digimon-meta.site)',
-          style: TextStyle(fontSize: 10 * scaleFactor, color: textColor),
+          style: TextStyle(
+              fontSize: 10 * scaleFactor,
+              color: deckImageColorService.selectedDeckImageColor.textColor),
         )
       ],
     );
@@ -467,10 +638,20 @@ class _DeckImagePageState extends State<DeckImagePage> {
       children: [
         SizedBox(height: 5 * scaleFactor),
         _buildGridView(
-            context, displayTamas, 10, cardColor, '디지타마 덱', scaleFactor),
+            context,
+            displayTamas,
+            10,
+            deckImageColorService.selectedDeckImageColor.cardColor,
+            '디지타마 덱',
+            scaleFactor),
         SizedBox(height: 5 * scaleFactor),
         _buildGridView(
-            context, displayDecks, 10, cardColor, '메인 덱', scaleFactor),
+            context,
+            displayDecks,
+            10,
+            deckImageColorService.selectedDeckImageColor.cardColor,
+            '메인 덱',
+            scaleFactor),
         SizedBox(height: 5 * scaleFactor),
       ],
     );
@@ -498,7 +679,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
               style: TextStyle(
                   fontFamily: 'JalnanGothic',
                   fontSize: 16 * scaleFactor,
-                  color: textColor),
+                  color:
+                      deckImageColorService.selectedDeckImageColor.textColor),
             ),
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
