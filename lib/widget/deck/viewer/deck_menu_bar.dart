@@ -24,14 +24,14 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width*0.01,25);
-    if(isPortrait) {
-      fontSize*=2;
-    }
+
+
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final fontSize = constraints.maxHeight * 0.15; // 텍스트 크기를 높이의 10%로 설정
+      final isPortrait =
+          MediaQuery.of(context).orientation == Orientation.portrait;
+      double fontSize =
+          isPortrait ? constraints.maxWidth * 0.1 : constraints.maxWidth * 0.05;
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,9 +54,6 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                           // ,overflow: TextOverflow.ellipsis,
                         ),
                       ),
-
-
-
                     ],
                   ),
                 ),

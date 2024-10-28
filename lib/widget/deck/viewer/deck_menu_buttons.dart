@@ -1,4 +1,3 @@
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +12,7 @@ import '../../../service/deck_service.dart';
 
 class DeckMenuButtons extends StatefulWidget {
   final DeckBuild deck;
+
   const DeckMenuButtons({super.key, required this.deck});
 
   @override
@@ -20,8 +20,6 @@ class DeckMenuButtons extends StatefulWidget {
 }
 
 class _DeckMenuButtonsState extends State<DeckMenuButtons> {
-
-
   void _showExportDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -77,7 +75,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
-                                text: textEditingController.text))
+                                    text: textEditingController.text))
                                 .then((_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -98,8 +96,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
-  void _showDeckCopyDialog(
-      BuildContext context) {
+
+  void _showDeckCopyDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -116,7 +114,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             TextButton(
               child: Text('예'),
               onPressed: () {
-
                 DeckBuild deck = DeckBuild.deckBuild(widget.deck);
                 Navigator.of(context).pop();
 
@@ -128,13 +125,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
+
   void showDeckReceiptDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('대회 제출용 레시피 다운로드'),
-          content:const SizedBox(
+          content: const SizedBox(
             width: 300,
             child: Text(
               '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 넘는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
@@ -164,90 +162,92 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          double iconSize = constraints.maxHeight*0.6;
-          return Column(
-            children: [
-
-              Expanded(
-                flex: 1,
-                child: Consumer<UserProvider>(builder: (BuildContext context,
-                    UserProvider userProvider, Widget? child) {
-                  bool hasManagerRole = userProvider.hasManagerRole(); // 권한 확인
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showDeckCopyDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.copy),
-                          tooltip: '복사해서 새로운 덱 만들기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => _showExportDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.upload),
-                          tooltip: '내보내기',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            context.router.push(DeckImageRoute(deck: widget.deck));
-                          },
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.image),
-                          tooltip: '이미지 저장',
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                            width: iconSize, height: iconSize),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () => showDeckReceiptDialog(context),
-                          iconSize: iconSize,
-                          icon: const Icon(Icons.receipt_long),
-                          tooltip: '대회 제출용 레시피',
-                        ),
-                      ),
-
-                      if (hasManagerRole)
-                        ConstrainedBox(
-                          constraints: BoxConstraints.tightFor(
-                              width: iconSize, height: iconSize),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () async {
-                              await DeckService().exportToTTSFile(widget.deck);
-                            },
-                            iconSize: iconSize,
-                            icon: const Icon(Icons.videogame_asset_outlined),
-                            tooltip: 'TTS 파일 내보내기',
-                          ),
-                        ),
-                    ],
-                  );
-                }),
-              ),
-            ],
+      final isPortrait =
+          MediaQuery.of(context).orientation == Orientation.portrait;
+      double iconSize =
+          isPortrait ? constraints.maxWidth * 0.1 : constraints.maxWidth * 0.04;
+      return Consumer<UserProvider>(
+        builder: (BuildContext context, UserProvider userProvider,
+            Widget? child) {
+          bool hasManagerRole = userProvider.hasManagerRole(); // 권한 확인
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              alignment: WrapAlignment.start,
+              spacing: iconSize*0.01,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: iconSize, height: iconSize),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _showDeckCopyDialog(context),
+                    iconSize: iconSize,
+                    icon: const Icon(Icons.copy),
+                    tooltip: '복사해서 새로운 덱 만들기',
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: iconSize, height: iconSize),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _showExportDialog(context),
+                    iconSize: iconSize,
+                    icon: const Icon(Icons.upload),
+                    tooltip: '내보내기',
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: iconSize, height: iconSize),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      context.router
+                          .push(DeckImageRoute(deck: widget.deck));
+                    },
+                    iconSize: iconSize,
+                    icon: const Icon(Icons.image),
+                    tooltip: '이미지 저장',
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: iconSize, height: iconSize),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => showDeckReceiptDialog(context),
+                    iconSize: iconSize,
+                    icon: const Icon(Icons.receipt_long),
+                    tooltip: '대회 제출용 레시피',
+                  ),
+                ),
+                if (hasManagerRole)
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                        width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        await DeckService()
+                            .exportToTTSFile(widget.deck);
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.videogame_asset_outlined),
+                      tooltip: 'TTS 파일 내보내기',
+                    ),
+                  ),
+              ],
+            ),
           );
-        });
+        },
+      );
+    });
   }
 }
