@@ -50,7 +50,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             child: Column(
               children: [
                 Expanded(
-                  flex:  4,
+                  // flex:  4,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

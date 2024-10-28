@@ -99,7 +99,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             child: Column(
               children: [
                 Expanded(
-                  flex: 4,
+                  // flex: 4,
                   child: Row(
                     children: [
                       //메뉴바
