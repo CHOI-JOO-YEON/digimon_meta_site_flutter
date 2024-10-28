@@ -58,6 +58,7 @@ dependencies:
   web: ^0.5.1
   image_downloader_web: ^2.0.4
   pdf: ^3.10.8
+  flex_color_picker: ^3.4.1
 
 
 
