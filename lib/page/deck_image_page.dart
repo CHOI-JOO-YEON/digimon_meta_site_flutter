@@ -209,7 +209,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
                           scaleFactor: bottomSheetScale,
                           onColorChanged: (color) {
                             setState(() {
-                              // 여기서 상위 위젯의 상태를 변경
                             });
                           },
                         ),
@@ -277,6 +276,14 @@ class _DeckImagePageState extends State<DeckImagePage> {
                     PopupMenuItem<String>(
                       child: Text('색상 변경'),
                       onTap: () => _showColorSetsBottomSheet(),
+                    ),
+                     PopupMenuItem<String>(
+                      child: Text('색상 초기화'),
+                      onTap: () {
+                        setState(() {
+                        deckImageColorService.resetColor();
+                        });
+                      }
                     ),
                     PopupMenuItem<String>(
                       child: StatefulBuilder(

@@ -19,6 +19,9 @@ class DeckImageColorService {
     return _instance;
   }
 
+  void resetColor(){
+    selectedDeckImageColor = DeckImageColor();
+  }
   DeckImageColorService._internal();
 
   void updateBackGroundColor(Color color) {
