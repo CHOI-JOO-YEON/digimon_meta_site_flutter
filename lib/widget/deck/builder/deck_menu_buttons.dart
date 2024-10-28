@@ -755,7 +755,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       final isPortrait =
           MediaQuery.of(context).orientation == Orientation.portrait;
       double iconSize =
-          isPortrait ? constraints.maxWidth * 0.1 : constraints.maxWidth * 0.04;
+          isPortrait ? constraints.maxWidth * 0.09 : constraints.maxWidth * 0.04;
       return Consumer<UserProvider>(builder: (BuildContext context,
           UserProvider userProvider, Widget? child) {
         bool hasManagerRole = userProvider.hasManagerRole();

@@ -122,7 +122,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                   ),
                 ),
                 Expanded(
-                    flex: 2,
+                    // flex: 2,
                     child: DeckMenuButtons(
                       deck: widget.deck,
                       clear: clearDeck,

@@ -72,7 +72,9 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                     ],
                   ),
                 ),
-                Expanded(flex: 2, child: DeckMenuButtons(
+                Expanded(
+                    // flex: 2,
+                    child: DeckMenuButtons(
                   deck: widget.deck,
                 ))
               ],
