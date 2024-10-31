@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -23,16 +24,19 @@ class DeckMenuButtons extends StatefulWidget {
   final Function() init;
   final Function() newCopy;
   final Function() reload;
+  final Function(List<String>) sortDeck;
   final Function(DeckView) import;
 
-  const DeckMenuButtons(
-      {super.key,
-      required this.deck,
-      required this.clear,
-      required this.init,
-      required this.import,
-      required this.newCopy,
-      required this.reload});
+  const DeckMenuButtons({
+    super.key,
+    required this.deck,
+    required this.clear,
+    required this.init,
+    required this.import,
+    required this.newCopy,
+    required this.reload,
+    required this.sortDeck,
+  });
 
   @override
   State<DeckMenuButtons> createState() => _DeckMenuButtonsState();
@@ -586,6 +590,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
           builder: (context, limitProvider, child) {
             LimitDto? selectedLimit = limitProvider.selectedLimit;
             bool isStrict = widget.deck.isStrict;
+            List<String> sortPriority = List.from(widget.deck.sortPriority);
 
             return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
@@ -605,13 +610,13 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           if (selectedLimit != null) {
                             limitProvider.updateSelectLimit(
                                 selectedLimit!.restrictionBeginDate);
-                            if (!widget.deck.isStrict && isStrict) {
-                              widget.clear();
-                            }
-                            widget.deck.updateIsStrict(isStrict);
-
-                            Navigator.of(context).pop();
                           }
+                          if (!widget.deck.isStrict && isStrict) {
+                            widget.clear();
+                          }
+                          widget.deck.updateIsStrict(isStrict);
+                          widget.sortDeck(sortPriority);
+                          Navigator.of(context).pop();
                         },
                         child: const Text('확인'),
                       ),
@@ -700,6 +705,36 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    Divider(),
+                    const Text('정렬 우선순위 변경', style: TextStyle(fontSize: 20)),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 400,
+                      width: 200,
+                      child: ReorderableListView(
+                        shrinkWrap: true,
+                        onReorder: (int oldIndex, int newIndex) {
+                          setState(() {
+                            if (newIndex > oldIndex) {
+                              newIndex -= 1;
+                            }
+                            final String item = sortPriority.removeAt(oldIndex);
+                            sortPriority.insert(newIndex, item);
+                          });
+                        },
+                        children: [
+                          for (int index = 0;
+                              index < sortPriority.length;
+                              index++)
+                            ListTile(
+                              key: ValueKey(sortPriority[index]),
+                              title: Text(widget.deck.getSortPriorityKor(sortPriority[index])),
+                              // leading: Text("${index}")
+
+                            ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               );
@@ -754,20 +789,21 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
         builder: (BuildContext context, BoxConstraints constraints) {
       final isPortrait =
           MediaQuery.of(context).orientation == Orientation.portrait;
-      double iconSize =
-          isPortrait ? constraints.maxWidth * 0.09 : constraints.maxWidth * 0.04;
-      return Consumer<UserProvider>(builder: (BuildContext context,
-          UserProvider userProvider, Widget? child) {
+      double iconSize = isPortrait
+          ? constraints.maxWidth * 0.09
+          : constraints.maxWidth * 0.04;
+      return Consumer<UserProvider>(builder:
+          (BuildContext context, UserProvider userProvider, Widget? child) {
         bool hasManagerRole = userProvider.hasManagerRole();
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: iconSize*0.01,
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Wrap(
+            alignment: WrapAlignment.start,
+            spacing: iconSize * 0.01,
             children: [
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
@@ -779,8 +815,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
@@ -792,8 +828,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => _showDeckCopyDialog(context),
@@ -803,8 +839,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () async {
@@ -822,8 +858,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => _showImportDialog(context),
@@ -833,8 +869,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => _showExportDialog(context),
@@ -844,8 +880,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
@@ -870,8 +906,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
               //   ),
               // ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => showDeckReceiptDialog(context),
@@ -881,8 +917,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
               ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: iconSize, height: iconSize),
+                constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => _showDeckSettingDialog(context),

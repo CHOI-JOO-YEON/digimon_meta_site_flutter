@@ -72,6 +72,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     setState(() {});
   }
 
+  sortDeck(List<String> sortPriority) {
+    widget.deck.sortPriority = sortPriority;
+    widget.deck.deckSort();
+    setState(() {});
+  }
+
   @override
   void dispose() {
     if (mounted) {
@@ -93,7 +99,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     return Column(
       children: [
         SizedBox(
-          height: height*0.3,
+          height: height * 0.3,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -124,22 +130,23 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 Expanded(
                     // flex: 2,
                     child: DeckMenuButtons(
-                      deck: widget.deck,
-                      clear: clearDeck,
-                      init: initDeck,
-                      import: widget.import,
-                      newCopy: newCopy,
-                      reload: () {
-                        setState(() {});
-                      },
-                    )),
+                  deck: widget.deck,
+                  clear: clearDeck,
+                  init: initDeck,
+                  import: widget.import,
+                  newCopy: newCopy,
+                  sortDeck: sortDeck,
+                  reload: () {
+                    setState(() {});
+                  },
+                )),
               ],
             ),
           ),
         ),
         SizedBox(
-          height: height*0.03,
-          child: Text('메인', style: TextStyle(fontSize: height*0.02)),
+          height: height * 0.03,
+          child: Text('메인', style: TextStyle(fontSize: height * 0.02)),
         ),
         Container(
           decoration: BoxDecoration(
@@ -157,8 +164,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         SizedBox(
-          height: height*0.03,
-          child: Container(child: Text('디지타마', style: TextStyle(fontSize: height*0.02))),
+          height: height * 0.03,
+          child: Container(
+              child: Text('디지타마', style: TextStyle(fontSize: height * 0.02))),
         ),
         Container(
           decoration: BoxDecoration(

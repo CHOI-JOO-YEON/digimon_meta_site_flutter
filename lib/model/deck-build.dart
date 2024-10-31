@@ -319,34 +319,6 @@ class DeckBuild {
     'OPTION': 3
   };
 
-  int digimonCardComparator(DigimonCard a, DigimonCard b) {
-    if (a.cardType != b.cardType) {
-      return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
-    }
-
-    if (a.lv != null && b.lv != null && a.lv != b.lv) {
-      return a.lv!.compareTo(b.lv!);
-    }
-
-    if (a.color1 != null && b.color1 != null && a.color1 != b.color1) {
-      return _colorOrder[a.color1]!.compareTo(_colorOrder[b.color1]!);
-    }
-
-    if (a.playCost != null && b.playCost != null && a.playCost != b.playCost) {
-      return a.playCost!.compareTo(b.playCost!);
-    }
-
-    if (a.sortString != b.sortString) {
-      return a.sortString!.compareTo(b.sortString!);
-    }
-
-    if (a.isParallel != b.isParallel) {
-      return a.isParallel! ? 1 : -1;
-    }
-
-    return 0;
-  }
-
   void colorArrange(Set<String> set) {
     var removeSet = [];
     for (var o in colors) {
@@ -382,4 +354,108 @@ class DeckBuild {
     String jsonString = jsonEncode(map);
     html.window.localStorage['deck'] = jsonString;
   }
+
+  List<String> sortPriority = [
+    'cardType',
+    'lv',
+    'color1',
+    'color2',
+    'playCost',
+    'sortString',
+    'isParallel',
+    'dp',
+    'cardName'
+  ];
+  Map<String, String> sortPriorityTextMap ={
+    'cardType' : '카드 타입',
+    'lv' : '레벨',
+    'color1' : '색상1',
+    'color2' : '색상2',
+    'playCost' : '등장/사용 코스트',
+    'sortString' : '정렬 문자열',
+    'isParallel' : '패럴렐 우선',
+    'dp' : 'DP',
+    'cardName' : '카드 이름'
+  };
+  String getSortPriorityKor(String sortString){
+    return sortPriorityTextMap[sortString]??'';
+  }
+
+  int digimonCardComparator(DigimonCard a, DigimonCard b) {
+  for (var criterion in sortPriority) {
+    int comparison = 0;
+    switch (criterion) {
+      case 'cardType':
+        comparison = _cardTypeOrder[a.cardType]?.compareTo(_cardTypeOrder[b.cardType] ?? double.infinity) ??
+            double.infinity.compareTo(_cardTypeOrder[b.cardType] ?? double.infinity);
+        break;
+      case 'lv':
+        comparison = (a.lv ?? double.infinity).compareTo(b.lv ?? double.infinity);
+        break;
+      case 'color1':
+        comparison = _colorOrder[a.color1]?.compareTo(_colorOrder[b.color1] ?? double.infinity) ??
+            double.infinity.compareTo(_colorOrder[b.color1] ?? double.infinity);
+        break;
+      case 'color2':
+        comparison = _colorOrder[a.color2]?.compareTo(_colorOrder[b.color2] ?? double.infinity) ??
+            double.infinity.compareTo(_colorOrder[b.color2] ?? double.infinity);
+        break;
+      case 'playCost':
+        comparison = (a.playCost ?? double.infinity).compareTo(b.playCost ?? double.infinity);
+        break;
+      case 'dp':
+        comparison = (a.dp ?? double.infinity).compareTo(b.dp ?? double.infinity);
+        break;
+      case 'sortString':
+        comparison = (a.sortString ?? '').compareTo(b.sortString ?? '');
+        break;
+      case 'cardName':
+        comparison = (a.cardName ?? '').compareTo(b.cardName ?? '');
+        break;
+      case 'isParallel':
+        comparison = (a.isParallel! ? -1 : 1).compareTo(b.isParallel! ? -1 : 1);
+        break;
+      default:
+        break;
+    }
+
+    if (comparison != 0) {
+      return comparison;
+    }
+  }
+  return 0;
+}
+
+
+  void setSortPriority(List<String> newPriority) {
+    sortPriority = newPriority;
+  }
+
+// int digimonCardComparator(DigimonCard a, DigimonCard b) {
+//   if (a.cardType != b.cardType) {
+//     return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
+//   }
+//
+//   if (a.lv != null && b.lv != null && a.lv != b.lv) {
+//     return a.lv!.compareTo(b.lv!);
+//   }
+//
+//   if (a.color1 != null && b.color1 != null && a.color1 != b.color1) {
+//     return _colorOrder[a.color1]!.compareTo(_colorOrder[b.color1]!);
+//   }
+//
+//   if (a.playCost != null && b.playCost != null && a.playCost != b.playCost) {
+//     return a.playCost!.compareTo(b.playCost!);
+//   }
+//
+//   if (a.sortString != b.sortString) {
+//     return a.sortString!.compareTo(b.sortString!);
+//   }
+//
+//   if (a.isParallel != b.isParallel) {
+//     return a.isParallel! ? 1 : -1;
+//   }
+//
+//   return 0;
+// }
 }
