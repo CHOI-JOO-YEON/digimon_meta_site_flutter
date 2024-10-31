@@ -1,5 +1,7 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
+import 'package:digimon_meta_site_flutter/service/lang_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -271,7 +273,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       _showShortDialog(context, "포맷을 골라야 합니다.");
                       return;
                     }
-                    DeckBuild? deck = await DeckService().save(widget.deck);
+                    DeckBuild? deck =
+                        await DeckService().save(widget.deck, context);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
                       widget.deck.isSave = true;
@@ -490,7 +493,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                               onChanged: (SiteName? value) {
                                 setState(() {
                                   _selectedButton = value!;
-                                  // 선택 상태가 바뀔 때마다 텍스트 필드 업데이트
                                   _textEditingController.text =
                                       _selectedButton.ExportToSiteDeckCode(
                                           widget.deck);
@@ -507,7 +509,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       decoration: const InputDecoration(
                           // hintText: 'Paste your deck.',
                           ),
-                      enabled: false, // 수정 불가능하게 설정
+                      enabled: false,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -582,92 +584,52 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showDeckSettingDialog(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double width = isPortrait
+        ? MediaQuery.sizeOf(context).width * 0.9
+        : MediaQuery.sizeOf(context).width / 3;
+    double height = MediaQuery.sizeOf(context).height / 2;
     CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Consumer<LimitProvider>(
-          builder: (context, limitProvider, child) {
+        return Consumer2<LimitProvider, DeckSortProvider>(
+          builder: (context, limitProvider, deckSortProvider, child) {
             LimitDto? selectedLimit = limitProvider.selectedLimit;
             bool isStrict = widget.deck.isStrict;
-            List<String> sortPriority = List.from(widget.deck.sortPriority);
+            List<SortCriterion> sortPriority = List.from(
+              deckSortProvider.sortPriority.map(
+                (criterion) => SortCriterion(
+                  criterion.field,
+                  ascending: criterion.ascending,
+                  orderMap: criterion.orderMap != null
+                      ? Map<String, int>.from(criterion.orderMap!)
+                      : null,
+                ),
+              ),
+            );
 
             return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
-              return AlertDialog(
-                actions: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('취소'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (selectedLimit != null) {
-                            limitProvider.updateSelectLimit(
-                                selectedLimit!.restrictionBeginDate);
-                          }
-                          if (!widget.deck.isStrict && isStrict) {
-                            widget.clear();
-                          }
-                          widget.deck.updateIsStrict(isStrict);
-                          widget.sortDeck(sortPriority);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('확인'),
-                      ),
-                    ],
-                  ),
-                ],
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+              return SizedBox(
+                width: width,
+                height: height,
+                child: AlertDialog(
+                  actions: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          '금지/제한: ',
-                          style: TextStyle(fontSize: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('취소'),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: DropdownButtonFormField<LimitDto>(
-                            value: selectedLimit,
-                            onChanged: (newValue) {
-                              setState(() {
-                                selectedLimit = newValue;
-                              });
-                            },
-                            items: limitProvider.limits.values.map((limitDto) {
-                              return DropdownMenuItem<LimitDto>(
-                                value: limitDto,
-                                child: Text(
-                                  '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          '엄격한 덱 작성 모드',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        Switch(
-                          inactiveThumbColor: Colors.red,
-                          value: isStrict,
-                          onChanged: (bool v) {
-                            if (v) {
+                        ElevatedButton(
+                          onPressed: () {
+                            if (!widget.deck.isStrict && isStrict) {
+                              // Show warning dialog when enabling strict mode
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -679,16 +641,28 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                       TextButton(
                                         child: Text('취소'),
                                         onPressed: () {
-                                          Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pop(); // Close warning dialog
                                         },
                                       ),
                                       TextButton(
                                         child: Text('확인'),
                                         onPressed: () {
-                                          setState(() {
-                                            isStrict = v;
-                                          });
-                                          Navigator.of(context).pop();
+                                          // Apply changes after confirmation
+                                          if (selectedLimit != null) {
+                                            limitProvider.updateSelectLimit(
+                                                selectedLimit!
+                                                    .restrictionBeginDate);
+                                          }
+                                          widget.clear();
+                                          widget.deck.updateIsStrict(isStrict);
+                                          deckSortProvider
+                                              .setSortPriority(sortPriority);
+                                          widget.reload();
+                                          Navigator.of(context)
+                                              .pop(); // Close warning dialog
+                                          Navigator.of(context)
+                                              .pop(); // Close settings dialog
                                         },
                                       ),
                                     ],
@@ -696,51 +670,224 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                 },
                               );
                             } else {
-                              setState(() {
-                                isStrict = v;
-                              });
+                              // Proceed without warning
+                              if (selectedLimit != null) {
+                                limitProvider.updateSelectLimit(
+                                    selectedLimit!.restrictionBeginDate);
+                              }
+                              widget.deck.updateIsStrict(isStrict);
+                              deckSortProvider.setSortPriority(sortPriority);
+                              widget.reload();
+                              Navigator.of(context).pop();
                             }
                           },
+                          child: const Text('확인'),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    Divider(),
-                    const Text('정렬 우선순위 변경', style: TextStyle(fontSize: 20)),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 400,
-                      width: 200,
-                      child: ReorderableListView(
-                        shrinkWrap: true,
-                        onReorder: (int oldIndex, int newIndex) {
-                          setState(() {
-                            if (newIndex > oldIndex) {
-                              newIndex -= 1;
-                            }
-                            final String item = sortPriority.removeAt(oldIndex);
-                            sortPriority.insert(newIndex, item);
-                          });
-                        },
+                  ],
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
                         children: [
-                          for (int index = 0;
-                              index < sortPriority.length;
-                              index++)
-                            ListTile(
-                              key: ValueKey(sortPriority[index]),
-                              title: Text(widget.deck.getSortPriorityKor(sortPriority[index])),
-                              // leading: Text("${index}")
-
+                          const Text(
+                            '금지/제한: ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: DropdownButtonFormField<LimitDto>(
+                              value: selectedLimit,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedLimit = newValue;
+                                });
+                              },
+                              items:
+                                  limitProvider.limits.values.map((limitDto) {
+                                return DropdownMenuItem<LimitDto>(
+                                  value: limitDto,
+                                  child: Text(
+                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                  ),
+                                );
+                              }).toList(),
                             ),
+                          ),
                         ],
                       ),
-                    )
-                  ],
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            '엄격한 덱 작성 모드',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          Switch(
+                            inactiveThumbColor: Colors.red,
+                            value: isStrict,
+                            onChanged: (bool v) {
+                              setState(() {
+                                isStrict = v;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('정렬 우선순위 변경',
+                              style: TextStyle(fontSize: 20)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  sortPriority = List.from(
+                                      deckSortProvider.sortPriority.map(
+                                    (criterion) => SortCriterion(
+                                      criterion.field,
+                                      ascending: criterion.ascending,
+                                      orderMap: criterion.orderMap != null
+                                          ? Map<String, int>.from(
+                                              criterion.orderMap!)
+                                          : null,
+                                    ),
+                                  ));
+                                });
+                                deckSortProvider.reset();
+                              },
+                              icon: Icon(Icons.refresh))
+                        ],
+                      ),
+                      SizedBox(
+                        width: width * 0.8,
+                        height: height * 0.6,
+                        child: ReorderableListView(
+                          shrinkWrap: true,
+                          onReorder: (int oldIndex, int newIndex) {
+                            setState(() {
+                              if (newIndex > oldIndex) {
+                                newIndex -= 1;
+                              }
+                              final SortCriterion item =
+                                  sortPriority.removeAt(oldIndex);
+                              sortPriority.insert(newIndex, item);
+                            });
+                          },
+                          children: [
+                            for (int index = 0;
+                                index < sortPriority.length;
+                                index++)
+                              ListTile(
+                                key: ValueKey(sortPriority[index].field),
+                                title: Text(
+                                    '${index + 1}. ${deckSortProvider.getSortPriorityKor(sortPriority[index].field)}'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (sortPriority[index].field ==
+                                            'cardType' ||
+                                        sortPriority[index].field == 'color1' ||
+                                        sortPriority[index].field == 'color2')
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        onPressed: () {
+                                          _showOrderMapDialog(
+                                              context,
+                                              sortPriority[index],
+                                              setState,
+                                              width * 0.8);
+                                        },
+                                      ),
+                                    TextButton(
+                                      child: sortPriority[index].ascending
+                                          ? Text('오름차순')
+                                          : Text('내림차순'),
+                                      onPressed: () {
+                                        setState(() {
+                                          sortPriority[index].ascending =
+                                              !sortPriority[index].ascending;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               );
             });
           },
         );
+      },
+    );
+  }
+
+  void _showOrderMapDialog(BuildContext context, SortCriterion criterion,
+      StateSetter parentSetState, double width) {
+    List<String> items = criterion.orderMap!.keys.toList();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: Text(
+                '${DeckSortProvider().getSortPriorityKor(criterion.field)} 순서 변경'),
+            content: SizedBox(
+              width: width,
+              child: ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (int oldIndex, int newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) {
+                      newIndex -= 1;
+                    }
+                    final String item = items.removeAt(oldIndex);
+                    items.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (int index = 0; index < items.length; index++)
+                    ListTile(
+                      key: ValueKey(items[index]),
+                      title: Text(
+                          '${index + 1}. ${LangService().getKorText(items[index])}'),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text('취소'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  // Update the orderMap
+                  parentSetState(() {
+                    criterion.orderMap = {
+                      for (int i = 0; i < items.length; i++) items[i]: i + 1
+                    };
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
       },
     );
   }

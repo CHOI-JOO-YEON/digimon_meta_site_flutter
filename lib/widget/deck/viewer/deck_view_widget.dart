@@ -1,14 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Make sure to import the provider package
+
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_buttons.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../../model/deck-build.dart';
+import '../../../provider/deck_sort_provider.dart';
 
 class DeckViewerView extends StatefulWidget {
   final DeckBuild deck;
@@ -16,7 +17,8 @@ class DeckViewerView extends StatefulWidget {
 
   const DeckViewerView({
     super.key,
-    required this.deck, this.searchNote,
+    required this.deck,
+    this.searchNote,
   });
 
   @override
@@ -26,6 +28,33 @@ class DeckViewerView extends StatefulWidget {
 class _DeckViewerViewState extends State<DeckViewerView> {
   int _rowNumber = 9;
   bool isInit = true;
+
+  DeckSortProvider _deckSortProvider = DeckSortProvider();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _deckSortProvider.removeListener(_onDeckSortProviderChanged);
+    _deckSortProvider = Provider.of<DeckSortProvider>(context);
+    _deckSortProvider.addListener(_onDeckSortProviderChanged);
+  }
+
+  void _onDeckSortProviderChanged() {
+    setState(() {
+    });
+  }
+
+  @override
+  void dispose() {
+    _deckSortProvider.removeListener(_onDeckSortProviderChanged);
+    super.dispose();
+  }
+
   void updateRowNumber(int n) {
     _rowNumber = n;
     setState(() {});
@@ -33,18 +62,18 @@ class _DeckViewerViewState extends State<DeckViewerView> {
 
   @override
   Widget build(BuildContext context) {
-    CardOverlayService _cardOverlayService = CardOverlayService();
+    CardOverlayService cardOverlayService = CardOverlayService();
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     double height = MediaQuery.of(context).size.height * 0.88;
-    if(isPortrait&&isInit){
-      _rowNumber=4;
+    if (isPortrait && isInit) {
+      _rowNumber = 4;
     }
-    isInit=false;
+    isInit = false;
     return Column(
       children: [
         SizedBox(
-          height: height*0.3,
+          height: height * 0.3,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -54,72 +83,85 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //메뉴바
+                      // 메뉴바
                       Expanded(
-                          flex: 2,
-                          child: DeckViewerMenuBar(
-                            deck: widget.deck,
-                          )),
-
-
-                      //행에 한번에 표시되는 카드
-                      Expanded(
-                        flex: isPortrait?1:2,
-                        child: CustomSlider(
-                            sliderValue: _rowNumber, sliderAction: updateRowNumber),
+                        flex: 2,
+                        child: DeckViewerMenuBar(
+                          deck: widget.deck,
+                        ),
                       ),
-                      Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                      // 행에 한번에 표시되는 카드
+                      Expanded(
+                        flex: isPortrait ? 1 : 2,
+                        child: CustomSlider(
+                          sliderValue: _rowNumber,
+                          sliderAction: updateRowNumber,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: DeckStat(deck: widget.deck),
+                      ),
                     ],
                   ),
                 ),
                 Expanded(
-                    // flex: 2,
-                    child: DeckMenuButtons(
-                  deck: widget.deck,
-                ))
+                  // flex: 2,
+                  child: DeckMenuButtons(
+                    deck: widget.deck,
+                  ),
+                ),
               ],
             ),
           ),
         ),
         SizedBox(
-          height: height*0.03,
-          child: Container(child: Text('메인', style: TextStyle(fontSize: height*0.02))),
+          height: height * 0.03,
+          child: Container(
+            child: Text(
+              '메인',
+              style: TextStyle(fontSize: height * 0.02),
+            ),
+          ),
         ),
-        //덱그리드뷰
+        // 덱 그리드뷰
         Container(
           decoration: BoxDecoration(
-              // color: Color.fromRGBO(255, 255, 240, 1),
-            color:  Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(5)),
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(5),
+          ),
           child: DeckScrollGridView(
             deckCount: widget.deck.deckMap,
             deck: widget.deck.deckCards,
             rowNumber: _rowNumber,
             searchNote: widget.searchNote,
             isTama: false,
-            cardOverlayService: _cardOverlayService,
-            // mouseEnterEvent: widget.mouseEnterEvent,
+            cardOverlayService: cardOverlayService,
           ),
         ),
         SizedBox(
-          height: height*0.03,
-          child: Container(child: Text('디지타마', style: TextStyle(fontSize: height*0.02))),
+          height: height * 0.03,
+          child: Container(
+            child: Text(
+              '디지타마',
+              style: TextStyle(fontSize: height * 0.02),
+            ),
+          ),
         ),
         Container(
           decoration: BoxDecoration(
-              color:  Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(5)),
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(5),
+          ),
           child: DeckScrollGridView(
             deckCount: widget.deck.tamaMap,
             deck: widget.deck.tamaCards,
             rowNumber: _rowNumber,
             searchNote: widget.searchNote,
             isTama: true,
-            cardOverlayService: _cardOverlayService,
-            // mouseEnterEvent: widget.mouseEnterEvent,
+            cardOverlayService: cardOverlayService,
           ),
         ),
-
       ],
     );
   }

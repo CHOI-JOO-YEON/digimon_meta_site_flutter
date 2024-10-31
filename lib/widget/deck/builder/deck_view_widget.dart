@@ -73,8 +73,8 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   }
 
   sortDeck(List<String> sortPriority) {
-    widget.deck.sortPriority = sortPriority;
-    widget.deck.deckSort();
+    // widget.deck.sortPriority = sortPriority;
+    // widget.deck.deckSort();
     setState(() {});
   }
 

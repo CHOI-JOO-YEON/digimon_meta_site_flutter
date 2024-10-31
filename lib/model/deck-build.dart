@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
-import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
-import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/service/limit_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -26,10 +23,9 @@ class DeckBuild {
 
   String? author;
   int? authorId;
-  LimitDto? limitDto = LimitProvider().getCurrentLimit();
 
   bool isSave = false;
-
+  DeckSortProvider? deckSortProvider;
   Map<String, int> cardNoCntMap = {};
   int? formatId;
   bool isPublic = false;
@@ -72,7 +68,9 @@ class DeckBuild {
     saveMapToLocalStorage();
   }
 
-  DeckBuild.deckView(DeckView deckView) {
+  DeckBuild.deckView(DeckView deckView, BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
     deckId = deckView.deckId;
     deckName = deckView.deckName!;
     author = deckView.authorName;
@@ -90,7 +88,7 @@ class DeckBuild {
           _addCard(card);
         }
       }
-      _postDeckChanged();
+      isSave = false;
     }
 
     for (var color in deckView.colors!) {
@@ -98,7 +96,9 @@ class DeckBuild {
     }
   }
 
-  DeckBuild.deckBuild(DeckBuild deck) {
+  DeckBuild.deckBuild(DeckBuild deck, BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
     deckName = '${deck.deckName} Copy';
     formatId = deck.formatId;
 
@@ -129,7 +129,12 @@ class DeckBuild {
     }
   }
 
-  DeckBuild();
+  DeckBuild(BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
+  }
+
+  DeckBuild.empty();
 
   Set<String> getCardColorSet() {
     Set<String> colorSet = {};
@@ -194,7 +199,7 @@ class DeckBuild {
       CardOverlayService().removeAllOverlays();
       map[card] = 1;
       cards.add(card);
-      cards.sort(digimonCardComparator);
+      cards.sort(deckSortProvider!.digimonCardComparator);
     } else {
       map[card] = map[card]! + 1;
     }
@@ -253,7 +258,7 @@ class DeckBuild {
     if (map[card] == 1) {
       map.remove(card);
       cards.remove(card);
-      cards.sort(digimonCardComparator);
+      cards.sort(deckSortProvider!.digimonCardComparator);
       cardMap.remove(card.cardId);
     } else {
       map[card] = map[card]! - 1;
@@ -332,8 +337,8 @@ class DeckBuild {
   }
 
   void deckSort() {
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
+    deckCards.sort(deckSortProvider!.digimonCardComparator);
+    tamaCards.sort(deckSortProvider!.digimonCardComparator);
   }
 
   void saveMapToLocalStorage() {
@@ -353,82 +358,6 @@ class DeckBuild {
     };
     String jsonString = jsonEncode(map);
     html.window.localStorage['deck'] = jsonString;
-  }
-
-  List<String> sortPriority = [
-    'cardType',
-    'lv',
-    'color1',
-    'color2',
-    'playCost',
-    'sortString',
-    'isParallel',
-    'dp',
-    'cardName'
-  ];
-  Map<String, String> sortPriorityTextMap ={
-    'cardType' : '카드 타입',
-    'lv' : '레벨',
-    'color1' : '색상1',
-    'color2' : '색상2',
-    'playCost' : '등장/사용 코스트',
-    'sortString' : '정렬 문자열',
-    'isParallel' : '패럴렐 우선',
-    'dp' : 'DP',
-    'cardName' : '카드 이름'
-  };
-  String getSortPriorityKor(String sortString){
-    return sortPriorityTextMap[sortString]??'';
-  }
-
-  int digimonCardComparator(DigimonCard a, DigimonCard b) {
-  for (var criterion in sortPriority) {
-    int comparison = 0;
-    switch (criterion) {
-      case 'cardType':
-        comparison = _cardTypeOrder[a.cardType]?.compareTo(_cardTypeOrder[b.cardType] ?? double.infinity) ??
-            double.infinity.compareTo(_cardTypeOrder[b.cardType] ?? double.infinity);
-        break;
-      case 'lv':
-        comparison = (a.lv ?? double.infinity).compareTo(b.lv ?? double.infinity);
-        break;
-      case 'color1':
-        comparison = _colorOrder[a.color1]?.compareTo(_colorOrder[b.color1] ?? double.infinity) ??
-            double.infinity.compareTo(_colorOrder[b.color1] ?? double.infinity);
-        break;
-      case 'color2':
-        comparison = _colorOrder[a.color2]?.compareTo(_colorOrder[b.color2] ?? double.infinity) ??
-            double.infinity.compareTo(_colorOrder[b.color2] ?? double.infinity);
-        break;
-      case 'playCost':
-        comparison = (a.playCost ?? double.infinity).compareTo(b.playCost ?? double.infinity);
-        break;
-      case 'dp':
-        comparison = (a.dp ?? double.infinity).compareTo(b.dp ?? double.infinity);
-        break;
-      case 'sortString':
-        comparison = (a.sortString ?? '').compareTo(b.sortString ?? '');
-        break;
-      case 'cardName':
-        comparison = (a.cardName ?? '').compareTo(b.cardName ?? '');
-        break;
-      case 'isParallel':
-        comparison = (a.isParallel! ? -1 : 1).compareTo(b.isParallel! ? -1 : 1);
-        break;
-      default:
-        break;
-    }
-
-    if (comparison != 0) {
-      return comparison;
-    }
-  }
-  return 0;
-}
-
-
-  void setSortPriority(List<String> newPriority) {
-    sortPriority = newPriority;
   }
 
 // int digimonCardComparator(DigimonCard a, DigimonCard b) {

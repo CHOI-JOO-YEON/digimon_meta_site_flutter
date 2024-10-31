@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:html' as html;
+import '../model/card.dart';
 import '../model/deck-build.dart';
 
 import '../model/format.dart';
@@ -19,10 +20,10 @@ import '../provider/limit_provider.dart';
 class DeckService {
   DeckApi deckApi = DeckApi();
 
-  Future<DeckBuild?> save(DeckBuild deck) async {
+  Future<DeckBuild?> save(DeckBuild deck, BuildContext context) async {
     DeckView? responseDto = await deckApi.postDeck(deck);
     if (responseDto != null) {
-      return DeckBuild.deckView(responseDto);
+      return DeckBuild.deckView(responseDto, context);
     }
     return null;
   }
@@ -72,9 +73,7 @@ class DeckService {
   }
 
   Future<PagedResponseDeckDto?> getDeck(
-      DeckSearchParameter deckSearchParameter,
-      BuildContext context) async {
-
+      DeckSearchParameter deckSearchParameter, BuildContext context) async {
     LimitProvider limitProvider = Provider.of(context, listen: false);
     if (limitProvider.selectedLimit != null) {
       deckSearchParameter.limitId = limitProvider.selectedLimit!.id;
@@ -230,22 +229,23 @@ class DeckService {
     html.Url.revokeObjectUrl(url);
   }
 
-  Future<DeckBuild?> createDeckByLocalJsonString(String jsonString) async {
+  Future<DeckBuild?> createDeckByLocalJsonString(String jsonString, BuildContext context) async {
     Map<String, dynamic> map = jsonDecode(jsonString);
     String deckName = map['deckName'];
     bool isStrict = map['isStrict'];
-    Map<String, dynamic> deckMapJson = Map<String, dynamic>.from(map['deckMap']);
+    Map<String, dynamic> deckMapJson =
+        Map<String, dynamic>.from(map['deckMap']);
 
-    DeckView? deckResponseDto =
-        await DeckApi().importDeckThisSite(deckMapJson);
+    DeckView? deckResponseDto = await DeckApi().importDeckThisSite(deckMapJson);
 
     if (deckResponseDto == null) {
       return null;
     }
-    DeckBuild deck = DeckBuild();
-    deck.deckName=deckName;
-    deck.isStrict=isStrict;
+    DeckBuild deck = DeckBuild(context);
+    deck.deckName = deckName;
+    deck.isStrict = isStrict;
     deck.import(deckResponseDto);
     return deck;
   }
+
 }

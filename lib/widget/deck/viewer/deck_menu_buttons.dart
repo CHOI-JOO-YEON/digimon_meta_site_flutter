@@ -114,7 +114,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             TextButton(
               child: Text('예'),
               onPressed: () {
-                DeckBuild deck = DeckBuild.deckBuild(widget.deck);
+                DeckBuild deck = DeckBuild.deckBuild(widget.deck, context);
                 Navigator.of(context).pop();
 
                 context.navigateTo(DeckBuilderRoute(deck: deck));
