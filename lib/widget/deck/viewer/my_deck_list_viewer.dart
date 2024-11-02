@@ -111,7 +111,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
               child: Text('수정'),
               onPressed: () {
                 Navigator.of(context).pop();
-                DeckBuild newDeck = DeckBuild.deckView(deck);
+                DeckBuild newDeck = DeckBuild.deckView(deck, context);
                 newDeck.isSave=true;
                 context.navigateTo(DeckBuilderRoute(deck: newDeck));
               },

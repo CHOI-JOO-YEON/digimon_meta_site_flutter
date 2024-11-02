@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
-import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
-import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/service/limit_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -26,10 +23,9 @@ class DeckBuild {
 
   String? author;
   int? authorId;
-  LimitDto? limitDto = LimitProvider().getCurrentLimit();
 
   bool isSave = false;
-
+  DeckSortProvider? deckSortProvider;
   Map<String, int> cardNoCntMap = {};
   int? formatId;
   bool isPublic = false;
@@ -72,7 +68,9 @@ class DeckBuild {
     saveMapToLocalStorage();
   }
 
-  DeckBuild.deckView(DeckView deckView) {
+  DeckBuild.deckView(DeckView deckView, BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
     deckId = deckView.deckId;
     deckName = deckView.deckName!;
     author = deckView.authorName;
@@ -90,7 +88,7 @@ class DeckBuild {
           _addCard(card);
         }
       }
-      _postDeckChanged();
+      isSave = false;
     }
 
     for (var color in deckView.colors!) {
@@ -98,7 +96,9 @@ class DeckBuild {
     }
   }
 
-  DeckBuild.deckBuild(DeckBuild deck) {
+  DeckBuild.deckBuild(DeckBuild deck, BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
     deckName = '${deck.deckName} Copy';
     formatId = deck.formatId;
 
@@ -129,7 +129,12 @@ class DeckBuild {
     }
   }
 
-  DeckBuild();
+  DeckBuild(BuildContext context) {
+    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+    deckSortProvider!.addListener(deckSort);
+  }
+
+  DeckBuild.empty();
 
   Set<String> getCardColorSet() {
     Set<String> colorSet = {};
@@ -194,7 +199,7 @@ class DeckBuild {
       CardOverlayService().removeAllOverlays();
       map[card] = 1;
       cards.add(card);
-      cards.sort(digimonCardComparator);
+      cards.sort(deckSortProvider!.digimonCardComparator);
     } else {
       map[card] = map[card]! + 1;
     }
@@ -253,7 +258,7 @@ class DeckBuild {
     if (map[card] == 1) {
       map.remove(card);
       cards.remove(card);
-      cards.sort(digimonCardComparator);
+      cards.sort(deckSortProvider!.digimonCardComparator);
       cardMap.remove(card.cardId);
     } else {
       map[card] = map[card]! - 1;
@@ -319,34 +324,6 @@ class DeckBuild {
     'OPTION': 3
   };
 
-  int digimonCardComparator(DigimonCard a, DigimonCard b) {
-    if (a.cardType != b.cardType) {
-      return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
-    }
-
-    if (a.lv != null && b.lv != null && a.lv != b.lv) {
-      return a.lv!.compareTo(b.lv!);
-    }
-
-    if (a.color1 != null && b.color1 != null && a.color1 != b.color1) {
-      return _colorOrder[a.color1]!.compareTo(_colorOrder[b.color1]!);
-    }
-
-    if (a.playCost != null && b.playCost != null && a.playCost != b.playCost) {
-      return a.playCost!.compareTo(b.playCost!);
-    }
-
-    if (a.sortString != b.sortString) {
-      return a.sortString!.compareTo(b.sortString!);
-    }
-
-    if (a.isParallel != b.isParallel) {
-      return a.isParallel! ? 1 : -1;
-    }
-
-    return 0;
-  }
-
   void colorArrange(Set<String> set) {
     var removeSet = [];
     for (var o in colors) {
@@ -360,8 +337,8 @@ class DeckBuild {
   }
 
   void deckSort() {
-    tamaCards.sort(digimonCardComparator);
-    deckCards.sort(digimonCardComparator);
+    deckCards.sort(deckSortProvider!.digimonCardComparator);
+    tamaCards.sort(deckSortProvider!.digimonCardComparator);
   }
 
   void saveMapToLocalStorage() {
@@ -382,4 +359,32 @@ class DeckBuild {
     String jsonString = jsonEncode(map);
     html.window.localStorage['deck'] = jsonString;
   }
+
+// int digimonCardComparator(DigimonCard a, DigimonCard b) {
+//   if (a.cardType != b.cardType) {
+//     return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
+//   }
+//
+//   if (a.lv != null && b.lv != null && a.lv != b.lv) {
+//     return a.lv!.compareTo(b.lv!);
+//   }
+//
+//   if (a.color1 != null && b.color1 != null && a.color1 != b.color1) {
+//     return _colorOrder[a.color1]!.compareTo(_colorOrder[b.color1]!);
+//   }
+//
+//   if (a.playCost != null && b.playCost != null && a.playCost != b.playCost) {
+//     return a.playCost!.compareTo(b.playCost!);
+//   }
+//
+//   if (a.sortString != b.sortString) {
+//     return a.sortString!.compareTo(b.sortString!);
+//   }
+//
+//   if (a.isParallel != b.isParallel) {
+//     return a.isParallel! ? 1 : -1;
+//   }
+//
+//   return 0;
+// }
 }

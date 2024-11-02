@@ -52,7 +52,7 @@ class _DeckListPageState extends State<DeckListPage> {
   }
 
   void updateSelectedDeck(DeckView deckView) {
-    _selectedDeck = DeckBuild.deckView(deckView);
+    _selectedDeck = DeckBuild.deckView(deckView, context);
     setState(() {});
   }
 

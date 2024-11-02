@@ -32,7 +32,10 @@ class DeckBuilderPage extends StatefulWidget {
   final String? searchParameterString;
   final DeckBuild? deck;
 
-  const DeckBuilderPage({super.key, this.deck,@QueryParam('searchParameter') this.searchParameterString});
+  const DeckBuilderPage(
+      {super.key,
+      this.deck,
+      @QueryParam('searchParameter') this.searchParameterString});
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -51,16 +54,17 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   int currentPage = 0;
   bool isTextSimplify = true;
 
-
-  DeckBuild deck = DeckBuild();
+  DeckBuild deck = DeckBuild.empty();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
   Timer? _debounce; // 디바운스를 위한 타이머
 
-  void updateSearchParameter()
-  {
-    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson()),deck: widget.deck));
+  void updateSearchParameter() {
+    context.navigateTo(DeckBuilderRoute(
+        searchParameterString: json.encode(searchParameter.toJson()),
+        deck: widget.deck));
   }
+
   void onViewModeChanged(String newMode) {
     viewMode = newMode;
     setState(() {});
@@ -88,13 +92,15 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         TypeService().insert(type);
       }
       if (widget.searchParameterString != null) {
-        searchParameter = SearchParameter.fromJson(json.decode(widget.searchParameterString!));
+        searchParameter = SearchParameter.fromJson(
+            json.decode(widget.searchParameterString!));
       }
 
       if (widget.deck != null) {
         deck = widget.deck!;
         deck.saveMapToLocalStorage();
       } else {
+        deck = DeckBuild(context);
         String? deckJsonString = html.window.localStorage['deck'];
 
         if (deckJsonString != null) {
@@ -137,7 +143,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             });
 
                             DeckBuild? savedDeck = await DeckService()
-                                .createDeckByLocalJsonString(deckJsonString);
+                                .createDeckByLocalJsonString(
+                                    deckJsonString, context);
                             if (savedDeck != null) {
                               deck = savedDeck;
                             }
@@ -166,26 +173,25 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       _onScroll();
     });
   }
-  void _onScroll() {
-    // 기존 타이머가 있으면 취소
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-    // 타이머 설정, 지정된 시간이 지나면 콜백 실행
+  void _onScroll() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      // 스크롤이 끝난 후 300ms 지나면 추가 처리 가능
-      // 여기서 추가 로직이 필요하면 넣을 수 있습니다.
     });
   }
+
   @override
   void didUpdateWidget(covariant DeckBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.deck != oldWidget.deck) {
       setState(() {
-        deck = widget.deck ?? DeckBuild();
+        deck = widget.deck ?? DeckBuild(context);
       });
     }
-    if(widget.searchParameterString!=null&& widget.searchParameterString!=oldWidget.searchParameterString) {
-      searchParameter = SearchParameter.fromJson(json.decode(widget.searchParameterString!));
+    if (widget.searchParameterString != null &&
+        widget.searchParameterString != oldWidget.searchParameterString) {
+      searchParameter =
+          SearchParameter.fromJson(json.decode(widget.searchParameterString!));
       initSearch();
     }
   }
@@ -193,7 +199,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void searchNote(int noteId) {
     searchParameter = SearchParameter();
     searchParameter.noteId = noteId;
-    context.navigateTo(DeckBuilderRoute(searchParameterString: json.encode(searchParameter.toJson()),deck: widget.deck));
+    context.navigateTo(DeckBuilderRoute(
+        searchParameterString: json.encode(searchParameter.toJson()),
+        deck: widget.deck));
 
     initSearch();
   }
@@ -230,11 +238,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     currentPage = searchParameter.page++;
   }
 
-
   deckUpdate(DeckView deckResponseDto) {
     deck.import(deckResponseDto);
     setState(() {});
   }
+
   bool _overlayRemoved = false;
 
   @override
@@ -254,7 +262,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
         return SlidingUpPanel(
-          onPanelSlide: (v){
+          onPanelSlide: (v) {
             if (v > 0.1) {
               _cardOverlayService.updatePanelStatus(true);
             } else {
@@ -262,9 +270,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             }
             if (v > 0.1 && !_overlayRemoved) {
               _cardOverlayService.removeAllOverlays();
-              _overlayRemoved = true; // 오버레이가 제거되었음을 기록
+              _overlayRemoved = true;
             } else if (v <= 0.1) {
-              _overlayRemoved = false; // 슬라이드가 최소로 돌아오면 다시 오버레이 생성 가능하게 설정
+              _overlayRemoved = false;
             }
           },
           controller: _panelController,
@@ -367,7 +375,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                         onPressed: () {
                                           _scrollController.animateTo(
                                             0,
-                                            duration: Duration(milliseconds: 500),
+                                            duration:
+                                                Duration(milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -383,7 +392,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                           _scrollController.animateTo(
                                             _scrollController
                                                 .position.maxScrollExtent,
-                                            duration: Duration(milliseconds: 500),
+                                            duration:
+                                                Duration(milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -409,7 +419,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   searchParameter: searchParameter,
                                   onSearch: initSearch,
                                   viewMode: viewMode,
-                                  onViewModeChanged: onViewModeChanged, updateSearchParameter: updateSearchParameter,
+                                  onViewModeChanged: onViewModeChanged,
+                                  updateSearchParameter: updateSearchParameter,
                                 )),
                             SizedBox(
                               height: 5,
@@ -465,10 +476,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     deck: deck,
                     cardPressEvent: removeCardByDeck,
                     import: deckUpdate,
-                    searchNote: searchNote, cardOverlayService: _cardOverlayService,
-
+                    searchNote: searchNote,
+                    cardOverlayService: _cardOverlayService,
                   ),
-                  SizedBox(height: MediaQuery.sizeOf(context).height*0.2,)
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.2,
+                  )
                 ],
               ),
             ),
@@ -521,7 +534,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             searchParameter: searchParameter,
                             onSearch: initSearch,
                             viewMode: viewMode,
-                            onViewModeChanged: onViewModeChanged, updateSearchParameter: updateSearchParameter,
+                            onViewModeChanged: onViewModeChanged,
+                            updateSearchParameter: updateSearchParameter,
                           )),
                       Expanded(
                           flex: 9,

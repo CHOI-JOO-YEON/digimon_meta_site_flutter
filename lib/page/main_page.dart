@@ -40,150 +40,143 @@ class MainPage extends StatelessWidget {
             children: [
               SizedBox(
                 height: max(MediaQuery.sizeOf(context).height * 0.1, 80),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          return Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                child: Consumer<UserProvider>(
+                  builder: (context, userProvider, child) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                              children: [
+                                if (userProvider.isLogin)
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
                                     children: [
-                                      if (userProvider.isLogin)
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              '${userProvider.nickname}',
-                                              style: TextStyle(
-                                                  fontSize: min(
-                                                      MediaQuery.sizeOf(context)
-                                                              .width *
-                                                          0.02,
-                                                      15)),
-                                            ),
-                                            Text(
-                                              '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
-                                              style: TextStyle(
-                                                  fontSize: min(
-                                                      MediaQuery.sizeOf(context)
-                                                              .width *
-                                                          0.02,
-                                                      15)),
-                                            ),
-                                          ],
-                                        ),
-                                      SizedBox(
-                                          width:
-                                              MediaQuery.sizeOf(context).width *
-                                                  0.009),
-                                      userProvider.isLogin
-                                          ? Center(
-                                              child: TextButton(
-                                                onPressed: () {
-                                                  userProvider.logout();
-                                                },
-                                                child: Text(
-                                                  '로그아웃',
-                                                  style: TextStyle(
-                                                      fontSize: fontSize),
-                                                ),
-                                              ),
-                                            )
-                                          : Center(
-                                              child: TextButton(
-                                                onPressed: () {
-                                                  openOAuthPopup();
-                                                },
-                                                child: Text(
-                                                  '로그인',
-                                                  style: TextStyle(
-                                                      fontSize: fontSize),
-                                                ),
-                                              ),
-                                            ),
+                                      Text(
+                                        '${userProvider.nickname}',
+                                        style: TextStyle(
+                                            fontSize: min(
+                                                MediaQuery.sizeOf(context)
+                                                        .width *
+                                                    0.02,
+                                                15)),
+                                      ),
+                                      Text(
+                                        '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
+                                        style: TextStyle(
+                                            fontSize: min(
+                                                MediaQuery.sizeOf(context)
+                                                        .width *
+                                                    0.02,
+                                                15)),
+                                      ),
                                     ],
                                   ),
-                                ),
+                                SizedBox(
+                                    width:
+                                        MediaQuery.sizeOf(context).width *
+                                            0.009),
+                                userProvider.isLogin
+                                    ? Center(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            userProvider.logout();
+                                          },
+                                          child: Text(
+                                            '로그아웃',
+                                            style: TextStyle(
+                                                fontSize: fontSize),
+                                          ),
+                                        ),
+                                      )
+                                    : Center(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            openOAuthPopup();
+                                          },
+                                          child: Text(
+                                            '로그인',
+                                            style: TextStyle(
+                                                fontSize: fontSize),
+                                          ),
+                                        ),
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: TabBar(
+
+                            controller: controller,
+                            tabs: [
+                              Tab(
+
+                                icon: Center(child: Icon(Icons.build,
+                                )),
+
+                                child: isPortrait
+                                    ? null
+                                    : Text(
+                                        'Builder',
+                                        style: TextStyle(
+                                            fontSize: fontSize * 0.9),
+                                      ),
+                                iconMargin: EdgeInsets.zero,
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: TabBar(
-
-                                  controller: controller,
-                                  tabs: [
-                                    Tab(
-
-                                      icon: Center(child: Icon(Icons.build,
-                                      )),
-
-                                      child: isPortrait
-                                          ? null
-                                          : Text(
-                                              'Builder',
-                                              style: TextStyle(
-                                                  fontSize: fontSize * 0.9),
-                                            ),
-                                      iconMargin: EdgeInsets.zero,
-                                    ),
-                                    Tab(
-                                      icon: Center(child: Icon(Icons.list)),
-                                      child: isPortrait
-                                          ? null
-                                          : Text('List',
-                                              style: TextStyle(
-                                                  fontSize: fontSize * 0.9)),
-                                      iconMargin: EdgeInsets.zero,
-                                    ),
-                                    Tab(
-                                      icon: Center(
-                                          child: Icon(Icons
-                                              .collections_bookmark_rounded)),
-                                      child: isPortrait
-                                          ? null
-                                          : Text('Collect',
-                                              style: TextStyle(
-                                                  fontSize: fontSize * 0.9)),
-                                      iconMargin: EdgeInsets.zero,
-                                    )
-                                  ],
-                                ),
+                              Tab(
+                                icon: Center(child: Icon(Icons.list)),
+                                child: isPortrait
+                                    ? null
+                                    : Text('List',
+                                        style: TextStyle(
+                                            fontSize: fontSize * 0.9)),
+                                iconMargin: EdgeInsets.zero,
                               ),
-                              Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // IconButton(
-                                      //   onPressed:  () async {
-                                      //     bool loginCheck = await userProvider.loginCheck();
-                                      //     if(loginCheck) {
-                                      //       _launchEmail(userProvider.nickname!);
-                                      //     }
-                                      //
-                                      //   },
-                                      //
-                                      //   icon: Icon(Icons.mail),
-                                      //   padding: EdgeInsets.zero,
-                                      //   tooltip: '개발자에게 메일 보내기',
-                                      // )
-                                    ],
-                                  )),
+                              Tab(
+                                icon: Center(
+                                    child: Icon(Icons
+                                        .collections_bookmark_rounded)),
+                                child: isPortrait
+                                    ? null
+                                    : Text('Collect',
+                                        style: TextStyle(
+                                            fontSize: fontSize * 0.9)),
+                                iconMargin: EdgeInsets.zero,
+                              )
                             ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                          ),
+                        ),
+                        Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // IconButton(
+                                //   onPressed:  () async {
+                                //     bool loginCheck = await userProvider.loginCheck();
+                                //     if(loginCheck) {
+                                //       _launchEmail(userProvider.nickname!);
+                                //     }
+                                //
+                                //   },
+                                //
+                                //   icon: Icon(Icons.mail),
+                                //   padding: EdgeInsets.zero,
+                                //   tooltip: '개발자에게 메일 보내기',
+                                // )
+                              ],
+                            )),
+                      ],
+                    );
+                  },
                 ),
               ),
               Expanded(child: child)
