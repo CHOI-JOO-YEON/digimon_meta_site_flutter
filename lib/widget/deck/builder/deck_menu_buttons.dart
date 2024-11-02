@@ -786,7 +786,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                               ListTile(
                                 key: ValueKey(sortPriority[index].field),
                                 title: Text(
-                                    '${index + 1}. ${deckSortProvider.getSortPriorityKor(sortPriority[index].field)}'),
+                                    deckSortProvider.getSortPriorityKor(sortPriority[index].field)),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -795,6 +795,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                         sortPriority[index].field == 'color1' ||
                                         sortPriority[index].field == 'color2')
                                       IconButton(
+                                        padding: EdgeInsets.zero,
                                         icon: Icon(Icons.edit),
                                         onPressed: () {
                                           _showOrderMapDialog(
@@ -804,10 +805,11 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                               width * 0.8);
                                         },
                                       ),
-                                    TextButton(
-                                      child: sortPriority[index].ascending
-                                          ? Text('오름차순')
-                                          : Text('내림차순'),
+                                    IconButton(
+                                      tooltip: '오름차순/내림차순',
+                                      icon: sortPriority[index].ascending
+                                          ? Icon(Icons.arrow_drop_up)
+                                          : Icon(Icons.arrow_drop_down),
                                       onPressed: () {
                                         setState(() {
                                           sortPriority[index].ascending =
@@ -861,7 +863,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     ListTile(
                       key: ValueKey(items[index]),
                       title: Text(
-                          '${index + 1}. ${LangService().getKorText(items[index])}'),
+                          LangService().getKorText(items[index])),
                     ),
                 ],
               ),
