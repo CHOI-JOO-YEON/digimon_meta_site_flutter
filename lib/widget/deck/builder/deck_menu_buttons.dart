@@ -767,60 +767,54 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       SizedBox(
                         width: width * 0.8,
                         height: height * 0.6,
-                        child: ReorderableListView(
+                        child: ReorderableListView.builder(
                           shrinkWrap: true,
+                          itemCount: sortPriority.length,
                           onReorder: (int oldIndex, int newIndex) {
-                            setState(() {
-                              if (newIndex > oldIndex) {
-                                newIndex -= 1;
-                              }
-                              final SortCriterion item =
-                                  sortPriority.removeAt(oldIndex);
-                              sortPriority.insert(newIndex, item);
-                            });
+                            if (newIndex > oldIndex) {
+                              newIndex -= 1;
+                            }
+                            final SortCriterion item =
+                                sortPriority.removeAt(oldIndex);
+                            sortPriority.insert(newIndex, item);
+                            setState(() {});
                           },
-                          children: [
-                            for (int index = 0;
-                                index < sortPriority.length;
-                                index++)
-                              ListTile(
-                                key: ValueKey(sortPriority[index].field),
-                                title: Text(
-                                    deckSortProvider.getSortPriorityKor(sortPriority[index].field)),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (sortPriority[index].field ==
-                                            'cardType' ||
-                                        sortPriority[index].field == 'color1' ||
-                                        sortPriority[index].field == 'color2')
-                                      IconButton(
-                                        padding: EdgeInsets.zero,
-                                        icon: Icon(Icons.edit),
-                                        onPressed: () {
-                                          _showOrderMapDialog(
-                                              context,
-                                              sortPriority[index],
-                                              setState,
-                                              width * 0.8);
-                                        },
-                                      ),
+                          itemBuilder: (BuildContext context, int index) {
+                            final criterion = sortPriority[index];
+                            return ListTile(
+                              key: ValueKey('${criterion.field}-$index'),
+                              title: Text(deckSortProvider
+                                  .getSortPriorityKor(criterion.field)),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (criterion.field == 'cardType' ||
+                                      criterion.field == 'color1' ||
+                                      criterion.field == 'color2')
                                     IconButton(
-                                      tooltip: '오름차순/내림차순',
-                                      icon: sortPriority[index].ascending
-                                          ? Icon(Icons.arrow_drop_up)
-                                          : Icon(Icons.arrow_drop_down),
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(Icons.edit),
                                       onPressed: () {
-                                        setState(() {
-                                          sortPriority[index].ascending =
-                                              !sortPriority[index].ascending;
-                                        });
+                                        _showOrderMapDialog(context,
+                                            criterion, setState, width * 0.8);
                                       },
                                     ),
-                                  ],
-                                ),
+                                  IconButton(
+                                    tooltip: '오름차순/내림차순',
+                                    icon: (criterion.ascending ?? true)
+                                        ? const Icon(Icons.arrow_drop_up)
+                                        : const Icon(Icons.arrow_drop_down),
+                                    onPressed: () {
+                                      setState(() {
+                                        criterion.ascending =
+                                            !(criterion.ascending ?? true);
+                                      });
+                                    },
+                                  ),
+                                ],
                               ),
-                          ],
+                            );
+                          },
                         ),
                       )
                     ],
@@ -862,8 +856,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   for (int index = 0; index < items.length; index++)
                     ListTile(
                       key: ValueKey(items[index]),
-                      title: Text(
-                          LangService().getKorText(items[index])),
+                      title: Text(LangService().getKorText(items[index])),
                     ),
                 ],
               ),
