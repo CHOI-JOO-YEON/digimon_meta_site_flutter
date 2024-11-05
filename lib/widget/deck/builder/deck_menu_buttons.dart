@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/page/game_playground_page.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:digimon_meta_site_flutter/service/lang_service.dart';
@@ -1036,17 +1037,20 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ),
               ),
 
-              // ConstrainedBox(
-              //   constraints: BoxConstraints.tightFor(
-              //       width: iconSize, height: iconSize),
-              //   child: IconButton(
-              //     padding: EdgeInsets.zero,
-              //     onPressed: () => _showRandomHandDialog(context),
-              //     iconSize: iconSize,
-              //     icon: const Icon(Icons.back_hand_rounded),
-              //     tooltip: '랜덤 핸드',
-              //   ),
-              // ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: iconSize, height: iconSize),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    CardOverlayService().removeAllOverlays();
+                    context.router.push(GamePlaygroundRoute(deckBuild: widget.deck));
+                  },
+                  iconSize: iconSize,
+                  icon: const Icon(Icons.back_hand_rounded),
+                  tooltip: '랜덤 핸드',
+                ),
+              ),
               ConstrainedBox(
                 constraints:
                     BoxConstraints.tightFor(width: iconSize, height: iconSize),
