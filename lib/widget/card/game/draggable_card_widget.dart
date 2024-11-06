@@ -10,10 +10,9 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 60,
       height: 90,
-      margin: EdgeInsets.all(2),
       child: Image.network(
         card.imgUrl ?? '',
         fit: BoxFit.cover,

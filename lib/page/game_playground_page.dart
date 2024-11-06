@@ -40,7 +40,7 @@ class GamePlaygroundPage extends StatelessWidget {
                       child: Column(
                         children: [
                           SecurityStackArea(),
-                          // RaisingZoneWidget(),
+                          RaisingZoneWidget(),
                         ],
                       ),
                     ),

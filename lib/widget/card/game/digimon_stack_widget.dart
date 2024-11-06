@@ -6,64 +6,68 @@ import 'draggable_card_widget.dart';
 
 class DigimonStackWidget extends StatelessWidget {
   final List<DigimonCard> digimonStack;
+  final String id;
   final Function(int fromIndex, int toIndex) onReorder;
   final Function(DigimonCard newCard, int toIndex) onAddCard;
+  final Function(int fromIndex) onLeave;
 
-  DigimonStackWidget({
+  const DigimonStackWidget({
+    super.key,
     required this.digimonStack,
     required this.onReorder,
     required this.onAddCard,
+    required this.onLeave,
+    required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 카드 간 간격
     double cardSpacing = 20.0;
-    double stackHeight = (digimonStack.length * cardSpacing) + 100; // 적당한 높이 설정
 
-    return DragTarget<Object>(
-      onWillAccept: (data) => true,
-      onAcceptWithDetails: (details) {
-        final data = details.data;
-        print(data.runtimeType);
-
-        if (data is DigimonCard) {
-          // DigimonStack에 없는 새 카드가 드롭된 경우
-          print('1');
+    return Expanded(
+      child: DragTarget<Map<String, dynamic>>(
+        onWillAccept: (data) => true,
+        onAcceptWithDetails: (details) {
+          final data = details.data;
+          String sourceId = data['id'] ?? '';
+          int fromIndex = data['fromIndex'] ?? -1;
+          DigimonCard card = data['card'];
           RenderBox box = context.findRenderObject() as RenderBox;
           Offset localOffset = box.globalToLocal(details.offset);
           int toIndex = (localOffset.dy / cardSpacing).floor();
-          toIndex = toIndex.clamp(0, digimonStack.length);
-
-          onAddCard(data , toIndex);
-        } else  {
-          // 기존 DigimonStack의 카드가 드래그된 경우
-          Map<String, dynamic> map = data as Map<String, dynamic>;
-          print('2');
-          int fromIndex = map['fromIndex']!;
-          RenderBox box = context.findRenderObject() as RenderBox;
-          Offset localOffset = box.globalToLocal(details.offset);
-          int toIndex = (localOffset.dy / cardSpacing).floor();
-          toIndex = toIndex.clamp(0, digimonStack.length - 1);
-
-          if (fromIndex != toIndex) {
-            onReorder(fromIndex, toIndex);
+          if (id == sourceId) {
+            if (fromIndex != -1 && fromIndex != toIndex) {
+              toIndex = toIndex.clamp(0, digimonStack.length - 1);
+              onReorder(fromIndex, toIndex);
+            }
+          } else {
+            toIndex = toIndex.clamp(0, digimonStack.length);
+            onAddCard(card, toIndex);
+            if (data['removeCard'] != null) {
+              data['removeCard']();
+            }
           }
-        }
-      },
-      builder: (context, candidateData, rejectedData) {
-        return SizedBox(
-          height: stackHeight, // Stack의 기본 크기 설정
-          child: Stack(
+        },
+        onLeave: (data) {},
+        builder: (context, candidateData, rejectedData) {
+          return Stack(
             clipBehavior: Clip.none,
-            children: digimonStack.asMap().entries.toList().reversed.map((entry){
+            children:
+                digimonStack.asMap().entries.toList().reversed.map((entry) {
               int index = entry.key;
               DigimonCard card = entry.value;
 
               return Positioned(
                 top: index * cardSpacing,
                 child: Draggable<Map<String, dynamic>>(
-                  data: {'fromIndex': index},
+                  data: {
+                    'fromIndex': index,
+                    'card': card,
+                    'id': id,
+                    'removeCard': () {
+                      onLeave(index);
+                    }
+                  },
                   feedback: Material(
                     elevation: 5,
                     child: CardWidget(card: card),
@@ -76,9 +80,9 @@ class DigimonStackWidget extends StatelessWidget {
                 ),
               );
             }).toList(),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

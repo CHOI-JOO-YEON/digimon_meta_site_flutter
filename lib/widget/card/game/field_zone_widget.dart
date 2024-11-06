@@ -22,13 +22,17 @@ class FieldZoneWidget extends StatelessWidget {
               children: [
                 Text('필드 존'),
                 DigimonStackWidget(
-                  digimonStack: fieldZone.digimonStack,
+                  digimonStack: fieldZone.stack,
                   onReorder: (fromIndex, toIndex) {
-                    fieldZone.reorderDigimonStack(fromIndex, toIndex);
+                    fieldZone.reorderStack(fromIndex, toIndex);
                   },
                   onAddCard: (card, toIndex){
-                    fieldZone.addDigimonToIndex(card, toIndex);
+                    fieldZone.addCardToStackAt(card, toIndex);
                   },
+                  onLeave: (fromIndex){
+                    fieldZone.removeCardToStackAt(fromIndex);
+                  },
+                  id: UniqueKey().toString(),
                 ),
               ],
             ),
