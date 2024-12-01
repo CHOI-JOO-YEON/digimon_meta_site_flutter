@@ -25,15 +25,15 @@ class MainPage extends StatelessWidget {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     return AutoTabsRouter.tabBar(
-
+      physics: const NeverScrollableScrollPhysics(),
       routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute()],
       builder: (context, child, controller) {
         controller.addListener(() {
           if (controller.indexIsChanging) {
-            // 탭이 변경될 때 모든 오버레이 제거
             _cardOverlayService.removeAllOverlays();
           }
         });
+
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Column(
