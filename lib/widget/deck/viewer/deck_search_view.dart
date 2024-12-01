@@ -106,6 +106,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
             return Column(
               children: [
                 TabBar(
+                  physics: const NeverScrollableScrollPhysics(),
                   controller: _tabController,
                   tabs: [
                     Tab(
@@ -125,7 +126,9 @@ class _DeckSearchViewState extends State<DeckSearchView>
                   ],
                 ),
                 Expanded(
-                  child: TabBarView(controller: _tabController, children: [
+                  child: TabBarView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: _tabController, children: [
                     DeckListViewer(
                       formatList: formats,
                       deckUpdate: widget.deckUpdate,
