@@ -163,4 +163,8 @@ class DigimonCard {
   String? getDisplaySourceEffect() {
     return localeCardDatas.first.sourceEffect;
   }
+
+  String? getDisplayLocale() {
+    return localeCardDatas.first.locale;
+  }
 }
