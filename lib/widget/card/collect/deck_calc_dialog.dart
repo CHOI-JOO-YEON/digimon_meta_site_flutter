@@ -331,7 +331,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                         leading: Image.network(
                                             card.smallImgUrl ?? ''),
                                         title: Text(
-                                            '${card.cardNo} ${card.cardName} ${card.rarity}' ??
+                                            '${card.cardNo} ${card.getDisplayName()} ${card.rarity}' ??
                                                 ''),
                                         subtitle: Text(
                                           '소지: $nowQuantity / 필요: $quantity',

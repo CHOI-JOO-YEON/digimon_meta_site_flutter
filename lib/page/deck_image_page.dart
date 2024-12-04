@@ -38,7 +38,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   void initState() {
     super.initState();
     if (widget.deck.deckCards.isEmpty) {
-      _selectedCard = DigimonCard(isEn: false);
+      _selectedCard = DigimonCard(isEn: false, localeCardDatas: []);
     } else {
       _selectedCard = widget.deck.deckCards.first;
     }

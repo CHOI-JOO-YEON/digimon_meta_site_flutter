@@ -22,12 +22,6 @@ class UsedCardInfo {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'rank': rank,
-    'ratio': ratio,
-    'count': count,
-    'card': card.toJson(),
-  };
   static List<UsedCardInfo> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => UsedCardInfo.fromJson(json)).toList();
   }

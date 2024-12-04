@@ -138,15 +138,15 @@ class DeckSortProvider with ChangeNotifier {
           comparison = (a.sortString ?? '').compareTo(b.sortString ?? '');
           break;
         case 'cardName':
-          comparison = (a.cardName ?? '').compareTo(b.cardName ?? '');
+          comparison = (a.getDisplayName() ?? '').compareTo(b.getDisplayName() ?? '');
           break;
         case 'isParallel':
           comparison =
               (a.isParallel! ? -1 : 1).compareTo(b.isParallel! ? -1 : 1);
           break;
         case 'hasXAntibody':
-          bool aHasXAntibody = a.cardName?.contains('X항체') ?? false;
-          bool bHasXAntibody = b.cardName?.contains('X항체') ?? false;
+          bool aHasXAntibody = a.getDisplayName()?.contains('X항체') ?? false;
+          bool bHasXAntibody = b.getDisplayName()?.contains('X항체') ?? false;
           comparison =
               (aHasXAntibody ? 1 : 0).compareTo(bHasXAntibody ? 1 : 0);
           break;

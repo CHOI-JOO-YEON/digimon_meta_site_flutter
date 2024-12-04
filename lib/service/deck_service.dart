@@ -106,7 +106,7 @@ class DeckService {
         mainDeckMap[cardNo] = [
           cardNo,
           card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
-          card.cardName,
+          card.getDisplayName(),
           card.getKorCardType(),
           count.toString()
         ];
@@ -129,7 +129,7 @@ class DeckService {
         digitamaDeckMap[cardNo!] = [
           cardNo,
           card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
-          card.cardName,
+          card.getDisplayName(),
           '디지타마',
           count.toString()
         ];
