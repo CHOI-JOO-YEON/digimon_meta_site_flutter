@@ -427,7 +427,7 @@ class CardService {
             child: Text(
               category,
               style: TextStyle(color: categoryColor, fontSize: fontSize,
-                  fontFamily: locale=='JPN'?"MPLUSC":"JalnanGothic"
+                  // fontFamily: locale=='JPN'?"MPLUSC":"JalnanGothic"
               ),
             ),
           ),
@@ -505,7 +505,7 @@ class CardService {
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
         backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        if (matchedText.contains('조그레스') || matchedText.contains('진화')) {
+        if (matchedText.contains('조그레스') || matchedText.contains('진화') || matchedText.contains('進化')) {
           backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
         } else {
           backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
