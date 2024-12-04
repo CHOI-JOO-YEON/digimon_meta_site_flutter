@@ -20,9 +20,4 @@ class UseCardResponseDto{
     );
   }
 
-
-  Map<String, dynamic> toJson() => {
-    'useCardList': usedCardList.map((item) => item.toJson()).toList(),
-    'totalCount': totalCount,
-  };
 }

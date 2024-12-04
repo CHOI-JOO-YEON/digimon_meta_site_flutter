@@ -20,10 +20,4 @@ class CardResponseDto {
     cards: json['cards'] != null ? List<DigimonCard>.from(json['cards'].map((x) => DigimonCard.fromJson(x))) : null,
   );
 
-  Map<String, dynamic> toJson() => {
-    'totalPages': totalPages,
-    'currentPage': currentPage,
-    'totalElements': totalElements,
-    'cards': cards != null ? List<dynamic>.from(cards!.map((x) => x.toJson())) : null,
-  };
 }

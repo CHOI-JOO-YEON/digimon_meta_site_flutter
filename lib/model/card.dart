@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:digimon_meta_site_flutter/model/locale_card_data.dart';
+
 import '../enums/form.dart';
 
 class DigimonCard {
   int? cardId;
   String? cardNo;
-  String? cardName;
   int? lv;
   int? dp;
   int? playCost;
@@ -13,8 +14,6 @@ class DigimonCard {
   int? digivolveCondition1;
   int? digivolveCost2;
   int? digivolveCondition2;
-  String? effect;
-  String? sourceEffect;
   String? color1;
   String? color2;
   String? color3;
@@ -31,6 +30,8 @@ class DigimonCard {
   String? noteName;
   int? noteId;
   bool isEn;
+
+  List<LocaleCardData> localeCardDatas;
 
   // Uint8List? compressedImg;
 
@@ -81,10 +82,6 @@ class DigimonCard {
     return Form.findKorNameByName(form!);
   }
 
-  // void setCompressedImg(Uint8List img) {
-  //   compressedImg = img;
-  // }
-
   String getDigivolveString1() {
     return 'Lv.$digivolveCondition1에서 $digivolveCost1';
   }
@@ -96,7 +93,6 @@ class DigimonCard {
   DigimonCard(
       {this.cardId,
       this.cardNo,
-      this.cardName,
       this.lv,
       this.dp,
       this.playCost,
@@ -104,8 +100,6 @@ class DigimonCard {
       this.digivolveCondition1,
       this.digivolveCost2,
       this.digivolveCondition2,
-      this.effect,
-      this.sourceEffect,
       this.color1,
       this.color2,
       this.color3,
@@ -121,68 +115,52 @@ class DigimonCard {
       this.releaseDate,
       this.noteId,
       this.noteName,
-      required this.isEn});
+      required this.isEn,
+      required this.localeCardDatas});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
-        cardId: json['cardId'],
-        cardNo: json['cardNo'],
-        cardName: json['cardName'],
-        lv: json['lv'],
-        dp: json['dp'],
-        playCost: json['playCost'],
-        digivolveCost1: json['digivolveCost1'],
-        digivolveCondition1: json['digivolveCondition1'],
-        digivolveCost2: json['digivolveCost2'],
-        digivolveCondition2: json['digivolveCondition2'],
-        effect: json['effect'],
-        sourceEffect: json['sourceEffect'],
-        color1: json['color1'],
-        color2: json['color2'],
-        color3: json['color3'],
-        rarity: json['rarity'],
-        cardType: json['cardType'],
-        form: json['form'],
-        attributes: json['attributes'],
-        types: json['types'] != null ? List<String>.from(json['types']) : null,
-        imgUrl: json['imgUrl'],
-        smallImgUrl: json['smallImgUrl'],
-        isParallel: json['isParallel'],
-        sortString: json['sortString'],
-        releaseDate: json['releaseDate'] != null
-            ? DateTime.parse(json['releaseDate'])
-            : null,
-        isEn: json['isEn'] ?? false,
-        noteId: json['noteId'],
-        noteName: json['noteName']);
+      cardId: json['cardId'],
+      cardNo: json['cardNo'],
+      lv: json['lv'],
+      dp: json['dp'],
+      playCost: json['playCost'],
+      digivolveCost1: json['digivolveCost1'],
+      digivolveCondition1: json['digivolveCondition1'],
+      digivolveCost2: json['digivolveCost2'],
+      digivolveCondition2: json['digivolveCondition2'],
+      color1: json['color1'],
+      color2: json['color2'],
+      color3: json['color3'],
+      rarity: json['rarity'],
+      cardType: json['cardType'],
+      form: json['form'],
+      attributes: json['attributes'],
+      types: json['types'] != null ? List<String>.from(json['types']) : null,
+      imgUrl: json['imgUrl'],
+      smallImgUrl: json['smallImgUrl'],
+      isParallel: json['isParallel'],
+      sortString: json['sortString'],
+      releaseDate: json['releaseDate'] != null
+          ? DateTime.parse(json['releaseDate'])
+          : null,
+      isEn: json['isEn'] ?? false,
+      noteId: json['noteId'],
+      noteName: json['noteName'],
+      localeCardDatas: List<LocaleCardData>.from(
+          json['localeCardDatas'].map((x) => LocaleCardData.fromJson(x))),
+    );
   }
 
-  Map<String, dynamic> toJson() => {
-        'cardId': cardId,
-        'cardNo': cardNo,
-        'cardName': cardName,
-        'lv': lv,
-        'dp': dp,
-        'playCost': playCost,
-        'digivolveCost1': digivolveCost1,
-        'digivolveCondition1': digivolveCondition1,
-        'digivolveCost2': digivolveCost2,
-        'digivolveCondition2': digivolveCondition2,
-        'effect': effect,
-        'sourceEffect': sourceEffect,
-        'color1': color1,
-        'color2': color2,
-        'color3': color3,
-        'rarity': rarity,
-        'cardType': cardType,
-        'form': form,
-        'attributes': attributes,
-        'types':
-            types != null ? List<dynamic>.from(types!.map((x) => x)) : null,
-        'imgUrl': imgUrl,
-        'isParallel': isParallel,
-        'sortString': sortString,
-        'smallImgUrl': smallImgUrl,
-        'releaseDate': releaseDate,
-      };
+  String? getDisplayName() {
+    return localeCardDatas.first.name;
+  }
+
+  String? getDisplayEffect() {
+    return localeCardDatas.first.effect;
+  }
+
+  String? getDisplaySourceEffect() {
+    return localeCardDatas.first.sourceEffect;
+  }
 }

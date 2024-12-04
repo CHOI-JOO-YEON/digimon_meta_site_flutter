@@ -64,30 +64,6 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     setState(() => isLoading = false);
   }
 
-  void _showImageDialog(BuildContext context, DigimonCard card) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Image.network(card.imgUrl ?? '', fit: BoxFit.fill),
-          actions: [
-            IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () async {
-                if (card.imgUrl != null) {
-                  await WebImageDownloader.downloadImageFromWeb(
-                    card.imgUrl!,
-                    name: '${card.cardNo}_${card.cardName}.png',
-                  );
-                }
-              },
-              icon: Icon(Icons.download),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,10 +94,6 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                   padding: const EdgeInsets.all(5.0),
                   child: Container(
                     decoration: BoxDecoration(
-                        // border: Border.all(
-                        //   color: Colors.grey,
-                        //   width: 1.0,
-                        // ),
                         borderRadius: BorderRadius.circular(5),
                         color: Theme.of(context).cardColor),
                     child: ListTile(
@@ -129,19 +101,13 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       leading: Image.network(card.smallImgUrl!),
                       title: Row(
                         children: [
-                          Text('${card.cardNo} ${card.cardName}'),
-                          // if (card.lv != null)
-                          //   Text('\tLv.${card.lv == 0 ? '-' : card.lv}'),
-                          // Text(
-                          //   '\t${card.rarity}',
-                          //   style: TextStyle(color: Colors.red),
-                          // )
+                          Text('${card.cardNo} ${card.getDisplayName()}'),
                         ],
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (card.effect != null)
+                          if (card.getDisplayEffect() != null)
                             Row(
                               children: [
                                 Expanded(
@@ -153,12 +119,12 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: _buildEffectText(
-                                        card.effect!, '상단 텍스트'),
+                                        card.getDisplayEffect()!, '상단 텍스트'),
                                   ),
                                 ),
                               ],
                             ),
-                          if (card.sourceEffect != null)
+                          if (card.getDisplaySourceEffect() != null)
                             Row(
                               children: [
                                 Expanded(
@@ -170,7 +136,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: _buildEffectText(
-                                        card.sourceEffect!, '하단 텍스트'),
+                                        card.getDisplaySourceEffect()!, '하단 텍스트'),
                                   ),
                                 ),
                               ],

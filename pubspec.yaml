@@ -88,6 +88,9 @@ flutter:
     - family: JalnanGothic
       fonts:
         - asset: assets/fonts/JalnanGothic.otf
+    - family: MPLUSC
+      fonts:
+        - asset: assets/fonts/MPLUSRounded1c-Black.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -95,6 +98,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/fonts/JalnanGothicTTF.ttf
+    - assets/fonts/MPLUSRounded1c-Black.ttf
     - assets/doc/digimon_recipe.jpg
   # To add assets to your application, add an assets section, like this:
   # assets:
