@@ -169,7 +169,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text("세부 검색 조건"),
+              title: const Text("세부 검색 조건"),
               content: SizedBox(
                 width: isPortrait
                     ? MediaQuery.sizeOf(context).width * 0.8
@@ -181,7 +181,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       //검색어
                       TextField(
                         controller: _dialogSearchStringEditingController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: '검색어',
                         ),
                       ),
@@ -205,7 +205,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         ),
                       ),
                       //lv 고르기
-                      Text(
+                      const Text(
                         'LV',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -228,9 +228,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           );
                         }).toList(),
                       ),
-                      Divider(),
+                      const Divider(),
                       //색 고르기
-                      Text(
+                      const Text(
                         '컬러',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -259,9 +259,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         }).toList(),
                       ),
                       //색 or/and
-                      Divider(),
+                      const Divider(),
                       //카드 타입 고르기
-                      Text(
+                      const Text(
                         '카드 타입',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -284,9 +284,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           );
                         }).toList(),
                       ),
-                      Divider(),
+                      const Divider(),
                       //레어도 고르기
-                      Text(
+                      const Text(
                         '레어도',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -310,8 +310,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           );
                         }).toList(),
                       ),
-                      Divider(),
-                      Text(
+                      const Divider(),
+                      const Text(
                         '패럴렐 여부',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -329,7 +329,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                     });
                                   },
                                 ),
-                                Text('모두'),
+                                const Text('모두'),
                               ],
                             ),
                             Row(
@@ -343,7 +343,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                     });
                                   },
                                 ),
-                                Text('일반 카드만')
+                                const Text('일반 카드만')
                               ],
                             ),
                             Row(
@@ -357,14 +357,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                     });
                                   },
                                 ),
-                                Text('패럴렐 카드만'),
+                                const Text('패럴렐 카드만'),
                               ],
                             )
                           ]),
-                      Divider(),
+                      const Divider(),
 
-                      Text(
-                        '영문 카드 포함 여부',
+                      const Text(
+                        '미발매 카드 포함 여부',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Wrap(
@@ -381,7 +381,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              Text('한글 카드만'),
+                              const Text('한글 카드만'),
                             ],
                           ),
                           Row(
@@ -395,14 +395,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              Text('영문 카드 포함')
+                              const Text('미발매 카드 포함')
                             ],
                           ),
                         ],
                       ),
-                      Divider(),
+                      const Divider(),
                       //dp
-                      Text(
+                      const Text(
                         'DP',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -421,9 +421,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           });
                         },
                       ),
-                      Divider(),
+                      const Divider(),
                       //play cost
-                      Text(
+                      const Text(
                         '등장/사용 코스트',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -442,10 +442,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           });
                         },
                       ),
-                      Divider(),
+                      const Divider(),
 
                       //digivolve cost
-                      Text(
+                      const Text(
                         '진화 코스트',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -464,8 +464,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           });
                         },
                       ),
-                      Divider(),
-                      Text(
+                      const Divider(),
+                      const Text(
                         '유형',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -481,7 +481,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                         TypeService().search(value);
                                   });
                                 },
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   labelText: '유형 검색',
                                 ),
                               ),
@@ -501,7 +501,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                     });
                                   },
                                 ),
-                                Text(
+                                const Text(
                                   'OR',
                                   // style: TextStyle(fontSize: fontSize),
                                 ),
@@ -515,7 +515,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                     });
                                   },
                                 ),
-                                Text(
+                                const Text(
                                   'AND',
                                   // style: TextStyle(fontSize: fontSize),
                                 ),
@@ -525,7 +525,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
                         ],
                       ),
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
                       // 검색 결과 표시
                       SizedBox(
                         height: 200,
@@ -580,7 +580,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
               ),
               actions: [
                 TextButton(
-                  child: Text("적용"),
+                  child: const Text("적용"),
                   onPressed: () {
                     if (selectedNote != null) {
                       widget.searchParameter.noteId = selectedNote?.noteId;
@@ -633,7 +633,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   },
                 ),
                 TextButton(
-                  child: Text("조건 초기화"),
+                  child: const Text("조건 초기화"),
                   onPressed: () {
                     selectedNote = all;
                     for (var color in colors) {
@@ -652,10 +652,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       selectedRarityMap[rarity] = false;
                     }
 
-                    currentDpRange = RangeValues(1000, 17000);
+                    currentDpRange = const RangeValues(1000, 17000);
 
-                    currentPlayCostRange = RangeValues(0, 20);
-                    currentDigivolutionCostRange = RangeValues(0, 8);
+                    currentPlayCostRange = const RangeValues(0, 20);
+                    currentDigivolutionCostRange = const RangeValues(0, 8);
                     parallelOption = 0;
                     _dialogSearchStringEditingController =
                         TextEditingController(text: '');
@@ -750,12 +750,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
         value: all,
         child: Text(
           all.name,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
     menuItems.add(
-      DropdownMenuItem<NoteDto>(
+      const DropdownMenuItem<NoteDto>(
         enabled: false,
         child: Divider(),
       ),
@@ -787,7 +787,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         enabled: false,
         child: Text(
           header,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -803,7 +803,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     if (items.isNotEmpty) {
       menuItems.add(
-        DropdownMenuItem<NoteDto>(
+        const DropdownMenuItem<NoteDto>(
           enabled: false,
           child: Divider(),
         ),
@@ -843,7 +843,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
             child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: _showFilterDialog,
-                icon: Icon(Icons.menu))),
+                icon: const Icon(Icons.menu))),
         if (widget.viewMode != null)
           Expanded(
             flex: 1,

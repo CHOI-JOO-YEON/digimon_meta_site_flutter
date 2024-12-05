@@ -73,8 +73,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   }
 
   sortDeck(List<String> sortPriority) {
-    // widget.deck.sortPriority = sortPriority;
-    // widget.deck.deckSort();
     setState(() {});
   }
 
@@ -115,8 +113,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                             deck: widget.deck,
                             textEditingController: textEditingController,
                           )),
-
-                      //행에 한번에 표시되는 카드
                       Expanded(
                         flex: isPortrait ? 1 : 2,
                         child: CustomSlider(
@@ -128,7 +124,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                   ),
                 ),
                 Expanded(
-                    // flex: 2,
                     child: DeckMenuButtons(
                   deck: widget.deck,
                   clear: clearDeck,
@@ -183,8 +178,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             cardOverlayService: widget.cardOverlayService,
           ),
         ),
-
-        //덱그리드뷰
       ],
     );
   }

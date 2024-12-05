@@ -90,7 +90,6 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                           deck: widget.deck,
                         ),
                       ),
-                      // 행에 한번에 표시되는 카드
                       Expanded(
                         flex: isPortrait ? 1 : 2,
                         child: CustomSlider(
@@ -124,7 +123,6 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             ),
           ),
         ),
-        // 덱 그리드뷰
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,

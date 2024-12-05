@@ -49,7 +49,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                       Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
                         style: TextStyle(fontSize: fontSize*0.8),),
                       Text(
-                        '${widget.deck.deckName}',
+                        widget.deck.deckName,
                         style: TextStyle(fontSize: fontSize
                           // ,overflow: TextOverflow.ellipsis,
                         ),

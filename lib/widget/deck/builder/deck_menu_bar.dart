@@ -56,31 +56,28 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(0),
-                child: Container(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Expanded(flex: 1, child: Container(),),
-                      Expanded(
-                          flex: 12,
-                          child: TextField(
-                            style: TextStyle(fontSize: fontSize),
-                            controller: widget.textEditingController,
-                            onChanged: (v) {
-                              widget.deck.deckName = v;
-                            },
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: widget.deck.isSave
-                              ? Container()
-                              : const TabTooltip(
-                                  message: '변경 사항이 저장되지 않았습니다.',
-                                  child:
-                                      Icon(Icons.warning, color: Colors.amber),
-                                )),
-                    ],
-                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                        flex: 12,
+                        child: TextField(
+                          style: TextStyle(fontSize: fontSize),
+                          controller: widget.textEditingController,
+                          onChanged: (v) {
+                            widget.deck.deckName = v;
+                          },
+                        )),
+                    Expanded(
+                        flex: 2,
+                        child: widget.deck.isSave
+                            ? Container()
+                            : const TabTooltip(
+                                message: '변경 사항이 저장되지 않았습니다.',
+                                child:
+                                    Icon(Icons.warning, color: Colors.amber),
+                              )),
+                  ],
                 ),
               )),
           Expanded(

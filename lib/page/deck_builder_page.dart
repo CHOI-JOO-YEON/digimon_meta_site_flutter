@@ -57,7 +57,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   DeckBuild deck = DeckBuild.empty();
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
-  Timer? _debounce; // 디바운스를 위한 타이머
+  Timer? _debounce;
 
   void updateSearchParameter() {
     context.navigateTo(DeckBuilderRoute(
@@ -74,7 +74,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void dispose() {
     if (mounted) {
       _scrollController.dispose();
-      _debounce?.cancel(); // 타이머가 남아 있으면 해제
+      _debounce?.cancel();
     }
 
     super.dispose();
@@ -113,14 +113,14 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 builder: (BuildContext context, StateSetter setState) {
                   return AlertDialog(
                     actionsAlignment: MainAxisAlignment.spaceBetween,
-                    title: Text('저장된 덱 불러오기'),
+                    title: const Text('저장된 덱 불러오기'),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('이전에 작성 중이던 덱이 있습니다. 불러오시겠습니까?'),
+                        const Text('이전에 작성 중이던 덱이 있습니다. 불러오시겠습니까?'),
                         if (isLoading)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16.0),
                             child: CircularProgressIndicator(),
                           ),
                       ],
@@ -128,7 +128,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     actions: [
                       if (!isLoading)
                         TextButton(
-                          child: Text('아니오'),
+                          child: const Text('아니오'),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                             html.window.localStorage.remove('deck');
@@ -136,7 +136,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                         ),
                       if (!isLoading)
                         TextButton(
-                          child: Text('예'),
+                          child: const Text('예'),
                           onPressed: () async {
                             setState(() {
                               isLoading = true;
@@ -376,7 +376,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                           _scrollController.animateTo(
                                             0,
                                             duration:
-                                                Duration(milliseconds: 500),
+                                                const Duration(milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -393,7 +393,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             _scrollController
                                                 .position.maxScrollExtent,
                                             duration:
-                                                Duration(milliseconds: 500),
+                                                const Duration(milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -422,7 +422,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   onViewModeChanged: onViewModeChanged,
                                   updateSearchParameter: updateSearchParameter,
                                 )),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
                             Expanded(
@@ -451,7 +451,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             isTextSimplify: isTextSimplify,
                                             searchNote: searchNote,
                                           ))
-                                    : Center(
+                                    : const Center(
                                         child: CircularProgressIndicator())),
                             Expanded(
                                 flex: _panelController.panelPosition < 0.7
@@ -563,7 +563,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       isTextSimplify: isTextSimplify,
                                       searchNote: searchNote,
                                     ))
-                              : Center(child: CircularProgressIndicator()))
+                              : const Center(child: CircularProgressIndicator()))
                     ],
                   ),
                 ),
