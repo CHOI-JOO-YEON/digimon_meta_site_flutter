@@ -87,10 +87,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
       notes.addAll(await CardApi().getNotes());
-      List<TypeDto> types = await CardApi().getTypes();
-      for (var type in types) {
-        TypeService().insert(type);
-      }
+
+      await TypeService().init();
       if (widget.searchParameterString != null) {
         searchParameter = SearchParameter.fromJson(
             json.decode(widget.searchParameterString!));

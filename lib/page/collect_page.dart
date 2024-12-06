@@ -16,6 +16,7 @@ import '../model/note.dart';
 import '../model/search_parameter.dart';
 import '../provider/user_provider.dart';
 import '../service/deck_service.dart';
+import '../service/type_service.dart';
 import '../widget/card/builder/card_search_bar.dart';
 import '../widget/card/collect/collect_card_scroll_grdiview_widget.dart';
 import '../widget/card/collect/deck_calc_dialog.dart';
@@ -47,6 +48,9 @@ class _CollectPageState extends State<CollectPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Future.delayed(const Duration(seconds: 0), () async {
+      await TypeService().init();
+    });
     initSearch();
   }
 

@@ -1,4 +1,5 @@
 
+import '../api/card_api.dart';
 import '../model/type.dart';
 
 class TypeService {
@@ -14,7 +15,6 @@ class TypeService {
 
 
   void insert(TypeDto typeDto) {
-
     map[typeDto.name]=typeDto;
   }
 
@@ -28,4 +28,14 @@ class TypeService {
     }
     return result;
   }
+
+  Future<void> init() async {
+    if(map.isEmpty) {
+      List<TypeDto> types = await CardApi().getTypes();
+      for (var type in types) {
+        TypeService().insert(type);
+      }
+    }
+  }
+
 }
