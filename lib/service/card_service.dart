@@ -28,7 +28,7 @@ class CardService {
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              LocaleCardData localeCardData = card.localeCardDatas[selectedLocaleIndex];
+              LocaleCardData localeCardData = card.localeCardData[selectedLocaleIndex];
 
               return AlertDialog(
                 content: Stack(
@@ -107,7 +107,7 @@ class CardService {
                                     ),
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: card.localeCardDatas.asMap().entries.map((entry) {
+                                      children: card.localeCardData.asMap().entries.map((entry) {
                                         int index = entry.key;
                                         LocaleCardData localeCardDate = entry.value;
                                         return Padding(
@@ -166,7 +166,7 @@ class CardService {
                                                         width:
                                                         constraints.maxWidth,
                                                         child: Image.network(
-                                                            card.imgUrl ?? '',
+                                                            card.getDisplayImgUrl() ?? '',
                                                             fit: BoxFit.fitWidth),
                                                       ),
                                                       Positioned(
@@ -184,11 +184,11 @@ class CardService {
                                                             EdgeInsets.zero,
                                                             tooltip: '이미지 다운로드',
                                                             onPressed: () async {
-                                                              if (card.imgUrl !=
+                                                              if (card.getDisplayImgUrl() !=
                                                                   null) {
                                                                 await WebImageDownloader
                                                                     .downloadImageFromWeb(
-                                                                  card.imgUrl!,
+                                                                  card.getDisplayImgUrl()!,
                                                                   name:
                                                                   '${card.cardNo}_${card.getDisplayName()}.png',
                                                                 );
@@ -354,7 +354,7 @@ class CardService {
                                               BorderRadius.circular(5)),
                                           child: ListTile(
                                             leading: Image.network(
-                                                usedCard.smallImgUrl ?? ''),
+                                                usedCard.getDisplaySmallImgUrl() ?? ''),
                                             title: Text(
                                               usedCard.getDisplayName() ?? '',
                                               style: TextStyle(

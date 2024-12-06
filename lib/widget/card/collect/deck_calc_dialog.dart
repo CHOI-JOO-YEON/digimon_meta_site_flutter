@@ -329,7 +329,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                     return Card(
                                       child: ListTile(
                                         leading: Image.network(
-                                            card.smallImgUrl ?? ''),
+                                            card.getDisplaySmallImgUrl() ?? ''),
                                         title: Text(
                                             '${card.cardNo} ${card.getDisplayName()} ${card.rarity}' ??
                                                 ''),

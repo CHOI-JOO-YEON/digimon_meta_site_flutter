@@ -38,7 +38,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   void initState() {
     super.initState();
     if (widget.deck.deckCards.isEmpty) {
-      _selectedCard = DigimonCard(isEn: false, localeCardDatas: []);
+      _selectedCard = DigimonCard(isEn: false, localeCardData: []);
     } else {
       _selectedCard = widget.deck.deckCards.first;
     }
@@ -375,7 +375,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                               width: 640 * scaleFactor,
                               child: Image.network(
                                   fit: BoxFit.contain,
-                                  _selectedCard?.imgUrl ?? ''),
+                                  _selectedCard?.getDisplayImgUrl() ?? ''),
                             ),
                           if (isHorizontal)
                             SizedBox(
@@ -527,7 +527,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                     setState(() {});
                   },
                   child: Image.network(
-                    cards[index].smallImgUrl ?? '',
+                    cards[index].getDisplaySmallImgUrl() ?? '',
                     fit: BoxFit.contain,
                   ),
                 );

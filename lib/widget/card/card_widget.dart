@@ -142,7 +142,7 @@ class _CustomCardState extends State<CustomCard> {
                             0,
                           ]),
                     child: Image.network(
-                      widget.card.smallImgUrl ?? '',
+                      widget.card.getDisplaySmallImgUrl() ?? '',
                       fit: BoxFit.fill,
                     ),
                   ),

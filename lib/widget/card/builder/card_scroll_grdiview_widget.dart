@@ -126,7 +126,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 width: (constraints.maxWidth / widget.rowNumber) * 0.99,
                 cardPressEvent: widget.cardPressEvent,
                 onHover: (context) =>
-                    _showBigImage(context, widget.cards[index].imgUrl!, index),
+                    _showBigImage(context, widget.cards[index].getDisplayImgUrl()!, index),
                 onExit: _hideBigImage,
                 searchNote: widget.searchNote,
                 onLongPress: () => CardService().showImageDialog(

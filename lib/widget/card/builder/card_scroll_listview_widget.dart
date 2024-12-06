@@ -97,7 +97,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                         borderRadius: BorderRadius.circular(5),
                         color: Theme.of(context).cardColor),
                     child: ListTile(
-                      leading: Image.network(card.smallImgUrl!),
+                      leading: Image.network(card.getDisplaySmallImgUrl()!),
                       title: Row(
                         children: [
                           Text('${card.cardNo}'),

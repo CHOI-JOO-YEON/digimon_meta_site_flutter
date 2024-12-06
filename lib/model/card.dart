@@ -22,18 +22,13 @@ class DigimonCard {
   String? form;
   String? attributes;
   List<String>? types;
-  String? imgUrl;
-  String? smallImgUrl;
   bool? isParallel;
   String? sortString;
   DateTime? releaseDate;
   String? noteName;
   int? noteId;
   bool isEn;
-
-  List<LocaleCardData> localeCardDatas;
-
-  // Uint8List? compressedImg;
+  List<LocaleCardData> localeCardData;
 
   String getKorCardType() {
     switch (cardType) {
@@ -108,15 +103,13 @@ class DigimonCard {
       this.form,
       this.attributes,
       this.types,
-      this.imgUrl,
       this.isParallel,
       this.sortString,
-      this.smallImgUrl,
       this.releaseDate,
       this.noteId,
       this.noteName,
       required this.isEn,
-      required this.localeCardDatas});
+      required this.localeCardData});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
@@ -137,8 +130,6 @@ class DigimonCard {
       form: json['form'],
       attributes: json['attributes'],
       types: json['types'] != null ? List<String>.from(json['types']) : null,
-      imgUrl: json['imgUrl'],
-      smallImgUrl: json['smallImgUrl'],
       isParallel: json['isParallel'],
       sortString: json['sortString'],
       releaseDate: json['releaseDate'] != null
@@ -147,24 +138,31 @@ class DigimonCard {
       isEn: json['isEn'] ?? false,
       noteId: json['noteId'],
       noteName: json['noteName'],
-      localeCardDatas: List<LocaleCardData>.from(
-          json['localeCardDatas'].map((x) => LocaleCardData.fromJson(x))),
+      localeCardData: List<LocaleCardData>.from(
+          json['localeCardData'].map((x) => LocaleCardData.fromJson(x))),
     );
   }
 
   String? getDisplayName() {
-    return localeCardDatas.first.name;
+    return localeCardData.first.name;
   }
 
   String? getDisplayEffect() {
-    return localeCardDatas.first.effect;
+    return localeCardData.first.effect;
   }
 
   String? getDisplaySourceEffect() {
-    return localeCardDatas.first.sourceEffect;
+    return localeCardData.first.sourceEffect;
   }
 
   String? getDisplayLocale() {
-    return localeCardDatas.first.locale;
+    return localeCardData.first.locale;
+  }
+
+  String? getDisplayImgUrl() {
+    return localeCardData.first.imgUrl;
+  }
+  String? getDisplaySmallImgUrl() {
+    return localeCardData.first.smallImgUrl;
   }
 }

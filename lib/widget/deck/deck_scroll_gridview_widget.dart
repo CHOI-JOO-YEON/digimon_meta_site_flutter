@@ -115,7 +115,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                   onHover: (context) {
                     final RenderBox renderBox = cardKey.currentContext!
                         .findRenderObject() as RenderBox;
-                    widget.cardOverlayService.showBigImage(context, card.imgUrl!,
+                    widget.cardOverlayService.showBigImage(context, card.getDisplayImgUrl()!,
                         renderBox, widget.rowNumber, index);
                   },
                   onExit: widget.cardOverlayService.hideBigImage,

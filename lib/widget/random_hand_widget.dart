@@ -100,7 +100,7 @@ class _RandomHandWidgetState extends State<RandomHandWidget> {
                       child: Stack(
                         children: securities.asMap().entries.map((entry) {
                           int index = entry.key;
-                          String url = entry.value.smallImgUrl ?? '';
+                          String url = entry.value.getDisplaySmallImgUrl() ?? '';
                           return Positioned(
                             top: (4-index) * (cardWidth/3),
                             child: FittedBox(

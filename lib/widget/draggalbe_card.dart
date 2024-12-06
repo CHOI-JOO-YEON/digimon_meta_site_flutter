@@ -11,7 +11,7 @@ class DraggableCard extends StatelessWidget {
     return Draggable<DigimonCard>(
       data: card,
         child: MouseRegion(
-          child: Image.network(card.smallImgUrl??''),
+          child: Image.network(card.getDisplaySmallImgUrl()??''),
         ),
         feedback: Material(
             child: Text('1',
