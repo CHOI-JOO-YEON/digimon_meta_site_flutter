@@ -381,7 +381,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                   });
                                 },
                               ),
-                              const Text('한글 카드만'),
+                              const Text('한국 발매카드만'),
                             ],
                           ),
                           Row(
