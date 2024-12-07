@@ -583,6 +583,7 @@ class CardService {
             'Counter',
             'On Deletion',
             'Digivolve'
+            'Main'
           ].any((keyword) => matchedText.contains(keyword))) {
             return const Color.fromRGBO(33, 37, 131, 1);
           } else if ([
