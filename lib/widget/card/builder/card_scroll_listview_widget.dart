@@ -169,17 +169,16 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   }
 
   Widget _buildEffectText(String text, String prefix, String locale) {
-    final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
-
     final List<InlineSpan> spans = [];
-    final RegExp regexp = RegExp(
-        r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
-    final Iterable<Match> matches = regexp.allMatches(trimmedText);
-
     spans.add(TextSpan(
         text: prefix,
         style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "JalnanGothic")));
     spans.add(TextSpan(text: '\n'));
+
+    final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
+    final RegExp regexp = RegExp(
+        r'(［[^［］]*］|（[^（）]*）|≪[^≪≫]*≫|【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
+    final Iterable<Match> matches = regexp.allMatches(trimmedText);
 
     int lastIndex = 0;
     for (final match in matches) {
@@ -197,8 +196,12 @@ class _CardScrollListViewState extends State<CardScrollListView> {
         backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
         backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
+      } else if (matchedText.startsWith('［') && matchedText.endsWith('］')) {
+        backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
       } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        if (matchedText.contains('조그레스') || matchedText.contains('진화') || matchedText.contains('進化')) {
+        if (matchedText.contains('조그레스') ||
+            matchedText.contains('진화') ||
+            matchedText.contains('進化')) {
           backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
         } else {
           backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
@@ -206,18 +209,19 @@ class _CardScrollListViewState extends State<CardScrollListView> {
       } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
         backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
       } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-        if (widget.isTextSimplify) {
-          lastIndex = match.end;
-          continue;
-        } else {
-          innerText = '(' + innerText + ')';
-          backgroundColor = Colors.black54;
-        }
+        innerText = '($innerText)';
+        backgroundColor = Colors.black54;
       } else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
         backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
+      } else if (matchedText.startsWith('≪') && matchedText.endsWith('≫')) {
+        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
+      } else if (matchedText.startsWith('（') && matchedText.endsWith('）')) {
+        backgroundColor = Colors.black54;
       } else {
         backgroundColor = Colors.black;
       }
+
+
       spans.add(TextSpan(
           text: matchedText, style: TextStyle(color: backgroundColor)));
       lastIndex = match.end;
