@@ -4,7 +4,6 @@ import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:image_downloader_web/image_downloader_web.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
@@ -101,8 +100,12 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       title: Row(
                         children: [
                           Text('${card.cardNo}'),
-                          Text(' ${card.getDisplayName()}',
-                          style: TextStyle(fontFamily: card.getDisplayLocale() == 'JPN' ? "MPLUSC" : "JalnanGothic"),
+                          Text(
+                            ' ${card.getDisplayName()}',
+                            style: TextStyle(
+                                fontFamily: card.getDisplayLocale() == 'JPN'
+                                    ? "MPLUSC"
+                                    : "JalnanGothic"),
                           ),
                         ],
                       ),
@@ -172,63 +175,17 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     final List<InlineSpan> spans = [];
     spans.add(TextSpan(
         text: prefix,
-        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "JalnanGothic")));
-    spans.add(TextSpan(text: '\n'));
+        style: const TextStyle(
+            fontWeight: FontWeight.bold, fontFamily: "JalnanGothic")));
+    spans.add(const TextSpan(text: '\n'));
 
-    final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
-    final RegExp regexp = RegExp(
-        r'(［[^［］]*］|（[^（）]*）|≪[^≪≫]*≫|【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕|디지크로스\s*-\d+)');
-    final Iterable<Match> matches = regexp.allMatches(trimmedText);
-
-    int lastIndex = 0;
-    for (final match in matches) {
-      if (match.start > lastIndex) {
-        spans
-            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
-      }
-
-      final String matchedText = match.group(0)!;
-      String innerText = matchedText.substring(1, matchedText.length - 1);
-      Color backgroundColor;
-      if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
-        backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
-      } else if (matchedText.startsWith('《') && matchedText.endsWith('》')) {
-        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
-      } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
-        backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
-      } else if (matchedText.startsWith('［') && matchedText.endsWith('］')) {
-        backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
-      } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-        if (matchedText.contains('조그레스') ||
-            matchedText.contains('진화') ||
-            matchedText.contains('進化')) {
-          backgroundColor = const Color.fromRGBO(33, 37, 131, 1);
-        } else {
-          backgroundColor = const Color.fromRGBO(163, 23, 99, 1);
-        }
-      } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
-        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
-      } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-        innerText = '($innerText)';
-        backgroundColor = Colors.black54;
-      } else if (RegExp(r'^디지크로스\s*-\d+$').hasMatch(matchedText)) {
-        backgroundColor = const Color.fromRGBO(61, 178, 86, 1);
-      } else if (matchedText.startsWith('≪') && matchedText.endsWith('≫')) {
-        backgroundColor = const Color.fromRGBO(206, 101, 1, 1);
-      } else if (matchedText.startsWith('（') && matchedText.endsWith('）')) {
-        backgroundColor = Colors.black54;
-      } else {
-        backgroundColor = Colors.black;
-      }
-
-
-      spans.add(TextSpan(
-          text: matchedText, style: TextStyle(color: backgroundColor)));
-      lastIndex = match.end;
+    if(widget.isTextSimplify) {
+      final RegExp pattern1 = RegExp(r'（[^（）]*）');
+      final RegExp pattern2 = RegExp(r'\([^()]*\)');
+      text = text.replaceAll(pattern1, "");
+      text = text.replaceAll(pattern2, "");
     }
-    if (lastIndex < trimmedText.length) {
-      spans.add(TextSpan(text: trimmedText.substring(lastIndex)));
-    }
+    spans.addAll(CardService().getSpansByLocale(locale, text));
 
     return RichText(
       text: TextSpan(
@@ -241,92 +198,4 @@ class _CardScrollListViewState extends State<CardScrollListView> {
       ),
     );
   }
-// Widget _buildEffectText(String text, String prefix) {
-//   // 줄바꿈 후 시작하는 공백 제거
-//   final String trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
-//
-//   final List<InlineSpan> spans = [];
-//   final RegExp regexp =
-//   RegExp(r'(【[^【】]*】|《[^《》]*》|\[[^\[\]]*\]|〈[^〈〉]*〉|\([^()]*\)|〔[^〔〕]*〕)');
-//   final Iterable<Match> matches = regexp.allMatches(trimmedText);
-//
-//   spans.add(
-//       TextSpan(text: prefix, style: TextStyle(fontWeight: FontWeight.bold)));
-//   spans.add(TextSpan(text: '\n')); // 줄바꿈 추가
-//
-//   int lastIndex = 0;
-//   for (final match in matches) {
-//     if (match.start > lastIndex) {
-//       spans
-//           .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
-//     }
-//
-//     final String matchedText = match.group(0)!;
-//     String innerText = matchedText.substring(1, matchedText.length - 1);
-//     Color backgroundColor;
-//     if (matchedText.startsWith('【') && matchedText.endsWith('】')) {
-//       backgroundColor = Color.fromRGBO(33, 37, 131, 1);
-//     } else if (matchedText.startsWith('《') && matchedText.endsWith('》')) {
-//       backgroundColor = Color.fromRGBO(206, 101, 1, 1);
-//     } else if (matchedText.startsWith('[') && matchedText.endsWith(']')) {
-//       backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-//     } else if (matchedText.startsWith('〔') && matchedText.endsWith('〕')) {
-//       backgroundColor = Color.fromRGBO(163, 23, 99, 1);
-//     } else if (matchedText.startsWith('〈') && matchedText.endsWith('〉')) {
-//       backgroundColor = Color.fromRGBO(206, 101, 1, 1);
-//     } else if (matchedText.startsWith('(') && matchedText.endsWith(')')) {
-//       if (widget.isTextSimplify) {
-//         lastIndex = match.end;
-//         continue; // 괄호 안 텍스트 숨기기
-//       } else {
-//         innerText = '(' + innerText + ')';
-//         backgroundColor = Colors.transparent;
-//       }
-//     } else {
-//       backgroundColor = Colors.transparent;
-//     }
-//
-//     spans.add(
-//       WidgetSpan(
-//         alignment: PlaceholderAlignment.middle,
-//         child: Container(
-//           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-//           // margin: EdgeInsets.only(top: 2, bottom: 2),
-//           decoration: BoxDecoration(
-//             color: backgroundColor,
-//             borderRadius: BorderRadius.circular(4),
-//           ),
-//           child: Text(
-//             innerText,
-//             style: TextStyle(
-//               fontSize: 12,
-//               color: backgroundColor != Colors.transparent
-//                   ? Colors.white
-//                   : Colors.black,
-//               height: 1.4,
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//
-//     lastIndex = match.end;
-//   }
-//
-//   if (lastIndex < trimmedText.length) {
-//     spans.add(TextSpan(text: trimmedText.substring(lastIndex)));
-//   }
-//
-//   return RichText(
-//     text: TextSpan(
-//       children: spans,
-//       style: TextStyle(
-//         fontSize: 12,
-//         color: Colors.black,
-//         height: 1.4,
-//         fontFamily: 'JalnanGothic',
-//       ),
-//     ),
-//   );
-// }
 }
