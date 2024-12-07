@@ -20,7 +20,7 @@ class DigimonCard {
   String? rarity;
   String? cardType;
   String? form;
-  String? attributes;
+  String? attribute;
   List<String>? types;
   bool? isParallel;
   String? sortString;
@@ -101,7 +101,7 @@ class DigimonCard {
       this.rarity,
       this.cardType,
       this.form,
-      this.attributes,
+      this.attribute,
       this.types,
       this.isParallel,
       this.sortString,
@@ -128,7 +128,7 @@ class DigimonCard {
       rarity: json['rarity'],
       cardType: json['cardType'],
       form: json['form'],
-      attributes: json['attributes'],
+      attribute: json['attribute'],
       types: json['types'] != null ? List<String>.from(json['types']) : null,
       isParallel: json['isParallel'],
       sortString: json['sortString'],

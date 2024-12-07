@@ -225,10 +225,10 @@ class CardService {
                                                           .getColorFromString(
                                                           card.color1!),
                                                       fontSize),
-                                                if (card.attributes != null)
+                                                if (card.attribute != null)
                                                   _attributeWidget(
                                                       context,
-                                                      [card.attributes!],
+                                                      [card.attribute!],
                                                       '속성',
                                                       ColorService
                                                           .getColorFromString(
@@ -260,10 +260,10 @@ class CardService {
                                                 ColorService.getColorFromString(
                                                     card.color1!),
                                                 fontSize),
-                                          if (card.attributes != null)
+                                          if (card.attribute != null)
                                             _attributeWidget(
                                                 context,
-                                                [card.attributes!],
+                                                [card.attribute!],
                                                 '속성',
                                                 ColorService.getColorFromString(
                                                     card.color1!),
