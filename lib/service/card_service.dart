@@ -582,7 +582,7 @@ class CardService {
             'Opponent\'s Turn',
             'Counter',
             'On Deletion',
-            'Digivolve'
+            'Digivolve',
             'Main'
           ].any((keyword) => matchedText.contains(keyword))) {
             return const Color.fromRGBO(33, 37, 131, 1);
