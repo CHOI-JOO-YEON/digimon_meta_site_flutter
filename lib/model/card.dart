@@ -1,6 +1,8 @@
+import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:digimon_meta_site_flutter/model/locale_card_data.dart';
+import 'package:idb_shim/idb.dart';
 
 import '../enums/form.dart';
 
@@ -160,9 +162,19 @@ class DigimonCard {
   }
 
   String? getDisplayImgUrl() {
-    return localeCardData.first.imgUrl;
+    for (var localeCardData in localeCardData) { 
+      if(localeCardData.imgUrl!=null) {
+        return localeCardData.imgUrl;
+      }
+    }
+    return null;
   }
   String? getDisplaySmallImgUrl() {
-    return localeCardData.first.smallImgUrl;
+    for (var localeCardData in localeCardData) {
+      if(localeCardData.smallImgUrl!=null) {
+        return localeCardData.smallImgUrl;
+      }
+    }
+    return null;
   }
 }
