@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Digimon-Meta',
+      title: 'DGCHub',
       theme: ThemeData(
        fontFamily: 'JalnanGothic',
         primarySwatch: const MaterialColor(0xFF1A237E, {

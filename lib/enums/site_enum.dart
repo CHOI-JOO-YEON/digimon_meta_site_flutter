@@ -80,7 +80,7 @@ extension SiteNameMapExtension on SiteName {
 
   String _convertDeckToDeckCodeByTTS(DeckBuild deck) {
     List<String> returnStrings = [];
-    returnStrings.add("Exported from Digimon-Meta");
+    returnStrings.add("Exported from DGCHub");
     for (var entry in deck.deckMap.entries) {
       for(int i=0;i<entry.value;i++){
         returnStrings.add(entry.key.cardNo!);

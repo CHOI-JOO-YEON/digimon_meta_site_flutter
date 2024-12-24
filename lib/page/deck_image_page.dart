@@ -449,7 +449,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text(
-          'Image created using Digimon Meta (digimon-meta.site)',
+          'Image created using DGCHub (dgchub.com)',
           style: TextStyle(
               fontSize: 10 * scaleFactor,
               color: deckImageColorService.selectedDeckImageColor.textColor),
