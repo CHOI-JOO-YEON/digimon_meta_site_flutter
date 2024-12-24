@@ -22,7 +22,7 @@ jobs:
       run: flutter pub get
 
     - name: Build Flutter Web with environment variable
-      run: flutter build web --release --dart-define=SERVER_URL=https://digimon-meta.site
+      run: flutter build web --release --dart-define=SERVER_URL=https://dgchub.com
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
