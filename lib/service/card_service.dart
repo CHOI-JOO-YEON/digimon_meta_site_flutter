@@ -536,6 +536,10 @@ class CardService {
         'color': const Color.fromRGBO(206, 101, 1, 1),
       },
       {
+        'pattern': r'《오버플로우 《-?\d+》》',
+        'color': const Color.fromRGBO(206, 101, 1, 1),
+      },
+      {
         'pattern': r'《[^《》]*》',
         'color': const Color.fromRGBO(206, 101, 1, 1),
       },
