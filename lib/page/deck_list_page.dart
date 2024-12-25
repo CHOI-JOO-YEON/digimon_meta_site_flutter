@@ -21,7 +21,8 @@ class DeckListPage extends StatefulWidget {
   final String? searchParameterString;
 
   const DeckListPage(
-      {super.key, @QueryParam('searchParameter') this.searchParameterString});
+      {super.key,
+      @QueryParam('searchParameter') this.searchParameterString,});
 
   @override
   State<DeckListPage> createState() => _DeckListPageState();
@@ -194,15 +195,15 @@ class _DeckListPageState extends State<DeckListPage> {
                                               onPressed: () {
                                                 _scrollController.animateTo(
                                                   0,
-                                                  duration:
-                                                      Duration(milliseconds: 500),
+                                                  duration: Duration(
+                                                      milliseconds: 500),
                                                   curve: Curves.easeInOut,
                                                 );
                                               },
                                               child: Text(
                                                 '메인덱',
-                                                style:
-                                                    TextStyle(fontSize: fontSize),
+                                                style: TextStyle(
+                                                    fontSize: fontSize),
                                               )),
                                         ),
                                         Expanded(
@@ -212,15 +213,15 @@ class _DeckListPageState extends State<DeckListPage> {
                                                 _scrollController.animateTo(
                                                   _scrollController
                                                       .position.maxScrollExtent,
-                                                  duration:
-                                                      Duration(milliseconds: 500),
+                                                  duration: Duration(
+                                                      milliseconds: 500),
                                                   curve: Curves.easeInOut,
                                                 );
                                               },
                                               child: Text(
                                                 '타마덱',
-                                                style:
-                                                    TextStyle(fontSize: fontSize),
+                                                style: TextStyle(
+                                                    fontSize: fontSize),
                                               )),
                                         )
                                       ],
@@ -254,14 +255,16 @@ class _DeckListPageState extends State<DeckListPage> {
                     child: _selectedDeck == null
                         ? Container()
                         : Column(
-                          children: [
-                            DeckViewerView(
+                            children: [
+                              DeckViewerView(
                                 deck: _selectedDeck!,
                                 searchNote: searchNote,
                               ),
-                            SizedBox(height: MediaQuery.sizeOf(context).height*0.2,)
-                          ],
-                        ),
+                              SizedBox(
+                                height: MediaQuery.sizeOf(context).height * 0.2,
+                              )
+                            ],
+                          ),
                   ),
                 ));
           })

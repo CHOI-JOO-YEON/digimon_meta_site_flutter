@@ -15,14 +15,18 @@ class DeckScrollGridView extends StatefulWidget {
   final Function(DigimonCard)? removeCard;
   final CardOverlayService cardOverlayService;
   final bool isTama;
-  const DeckScrollGridView(
-      {super.key,
-      required this.deckCount,
-      required this.rowNumber,
-      required this.deck,
-      this.searchNote,
-      this.addCard,
-      this.removeCard, required this.cardOverlayService, required this.isTama, });
+
+  const DeckScrollGridView({
+    super.key,
+    required this.deckCount,
+    required this.rowNumber,
+    required this.deck,
+    this.searchNote,
+    this.addCard,
+    this.removeCard,
+    required this.cardOverlayService,
+    required this.isTama,
+  });
 
   @override
   State<DeckScrollGridView> createState() => _DeckScrollGridViewState();
@@ -34,7 +38,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
   @override
   void initState() {
     super.initState();
-   
+
     WidgetsBinding.instance.addObserver(this); // Observer 등록
     _scrollController.addListener(() {
       // 스크롤이 발생할 때 오버레이 위치 업데이트
@@ -75,9 +79,12 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return GridView.builder(
-          shrinkWrap: true, // 내부 요소에 따라 그리드 높이 조절
-          controller: _scrollController, // ScrollController 연결
-          physics: const NeverScrollableScrollPhysics(), // 그리드뷰 자체 스크롤 비활성화
+          shrinkWrap: true,
+          // 내부 요소에 따라 그리드 높이 조절
+          controller: _scrollController,
+          // ScrollController 연결
+          physics: const NeverScrollableScrollPhysics(),
+          // 그리드뷰 자체 스크롤 비활성화
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,
@@ -91,6 +98,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
 
             return Stack(
               children: [
+                
                 CustomCard(
                   key: cardKey,
                   card: card,
@@ -105,18 +113,27 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                           () => {
                                 widget.removeCard!(card),
                                 if (widget.deckCount[card] == null)
-                                  {widget.cardOverlayService.removeAllOverlays()}
+                                  {
+                                    widget.cardOverlayService
+                                        .removeAllOverlays()
+                                  }
                               },
-                          () => widget.addCard!(card),widget.isTama);
+                          () => widget.addCard!(card),
+                          widget.isTama);
                     }
                   },
                   onLongPress: () => CardService()
-                      .showImageDialog(context, card, widget.searchNote),
+                      .showImageDialog(context, card, widget.searchNote, 
+                  ),
                   onHover: (context) {
-                    final RenderBox renderBox = cardKey.currentContext!
-                        .findRenderObject() as RenderBox;
-                    widget.cardOverlayService.showBigImage(context, card.getDisplayImgUrl()!,
-                        renderBox, widget.rowNumber, index);
+                    final RenderBox renderBox =
+                        cardKey.currentContext!.findRenderObject() as RenderBox;
+                    widget.cardOverlayService.showBigImage(
+                        context,
+                        card.getDisplayImgUrl()!,
+                        renderBox,
+                        widget.rowNumber,
+                        index);
                   },
                   onExit: widget.cardOverlayService.hideBigImage,
                   searchNote: widget.searchNote,
@@ -130,9 +147,9 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                     child: StrokeText(
                       text: '$count',
                       textStyle: TextStyle(
-                        fontSize: ((constraints.maxWidth / widget.rowNumber) *
-                                0.9) /
-                            6,
+                        fontSize:
+                            ((constraints.maxWidth / widget.rowNumber) * 0.9) /
+                                6,
                         color: Colors.black,
                       ),
                       strokeColor: Colors.white,

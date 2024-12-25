@@ -18,7 +18,7 @@ class DeckViewerView extends StatefulWidget {
   const DeckViewerView({
     super.key,
     required this.deck,
-    this.searchNote,
+    this.searchNote, 
   });
 
   @override

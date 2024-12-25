@@ -17,6 +17,7 @@ class CardScrollGridView extends StatefulWidget {
   final int totalPages;
   final int currentPage;
   final Function(DigimonCard)? mouseEnterEvent;
+  final bool isTextSimplify;
 
   const CardScrollGridView({
     super.key,
@@ -26,7 +27,7 @@ class CardScrollGridView extends StatefulWidget {
     required this.cardPressEvent,
     this.mouseEnterEvent,
     required this.totalPages,
-    required this.currentPage,
+    required this.currentPage, required this.isTextSimplify,
   });
 
   @override

@@ -3,7 +3,8 @@ import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import '../../../provider/text_simplify_provider.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
@@ -12,21 +13,18 @@ class CardScrollListView extends StatefulWidget {
   final int totalPages;
   final int currentPage;
   final Function(DigimonCard)? mouseEnterEvent;
-  final bool isTextSimplify;
-  final Function(bool) updateIsTextSimplify;
   final Function(int)? searchNote;
 
-  const CardScrollListView(
-      {super.key,
-      required this.cards,
-      required this.loadMoreCards,
-      required this.cardPressEvent,
-      this.mouseEnterEvent,
-      required this.totalPages,
-      required this.currentPage,
-      required this.isTextSimplify,
-      required this.updateIsTextSimplify,
-      this.searchNote});
+  const CardScrollListView({
+    super.key,
+    required this.cards,
+    required this.loadMoreCards,
+    required this.cardPressEvent,
+    this.mouseEnterEvent,
+    required this.totalPages,
+    required this.currentPage,
+    this.searchNote,
+  });
 
   @override
   State<CardScrollListView> createState() => _CardScrollListViewState();
@@ -44,7 +42,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !isLoading &&
         widget.currentPage < widget.totalPages) {
       loadMoreItems();
@@ -68,15 +66,20 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Text('텍스트 간소화'),
-            Switch(
-              value: widget.isTextSimplify,
-              onChanged: (v) => widget.updateIsTextSimplify(v),
-              inactiveThumbColor: Colors.red,
-            )
-          ],
+        // 텍스트 간소화 스위치를 Consumer로 감싸 프로바이더 상태를 반영
+        Consumer<TextSimplifyProvider>(
+          builder: (context, textSimplifyProvider, child) {
+            return Row(
+              children: [
+                Text('텍스트 간소화'),
+                Switch(
+                  value: textSimplifyProvider.getTextSimplify(),
+                  onChanged: (v) => textSimplifyProvider.updateTextSimplify(v),
+                  inactiveThumbColor: Colors.red,
+                ),
+              ],
+            );
+          },
         ),
         Expanded(
           child: ListView.builder(
@@ -93,19 +96,26 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                   padding: const EdgeInsets.all(5.0),
                   child: Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: Theme.of(context).cardColor),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Theme.of(context).cardColor,
+                    ),
                     child: ListTile(
-                      leading: Image.network(card.getDisplaySmallImgUrl()!),
+                      leading: Image.network(
+                        card.getDisplaySmallImgUrl()!,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.broken_image);
+                        },
+                      ),
                       title: Row(
                         children: [
                           Text('${card.cardNo}'),
                           Text(
                             ' ${card.getDisplayName()}',
                             style: TextStyle(
-                                fontFamily: card.getDisplayLocale() == 'JPN'
-                                    ? "MPLUSC"
-                                    : "JalnanGothic"),
+                              fontFamily: card.getDisplayLocale() == 'JPN'
+                                  ? "MPLUSC"
+                                  : "JalnanGothic",
+                            ),
                           ),
                         ],
                       ),
@@ -123,10 +133,11 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       color: color.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: _buildEffectText(
-                                        card.getDisplayEffect()!,
-                                        '상단 텍스트',
-                                        card.getDisplayLocale()!),
+                                    child: EffectText(
+                                      text: card.getDisplayEffect()!,
+                                      prefix: '상단 텍스트',
+                                      locale: card.getDisplayLocale()!,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -142,10 +153,11 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       color: color.withOpacity(0.6),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: _buildEffectText(
-                                        card.getDisplaySourceEffect()!,
-                                        '하단 텍스트',
-                                        card.getDisplayLocale()!),
+                                    child: EffectText(
+                                      text: card.getDisplaySourceEffect()!,
+                                      prefix: '하단 텍스트',
+                                      locale: card.getDisplayLocale()!,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -154,8 +166,11 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.zoom_in),
-                        onPressed: () => CardService()
-                            .showImageDialog(context, card, widget.searchNote),
+                        onPressed: () => CardService().showImageDialog(
+                          context,
+                          card,
+                          widget.searchNote,
+                        ),
                       ),
                       onTap: () => widget.cardPressEvent(card),
                     ),
@@ -166,35 +181,47 @@ class _CardScrollListViewState extends State<CardScrollListView> {
               }
             },
           ),
-        )
+        ),
       ],
     );
   }
+}
 
-  Widget _buildEffectText(String text, String prefix, String locale) {
+class EffectText extends StatelessWidget {
+  final String text;
+  final String prefix;
+  final String locale;
+
+  const EffectText({
+    Key? key,
+    required this.text,
+    required this.prefix,
+    required this.locale,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    bool isTextSimplify = Provider.of<TextSimplifyProvider>(context).getTextSimplify();
     final List<InlineSpan> spans = [];
     spans.add(TextSpan(
-        text: prefix,
-        style: const TextStyle(
-            fontWeight: FontWeight.bold, fontFamily: "JalnanGothic")));
+      text: prefix,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontFamily: "JalnanGothic",
+      ),
+    ));
     spans.add(const TextSpan(text: '\n'));
-
-    if(widget.isTextSimplify) {
-      final RegExp pattern1 = RegExp(r'（[^（）]*）');
-      final RegExp pattern2 = RegExp(r'\([^()]*\)');
-      text = text.replaceAll(pattern1, "");
-      text = text.replaceAll(pattern2, "");
-    }
-    spans.addAll(CardService().getSpansByLocale(locale, text));
+    spans.addAll(CardService().getSpansByLocale(locale, text, isTextSimplify));
 
     return RichText(
       text: TextSpan(
         children: spans,
         style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            height: 1.4,
-            fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic"),
+          fontSize: 12,
+          color: Colors.black,
+          height: 1.4,
+          fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic",
+        ),
       ),
     );
   }

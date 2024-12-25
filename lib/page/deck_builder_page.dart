@@ -35,7 +35,7 @@ class DeckBuilderPage extends StatefulWidget {
   const DeckBuilderPage(
       {super.key,
       this.deck,
-      @QueryParam('searchParameter') this.searchParameterString});
+      @QueryParam('searchParameter') this.searchParameterString,});
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -52,7 +52,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   List<NoteDto> notes = [];
   int totalPages = 0;
   int currentPage = 0;
-  bool isTextSimplify = true;
 
   DeckBuild deck = DeckBuild.empty();
   SearchParameter searchParameter = SearchParameter();
@@ -174,8 +173,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   void _onScroll() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-    });
+    _debounce = Timer(const Duration(milliseconds: 300), () {});
   }
 
   @override
@@ -373,8 +371,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                         onPressed: () {
                                           _scrollController.animateTo(
                                             0,
-                                            duration:
-                                                const Duration(milliseconds: 500),
+                                            duration: const Duration(
+                                                milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -390,8 +388,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                           _scrollController.animateTo(
                                             _scrollController
                                                 .position.maxScrollExtent,
-                                            duration:
-                                                const Duration(milliseconds: 500),
+                                            duration: const Duration(
+                                                milliseconds: 500),
                                             curve: Curves.easeInOut,
                                           );
                                         },
@@ -442,11 +440,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             cardPressEvent: addCardByDeck,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
-                                            updateIsTextSimplify: (v) {
-                                              isTextSimplify = v;
-                                              setState(() {});
-                                            },
-                                            isTextSimplify: isTextSimplify,
                                             searchNote: searchNote,
                                           ))
                                     : const Center(
@@ -554,14 +547,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
                                       currentPage: currentPage,
-                                      updateIsTextSimplify: (v) {
-                                        isTextSimplify = v;
-                                        setState(() {});
-                                      },
-                                      isTextSimplify: isTextSimplify,
                                       searchNote: searchNote,
                                     ))
-                              : const Center(child: CircularProgressIndicator()))
+                              : const Center(
+                                  child: CircularProgressIndicator()))
                     ],
                   ),
                 ),

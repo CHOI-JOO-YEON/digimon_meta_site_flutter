@@ -110,7 +110,7 @@ class _RandomHandWidgetState extends State<RandomHandWidget> {
                                 // 라디안으로 변환된 90도
                                 origin: Offset(0,0),
                                 // 회전 축을 조정합니다. 이 값을 조절해 보세요.
-                                child: CustomCard(width: cardWidth,cardPressEvent: (card){},card: hands[index],),
+                                child: CustomCard(width: cardWidth,cardPressEvent: (card){},card: hands[index]),
                               ),
                             ),
                           );

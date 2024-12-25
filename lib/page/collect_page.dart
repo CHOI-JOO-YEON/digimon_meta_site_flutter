@@ -63,7 +63,6 @@ class _CollectPageState extends State<CollectPage> {
           SearchParameter.fromJson(json.decode(widget.searchParameterString!));
     }
     initSearch();
-
   }
 
   @override
@@ -202,8 +201,7 @@ class _CollectPageState extends State<CollectPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      List<DeckView>? decks =
-                          await DeckApi().findAllMyDecks();
+                      List<DeckView>? decks = await DeckApi().findAllMyDecks();
                       if (decks != null && decks.isNotEmpty) {
                         _showCalcDialog(context, decks);
                       }
@@ -260,6 +258,7 @@ class _CollectPageState extends State<CollectPage> {
                                         cardPressEvent: (card) {},
                                         totalPages: totalPages,
                                         currentPage: currentPage,
+                                        isTextSimplify: false,
                                       )
                                     : const Center(
                                         child: CircularProgressIndicator(),

@@ -22,7 +22,8 @@ class CardScrollGridView extends StatefulWidget {
       required this.cardPressEvent,
       this.mouseEnterEvent,
       required this.totalPages,
-      required this.currentPage, this.searchNote});
+      required this.currentPage,
+      this.searchNote,});
 
   @override
   State<CardScrollGridView> createState() => _CardScrollGridViewState();
@@ -125,12 +126,12 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 card: widget.cards[index],
                 width: (constraints.maxWidth / widget.rowNumber) * 0.99,
                 cardPressEvent: widget.cardPressEvent,
-                onHover: (context) =>
-                    _showBigImage(context, widget.cards[index].getDisplayImgUrl()!, index),
+                onHover: (context) => _showBigImage(
+                    context, widget.cards[index].getDisplayImgUrl()!, index),
                 onExit: _hideBigImage,
                 searchNote: widget.searchNote,
                 onLongPress: () => CardService().showImageDialog(
-                    context,widget.cards[index], widget.searchNote),
+                    context, widget.cards[index], widget.searchNote),
               ),
             );
           } else {
