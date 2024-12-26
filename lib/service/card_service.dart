@@ -101,7 +101,7 @@ class CardService {
                                               Colors.black,
                                             ),
                                             child: Text(
-                                              'Lv.${card.lv}',
+                                              'Lv.${card.lv==0?'-':card.lv}',
                                               style: TextStyle(fontSize: fontSize),
                                             ),
                                           ),
