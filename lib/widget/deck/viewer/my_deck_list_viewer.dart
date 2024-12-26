@@ -22,7 +22,13 @@ class MyDeckListViewer extends StatefulWidget {
   final VoidCallback updateSearchParameter;
 
   const MyDeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter, required this.updateSearchParameter});
+      {super.key,
+      required this.formatList,
+      required this.deckUpdate,
+      required this.selectedFormat,
+      required this.updateSelectFormat,
+      required this.deckSearchParameter,
+      required this.updateSearchParameter});
 
   @override
   State<MyDeckListViewer> createState() => _MyDeckListViewerState();
@@ -33,13 +39,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   int currentPage = 1;
   int maxPage = 0;
   int _selectedIndex = -1;
-  bool isLoading= false;
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     widget.deckSearchParameter.formatId = widget.selectedFormat.formatId;
-
-
 
     Future.delayed(const Duration(seconds: 0), () async {
       await searchDecks(widget.deckSearchParameter.myPage);
@@ -47,16 +52,16 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   }
 
   Future<void> searchDecks(int page) async {
-    if(isLoading) {
+    if (isLoading) {
       return;
     }
 
-    isLoading =true;
-    widget.deckSearchParameter.isMyDeck=true;
+    isLoading = true;
+    widget.deckSearchParameter.isMyDeck = true;
     currentPage = page;
-    widget.deckSearchParameter.updatePage(page,true);
-    PagedResponseDeckDto? pagedDeck = await DeckService().getDeck(widget.deckSearchParameter,context);
-
+    widget.deckSearchParameter.updatePage(page, true);
+    PagedResponseDeckDto? pagedDeck =
+        await DeckService().getDeck(widget.deckSearchParameter, context);
 
     if (pagedDeck != null) {
       decks = pagedDeck.decks;
@@ -64,36 +69,28 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
       maxPage = pagedDeck.totalPages;
       _selectedIndex = 0;
 
-      if(!decks.isEmpty) {
+      if (!decks.isEmpty) {
         widget.deckUpdate(decks.first);
       }
-
     }
     setState(() {
       widget.updateSearchParameter();
-      isLoading =false;
+      isLoading = false;
     });
-
-
-
   }
-
-
 
   void deleteDeck(int deckId) async {
     bool isSuccess = await DeckService().deleteDeck(deckId);
     if (isSuccess) {
-      if(decks.length==1) {
+      if (decks.length == 1) {
         await searchDecks(1);
-      }else{
+      } else {
         await searchDecks(widget.deckSearchParameter.myPage);
       }
-
     }
   }
 
-  void showModifyConfirmationDialog(
-      BuildContext context, DeckView deck) {
+  void showModifyConfirmationDialog(BuildContext context, DeckView deck) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -112,7 +109,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
               onPressed: () {
                 Navigator.of(context).pop();
                 DeckBuild newDeck = DeckBuild.deckView(deck, context);
-                newDeck.isSave=true;
+                newDeck.isSave = true;
                 context.navigateTo(DeckBuilderRoute(deck: newDeck));
               },
             ),
@@ -163,7 +160,8 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
           formatList: widget.formatList,
           searchParameter: widget.deckSearchParameter,
           search: searchDecks,
-          selectedFormat:  widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat,
+          selectedFormat: widget.selectedFormat,
+          updateSelectFormat: widget.updateSelectFormat,
           isMyDeck: true,
         ),
         SizedBox(
@@ -202,8 +200,9 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? '',
                       style: TextStyle(fontSize: fontSize)),
-                  subtitle: Text('${deck.authorName}#${(deck.authorId!-3).toString().padLeft(4,'0')}',
-                      style: TextStyle(fontSize: fontSize*0.8)),
+                  subtitle: Text(
+                      '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
+                      style: TextStyle(fontSize: fontSize * 0.8)),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);

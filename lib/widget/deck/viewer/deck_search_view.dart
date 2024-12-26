@@ -114,6 +114,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
                         '전체 덱',
                         style: TextStyle(fontSize: fontSize),
                       ),
+                      
                     ),
                     Tab(
                       child: Text(
@@ -123,7 +124,12 @@ class _DeckSearchViewState extends State<DeckSearchView>
                             color: _isDisabled[1] ? Colors.grey : Colors.black),
                       ),
                     ),
+                    
                   ],
+                  onTap: (index) {
+                    widget.deckSearchParameter.isMyDeck = index == 1;
+                    widget.updateSearchParameter();
+                  },
                 ),
                 Expanded(
                   child: TabBarView(

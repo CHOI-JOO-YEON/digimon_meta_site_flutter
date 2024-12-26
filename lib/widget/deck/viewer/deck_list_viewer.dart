@@ -19,7 +19,13 @@ class DeckListViewer extends StatefulWidget {
   final VoidCallback updateSearchParameter;
 
   const DeckListViewer(
-      {super.key, required this.formatList, required this.deckUpdate, required this.selectedFormat, required this.updateSelectFormat, required this.deckSearchParameter, required this.updateSearchParameter});
+      {super.key,
+      required this.formatList,
+      required this.deckUpdate,
+      required this.selectedFormat,
+      required this.updateSelectFormat,
+      required this.deckSearchParameter,
+      required this.updateSearchParameter});
 
   @override
   State<DeckListViewer> createState() => _DeckListViewerState();
@@ -47,11 +53,11 @@ class _DeckListViewerState extends State<DeckListViewer> {
     }
 
     isLoading = true;
-    widget.deckSearchParameter.isMyDeck=false;
+    widget.deckSearchParameter.isMyDeck = false;
     currentPage = page;
-    widget.deckSearchParameter.updatePage(page,false);
+    widget.deckSearchParameter.updatePage(page, false);
     PagedResponseDeckDto? pagedDeck =
-        await DeckService().getDeck(widget.deckSearchParameter,context);
+        await DeckService().getDeck(widget.deckSearchParameter, context);
 
     if (pagedDeck != null) {
       decks = pagedDeck.decks;
@@ -83,7 +89,9 @@ class _DeckListViewerState extends State<DeckListViewer> {
           formatList: widget.formatList,
           searchParameter: widget.deckSearchParameter,
           search: searchDecks,
-          selectedFormat: widget.selectedFormat, updateSelectFormat: widget.updateSelectFormat, isMyDeck: false,
+          selectedFormat: widget.selectedFormat,
+          updateSelectFormat: widget.updateSelectFormat,
+          isMyDeck: false,
         ),
         SizedBox(
           height: 5,
@@ -102,8 +110,9 @@ class _DeckListViewerState extends State<DeckListViewer> {
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? '',
                       style: TextStyle(fontSize: fontSize)),
-                  subtitle: Text('${deck.authorName}#${(deck.authorId!-3).toString().padLeft(4,'0')}',
-                      style: TextStyle(fontSize: fontSize*0.8)),
+                  subtitle: Text(
+                      '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
+                      style: TextStyle(fontSize: fontSize * 0.8)),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);
