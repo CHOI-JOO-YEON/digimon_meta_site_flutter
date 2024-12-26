@@ -48,6 +48,7 @@ class DeckSortProvider with ChangeNotifier {
     SortCriterion('isParallel', ascending: true),
     SortCriterion('dp', ascending: true),
     SortCriterion('cardName', ascending: true),
+    SortCriterion('releaseDate', ascending: true),
     SortCriterion('hasXAntibody', ascending: true),
   ];
 
@@ -81,6 +82,7 @@ class DeckSortProvider with ChangeNotifier {
     SortCriterion('isParallel', ascending: true),
     SortCriterion('dp', ascending: true),
     SortCriterion('cardName', ascending: true),
+    SortCriterion('releaseDate', ascending: true),
     SortCriterion('hasXAntibody', ascending: true),
   ];
 
@@ -94,6 +96,7 @@ class DeckSortProvider with ChangeNotifier {
     'isParallel': '패럴렐 우선',
     'dp': 'DP',
     'cardName': '카드 이름',
+    'releaseDate' : '발매 일자',
     'hasXAntibody': 'X항체 포함 여부',
   };
 
@@ -144,6 +147,10 @@ class DeckSortProvider with ChangeNotifier {
           comparison =
               (a.isParallel! ? -1 : 1).compareTo(b.isParallel! ? -1 : 1);
           break;
+        case 'releaseDate':
+          comparison =
+          (a.releaseDate?? DateTime(0)).compareTo(b.releaseDate?? DateTime(0));
+              break;
         case 'hasXAntibody':
           bool aHasXAntibody = a.getDisplayName()?.contains('X항체') ?? false;
           bool bHasXAntibody = b.getDisplayName()?.contains('X항체') ?? false;
