@@ -84,6 +84,10 @@ class DeckService {
     PagedResponseDeckDto? decks =
         await DeckApi().findDecks(deckSearchParameter);
 
+    if(decks != null) {
+      FormatDeckCountProvider formatDeckCountProvider = Provider.of(context, listen: false);
+      deckSearchParameter.isMyDeck?formatDeckCountProvider.setFormatMyDeckCount(decks):formatDeckCountProvider.setFormatAllDeckCount(decks);
+    }
     
 
     return decks;

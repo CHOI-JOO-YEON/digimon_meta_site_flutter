@@ -6,11 +6,9 @@ import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
-import '../../../provider/format_deck_count_provider.dart';
 
 class DeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
@@ -61,14 +59,12 @@ class _DeckListViewerState extends State<DeckListViewer> {
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(widget.deckSearchParameter, context);
     if (pagedDeck != null) {
-      FormatDeckCountProvider formatDeckCountProvider = Provider.of(context, listen: false);
-      formatDeckCountProvider.setFormatAllDeckCount(pagedDeck);
       decks = pagedDeck.decks;
 
       maxPage = pagedDeck.totalPages;
       _selectedIndex = 0;
 
-      if (!decks.isEmpty) {
+      if (decks.isNotEmpty) {
         widget.deckUpdate(decks.first);
       }
     }
@@ -96,7 +92,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
           updateSelectFormat: widget.updateSelectFormat,
           isMyDeck: false,
         ),
-        SizedBox(
+        const SizedBox(
           height: 5,
         ),
         Expanded(
@@ -129,7 +125,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: currentPage > 1
                   ? () {
                       searchDecks(currentPage - 1);
@@ -139,7 +135,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
             Text('Page $currentPage of $maxPage',
                 style: TextStyle(fontSize: fontSize)),
             IconButton(
-              icon: Icon(Icons.arrow_forward),
+              icon: const Icon(Icons.arrow_forward),
               onPressed: currentPage < maxPage
                   ? () {
                       searchDecks(currentPage + 1);
