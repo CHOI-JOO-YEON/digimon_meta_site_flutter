@@ -82,9 +82,6 @@ class DeckBuild {
       for (var cardEntry in deckView.cardAndCntMap!.entries) {
         DigimonCard card = cardEntry.key;
         for (int i = 0; i < cardEntry.value; i++) {
-          if (!isCanAdd(card)) {
-            return;
-          }
           _addCard(card);
         }
       }
