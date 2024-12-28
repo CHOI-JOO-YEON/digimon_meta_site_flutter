@@ -356,9 +356,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
       text: TextSpan(
         style: TextStyle(fontSize: fontSize, color: Colors.black, fontFamily: 'JalnanGothic',),
         children:  [
-          TextSpan(text: '${_selectedFormat!.name} ($selectedDeckCountStr개의 덱)\n'),
+          TextSpan(text: '${formatDto.name} ($selectedDeckCountStr개의 덱)\n'),
           TextSpan(
-            text: '[${formatDateRange(_selectedFormat!.startDate, _selectedFormat!.endDate)}]',
+            text: '[${formatDateRange(formatDto.startDate, formatDto.endDate)}]',
             style: const TextStyle(color: Colors.grey),
           ),
         ],
