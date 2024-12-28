@@ -6,9 +6,11 @@ import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/color_palette.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
+import '../../../provider/format_deck_count_provider.dart';
 
 class DeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
@@ -58,8 +60,9 @@ class _DeckListViewerState extends State<DeckListViewer> {
     widget.deckSearchParameter.updatePage(page, false);
     PagedResponseDeckDto? pagedDeck =
         await DeckService().getDeck(widget.deckSearchParameter, context);
-
     if (pagedDeck != null) {
+      FormatDeckCountProvider formatDeckCountProvider = Provider.of(context, listen: false);
+      formatDeckCountProvider.setFormatAllDeckCount(pagedDeck);
       decks = pagedDeck.decks;
 
       maxPage = pagedDeck.totalPages;

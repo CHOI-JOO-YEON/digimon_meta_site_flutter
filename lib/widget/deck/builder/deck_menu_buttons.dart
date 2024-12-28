@@ -207,11 +207,11 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       hint: Text(formats[widget.deck.formatId]?.name ?? "포맷 "),
                       items: [
                         const DropdownMenuItem<int>(
+                          enabled: false,
                           child: Text(
                             '일반 포맷',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          enabled: false,
                         ),
                         ...formats.entries
                             .where((entry) => entry.value.isOnlyEn == false)
@@ -225,11 +225,11 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                               // overflow: TextOverflow.ellipsis,
                             ),
                           );
-                        }).toList(),
+                        }),
                         const DropdownMenuItem<int>(
+                          enabled: false,
                           child: Text('미발매 포맷 [예상 발매 일정]',
                               style: TextStyle(fontWeight: FontWeight.bold)),
-                          enabled: false,
                         ),
                         ...formats.entries
                             .where((entry) => entry.value.isOnlyEn == true)
@@ -242,7 +242,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                 '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
                                 '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
                           );
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (int? newValue) {
                         setState(() {
@@ -429,7 +429,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
               actions: <Widget>[
                 if (isLoading) const CircularProgressIndicator(),
                 ElevatedButton(
-                  child: const Text('가져오기'),
                   onPressed: isLoading
                       ? null
                       : () async {
@@ -453,6 +452,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                             });
                           }
                         },
+                  child: const Text('가져오기'),
                 ),
               ],
             );

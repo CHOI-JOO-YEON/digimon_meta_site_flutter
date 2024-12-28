@@ -5,6 +5,7 @@ import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
+import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -75,12 +76,15 @@ class DeckService {
   Future<PagedResponseDeckDto?> getDeck(
       DeckSearchParameter deckSearchParameter, BuildContext context) async {
     LimitProvider limitProvider = Provider.of(context, listen: false);
+    
     if (limitProvider.selectedLimit != null) {
       deckSearchParameter.limitId = limitProvider.selectedLimit!.id;
     }
 
     PagedResponseDeckDto? decks =
         await DeckApi().findDecks(deckSearchParameter);
+
+    
 
     return decks;
   }
@@ -229,7 +233,8 @@ class DeckService {
     html.Url.revokeObjectUrl(url);
   }
 
-  Future<DeckBuild?> createDeckByLocalJsonString(String jsonString, BuildContext context) async {
+  Future<DeckBuild?> createDeckByLocalJsonString(
+      String jsonString, BuildContext context) async {
     Map<String, dynamic> map = jsonDecode(jsonString);
     String deckName = map['deckName'];
     bool isStrict = map['isStrict'];
@@ -247,5 +252,4 @@ class DeckService {
     deck.import(deckResponseDto);
     return deck;
   }
-
 }

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../model/deck_search_parameter.dart';
 import '../../../model/format.dart';
 import '../../../model/limit_dto.dart';
+import '../../../provider/format_deck_count_provider.dart';
 import '../../../provider/limit_provider.dart';
 import '../../../service/color_service.dart';
 
@@ -82,13 +83,13 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                         widget.search(1);
                         Navigator.of(context).pop();
                       },
-                      child: Text('적용'),
+                      child: const Text('적용'),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text('취소'),
+                      child: const Text('취소'),
                     ),
                   ],
                   content: Column(
@@ -96,11 +97,11 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     children: [
                       Row(
                         children: [
-                          Text(
+                          const Text(
                             '금지/제한: ',
                             style: TextStyle(fontSize: 20),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Expanded(
@@ -124,11 +125,11 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             '유효한 덱만 보기',
                             style: TextStyle(fontSize: 20),
                           ),
@@ -171,68 +172,91 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           children: [
             Expanded(
               flex: 3,
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<FormatDto>(
-                  isExpanded: true,
-                  hint: Text(
-                    _selectedFormat == null
-                        ? '포맷'
-                        : '${_selectedFormat!.name} \n['
-                            '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
+              child:  Consumer<FormatDeckCountProvider>(
+                builder: (context, deckCountProvider, child) {
+                  String selectedDeckCountStr = '';
+                  if (_selectedFormat != null) {
+                    final selectedDeckCount = deckCountProvider.getFormatDeckCount(
+                      _selectedFormat!.formatId,
+                      widget.isMyDeck,
+                    );
+                    selectedDeckCountStr =
+                    selectedDeckCount > 99 ? ' (99+)' : ' ($selectedDeckCount)';
+                  }
+
+                  return DropdownButtonHideUnderline(
+                    child: DropdownButton<FormatDto>(
+                      isExpanded: true,
+                      hint: Text(
+                        _selectedFormat == null
+                            ? '포맷'
+                            : '${_selectedFormat!.name}$selectedDeckCountStr\n'
+                            '[${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
                             '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]',
-                    style: TextStyle(fontSize: fontSize),
-                    // overflow: TextOverflow.ellipsis,
-                  ),
-                  value: _selectedFormat,
-                  items: [
-                    DropdownMenuItem<FormatDto>(
-                      child: Text('일반 포맷',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      enabled: false,
-                    ),
-                    ...widget.formatList
-                        .where((format) => format.isOnlyEn == false)
-                        .map((format) {
-                      return DropdownMenuItem<FormatDto>(
-                        value: format,
-                        child: Text(
-                          '${format.name} \n['
-                          '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
-                          '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
-                          style: TextStyle(fontSize: fontSize),
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+                      value: _selectedFormat,
+                      items: [
+                        const DropdownMenuItem<FormatDto>(
+                          enabled: false,
+                          child: Text(
+                            '일반 포맷',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      );
-                    }).toList(),
-                    DropdownMenuItem<FormatDto>(
-                      child: Text('미발매 포맷 [예상 발매 일정]',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      enabled: false,
-                    ),
-                    ...widget.formatList
-                        .where((format) => format.isOnlyEn == true)
-                        .toList()
-                        .reversed
-                        .map((format) {
-                      return DropdownMenuItem<FormatDto>(
-                        value: format,
-                        child: Text(
-                          '${format.name} \n['
-                          '${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
-                          '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
-                          style: TextStyle(fontSize: fontSize),
+                        ...widget.formatList
+                            .where((format) => format.isOnlyEn == false)
+                            .map((format) {
+                          final deckCount = deckCountProvider
+                              .getFormatDeckCount(format.formatId, widget.isMyDeck);
+                          final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
+
+                          return DropdownMenuItem<FormatDto>(
+                            value: format,
+                            child: Text(
+                              '${format.name} ($deckCountStr)\n'
+                                  '[${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
+                                  '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
+                            ),
+                          );
+                        }),
+                        const DropdownMenuItem<FormatDto>(
+                          enabled: false,
+                          child: Text(
+                            '미발매 포맷 [예상 발매 일정]',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      );
-                    }).toList(),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedFormat = value;
-                      widget.searchParameter.formatId = value?.formatId;
-                      widget.updateSelectFormat(_selectedFormat!);
-                      widget.search(1);
-                    });
-                  },
-                ),
+                        ...widget.formatList
+                            .where((format) => format.isOnlyEn == true)
+                            .toList()
+                            .reversed
+                            .map((format) {
+                          final deckCount = deckCountProvider
+                              .getFormatDeckCount(format.formatId, widget.isMyDeck);
+                          final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
+
+                          return DropdownMenuItem<FormatDto>(
+                            value: format,
+                            child: Text(
+                              '${format.name} ($deckCountStr)\n'
+                                  '[${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
+                                  '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
+                            ),
+                          );
+                        }),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedFormat = value;
+                          widget.searchParameter.formatId = value?.formatId;
+                          widget.updateSelectFormat(_selectedFormat!);
+                          widget.search(1);
+                        });
+                      },
+                    ),
+                  );
+                },
               ),
             ),
             // Expanded(flex: 1, child: ),

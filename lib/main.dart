@@ -1,6 +1,7 @@
 import 'package:digimon_meta_site_flutter/model/user.dart';
 import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/text_simplify_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => LimitProvider()),
       ChangeNotifierProvider(create: (_) => DeckSortProvider()),
       ChangeNotifierProvider(create: (_) => TextSimplifyProvider()),
+      ChangeNotifierProvider(create: (_) => FormatDeckCountProvider()),
       ChangeNotifierProxyProvider<UserProvider, CollectProvider>(
         create: (_) => CollectProvider(),
         update: (_, userProvider, collectProvider) {
