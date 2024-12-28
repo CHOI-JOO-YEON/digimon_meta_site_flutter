@@ -235,8 +235,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
         double targetWidth = isHorizontal ? horizontalSize : size;
 
-        var pixelRatio = targetWidth / boundarySize.width;
-
+        // var pixelRatio = targetWidth / boundarySize.width;
+        var pixelRatio = 1.2;
+        
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
         );
