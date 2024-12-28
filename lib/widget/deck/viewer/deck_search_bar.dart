@@ -187,14 +187,8 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   return DropdownButtonHideUnderline(
                     child: DropdownButton<FormatDto>(
                       isExpanded: true,
-                      hint: Text(
-                        _selectedFormat == null
-                            ? '포맷'
-                            : '${_selectedFormat!.name}$selectedDeckCountStr\n'
-                            '[${DateFormat('yyyy-MM-dd').format(_selectedFormat!.startDate)} ~ '
-                            '${DateFormat('yyyy-MM-dd').format(_selectedFormat!.endDate)}]',
-                        style: TextStyle(fontSize: fontSize),
-                      ),
+                      hint: _selectedFormat==null?Text('포맷', style: TextStyle(fontSize: fontSize),): 
+                          dropDownFormatItem(_selectedFormat!, fontSize, selectedDeckCountStr),
                       value: _selectedFormat,
                       items: [
                         const DropdownMenuItem<FormatDto>(
@@ -213,11 +207,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
                           return DropdownMenuItem<FormatDto>(
                             value: format,
-                            child: Text(
-                              '${format.name} ($deckCountStr)\n'
-                                  '[${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
-                                  '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
-                            ),
+                              child: dropDownFormatItem(format, fontSize, deckCountStr)
                           );
                         }),
                         const DropdownMenuItem<FormatDto>(
@@ -238,11 +228,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
                           return DropdownMenuItem<FormatDto>(
                             value: format,
-                            child: Text(
-                              '${format.name} ($deckCountStr)\n'
-                                  '[${DateFormat('yyyy-MM-dd').format(format.startDate)} ~ '
-                                  '${DateFormat('yyyy-MM-dd').format(format.endDate)}]',
-                            ),
+                            child: dropDownFormatItem(format, fontSize, deckCountStr)
                           );
                         }),
                       ],
@@ -358,6 +344,25 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           ),
         ]),
       ],
+    );
+  }
+  Widget dropDownFormatItem(FormatDto formatDto, double fontSize, String selectedDeckCountStr)
+  {
+    String formatDateRange(DateTime startDate, DateTime endDate) {
+      final dateFormat = DateFormat('yyyy-MM-dd');
+      return '${dateFormat.format(startDate)} ~ ${dateFormat.format(endDate)}';
+    }
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(fontSize: fontSize, color: Colors.black, fontFamily: 'JalnanGothic',),
+        children:  [
+          TextSpan(text: '${_selectedFormat!.name} ($selectedDeckCountStr개의 덱)\n'),
+          TextSpan(
+            text: '[${formatDateRange(_selectedFormat!.startDate, _selectedFormat!.endDate)}]',
+            style: const TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
     );
   }
 }
