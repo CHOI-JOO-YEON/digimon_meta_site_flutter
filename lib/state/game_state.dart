@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 
 import '../model/card.dart';
@@ -148,17 +146,26 @@ class FieldZone extends ChangeNotifier {
   }
 
   void removeCardToStackAt(int index) {
-    List<int> addIndexes = [];
-    _rotatedCards.remove(index);
-
-    for (int i = index + 1; i < stack.length; i++) {
-      if (_rotatedCards.contains(i)) {
-        _rotatedCards.remove(i);
-        addIndexes.add(i - 1);
+    if (index == stack.length -1 && _rotatedCards.contains(stack.length - 1)) {
+      if(stack.length > 1) {
+        _rotatedCards.remove(stack.length - 1);
+        _rotatedCards.add(stack.length - 2);  
+      }else {
+        _rotatedCards.clear();
       }
-    }
-    for (var i in addIndexes) {
-      _rotatedCards.add(i);
+    } else {
+      List<int> addIndexes = [];
+      _rotatedCards.remove(index);
+
+      for (int i = index + 1; i < stack.length; i++) {
+        if (_rotatedCards.contains(i)) {
+          _rotatedCards.remove(i);
+          addIndexes.add(i - 1);
+        }
+      }
+      for (var i in addIndexes) {
+        _rotatedCards.add(i);
+      }
     }
     stack.removeAt(index);
     notifyListeners();

@@ -30,6 +30,7 @@ class FieldArea extends StatelessWidget {
                         return FieldZoneWidget(
                           fieldZone: gameState.fieldZones[index],
                           cardWidth: cardWidth,
+                          isRaising: false,
                         );
                       },
                     ),
@@ -42,6 +43,7 @@ class FieldArea extends StatelessWidget {
                         return FieldZoneWidget(
                           fieldZone: gameState.fieldZones[index + 8],
                           cardWidth: cardWidth * 0.5,
+                          isRaising: false,
                         );
                       },
                     ),

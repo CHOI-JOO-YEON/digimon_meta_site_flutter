@@ -35,6 +35,7 @@ class RaisingZoneWidget extends StatelessWidget {
                   child: FieldZoneWidget(
                 fieldZone: raisingZone.fieldZone,
                 cardWidth: cardWidth,
+                isRaising: true,
               )),
             ],
           ),

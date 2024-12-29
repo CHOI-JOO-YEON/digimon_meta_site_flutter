@@ -9,8 +9,9 @@ import 'digimon_stack_widget.dart';
 class FieldZoneWidget extends StatelessWidget {
   final FieldZone fieldZone;
   final double cardWidth;
+  final bool isRaising;
 
-  const FieldZoneWidget({super.key, required this.fieldZone, required this.cardWidth});
+  const FieldZoneWidget({super.key, required this.fieldZone, required this.cardWidth, required this.isRaising});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,11 @@ class FieldZoneWidget extends StatelessWidget {
                 fieldZone.removeCardToStackAt(fromIndex);
               },
               id: UniqueKey().toString(), cardWidth: cardWidth,
-              triggerRest: fieldZone.rotateIndex,
+              triggerRest: (index)  {
+                if(!isRaising) {
+                  fieldZone.rotateIndex(index);
+                }
+              },
               isRotate: fieldZone.isRotate,
             ),
           );
