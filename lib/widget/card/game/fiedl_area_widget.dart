@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../../../state/game_state.dart';
 import 'field_zone_widget.dart';
@@ -8,35 +9,52 @@ class FieldArea extends StatelessWidget {
   final double cardWidth;
 
   const FieldArea({super.key, required this.cardWidth});
-  
+
   @override
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        int crossAxisCount =
-            MediaQuery.of(context).orientation == Orientation.portrait ? 2 : 3;
-
         return Column(
           children: [
-            Text('필드'),
+            const Text('필드'),
             Expanded(
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate:
-                    SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
-                itemCount: gameState.fieldZones.length,
-                itemBuilder: (context, index) {
-                  return FieldZoneWidget(fieldZone: gameState.fieldZones[index], cardWidth: cardWidth,);
-                },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 8, childAspectRatio: 0.35),
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        return FieldZoneWidget(
+                          fieldZone: gameState.fieldZones[index],
+                          cardWidth: cardWidth,
+                        );
+                      },
+                    ),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 16, childAspectRatio: 0.712),
+                      itemCount: gameState.fieldZones.length - 8,
+                      itemBuilder: (context, index) {
+                        return FieldZoneWidget(
+                          fieldZone: gameState.fieldZones[index + 8],
+                          cardWidth: cardWidth * 0.5,
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
+            
             ElevatedButton(
               onPressed: () {
-                gameState.fieldZones.add(FieldZone());
-                gameState.notifyListeners();
+                gameState.addFieldZone(16);
               },
-              child: Text('필드 존 추가'),
+              child: const Text('필드 존 추가'),
             ),
           ],
         );

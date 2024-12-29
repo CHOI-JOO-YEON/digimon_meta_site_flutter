@@ -39,13 +39,12 @@ class HandArea extends StatelessWidget {
           Text(
             '패 (${gameState.hand.length})',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: cardWidth * 0.1,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 10),
           DragTarget<Map<String, dynamic>>(
             onWillAccept: (data) => true,
             onAcceptWithDetails: (details) {
@@ -107,15 +106,14 @@ class HandArea extends StatelessWidget {
                               value: gameState,
                               child: Material(
                                 color: Colors.transparent,
-                                child: CardWidget(card: card, cardWidth: cardWidth),
+                                child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
                               ),
                             ),
                             childWhenDragging: Opacity(
                               opacity: 0.5,
-                              child:
-                              CardWidget(card: card, cardWidth: cardWidth),
+                              child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
                             ),
-                            child: CardWidget(card: card, cardWidth: cardWidth),
+                          child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
                           ),
                         );
                       },

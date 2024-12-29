@@ -8,8 +8,9 @@ import '../../../state/game_state.dart';
 class CardWidget extends StatelessWidget {
   final DigimonCard card;
   final double cardWidth;
+  final Function rest;
 
-  const CardWidget({super.key, required this.card, required this.cardWidth});
+  const CardWidget({super.key, required this.card, required this.cardWidth, required this.rest});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,9 @@ class CardWidget extends StatelessWidget {
       height: cardWidth * 1.404,
       child: GestureDetector(
         onTap: () => gameState.updateSelectedCard(card),
+        onDoubleTap: () {
+          rest();
+        },
         child: Image.network(
           card.getDisplaySmallImgUrl() ?? '',
           fit: BoxFit.cover,

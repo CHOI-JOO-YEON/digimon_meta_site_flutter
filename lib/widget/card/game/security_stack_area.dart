@@ -75,6 +75,7 @@ class _SecurityCardWidgetState extends State<SecurityCardWidget> {
                   child: CardWidget(
                     card: widget.card,
                     cardWidth: widget.cardWidth,
+                    rest: (){},
                   ),
                 ),
               )

@@ -1,9 +1,14 @@
+import 'package:digimon_meta_site_flutter/widget/card/game/draggable_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../state/game_state.dart';
 
 class DeckArea extends StatelessWidget {
+  final double cardWidth;
+
+  const DeckArea({super.key, required this.cardWidth});
+
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
@@ -18,8 +23,8 @@ class DeckArea extends StatelessWidget {
           child: Text('드로우'),
         ),
         Container(
-          width: 60,
-          height: 90,
+          width: cardWidth,
+          height: cardWidth * 1.404,
           color: Colors.blue,
           child: Center(child: Text('DECK')),
         ),
