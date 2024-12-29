@@ -7,8 +7,9 @@ import 'digimon_stack_widget.dart';
 
 class FieldZoneWidget extends StatelessWidget {
   final FieldZone fieldZone;
+  final double cardWidth;
 
-  FieldZoneWidget({required this.fieldZone});
+  const FieldZoneWidget({super.key, required this.fieldZone, required this.cardWidth});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class FieldZoneWidget extends StatelessWidget {
                   onLeave: (fromIndex){
                     fieldZone.removeCardToStackAt(fromIndex);
                   },
-                  id: UniqueKey().toString(),
+                  id: UniqueKey().toString(), cardWidth: cardWidth,
                 ),
               ],
             ),

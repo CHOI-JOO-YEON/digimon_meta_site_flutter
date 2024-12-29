@@ -21,7 +21,7 @@ class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
     AutoRoute(page: DeckImageRoute.page,path: "/deck-image",guards: [DeckGuard()]),
-    AutoRoute(page: GamePlaygroundRoute.page,path: "/game"),
+    AutoRoute(page: GamePlayGroundRoute.page,path: "/game"),
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
     AutoRoute(
       initial: true,

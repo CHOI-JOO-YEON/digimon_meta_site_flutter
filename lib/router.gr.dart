@@ -65,11 +65,14 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
-    GamePlaygroundRoute.name: (routeData) {
-      final args = routeData.argsAs<GamePlaygroundRouteArgs>();
+    GamePlayGroundRoute.name: (routeData) {
+      final args = routeData.argsAs<GamePlayGroundRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: GamePlaygroundPage(deckBuild: args.deckBuild),
+        child: GamePlayGroundPage(
+          key: args.key,
+          deckBuild: args.deckBuild,
+        ),
       );
     },
     KakaoLoginRoute.name: (routeData) {
@@ -248,31 +251,40 @@ class DeckListRouteArgs {
 }
 
 /// generated route for
-/// [GamePlaygroundPage]
-class GamePlaygroundRoute extends PageRouteInfo<GamePlaygroundRouteArgs> {
-  GamePlaygroundRoute({
+/// [GamePlayGroundPage]
+class GamePlayGroundRoute extends PageRouteInfo<GamePlayGroundRouteArgs> {
+  GamePlayGroundRoute({
+    Key? key,
     required DeckBuild deckBuild,
     List<PageRouteInfo>? children,
   }) : super(
-          GamePlaygroundRoute.name,
-          args: GamePlaygroundRouteArgs(deckBuild: deckBuild),
+          GamePlayGroundRoute.name,
+          args: GamePlayGroundRouteArgs(
+            key: key,
+            deckBuild: deckBuild,
+          ),
           initialChildren: children,
         );
 
-  static const String name = 'GamePlaygroundRoute';
+  static const String name = 'GamePlayGroundRoute';
 
-  static const PageInfo<GamePlaygroundRouteArgs> page =
-      PageInfo<GamePlaygroundRouteArgs>(name);
+  static const PageInfo<GamePlayGroundRouteArgs> page =
+      PageInfo<GamePlayGroundRouteArgs>(name);
 }
 
-class GamePlaygroundRouteArgs {
-  const GamePlaygroundRouteArgs({required this.deckBuild});
+class GamePlayGroundRouteArgs {
+  const GamePlayGroundRouteArgs({
+    this.key,
+    required this.deckBuild,
+  });
+
+  final Key? key;
 
   final DeckBuild deckBuild;
 
   @override
   String toString() {
-    return 'GamePlaygroundRouteArgs{deckBuild: $deckBuild}';
+    return 'GamePlayGroundRouteArgs{key: $key, deckBuild: $deckBuild}';
   }
 }
 

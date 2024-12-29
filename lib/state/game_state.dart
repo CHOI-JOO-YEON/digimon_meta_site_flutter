@@ -12,39 +12,42 @@ class GameState extends ChangeNotifier {
   RaisingZone raisingZone = RaisingZone();
   List<FieldZone> fieldZones = [];
   int memory = 0;
+  DigimonCard? selectedCard;
 
   GameState(DeckBuild deckBuild) {
-    // 메인 덱 초기화
     deckBuild.deckMap.forEach((card, count) {
       for (int i = 0; i < count; i++) {
         mainDeck.add(card);
       }
     });
 
-    // 디지타마 덱 초기화
     deckBuild.tamaMap.forEach((card, count) {
       for (int i = 0; i < count; i++) {
         digitamaDeck.add(card);
       }
     });
 
-    // 덱 섞기
     mainDeck.shuffle();
     digitamaDeck.shuffle();
     raisingZone.setDigitamaDeck(digitamaDeck);
 
-    // 시큐리티 스택 설정 (5장)
     for (int i = 0; i < 5; i++) {
       securityStack.add(mainDeck.removeLast());
     }
-
-    // 초기 패 설정 (5장)
     for (int i = 0; i < 5; i++) {
       hand.add(mainDeck.removeLast());
     }
 
-    // 필드 존 초기화
     fieldZones.add(FieldZone());
+  }
+
+  DigimonCard? getSelectedCard() {
+    return selectedCard;
+  }
+
+  void updateSelectedCard(DigimonCard card) {
+    selectedCard = card;
+    notifyListeners();
   }
 
   void drawCard() {

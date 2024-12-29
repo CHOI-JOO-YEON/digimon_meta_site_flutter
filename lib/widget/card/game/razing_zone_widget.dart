@@ -10,6 +10,10 @@ import 'digimon_stack_widget.dart';
 import 'draggable_card_widget.dart';
 
 class RaisingZoneWidget extends StatelessWidget {
+  final double cardWidth;
+
+  const RaisingZoneWidget({super.key, required this.cardWidth});
+  
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
@@ -19,7 +23,7 @@ class RaisingZoneWidget extends StatelessWidget {
       child: Column(
         children: [
           Text('육성 존'),
-          Expanded(child: FieldZoneWidget(fieldZone: raisingZone.fieldZone)),
+          Expanded(child: FieldZoneWidget(fieldZone: raisingZone.fieldZone, cardWidth: cardWidth,)),
           ElevatedButton(
             onPressed: () {
               raisingZone.hatchEgg();

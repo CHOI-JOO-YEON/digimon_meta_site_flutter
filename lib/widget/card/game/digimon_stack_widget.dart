@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../model/card.dart';
+import '../../../state/game_state.dart';
 import 'draggable_card_widget.dart';
 
 class DigimonStackWidget extends StatelessWidget {
@@ -10,6 +12,7 @@ class DigimonStackWidget extends StatelessWidget {
   final Function(int fromIndex, int toIndex) onReorder;
   final Function(DigimonCard newCard, int toIndex) onAddCard;
   final Function(int fromIndex) onLeave;
+  final double cardWidth;
 
   const DigimonStackWidget({
     super.key,
@@ -18,12 +21,13 @@ class DigimonStackWidget extends StatelessWidget {
     required this.onAddCard,
     required this.onLeave,
     required this.id,
+    required this.cardWidth,
   });
 
   @override
   Widget build(BuildContext context) {
     double cardSpacing = 20.0;
-
+    final gameState = Provider.of<GameState>(context);
     return Expanded(
       child: DragTarget<Map<String, dynamic>>(
         onWillAccept: (data) => true,
@@ -68,15 +72,18 @@ class DigimonStackWidget extends StatelessWidget {
                       onLeave(index);
                     }
                   },
-                  feedback: Material(
-                    elevation: 5,
-                    child: CardWidget(card: card),
+                  feedback: ChangeNotifierProvider.value(
+                    value: gameState,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: CardWidget(card: card, cardWidth: cardWidth),
+                    ),
                   ),
                   childWhenDragging: Opacity(
                     opacity: 0.3,
-                    child: CardWidget(card: card),
+                    child: CardWidget(card: card, cardWidth: cardWidth,),
                   ),
-                  child: CardWidget(card: card),
+                  child: CardWidget(card: card, cardWidth: cardWidth,),
                 ),
               );
             }).toList(),

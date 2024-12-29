@@ -5,6 +5,10 @@ import '../../../state/game_state.dart';
 import 'field_zone_widget.dart';
 
 class FieldArea extends StatelessWidget {
+  final double cardWidth;
+
+  const FieldArea({super.key, required this.cardWidth});
+  
   @override
   Widget build(BuildContext context) {
     return Consumer<GameState>(
@@ -23,7 +27,7 @@ class FieldArea extends StatelessWidget {
                     SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: crossAxisCount),
                 itemCount: gameState.fieldZones.length,
                 itemBuilder: (context, index) {
-                  return FieldZoneWidget(fieldZone: gameState.fieldZones[index]);
+                  return FieldZoneWidget(fieldZone: gameState.fieldZones[index], cardWidth: cardWidth,);
                 },
               ),
             ),

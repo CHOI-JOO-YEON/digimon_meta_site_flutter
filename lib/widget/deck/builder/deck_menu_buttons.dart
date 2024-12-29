@@ -1044,7 +1044,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   padding: EdgeInsets.zero,
                   onPressed: () {
                     CardOverlayService().removeAllOverlays();
-                    context.router.push(GamePlaygroundRoute(deckBuild: widget.deck));
+                    context.router.push(GamePlayGroundRoute(deckBuild: widget.deck));
                   },
                   iconSize: iconSize,
                   icon: const Icon(Icons.back_hand_rounded),

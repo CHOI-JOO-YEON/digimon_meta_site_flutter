@@ -1,91 +1,131 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/card.dart';
 import '../../../state/game_state.dart';
 import 'draggable_card_widget.dart';
 
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
+}
+
 class HandArea extends StatelessWidget {
+  final double cardWidth;
+
   final String id = 'hand';
 
-  const HandArea({super.key});
+  const HandArea({super.key, required this.cardWidth});
 
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
 
-    return SizedBox(
-      width: double.infinity,
-      child: Container(
-        color: Colors.red,
-        child: Column(
-          children: [
-            Text('패 (${gameState.hand.length})'),
-            DragTarget<Map<String, dynamic>>(
-              onWillAccept: (data) => true,
-              onAcceptWithDetails: (details) {
-                final data = details.data;
-                String sourceId = data['id'] ?? '';
-                int fromIndex = data['fromIndex'] ?? -1;
-                DigimonCard card = data['card'];
+    final ScrollController scrollController = ScrollController();
 
-                RenderBox box = context.findRenderObject() as RenderBox;
-                Offset localOffset = box.globalToLocal(details.offset);
+    return Container(
+      color: Colors.red,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, 
+        children: [
+          Text(
+            '패 (${gameState.hand.length})',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          DragTarget<Map<String, dynamic>>(
+            onWillAccept: (data) => true,
+            onAcceptWithDetails: (details) {
+              final data = details.data;
+              String sourceId = data['sourceId'] ?? '';
+              int fromIndex = data['fromIndex'] ?? -1;
+              DigimonCard card = data['card'];
 
-                double cardWidth = 60.0;
-                int toIndex = (localOffset.dx / (cardWidth)).floor();
+              RenderBox box = context.findRenderObject() as RenderBox;
+              Offset localOffset = box.globalToLocal(details.offset);
 
-                if (sourceId == id) {
-                  toIndex = toIndex.clamp(0, gameState.hand.length - 1);
-                    gameState.reorderHand(fromIndex, toIndex);
-                } else {
-                  toIndex = toIndex.clamp(0, gameState.hand.length);
-                  gameState.addCardToHandAt(card, toIndex);
-                  if (data['removeCard'] != null) {
-                    data['removeCard']();
-                  }
+              double scrollOffset = scrollController.hasClients ? scrollController.offset : 0.0;
+              double adjustedX = localOffset.dx + scrollOffset;
+
+              int toIndex = (adjustedX / cardWidth).floor();
+
+              if (sourceId == id) {
+                toIndex = toIndex.clamp(0, gameState.hand.length - 1);
+                gameState.reorderHand(fromIndex, toIndex);
+              } else {
+                toIndex = toIndex.clamp(0, gameState.hand.length);
+                gameState.addCardToHandAt(card, toIndex);
+                if (data['removeCard'] != null) {
+                  data['removeCard']();
                 }
-              },
-              onLeave: (data) {
-              },
-              builder: (context, candidateData, rejectedData) {
-                return Container(
-                  color: Colors.red,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: gameState.hand.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        DigimonCard card = entry.value;
-
-                        return Draggable<Map<String, dynamic>>(
-                          data: {
-                            'card': card,
-                            'fromIndex': index,
-                            'sourceId': id,
-                            'removeCard': () {
-                              gameState.removeCardFromHandAt(index);
+              }
+            },
+            builder: (context, candidateData, rejectedData) {
+              return SizedBox(
+                height: cardWidth * 1.404, 
+                child: ScrollConfiguration(
+                  behavior: CustomScrollBehavior(),
+                  child:  RawScrollbar(
+                    controller: scrollController,
+                    thumbVisibility: true, 
+                    thickness: 8.0,
+                    radius: const Radius.circular(4.0),
+                    thumbColor: Colors.blueAccent,
+                    trackColor: Colors.blue.shade100, 
+                    trackBorderColor: Colors.blue.shade300, 
+                    child: ListView.builder(
+                      controller: scrollController, 
+                      scrollDirection: Axis.horizontal,
+                      itemCount: gameState.hand.length,
+                      itemBuilder: (context, index) {
+                        final card = gameState.hand[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Draggable<Map<String, dynamic>>(
+                            data: {
+                              'card': card,
+                              'fromIndex': index,
+                              'sourceId': id,
+                              'removeCard': () {
+                                gameState.removeCardFromHandAt(index);
+                              },
                             },
-                          },
-                          feedback: Material(
-                            child: CardWidget(card: card),
+                            feedback: ChangeNotifierProvider.value(
+                              value: gameState,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: CardWidget(card: card, cardWidth: cardWidth),
+                              ),
+                            ),
+                            childWhenDragging: Opacity(
+                              opacity: 0.5,
+                              child:
+                              CardWidget(card: card, cardWidth: cardWidth),
+                            ),
+                            child: CardWidget(card: card, cardWidth: cardWidth),
                           ),
-                          childWhenDragging: Opacity(
-                            opacity: 0.5,
-                            child: CardWidget(card: card),
-                          ),
-                          child: CardWidget(card: card),
                         );
-                      }).toList(),
+                      },
                     ),
                   ),
-                );
-              },
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
