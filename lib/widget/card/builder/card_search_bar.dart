@@ -769,7 +769,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     menuItems.addAll(
         _createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
     menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('영문 카드', enList));
+    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('미발매 카드', enList));
 
     if (!etcList.isEmpty) {
       menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
