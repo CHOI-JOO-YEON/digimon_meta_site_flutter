@@ -14,7 +14,7 @@ import '../provider/text_simplify_provider.dart';
 import '../service/color_service.dart';
 import '../state/game_state.dart';
 import '../widget/card/game/deck_area.dart';
-import '../widget/card/game/fiedl_area_widget.dart';
+import '../widget/card/game/field_area_widget.dart';
 import '../widget/card/game/hand_area.dart';
 import '../widget/card/game/memory_gauge.dart';
 import '../widget/card/game/razing_zone_widget.dart';

@@ -61,14 +61,13 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
 
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) => true,
-
       onAcceptWithDetails: (details) {
         final data = details.data;
         final RenderBox box = context.findRenderObject() as RenderBox;
         final Offset localOffset = box.globalToLocal(details.offset);
 
         final double scrollOffset =
-        _scrollController.hasClients ? _scrollController.offset : 0.0;
+            _scrollController.hasClients ? _scrollController.offset : 0.0;
 
         final Size size = box.size;
         final double rawHeight = size.height;
@@ -91,7 +90,6 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         if (draggedCards != null && draggedCards.isNotEmpty) {
           final String sourceId = data['id'] ?? '';
           if (sourceId == widget.id) {
-
           } else {
             for (int i = 0; i < draggedCards.length; i++) {
               widget.onAddCard(draggedCards[i], toIndex + i);
@@ -100,7 +98,6 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
               data['removeCards']();
             }
           }
-
         } else if (singleCard != null) {
           final String sourceId = data['id'] ?? '';
           final int fromIndex = data['fromIndex'] ?? -1;
@@ -118,20 +115,19 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
           }
         }
       },
-
       builder: (context, candidateData, rejectedData) {
         return LayoutBuilder(
           builder: (context, constraints) {
             double stackHeight =
                 cardHeight + (cardSpacing * (widget.digimonStack.length - 1));
             double height =
-            stackHeight.clamp(constraints.maxHeight, double.infinity);
+                stackHeight.clamp(constraints.maxHeight, double.infinity);
 
             return SingleChildScrollView(
               controller: _scrollController,
               child: SizedBox(
                 height: height,
-                child: Opacity( 
+                child: Opacity(
                   opacity: isDragging ? 0.5 : 1.0,
                   child: Stack(
                     clipBehavior: Clip.none,
@@ -196,66 +192,76 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
                           ),
                         );
                       }),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Draggable<Map<String, dynamic>>(
-                          data: {
-                            'id': widget.id,
-                            'cards': widget.digimonStack,
-                            'removeCards': () {
-                              for (int i = widget.digimonStack.length - 1; i >= 0; i--) {
-                                widget.onLeave(i);
-                              }
+                      if (widget.digimonStack.isNotEmpty)
+                        Positioned(
+                          bottom: cardHeight +
+                              cardSpacing * (widget.digimonStack.length - 2),
+                          right: 0,
+                          child: Draggable<Map<String, dynamic>>(
+                            data: {
+                              'id': widget.id,
+                              'cards': widget.digimonStack,
+                              'removeCards': () {
+                                for (int i = widget.digimonStack.length - 1;
+                                    i >= 0;
+                                    i--) {
+                                  widget.onLeave(i);
+                                }
+                              },
                             },
-                          },
-                          feedback: ChangeNotifierProvider.value(
-                            value: gameState,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: SizedBox(
-                                width: widget.cardWidth,
-                                height: cardHeight + cardSpacing * (widget.digimonStack.length - 1),
-                                child: Stack(
-                                  children: widget.digimonStack.asMap().entries.map((entry) {
-                                    int index = entry.key;
-                                    DigimonCard card = entry.value;
-                                    return Positioned(
-                                      bottom: index * cardSpacing,
-                                      child: CardWidget(
-                                        card: card,
-                                        cardWidth: widget.cardWidth,
-                                        rest: () {},
-                                      ),
-                                    );
-                                  }).toList(),
+                            feedback: ChangeNotifierProvider.value(
+                              value: gameState,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: SizedBox(
+                                  width: widget.cardWidth,
+                                  height: cardHeight +
+                                      cardSpacing *
+                                          (widget.digimonStack.length - 1),
+                                  child: Stack(
+                                    children: widget.digimonStack
+                                        .asMap()
+                                        .entries
+                                        .map((entry) {
+                                      int index = entry.key;
+                                      DigimonCard card = entry.value;
+                                      return Positioned(
+                                        bottom: index * cardSpacing,
+                                        right: 0,
+                                        child: CardWidget(
+                                          card: card,
+                                          cardWidth: widget.cardWidth,
+                                          rest: () {},
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          childWhenDragging: Container(),
-                          onDragStarted: () {
-                            setState(() {
-                              isDragging = true;
-                            });
-                          },
-                          onDragEnd: (details) {
-                            setState(() {
-                              isDragging = false;
-                            });
-                          },
-                          onDragCompleted: () {
-                            setState(() {
-                              isDragging = false;
-                            });
-                          },
-                          child: const Icon(
-                            Icons.drag_handle,
-                            color: Colors.white,
-                            size: 30,
+                            childWhenDragging: Container(),
+                            onDragStarted: () {
+                              setState(() {
+                                isDragging = true;
+                              });
+                            },
+                            onDragEnd: (details) {
+                              setState(() {
+                                isDragging = false;
+                              });
+                            },
+                            onDragCompleted: () {
+                              setState(() {
+                                isDragging = false;
+                              });
+                            },
+                            child: Icon(
+                              Icons.radio_button_on,
+                              color: Colors.blue,
+                              size: widget.cardWidth * 0.25,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),

@@ -11,11 +11,11 @@ import 'draggable_card_widget.dart';
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.stylus,
-    PointerDeviceKind.unknown,
-  };
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
+      };
 }
 
 class HandArea extends StatelessWidget {
@@ -34,7 +34,7 @@ class HandArea extends StatelessWidget {
     return Container(
       color: Colors.red,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center, 
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             '패 (${gameState.hand.length})',
@@ -51,12 +51,13 @@ class HandArea extends StatelessWidget {
               final data = details.data;
               String sourceId = data['sourceId'] ?? '';
               int fromIndex = data['fromIndex'] ?? -1;
-              DigimonCard card = data['card'];
-
+              DigimonCard? card = data['card'];
+              final List<DigimonCard>? draggedCards = data['cards'];
               RenderBox box = context.findRenderObject() as RenderBox;
               Offset localOffset = box.globalToLocal(details.offset);
 
-              double scrollOffset = scrollController.hasClients ? scrollController.offset : 0.0;
+              double scrollOffset =
+                  scrollController.hasClients ? scrollController.offset : 0.0;
               double adjustedX = localOffset.dx + scrollOffset;
 
               int toIndex = (adjustedX / cardWidth).floor();
@@ -65,8 +66,19 @@ class HandArea extends StatelessWidget {
                 toIndex = toIndex.clamp(0, gameState.hand.length - 1);
                 gameState.reorderHand(fromIndex, toIndex);
               } else {
+                
+
                 toIndex = toIndex.clamp(0, gameState.hand.length);
-                gameState.addCardToHandAt(card, toIndex);
+                if (draggedCards != null && draggedCards.isNotEmpty) {
+                  for (int i = 0; i < draggedCards.length; i++) {
+                    gameState.addCardToHandAt(draggedCards[i], toIndex + i);
+                  }
+                  if (data['removeCards'] != null) {
+                    data['removeCards']();
+                  }
+                }else {
+                  gameState.addCardToHandAt(card!, toIndex);
+                }
                 if (data['removeCard'] != null) {
                   data['removeCard']();
                 }
@@ -74,19 +86,19 @@ class HandArea extends StatelessWidget {
             },
             builder: (context, candidateData, rejectedData) {
               return SizedBox(
-                height: cardWidth * 1.404, 
+                height: cardWidth * 1.404,
                 child: ScrollConfiguration(
                   behavior: CustomScrollBehavior(),
-                  child:  RawScrollbar(
+                  child: RawScrollbar(
                     controller: scrollController,
-                    thumbVisibility: true, 
+                    thumbVisibility: true,
                     thickness: 8.0,
                     radius: const Radius.circular(4.0),
                     thumbColor: Colors.blueAccent,
-                    trackColor: Colors.blue.shade100, 
-                    trackBorderColor: Colors.blue.shade300, 
+                    trackColor: Colors.blue.shade100,
+                    trackBorderColor: Colors.blue.shade300,
                     child: ListView.builder(
-                      controller: scrollController, 
+                      controller: scrollController,
                       scrollDirection: Axis.horizontal,
                       itemCount: gameState.hand.length,
                       itemBuilder: (context, index) {
@@ -106,14 +118,26 @@ class HandArea extends StatelessWidget {
                               value: gameState,
                               child: Material(
                                 color: Colors.transparent,
-                                child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
+                                child: CardWidget(
+                                  card: card,
+                                  cardWidth: cardWidth,
+                                  rest: () {},
+                                ),
                               ),
                             ),
                             childWhenDragging: Opacity(
                               opacity: 0.5,
-                              child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
+                              child: CardWidget(
+                                card: card,
+                                cardWidth: cardWidth,
+                                rest: () {},
+                              ),
                             ),
-                          child: CardWidget(card: card, cardWidth: cardWidth, rest: (){},),
+                            child: CardWidget(
+                              card: card,
+                              cardWidth: cardWidth,
+                              rest: () {},
+                            ),
                           ),
                         );
                       },
