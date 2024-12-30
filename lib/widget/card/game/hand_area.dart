@@ -49,40 +49,39 @@ class HandArea extends StatelessWidget {
             onWillAccept: (data) => true,
             onAcceptWithDetails: (details) {
               final data = details.data;
-              String sourceId = data['sourceId'] ?? '';
-              int fromIndex = data['fromIndex'] ?? -1;
-              DigimonCard? card = data['card'];
-              final List<DigimonCard>? draggedCards = data['cards'];
-              RenderBox box = context.findRenderObject() as RenderBox;
-              Offset localOffset = box.globalToLocal(details.offset);
+              final sourceId = data['sourceId'] as String? ?? '';
+              final fromIndex = data['fromIndex'] as int? ?? -1;
+              final card = data['card'] as DigimonCard?;
+              final draggedCards = data['cards'] as List<DigimonCard>?;
 
-              double scrollOffset =
-                  scrollController.hasClients ? scrollController.offset : 0.0;
-              double adjustedX = localOffset.dx + scrollOffset;
+              final renderBox = context.findRenderObject() as RenderBox;
+              final localOffset = renderBox.globalToLocal(details.offset);
+
+              final scrollOffset = scrollController.hasClients ? scrollController.offset : 0.0;
+              final adjustedX = localOffset.dx + scrollOffset + cardWidth/2;
 
               int toIndex = (adjustedX / cardWidth).floor();
 
               if (sourceId == id) {
                 toIndex = toIndex.clamp(0, gameState.hand.length - 1);
                 gameState.reorderHand(fromIndex, toIndex);
-              } else {
-                
-
-                toIndex = toIndex.clamp(0, gameState.hand.length);
-                if (draggedCards != null && draggedCards.isNotEmpty) {
-                  for (int i = 0; i < draggedCards.length; i++) {
-                    gameState.addCardToHandAt(draggedCards[i], toIndex + i);
-                  }
-                  if (data['removeCards'] != null) {
-                    data['removeCards']();
-                  }
-                }else {
-                  gameState.addCardToHandAt(card!, toIndex);
+                return;
+              }
+              toIndex = toIndex.clamp(0, gameState.hand.length);
+              if (draggedCards?.isNotEmpty == true) {
+                for (var i = draggedCards!.length -1; i >= 0 ; i--) {
+                  gameState.addCardToHandAt(draggedCards[i], toIndex++);
                 }
-                if (data['removeCard'] != null) {
+                if(data['removeCards'] != null) {
+                  data['removeCards']();
+                }
+              } else if (card != null) {
+                gameState.addCardToHandAt(card, toIndex);
+                if(data['removeCard'] != null) {
                   data['removeCard']();
                 }
               }
+              
             },
             builder: (context, candidateData, rejectedData) {
               return SizedBox(
@@ -103,41 +102,38 @@ class HandArea extends StatelessWidget {
                       itemCount: gameState.hand.length,
                       itemBuilder: (context, index) {
                         final card = gameState.hand[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: {
-                              'card': card,
-                              'fromIndex': index,
-                              'sourceId': id,
-                              'removeCard': () {
-                                gameState.removeCardFromHandAt(index);
-                              },
+                        return Draggable<Map<String, dynamic>>(
+                          data: {
+                            'card': card,
+                            'fromIndex': index,
+                            'sourceId': id,
+                            'removeCard': () {
+                              gameState.removeCardFromHandAt(index);
                             },
-                            feedback: ChangeNotifierProvider.value(
-                              value: gameState,
-                              child: Material(
-                                color: Colors.transparent,
-                                child: CardWidget(
-                                  card: card,
-                                  cardWidth: cardWidth,
-                                  rest: () {},
-                                ),
-                              ),
-                            ),
-                            childWhenDragging: Opacity(
-                              opacity: 0.5,
+                          },
+                          feedback: ChangeNotifierProvider.value(
+                            value: gameState,
+                            child: Material(
+                              color: Colors.transparent,
                               child: CardWidget(
                                 card: card,
                                 cardWidth: cardWidth,
                                 rest: () {},
                               ),
                             ),
+                          ),
+                          childWhenDragging: Opacity(
+                            opacity: 0.5,
                             child: CardWidget(
                               card: card,
                               cardWidth: cardWidth,
                               rest: () {},
                             ),
+                          ),
+                          child: CardWidget(
+                            card: card,
+                            cardWidth: cardWidth,
+                            rest: () {},
                           ),
                         );
                       },

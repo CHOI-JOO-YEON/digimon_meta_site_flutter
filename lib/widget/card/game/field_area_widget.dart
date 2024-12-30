@@ -14,54 +14,51 @@ class FieldArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        return Container(
-          color: Theme.of(context).cardColor,
-          child: Column(
-            children: [
-              const Text('필드'),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8, childAspectRatio: 0.35),
-                        itemCount: 8,
-                        itemBuilder: (context, index) {
-                          return FieldZoneWidget(
-                            fieldZone: gameState.fieldZones[index],
-                            cardWidth: cardWidth,
-                            isRaising: false,
-                          );
-                        },
-                      ),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 16, childAspectRatio: 0.712),
-                        itemCount: gameState.fieldZones.length - 8,
-                        itemBuilder: (context, index) {
-                          return FieldZoneWidget(
-                            fieldZone: gameState.fieldZones[index + 8],
-                            cardWidth: cardWidth * 0.5,
-                            isRaising: false,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+        return Column(
+          children: [
+            const Text('필드'),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 8, childAspectRatio: 0.35),
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        return FieldZoneWidget(
+                          fieldZone: gameState.fieldZones[index],
+                          cardWidth: cardWidth,
+                          isRaising: false,
+                        );
+                      },
+                    ),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 8, childAspectRatio: 0.712),
+                      itemCount: gameState.fieldZones.length - 8,
+                      itemBuilder: (context, index) {
+                        return FieldZoneWidget(
+                          fieldZone: gameState.fieldZones[index + 8],
+                          cardWidth: cardWidth,
+                          isRaising: false,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              
-              ElevatedButton(
-                onPressed: () {
-                  gameState.addFieldZone(16);
-                },
-                child: const Text('필드 존 추가'),
-              ),
-            ],
-          ),
+            ),
+            
+            ElevatedButton(
+              onPressed: () {
+                gameState.addFieldZone(16);
+              },
+              child: const Text('필드 존 추가'),
+            ),
+          ],
         );
       },
     );

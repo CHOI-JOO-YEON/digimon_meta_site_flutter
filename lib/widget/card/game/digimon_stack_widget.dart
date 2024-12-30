@@ -82,8 +82,12 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         final int n = widget.digimonStack.length;
         final double bHeight =
             height - min(cSpacing * n, height - (cHeight - cSpacing));
-        final double temp = localOffset.dy + cHeight - bHeight;
+        final double temp =
+            localOffset.dy + cHeight - bHeight;
         int toIndex = (temp / cSpacing).floor();
+        if(toIndex < 0) {
+          toIndex = 0;
+        }
         toIndex = n - toIndex;
         toIndex = toIndex.clamp(0, n);
 
@@ -103,6 +107,9 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
           final int fromIndex = data['fromIndex'] ?? -1;
 
           if (sourceId == widget.id) {
+            if(toIndex==n) {
+              toIndex--;
+            }
             if (fromIndex != -1 && fromIndex != toIndex && toIndex < n) {
               widget.onReorder(fromIndex, toIndex);
             }
@@ -166,23 +173,8 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
                                 rest: () => triggerRest(index),
                               ),
                             ),
-                            onDragStarted: () {
-                              setState(() {
-                                isDragging = true;
-                              });
-                            },
-                            onDragEnd: (details) {
-                              setState(() {
-                                isDragging = false;
-                              });
-                            },
-                            onDragCompleted: () {
-                              setState(() {
-                                isDragging = false;
-                              });
-                            },
                             child: Transform.rotate(
-                              angle: widget.isRotate(index) ? -pi / 4 : 0.0,
+                              angle: widget.isRotate(index) ? -pi / 8 : 0.0,
                               child: CardWidget(
                                 card: card,
                                 cardWidth: widget.cardWidth,

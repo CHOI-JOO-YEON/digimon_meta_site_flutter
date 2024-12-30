@@ -7,6 +7,7 @@ class GameState extends ChangeNotifier {
   List<DigimonCard> mainDeck = [];
   List<DigimonCard> digitamaDeck = [];
   List<DigimonCard> hand = [];
+  List<DigimonCard> shows = [];
   List<DigimonCard> securityStack = [];
   List<DigimonCard> trash = [];
   RaisingZone raisingZone = RaisingZone();
@@ -15,7 +16,7 @@ class GameState extends ChangeNotifier {
   DigimonCard? selectedCard;
 
   GameState(DeckBuild deckBuild) {
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 16; i++) {
       fieldZones.add(FieldZone());
     }
     deckBuild.deckMap.forEach((card, count) {
@@ -61,6 +62,12 @@ class GameState extends ChangeNotifier {
   void drawCard() {
     if (mainDeck.isNotEmpty) {
       hand.add(mainDeck.removeLast());
+      notifyListeners();
+    }
+  }
+  void showCard() {
+    if (mainDeck.isNotEmpty) {
+      shows.add(mainDeck.removeLast());
       notifyListeners();
     }
   }

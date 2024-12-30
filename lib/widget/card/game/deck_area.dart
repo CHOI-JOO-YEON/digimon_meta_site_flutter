@@ -22,6 +22,12 @@ class DeckArea extends StatelessWidget {
           },
           child: Text('드로우'),
         ),
+        ElevatedButton(
+          onPressed: () {
+            gameState.drawCard();
+          },
+          child: Text('드로우'),
+        ),
         Container(
           width: cardWidth,
           height: cardWidth * 1.404,
