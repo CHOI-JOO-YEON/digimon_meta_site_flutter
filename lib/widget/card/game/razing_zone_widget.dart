@@ -32,10 +32,13 @@ class RaisingZoneWidget extends StatelessWidget {
                     height: cardWidth * 1.404,
                   )),
               Expanded(
-                  child: FieldZoneWidget(
-                fieldZone: raisingZone.fieldZone,
-                cardWidth: cardWidth,
-                isRaising: true,
+                  child: Padding(
+                padding: EdgeInsets.all(cardWidth * 0.025),
+                child: FieldZoneWidget(
+                  fieldZone: raisingZone.fieldZone,
+                  cardWidth: cardWidth,
+                  isRaising: true,
+                ),
               )),
             ],
           ),

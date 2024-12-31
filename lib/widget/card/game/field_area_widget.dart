@@ -23,8 +23,10 @@ class FieldArea extends StatelessWidget {
                   children: [
                     GridView.builder(
                       shrinkWrap: true,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 8, childAspectRatio: 0.35),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 8,
+                          childAspectRatio: 0.35,
+                          crossAxisSpacing: cardWidth * 0.05),
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
@@ -34,10 +36,15 @@ class FieldArea extends StatelessWidget {
                         );
                       },
                     ),
+                    SizedBox(
+                      height: cardWidth * 0.05,
+                    ),
                     GridView.builder(
                       shrinkWrap: true,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 8, childAspectRatio: 0.712),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 8,
+                          childAspectRatio: 0.712,
+                          crossAxisSpacing: cardWidth * 0.05),
                       itemCount: gameState.fieldZones.length - 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
@@ -51,7 +58,6 @@ class FieldArea extends StatelessWidget {
                 ),
               ),
             ),
-            
             ElevatedButton(
               onPressed: () {
                 gameState.addFieldZone(16);

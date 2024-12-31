@@ -23,8 +23,12 @@ class FieldZoneWidget extends StatelessWidget {
       value: fieldZone,
       child: Consumer<FieldZone>(
         builder: (context, fieldZone, child) {
-          return Padding(
+          return Container(
             padding: EdgeInsets.all(cardWidth * 0.05),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(cardWidth * 0.1)
+            ),
             child: DigimonStackWidget(
               digimonStack: fieldZone.stack,
               onReorder: (fromIndex, toIndex) {
@@ -37,7 +41,7 @@ class FieldZoneWidget extends StatelessWidget {
                 fieldZone.removeCardToStackAt(fromIndex);
               },
               id: UniqueKey().toString(),
-              cardWidth: cardWidth * 0.9,
+              cardWidth: cardWidth * 0.85,
               triggerRest: (index) {
                 if (!isRaising) {
                   fieldZone.rotateIndex(index);

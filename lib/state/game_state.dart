@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../model/card.dart';
@@ -65,6 +67,7 @@ class GameState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   void showCard() {
     if (mainDeck.isNotEmpty) {
       shows.add(mainDeck.removeLast());
@@ -153,11 +156,11 @@ class FieldZone extends ChangeNotifier {
   }
 
   void removeCardToStackAt(int index) {
-    if (index == stack.length -1 && _rotatedCards.contains(stack.length - 1)) {
-      if(stack.length > 1) {
+    if (index == stack.length - 1 && _rotatedCards.contains(stack.length - 1)) {
+      if (stack.length > 1) {
         _rotatedCards.remove(stack.length - 1);
-        _rotatedCards.add(stack.length - 2);  
-      }else {
+        _rotatedCards.add(stack.length - 2);
+      } else {
         _rotatedCards.clear();
       }
     } else {
