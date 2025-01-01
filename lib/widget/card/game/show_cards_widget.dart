@@ -10,15 +10,14 @@ import 'draggable_card_widget.dart';
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.stylus,
-    PointerDeviceKind.unknown,
-  };
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
+      };
 }
 
 class ShowCards extends StatelessWidget {
-
   final double cardWidth;
 
   final String id = 'shows';
@@ -39,35 +38,40 @@ class ShowCards extends StatelessWidget {
         final fromIndex = data['fromIndex'] as int? ?? -1;
         final card = data['card'] as DigimonCard?;
         final draggedCards = data['cards'] as List<DigimonCard>?;
-    
+
         final renderBox = context.findRenderObject() as RenderBox;
         final localOffset = renderBox.globalToLocal(details.offset);
-    
-        final scrollOffset = scrollController.hasClients ? scrollController.offset : 0.0;
-        final adjustedX = localOffset.dx + scrollOffset + cardWidth/2;
-    
+
+        final scrollOffset =
+            scrollController.hasClients ? scrollController.offset : 0.0;
+        final adjustedX = localOffset.dx + scrollOffset;
+
         int toIndex = (adjustedX / cardWidth).floor();
-    
+
+        if (toIndex < fromIndex) {
+          toIndex = ((adjustedX + cardWidth) / cardWidth).floor();
+        }
+
         if (sourceId == id) {
           toIndex = toIndex.clamp(0, gameState.hand.length - 1);
           gameState.reorderShow(fromIndex, toIndex);
           return;
         }
+
         toIndex = toIndex.clamp(0, gameState.hand.length);
         if (draggedCards?.isNotEmpty == true) {
-          for (var i = draggedCards!.length -1; i >= 0 ; i--) {
+          for (var i = draggedCards!.length - 1; i >= 0; i--) {
             gameState.addCardToShowsAt(draggedCards[i], toIndex++);
           }
-          if(data['removeCards'] != null) {
+          if (data['removeCards'] != null) {
             data['removeCards']();
           }
         } else if (card != null) {
           gameState.addCardToShowsAt(card, toIndex);
-          if(data['removeCard'] != null) {
+          if (data['removeCard'] != null) {
             data['removeCard']();
           }
         }
-    
       },
       builder: (context, candidateData, rejectedData) {
         return ScrollConfiguration(

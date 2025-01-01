@@ -82,10 +82,9 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         final int n = widget.digimonStack.length;
         final double bHeight =
             height - min(cSpacing * n, height - (cHeight - cSpacing));
-        final double temp =
-            localOffset.dy + cHeight - bHeight;
+        final double temp = localOffset.dy + cHeight - bHeight;
         int toIndex = (temp / cSpacing).floor();
-        if(toIndex < 0) {
+        if (toIndex < 0) {
           toIndex = 0;
         }
         toIndex = n - toIndex;
@@ -107,7 +106,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
           final int fromIndex = data['fromIndex'] ?? -1;
 
           if (sourceId == widget.id) {
-            if(toIndex==n) {
+            if (toIndex == n) {
               toIndex--;
             }
             if (fromIndex != -1 && fromIndex != toIndex && toIndex < n) {
