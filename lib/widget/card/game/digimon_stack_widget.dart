@@ -188,7 +188,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
                         Positioned(
                           bottom: cardHeight +
                               cardSpacing * (widget.digimonStack.length - 2),
-                          right: 0,
+                          left: 0,
                           child: Draggable<Map<String, dynamic>>(
                             data: {
                               'id': widget.id,

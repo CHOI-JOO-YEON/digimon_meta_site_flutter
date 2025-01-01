@@ -89,14 +89,35 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reorderShow(int fromIndex, int toIndex) {
+    if (fromIndex < 0 || fromIndex == toIndex) return;
+
+    final card = shows.removeAt(fromIndex);
+    shows.insert(toIndex, card);
+
+    notifyListeners();
+  }
+
+
   void addCardToHandAt(DigimonCard card, int toIndex) {
     hand.insert(toIndex, card);
     notifyListeners();
   }
-
+  void addCardToShowsAt(DigimonCard card, int toIndex) {
+    shows.insert(toIndex, card);
+    notifyListeners();
+  }
   void removeCardFromHandAt(int index) {
     hand.removeAt(index);
     notifyListeners();
+  }
+  void removeCardFromShowsAt(int index) {
+    shows.removeAt(index);
+    notifyListeners();
+  }
+
+  bool isShowDialog() {
+    return shows.isNotEmpty;
   }
 }
 

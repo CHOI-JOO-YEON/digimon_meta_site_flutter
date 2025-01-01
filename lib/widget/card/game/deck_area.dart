@@ -24,9 +24,9 @@ class DeckArea extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            gameState.drawCard();
+            gameState.showCard();
           },
-          child: Text('드로우'),
+          child: Text('카드 공개'),
         ),
         Container(
           width: cardWidth,

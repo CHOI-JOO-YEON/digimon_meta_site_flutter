@@ -19,6 +19,7 @@ import '../widget/card/game/hand_area.dart';
 import '../widget/card/game/memory_gauge.dart';
 import '../widget/card/game/razing_zone_widget.dart';
 import '../widget/card/game/security_stack_area.dart';
+import '../widget/card/game/show_cards_widget.dart';
 import '../widget/card/game/trash_area.dart';
 
 @RoutePage()
@@ -284,67 +285,79 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                   color: Theme.of(context).cardColor,
                   width: width,
                   height: height,
-                  child: Column(
+                  child: Stack(
                     children: [
-                      Expanded(flex: 1, child: MemoryGauge()),
-                      Expanded(
-                        flex: 8,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      flex: 1,
-                                      child: SecurityStackArea(
-                                        cardWidth: cardWidth,
-                                      )),
-                                  Expanded(
-                                      flex: 1,
-                                      child: RaisingZoneWidget(
-                                        cardWidth: cardWidth,
-                                      )),
-                                ],
-                              ),
+                      Column(
+                        children: [
+                          Expanded(flex: 1, child: MemoryGauge()),
+                          Expanded(
+                            flex: 8,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: SecurityStackArea(
+                                            cardWidth: cardWidth,
+                                          )),
+                                      Expanded(
+                                          flex: 1,
+                                          child: RaisingZoneWidget(
+                                            cardWidth: cardWidth,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 8,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                          flex: 3,
+                                          child: FieldArea(
+                                            cardWidth: cardWidth,
+                                          )),
+                                      Expanded(
+                                          flex: 1,
+                                          child: HandArea(
+                                            cardWidth: cardWidth * 0.8,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: DeckArea(
+                                            cardWidth: cardWidth,
+                                          )),
+                                      Expanded(
+                                          flex: 1,
+                                          child: TrashArea(
+                                            cardWidth: cardWidth,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              flex: 8,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      flex: 3,
-                                      child: FieldArea(
-                                        cardWidth: cardWidth,
-                                      )),
-                                  Expanded(
-                                      flex: 1,
-                                      child: HandArea(
-                                        cardWidth: cardWidth * 0.8,
-                                      )),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                      flex: 1,
-                                      child: DeckArea(
-                                        cardWidth: cardWidth,
-                                      )),
-                                  Expanded(
-                                      flex: 1,
-                                      child: TrashArea(
-                                        cardWidth: cardWidth,
-                                      )),
-                                ],
-                              ),
-                            ),
-                          ],
+                          )
+                        ],
+                      ),
+                      if (gameState.isShowDialog())
+                        Align(
+                          alignment: Alignment.center,
+                            child: SizedBox(
+                                height: cardWidth * 1.404,
+                                width: cardWidth * 5,
+                                child: ShowCards(cardWidth: cardWidth,))
                         ),
-                      )
                     ],
                   ),
                 ),
