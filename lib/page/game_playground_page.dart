@@ -354,8 +354,8 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                         Align(
                           alignment: Alignment.center,
                             child: SizedBox(
-                                height: cardWidth * 1.404,
-                                width: cardWidth * 5,
+                                height: cardWidth * 2,
+                                width: cardWidth * 6,
                                 child: ShowCards(cardWidth: cardWidth,))
                         ),
                     ],
