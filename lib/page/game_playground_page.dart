@@ -47,7 +47,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
             double height = width * (3.5 / 6);
             double cardWidth = width / 12;
             final gameState = Provider.of<GameState>(context);
-            double fontSize = 15;
+            double fontSize = width * 0.01;
             int selectedLocaleIndex = 0;
             LocaleCardData? localeCardData = gameState
                 .getSelectedCard()
@@ -65,60 +65,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                 child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Wrap(
-                                          crossAxisAlignment:
-                                              WrapCrossAlignment.center,
-                                          spacing: 10,
-                                          children: [
-                                            Text(
-                                              '${gameState.getSelectedCard()!.cardNo}',
-                                              style: TextStyle(
-                                                  fontSize: fontSize,
-                                                  color: Theme.of(context)
-                                                      .hintColor),
-                                            ),
-                                            Text(
-                                              '${gameState.getSelectedCard()!.rarity}',
-                                              style: TextStyle(
-                                                  fontSize: fontSize,
-                                                  color: Theme.of(context)
-                                                      .primaryColor),
-                                            ),
-                                            Text(
-                                              gameState
-                                                  .getSelectedCard()!
-                                                  .getKorCardType(),
-                                              style: TextStyle(
-                                                  fontSize: fontSize,
-                                                  color: ColorService
-                                                      .getColorFromString(
-                                                          gameState
-                                                              .getSelectedCard()!
-                                                              .color1!)),
-                                            ),
-                                            if (gameState
-                                                    .getSelectedCard()!
-                                                    .lv !=
-                                                null)
-                                              ElevatedButton(
-                                                onPressed: null,
-                                                style: ElevatedButton.styleFrom(
-                                                  disabledBackgroundColor:
-                                                      Theme.of(context)
-                                                          .cardColor,
-                                                  disabledForegroundColor:
-                                                      Colors.black,
-                                                ),
-                                                child: Text(
-                                                  'Lv.${gameState.getSelectedCard()!.lv == 0 ? '-' : gameState.getSelectedCard()!.lv}',
-                                                  style: TextStyle(
-                                                      fontSize: fontSize),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
+                                      Row(
+                                        children: [
+                                          IconButton(onPressed: ()=> gameState.undo(), icon: Icon(Icons.undo)),  
+                                          IconButton(onPressed: ()=> gameState.redo(), icon: Icon(Icons.redo))  
+                                        ],
                                       ),
                                       Row(
                                         mainAxisSize: MainAxisSize.min,

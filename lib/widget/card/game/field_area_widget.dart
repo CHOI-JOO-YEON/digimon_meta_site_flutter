@@ -30,7 +30,7 @@ class FieldArea extends StatelessWidget {
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
-                          fieldZone: gameState.fieldZones[index],
+                          fieldZone: gameState.fieldZones["field$index"]!,
                           cardWidth: cardWidth,
                           isRaising: false,
                         );
@@ -48,7 +48,7 @@ class FieldArea extends StatelessWidget {
                       itemCount: gameState.fieldZones.length - 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
-                          fieldZone: gameState.fieldZones[index + 8],
+                          fieldZone: gameState.fieldZones["field${index + 8}"]!,
                           cardWidth: cardWidth,
                           isRaising: false,
                         );
@@ -58,12 +58,12 @@ class FieldArea extends StatelessWidget {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                gameState.addFieldZone(16);
-              },
-              child: const Text('필드 존 추가'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     gameState.addFieldZone(16);
+            //   },
+            //   child: const Text('필드 존 추가'),
+            // ),
           ],
         );
       },

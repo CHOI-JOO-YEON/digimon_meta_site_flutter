@@ -11,7 +11,8 @@ class DigimonStackWidget extends StatefulWidget {
   final List<DigimonCard> digimonStack;
   final String id;
   final Function(int fromIndex, int toIndex) onReorder;
-  final Function(DigimonCard newCard, int toIndex) onAddCard;
+  final Function(DigimonCard newCard, int toIndex, int fromIndex, String from)
+      onAddCard;
   final Function(int fromIndex) onLeave;
   final Function(int index) triggerRest;
   final bool Function(int index) isRotate;
@@ -35,7 +36,7 @@ class DigimonStackWidget extends StatefulWidget {
 
 class _DigimonStackWidgetState extends State<DigimonStackWidget> {
   late ScrollController _scrollController;
-  bool isDragging = false; // 드래그 상태를 추적하는 플래그
+  bool isDragging = false;
 
   @override
   void initState() {
@@ -63,6 +64,8 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
       onWillAcceptWithDetails: (data) => true,
       onAcceptWithDetails: (details) {
         final data = details.data;
+        final sourceId = data['sourceId'] as String? ?? '';
+        final fromIndex = data['fromIndex'] as int? ?? -1;
         final RenderBox box = context.findRenderObject() as RenderBox;
         final Offset localOffset = box.globalToLocal(details.offset);
 
@@ -73,7 +76,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         final double rawHeight = size.height;
         final double height = rawHeight + scrollOffset;
 
-        final List<DigimonCard>? draggedCards = data['cards'];
+        final List<DigimonCard> draggedCards = data['cards'] ?? [];
 
         final DigimonCard? singleCard = data['card'];
 
@@ -90,19 +93,18 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         toIndex = n - toIndex;
         toIndex = toIndex.clamp(0, n);
 
-        if (draggedCards != null && draggedCards.isNotEmpty) {
-          final String sourceId = data['id'] ?? '';
+        if (draggedCards.isNotEmpty) {
           if (sourceId == widget.id) {
           } else {
             for (int i = 0; i < draggedCards.length; i++) {
-              widget.onAddCard(draggedCards[i], toIndex + i);
+              widget.onAddCard(
+                  draggedCards[i], toIndex + i, 0, sourceId);
             }
             if (data['removeCards'] != null) {
               data['removeCards']();
             }
           }
         } else if (singleCard != null) {
-          final String sourceId = data['id'] ?? '';
           final int fromIndex = data['fromIndex'] ?? -1;
 
           if (sourceId == widget.id) {
@@ -113,7 +115,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
               widget.onReorder(fromIndex, toIndex);
             }
           } else {
-            widget.onAddCard(singleCard, toIndex);
+            widget.onAddCard(singleCard, toIndex, fromIndex, sourceId);
 
             if (data['removeCard'] != null) {
               data['removeCard']();
@@ -148,7 +150,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
                             data: {
                               'fromIndex': index,
                               'card': card,
-                              'id': widget.id,
+                              'sourceId': widget.id,
                               'removeCard': () {
                                 widget.onLeave(index);
                               },
@@ -192,6 +194,7 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
                             data: {
                               'id': widget.id,
                               'cards': widget.digimonStack,
+                              'sourceId': widget.id,
                               'removeCards': () {
                                 for (int i = widget.digimonStack.length - 1;
                                     i >= 0;

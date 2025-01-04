@@ -20,7 +20,7 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
 class ShowCards extends StatelessWidget {
   final double cardWidth;
 
-  final String id = 'shows';
+  final String id = 'show';
 
   const ShowCards({super.key, required this.cardWidth});
 
@@ -53,7 +53,7 @@ class ShowCards extends StatelessWidget {
                 final sourceId = data['sourceId'] as String? ?? '';
                 final fromIndex = data['fromIndex'] as int? ?? -1;
                 final card = data['card'] as DigimonCard?;
-                final draggedCards = data['cards'] as List<DigimonCard>?;
+                final draggedCards = data['cards'] as List<DigimonCard>??[];
             
                 final renderBox = context.findRenderObject() as RenderBox;
                 final localOffset = renderBox.globalToLocal(details.offset);
@@ -69,21 +69,21 @@ class ShowCards extends StatelessWidget {
                 }
             
                 if (sourceId == id) {
-                  toIndex = toIndex.clamp(0, gameState.hand.length - 1);
+                  toIndex = toIndex.clamp(0, gameState.shows.length - 1);
                   gameState.reorderShow(fromIndex, toIndex);
                   return;
                 }
             
-                toIndex = toIndex.clamp(0, gameState.hand.length);
-                if (draggedCards?.isNotEmpty == true) {
-                  for (var i = draggedCards!.length - 1; i >= 0; i--) {
-                    gameState.addCardToShowsAt(draggedCards[i], toIndex++);
+                toIndex = toIndex.clamp(0, gameState.shows.length);
+                if (draggedCards.isNotEmpty) {
+                  for (var i = draggedCards.length - 1; i >= 0; i--) {
+                    gameState.addCardToShowsAt(draggedCards[i], toIndex++, sourceId, i);
                   }
                   if (data['removeCards'] != null) {
                     data['removeCards']();
                   }
                 } else if (card != null) {
-                  gameState.addCardToShowsAt(card, toIndex);
+                  gameState.addCardToShowsAt(card, toIndex, sourceId, fromIndex);
                   if (data['removeCard'] != null) {
                     data['removeCard']();
                   }

@@ -45,7 +45,7 @@ class RaisingZoneWidget extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            raisingZone.hatchEgg();
+            raisingZone.hatchEgg(gameState);
           },
           child: const Text('부화'),
         ),

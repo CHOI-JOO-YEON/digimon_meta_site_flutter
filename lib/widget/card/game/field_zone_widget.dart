@@ -19,6 +19,7 @@ class FieldZoneWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gameState = Provider.of<GameState>(context);
     return ChangeNotifierProvider.value(
       value: fieldZone,
       child: Consumer<FieldZone>(
@@ -32,15 +33,15 @@ class FieldZoneWidget extends StatelessWidget {
             child: DigimonStackWidget(
               digimonStack: fieldZone.stack,
               onReorder: (fromIndex, toIndex) {
-                fieldZone.reorderStack(fromIndex, toIndex);
+                fieldZone.reorderStack(fromIndex, toIndex, gameState);
               },
-              onAddCard: (card, toIndex) {
-                fieldZone.addCardToStackAt(card, toIndex);
+              onAddCard: (card, toIndex, fromIndex, from) {
+                fieldZone.addCardToStackAt(card, toIndex, fromIndex, from, gameState);
               },
               onLeave: (fromIndex) {
                 fieldZone.removeCardToStackAt(fromIndex);
               },
-              id: UniqueKey().toString(),
+              id: fieldZone.key,
               cardWidth: cardWidth * 0.85,
               triggerRest: (index) {
                 if (!isRaising) {

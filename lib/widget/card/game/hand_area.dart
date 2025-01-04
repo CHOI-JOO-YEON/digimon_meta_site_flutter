@@ -52,7 +52,7 @@ class HandArea extends StatelessWidget {
               final sourceId = data['sourceId'] as String? ?? '';
               final fromIndex = data['fromIndex'] as int? ?? -1;
               final card = data['card'] as DigimonCard?;
-              final draggedCards = data['cards'] as List<DigimonCard>?;
+              final draggedCards = data['cards'] as List<DigimonCard>?? [];
 
               final renderBox = context.findRenderObject() as RenderBox;
               final localOffset = renderBox.globalToLocal(details.offset);
@@ -73,15 +73,15 @@ class HandArea extends StatelessWidget {
                 return;
               }
               toIndex = toIndex.clamp(0, gameState.hand.length);
-              if (draggedCards?.isNotEmpty == true) {
-                for (var i = draggedCards!.length - 1; i >= 0; i--) {
-                  gameState.addCardToHandAt(draggedCards[i], toIndex++);
+              if (draggedCards.isNotEmpty) {
+                for (var i = draggedCards.length - 1; i >= 0; i--) {
+                  gameState.addCardToHandAt(draggedCards[i], toIndex++, sourceId, i);
                 }
                 if (data['removeCards'] != null) {
                   data['removeCards']();
                 }
               } else if (card != null) {
-                gameState.addCardToHandAt(card, toIndex);
+                gameState.addCardToHandAt(card, toIndex, sourceId, fromIndex);
                 if (data['removeCard'] != null) {
                   data['removeCard']();
                 }
