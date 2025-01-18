@@ -58,7 +58,6 @@ class GameState extends ChangeNotifier {
   void undo() {
     if (undoStack.isEmpty) return;
     MoveLog moveLog = undoStack.removeLast();
-    print(moveLog);
     DigimonCard? card = getCardByLog(moveLog.to, moveLog.toIndex);
     if (card != null) {
       addCardByLog(moveLog.from, moveLog.fromIndex, card);
@@ -161,6 +160,27 @@ class GameState extends ChangeNotifier {
     shows.insert(toIndex, card);
     addMoveStack(MoveLog(
         to: "show", from: from, toIndex: toIndex, fromIndex: fromIndex));
+    notifyListeners();
+  }
+
+  void addCardToDeckBottom(DigimonCard card, String from, int fromIndex) {
+    mainDeck.insert(0, card);
+    addMoveStack(
+        MoveLog(to: "deck", from: from, toIndex: 0, fromIndex: fromIndex));
+    notifyListeners();
+  }
+
+  void addCardToDeckTop(DigimonCard card, String from, int fromIndex) {
+    int toIndex = mainDeck.length;
+    mainDeck.add(card);
+    addMoveStack(MoveLog(
+        to: "deck", from: from, toIndex: toIndex, fromIndex: fromIndex));
+    notifyListeners();
+  }
+  void addCardToTrash(DigimonCard card, String from, int fromIndex) {
+    trash.add(card);
+    addMoveStack(MoveLog(
+        to: "trash", from: from, toIndex: trash.length - 1, fromIndex: fromIndex));
     notifyListeners();
   }
 

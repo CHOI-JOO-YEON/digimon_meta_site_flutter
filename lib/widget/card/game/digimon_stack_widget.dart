@@ -76,7 +76,8 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
         final double rawHeight = size.height;
         final double height = rawHeight + scrollOffset;
 
-        final List<DigimonCard> draggedCards = data['cards'] ?? [];
+        final draggedCards =
+            data['cards'] == null ? [] : data['cards'] as List<DigimonCard>;
 
         final DigimonCard? singleCard = data['card'];
 
@@ -97,16 +98,13 @@ class _DigimonStackWidgetState extends State<DigimonStackWidget> {
           if (sourceId == widget.id) {
           } else {
             for (int i = 0; i < draggedCards.length; i++) {
-              widget.onAddCard(
-                  draggedCards[i], toIndex + i, 0, sourceId);
+              widget.onAddCard(draggedCards[i], toIndex + i, 0, sourceId);
             }
             if (data['removeCards'] != null) {
               data['removeCards']();
             }
           }
         } else if (singleCard != null) {
-          final int fromIndex = data['fromIndex'] ?? -1;
-
           if (sourceId == widget.id) {
             if (toIndex == n) {
               toIndex--;

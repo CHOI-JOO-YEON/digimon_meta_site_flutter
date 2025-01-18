@@ -32,7 +32,10 @@ class HandArea extends StatelessWidget {
     final ScrollController scrollController = ScrollController();
 
     return Container(
-      color: Colors.red,
+      decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(cardWidth * 0.1)
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -40,9 +43,9 @@ class HandArea extends StatelessWidget {
             '패 (${gameState.hand.length})',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: cardWidth * 0.1,
+              fontSize: cardWidth * 0.15,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              // color: Colors.white,
             ),
           ),
           DragTarget<Map<String, dynamic>>(
@@ -52,7 +55,9 @@ class HandArea extends StatelessWidget {
               final sourceId = data['sourceId'] as String? ?? '';
               final fromIndex = data['fromIndex'] as int? ?? -1;
               final card = data['card'] as DigimonCard?;
-              final draggedCards = data['cards'] as List<DigimonCard>?? [];
+              final draggedCards = data['cards'] == null
+                  ? []
+                  : data['cards'] as List<DigimonCard>;
 
               final renderBox = context.findRenderObject() as RenderBox;
               final localOffset = renderBox.globalToLocal(details.offset);
@@ -75,7 +80,8 @@ class HandArea extends StatelessWidget {
               toIndex = toIndex.clamp(0, gameState.hand.length);
               if (draggedCards.isNotEmpty) {
                 for (var i = draggedCards.length - 1; i >= 0; i--) {
-                  gameState.addCardToHandAt(draggedCards[i], toIndex++, sourceId, i);
+                  gameState.addCardToHandAt(
+                      draggedCards[i], toIndex++, sourceId, i);
                 }
                 if (data['removeCards'] != null) {
                   data['removeCards']();

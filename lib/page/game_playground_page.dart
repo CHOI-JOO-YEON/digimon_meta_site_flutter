@@ -58,6 +58,12 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                   flex: 1,
                   child: Column(
                     children: [
+                      Row(
+                        children: [
+                          IconButton(onPressed: ()=> gameState.undo(), icon: Icon(Icons.undo)),
+                          IconButton(onPressed: ()=> gameState.redo(), icon: Icon(Icons.redo))
+                        ],
+                      ),
                       gameState.getSelectedCard() == null
                           ? Container()
                           : Expanded(
@@ -65,12 +71,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                 child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Row(
-                                        children: [
-                                          IconButton(onPressed: ()=> gameState.undo(), icon: Icon(Icons.undo)),  
-                                          IconButton(onPressed: ()=> gameState.redo(), icon: Icon(Icons.redo))  
-                                        ],
-                                      ),
+                                      
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: gameState
@@ -305,7 +306,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                         Align(
                           alignment: Alignment.center,
                             child: SizedBox(
-                                height: cardWidth * 2,
+                                height: cardWidth * 2.6,
                                 width: cardWidth * 6,
                                 child: ShowCards(cardWidth: cardWidth,))
                         ),
