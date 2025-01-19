@@ -373,7 +373,6 @@ class DeckBuild {
     String encoded = Uri.encodeComponent(deckParam);
 
     url += "deck=$encoded";
-    print(url);
     return url;
   }
 // int digimonCardComparator(DigimonCard a, DigimonCard b) {

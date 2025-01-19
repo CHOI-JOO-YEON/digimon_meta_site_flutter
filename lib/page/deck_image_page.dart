@@ -239,7 +239,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
         var pixelRatio = targetWidth / boundarySize.width;
         pixelRatio *= 1.2;
-        // var pixelRatio = 1.2;
 
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
@@ -375,7 +374,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         children: [
                           if (isHorizontal)
                             SizedBox(
-                              width: 640 * scaleFactor,
+                              width: 610 * scaleFactor,
                               child: Image.network(
                                   fit: BoxFit.contain,
                                   _selectedCard?.getDisplayImgUrl() ?? ''),
@@ -418,16 +417,10 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Row(
       children: [
         SizedBox(
-          width: (isHorizontal ? 1142 : 492) * scaleFactor,
+          width: (isHorizontal ? 950 : 328) * scaleFactor,
           child: Row(
             children: [
-              Expanded(
-                flex: 1,
-                child: QrImageView(
-                  data: widget.deck.getQrUrl(),
-                  version: QrVersions.auto,
-                ),
-              ),
+             
               Expanded(
                 flex: 2,
                 child: Center(
@@ -436,11 +429,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
                     style: TextStyle(
                         fontSize: 25 * scaleFactor,
                         fontFamily: 'JalnanGothic',
-                        color:
-                            deckImageColorService.selectedDeckImageColor.textColor),
+                        color: deckImageColorService
+                            .selectedDeckImageColor.textColor),
                   ),
                 ),
               ),
+              
             ],
           ),
         ),
@@ -455,6 +449,18 @@ class _DeckImagePageState extends State<DeckImagePage> {
                 barColor: deckImageColorService.selectedDeckImageColor.barColor,
                 backGroundColor:
                     deckImageColorService.selectedDeckImageColor.cardColor),
+          ),
+        ),
+        SizedBox(
+          width: 164 * scaleFactor,
+          child: QrImageView(
+            data: widget.deck.getQrUrl(),
+            // embeddedImage: AssetImage('assets/images/img.png'),
+            // embeddedImageStyle: QrEmbeddedImageStyle(
+            //   size: Size(40 * scaleFactor, 40 * scaleFactor
+            //   ), // 이미지 크기
+            // ),
+            version: QrVersions.auto,
           ),
         ),
       ],
@@ -521,14 +527,14 @@ class _DeckImagePageState extends State<DeckImagePage> {
         padding: EdgeInsets.all(8.0 * scaleFactor),
         child: Column(
           children: [
-            Text(
-              name,
-              style: TextStyle(
-                  fontFamily: 'JalnanGothic',
-                  fontSize: 16 * scaleFactor,
-                  color:
-                      deckImageColorService.selectedDeckImageColor.textColor),
-            ),
+            // Text(
+            //   name,
+            //   style: TextStyle(
+            //       fontFamily: 'JalnanGothic',
+            //       fontSize: 16 * scaleFactor,
+            //       color:
+            //           deckImageColorService.selectedDeckImageColor.textColor),
+            // ),
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,

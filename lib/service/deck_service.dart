@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
@@ -11,12 +12,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:zxing2/qrcode.dart';
 import 'dart:html' as html;
 import '../model/card.dart';
 import '../model/deck-build.dart';
 
 import '../model/format.dart';
 import '../provider/limit_provider.dart';
+import 'package:image/image.dart' as imglib;
 
 class DeckService {
   DeckApi deckApi = DeckApi();
@@ -256,4 +259,63 @@ class DeckService {
     deck.import(deckResponseDto);
     return deck;
   }
+  
+  Future<String?> decodeQrCodeFromImage(Uint8List imageBytes) async {
+    // 1) 이미지 디코딩
+    final rawImage = imglib.decodeImage(imageBytes);
+    if (rawImage == null) {
+      // 디코딩 실패 (이미지가 아니거나 손상됨)
+      return null;
+    }
+
+    final imageData = rawImage.data; // ImageData? 타입
+    if (imageData == null) {
+      // data가 없는 경우 (이론상 잘 없지만 안전하게 체크)
+      return null;
+    }
+
+    // 보통 imageData.type == ImageDataType.uint8 (RGBA 8비트)
+    // buffer가 실제 픽셀 바이트 배열 (Uint8List or null)
+    final buffer = imageData.getBytes();
+    if (buffer == null || buffer is! Uint8List) {
+      // RGBA 픽셀 데이터를 읽을 수 없음
+      return null;
+    }
+
+    // 2) RGBA -> ARGB 변환
+    //   RGBA(4 bytes) = R, G, B, A 순서
+    //   ARGB(32bit int) = 0xAARRGGBB 순서
+    final width = rawImage.width;
+    final height = rawImage.height;
+    final pixelCount = width * height;
+    // 픽셀 하나당 4바이트이므로, buffer 길이는 pixelCount*4 이상이어야 함
+    if (buffer.length < pixelCount * 4) {
+      return null;
+    }
+
+    final int32Data = Int32List(pixelCount);
+    for (int i = 0; i < pixelCount; i++) {
+      final r = buffer[i * 4 + 0];
+      final g = buffer[i * 4 + 1];
+      final b = buffer[i * 4 + 2];
+      final a = buffer[i * 4 + 3];
+      // 0xAARRGGBB 형태의 int (alpha가 최상위 바이트)
+      int32Data[i] = (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    // 3) zxing2로 QR 디코딩
+    final luminanceSource = RGBLuminanceSource(width, height, int32Data);
+    final binarizer = HybridBinarizer(luminanceSource);
+    final bitmap = BinaryBitmap(binarizer);
+
+    final reader = QRCodeReader();
+    try {
+      final result = reader.decode(bitmap);
+      return result.text; // QR 코드 내용
+    } catch (e) {
+      // QR/바코드 인식 실패
+      return null;
+    }
+  }
+
 }
