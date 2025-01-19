@@ -34,6 +34,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   String selectColorSetKey = "RED";
   double scaleFactor = 0;
   double bottomSheetScale = 0;
+
   @override
   void initState() {
     horizontalSize = size * 1.65;
@@ -209,8 +210,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         child: ColorPickerBottomSheet(
                           scaleFactor: bottomSheetScale,
                           onColorChanged: (color) {
-                            setState(() {
-                            });
+                            setState(() {});
                           },
                         ),
                       )
@@ -239,7 +239,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         var pixelRatio = targetWidth / boundarySize.width;
         pixelRatio *= 1.2;
         // var pixelRatio = 1.2;
-        
+
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
         );
@@ -280,14 +280,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
                       child: Text('색상 변경'),
                       onTap: () => _showColorSetsBottomSheet(),
                     ),
-                     PopupMenuItem<String>(
-                      child: Text('색상 초기화'),
-                      onTap: () {
-                        setState(() {
-                        deckImageColorService.resetColor();
-                        });
-                      }
-                    ),
+                    PopupMenuItem<String>(
+                        child: Text('색상 초기화'),
+                        onTap: () {
+                          setState(() {
+                            deckImageColorService.resetColor();
+                          });
+                        }),
                     PopupMenuItem<String>(
                       child: StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {
@@ -350,8 +349,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
           final isPortrait =
               MediaQuery.of(context).orientation == Orientation.portrait;
           bottomSheetScale = isPortrait
-              ? (constraints.maxWidth * 2)/size
-              : (constraints.maxWidth * 0.6)/size;
+              ? (constraints.maxWidth * 2) / size
+              : (constraints.maxWidth * 0.6) / size;
           double screenWidth =
               min(constraints.maxWidth, isHorizontal ? horizontalSize : size);
           scaleFactor = screenWidth / (isHorizontal ? horizontalSize : size);

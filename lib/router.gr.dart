@@ -77,6 +77,19 @@ abstract class _$AppRouter extends RootStackRouter {
         child: MainPage(),
       );
     },
+    QrDeckImportRoute.name: (routeData) {
+      final queryParams = routeData.queryParams;
+      final args = routeData.argsAs<QrDeckImportRouteArgs>(
+          orElse: () =>
+              QrDeckImportRouteArgs(deckParam: queryParams.optString('deck')));
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: QrDeckImportPage(
+          key: args.key,
+          deckParam: args.deckParam,
+        ),
+      );
+    },
   };
 }
 
@@ -266,4 +279,43 @@ class MainRoute extends PageRouteInfo<void> {
   static const String name = 'MainRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [QrDeckImportPage]
+class QrDeckImportRoute extends PageRouteInfo<QrDeckImportRouteArgs> {
+  QrDeckImportRoute({
+    Key? key,
+    String? deckParam,
+    List<PageRouteInfo>? children,
+  }) : super(
+          QrDeckImportRoute.name,
+          args: QrDeckImportRouteArgs(
+            key: key,
+            deckParam: deckParam,
+          ),
+          rawQueryParams: {'deck': deckParam},
+          initialChildren: children,
+        );
+
+  static const String name = 'QrDeckImportRoute';
+
+  static const PageInfo<QrDeckImportRouteArgs> page =
+      PageInfo<QrDeckImportRouteArgs>(name);
+}
+
+class QrDeckImportRouteArgs {
+  const QrDeckImportRouteArgs({
+    this.key,
+    this.deckParam,
+  });
+
+  final Key? key;
+
+  final String? deckParam;
+
+  @override
+  String toString() {
+    return 'QrDeckImportRouteArgs{key: $key, deckParam: $deckParam}';
+  }
 }
