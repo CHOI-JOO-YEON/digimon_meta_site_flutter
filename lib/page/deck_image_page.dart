@@ -30,12 +30,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
   final GlobalKey gridKey = GlobalKey();
   DigimonCard? _selectedCard;
   double size = 1000;
-  double horizontalSize = 1650;
+  double horizontalSize = 0;
   String selectColorSetKey = "RED";
   double scaleFactor = 0;
   double bottomSheetScale = 0;
   @override
   void initState() {
+    horizontalSize = size * 1.65;
     super.initState();
     if (widget.deck.deckCards.isEmpty) {
       _selectedCard = DigimonCard(isEn: false, localeCardData: []);
@@ -235,8 +236,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
         double targetWidth = isHorizontal ? horizontalSize : size;
 
-        // var pixelRatio = targetWidth / boundarySize.width;
-        var pixelRatio = 1.2;
+        var pixelRatio = targetWidth / boundarySize.width;
+        pixelRatio *= 1.2;
+        // var pixelRatio = 1.2;
         
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
@@ -259,7 +261,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
-            width: 1000,
+            width: size,
             child: AppBar(
               backgroundColor: Theme.of(context).colorScheme.background,
               title: Text('이미지 내보내기',
