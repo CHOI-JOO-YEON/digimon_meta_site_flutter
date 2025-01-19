@@ -6,6 +6,7 @@ import 'package:digimon_meta_site_flutter/service/deck_image_color_service.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
 import '../model/card.dart';
 import '../model/deck-build.dart';
@@ -418,15 +419,29 @@ class _DeckImagePageState extends State<DeckImagePage> {
       children: [
         SizedBox(
           width: (isHorizontal ? 1142 : 492) * scaleFactor,
-          child: Center(
-            child: Text(
-              widget.deck.deckName,
-              style: TextStyle(
-                  fontSize: 25 * scaleFactor,
-                  fontFamily: 'JalnanGothic',
-                  color:
-                      deckImageColorService.selectedDeckImageColor.textColor),
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: QrImageView(
+                  data: widget.deck.getQrUrl(),
+                  version: QrVersions.auto,
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Text(
+                    widget.deck.deckName,
+                    style: TextStyle(
+                        fontSize: 25 * scaleFactor,
+                        fontFamily: 'JalnanGothic',
+                        color:
+                            deckImageColorService.selectedDeckImageColor.textColor),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(
