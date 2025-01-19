@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,11 +15,16 @@ class TrashArea extends StatelessWidget {
     return Column(
       children: [
         Text('트래시 (${gameState.trash.length})'),
-        Container(
-          width: cardWidth,
-          height: cardWidth * 1.404,
-          color: Colors.grey,
-          child: Center(child: Text('TRASH')),
+        GestureDetector(
+          onTap: (){
+            gameState.updateShowTrash(!gameState.isShowTrash);
+          },
+          child: Container(
+            width: cardWidth,
+            height: cardWidth * 1.404,
+            color: Colors.grey,
+            child: Center(child: Text('TRASH')),
+          ),
         ),
       ],
     );

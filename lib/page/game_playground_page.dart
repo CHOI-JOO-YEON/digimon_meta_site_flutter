@@ -302,11 +302,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                           )
                         ],
                       ),
-                      if (gameState.isShowDialog())
+                      if (gameState.isShowDialog() || gameState.isShowTrash)
                         Align(
                           alignment: Alignment.center,
                             child: SizedBox(
-                                height: cardWidth * 2.6,
+                                height: cardWidth * 6,
                                 width: cardWidth * 6,
                                 child: ShowCards(cardWidth: cardWidth,))
                         ),

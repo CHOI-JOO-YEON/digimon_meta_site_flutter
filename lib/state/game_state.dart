@@ -17,6 +17,12 @@ class GameState extends ChangeNotifier {
 
   int memory = 0;
   DigimonCard? selectedCard;
+  bool isShowTrash = false;
+
+  void updateShowTrash(bool value) {
+    isShowTrash = value;
+    notifyListeners();
+  }
 
   GameState(DeckBuild deckBuild) {
     for (int i = 0; i < 16; i++) {
@@ -147,6 +153,16 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reorderTrash(int fromIndex, int toIndex) {
+    if (fromIndex < 0 || fromIndex == toIndex) return;
+
+    final card = trash.removeAt(fromIndex);
+    trash.insert(toIndex, card);
+    addMoveStack(MoveLog(
+        to: "trash", from: "trash", toIndex: toIndex, fromIndex: fromIndex));
+    notifyListeners();
+  }
+
   void addCardToHandAt(
       DigimonCard card, int toIndex, String from, int fromIndex) {
     hand.insert(toIndex, card);
@@ -160,6 +176,14 @@ class GameState extends ChangeNotifier {
     shows.insert(toIndex, card);
     addMoveStack(MoveLog(
         to: "show", from: from, toIndex: toIndex, fromIndex: fromIndex));
+    notifyListeners();
+  }
+
+  void addCardToTrashAt(
+      DigimonCard card, int toIndex, String from, int fromIndex) {
+    trash.insert(toIndex, card);
+    addMoveStack(MoveLog(
+        to: "trash", from: from, toIndex: toIndex, fromIndex: fromIndex));
     notifyListeners();
   }
 
@@ -177,10 +201,14 @@ class GameState extends ChangeNotifier {
         to: "deck", from: from, toIndex: toIndex, fromIndex: fromIndex));
     notifyListeners();
   }
+
   void addCardToTrash(DigimonCard card, String from, int fromIndex) {
     trash.add(card);
     addMoveStack(MoveLog(
-        to: "trash", from: from, toIndex: trash.length - 1, fromIndex: fromIndex));
+        to: "trash",
+        from: from,
+        toIndex: trash.length - 1,
+        fromIndex: fromIndex));
     notifyListeners();
   }
 
@@ -191,6 +219,11 @@ class GameState extends ChangeNotifier {
 
   void removeCardFromShowsAt(int index) {
     shows.removeAt(index);
+    notifyListeners();
+  }
+
+  void removeCardFromTrashAt(int index) {
+    trash.removeAt(index);
     notifyListeners();
   }
 
@@ -208,6 +241,8 @@ class GameState extends ChangeNotifier {
         return mainDeck.removeAt(toIndex);
       case "raising":
         return raisingZone.fieldZone.stack.removeAt(toIndex);
+      case "trash":
+        return trash.removeAt(toIndex);
     }
 
     if (to.startsWith("field")) {
@@ -219,16 +254,24 @@ class GameState extends ChangeNotifier {
   void addCardByLog(String from, int fromIndex, DigimonCard card) {
     switch (from) {
       case "hand":
+        fromIndex.clamp(0, hand.length - 1);
         return hand.insert(fromIndex, card);
       case "show":
+        fromIndex.clamp(0, shows.length - 1);
         return shows.insert(fromIndex, card);
       case "deck":
+        fromIndex.clamp(0, mainDeck.length - 1);
         return mainDeck.insert(fromIndex, card);
       case "raising":
+        fromIndex.clamp(0, raisingZone.fieldZone.stack.length - 1);
         return raisingZone.fieldZone.stack.insert(fromIndex, card);
+      case "trash":
+        fromIndex.clamp(0, trash.length - 1);
+        return trash.insert(fromIndex, card);
     }
 
     if (from.startsWith("field")) {
+      fromIndex.clamp(0, fieldZones[from]!.stack.length - 1);
       return fieldZones[from]!.stack.insert(fromIndex, card);
     }
   }
