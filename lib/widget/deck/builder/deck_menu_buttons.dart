@@ -445,6 +445,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                                 if (decodedData != null) {
                                   final uri = Uri.parse(decodedData);
 
+                                  print(uri);
                                   final deckString =
                                   uri.queryParameters['deck'];
                                   

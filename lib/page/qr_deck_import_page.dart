@@ -34,14 +34,12 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
     if (param != null && param.isNotEmpty) {
 
       var deckView = await DeckApi().importDeckQr(widget.deckParam!);
-      if (deckView == null) {
-        return null;
+      if (deckView != null) {
+        deck.import(deckView);
       }
-      deck.deckName = 'My Deck';
-      deck.isStrict = true;
-      deck.import(deckView);
+      
     }
-    context.pushRoute(DeckBuilderRoute(deck: deck));
+    context.navigateTo(DeckBuilderRoute(deck: deck));
   }
 
   Map<int, int> parseDeckString(String str) {
