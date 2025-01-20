@@ -24,7 +24,7 @@ class AppRouter extends _$AppRouter {
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
     AutoRoute(page: QrDeckImportRoute.page,path: "/qr", meta: {'deck': 'String',},),
     AutoRoute(
-      initial: true,
+      // initial: true,
       path: '/',
       page: MainRoute.page,
       children: [
