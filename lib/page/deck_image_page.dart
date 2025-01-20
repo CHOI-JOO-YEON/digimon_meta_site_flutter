@@ -6,6 +6,7 @@ import 'package:digimon_meta_site_flutter/service/deck_image_color_service.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
 import '../model/card.dart';
 import '../model/deck-build.dart';
@@ -34,6 +35,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   String selectColorSetKey = "RED";
   double scaleFactor = 0;
   double bottomSheetScale = 0;
+
   @override
   void initState() {
     horizontalSize = size * 1.65;
@@ -209,8 +211,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         child: ColorPickerBottomSheet(
                           scaleFactor: bottomSheetScale,
                           onColorChanged: (color) {
-                            setState(() {
-                            });
+                            setState(() {});
                           },
                         ),
                       )
@@ -238,8 +239,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
         var pixelRatio = targetWidth / boundarySize.width;
         pixelRatio *= 1.2;
-        // var pixelRatio = 1.2;
-        
+
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
         );
@@ -280,14 +280,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
                       child: Text('색상 변경'),
                       onTap: () => _showColorSetsBottomSheet(),
                     ),
-                     PopupMenuItem<String>(
-                      child: Text('색상 초기화'),
-                      onTap: () {
-                        setState(() {
-                        deckImageColorService.resetColor();
-                        });
-                      }
-                    ),
+                    PopupMenuItem<String>(
+                        child: Text('색상 초기화'),
+                        onTap: () {
+                          setState(() {
+                            deckImageColorService.resetColor();
+                          });
+                        }),
                     PopupMenuItem<String>(
                       child: StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {
@@ -350,8 +349,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
           final isPortrait =
               MediaQuery.of(context).orientation == Orientation.portrait;
           bottomSheetScale = isPortrait
-              ? (constraints.maxWidth * 2)/size
-              : (constraints.maxWidth * 0.6)/size;
+              ? (constraints.maxWidth * 2) / size
+              : (constraints.maxWidth * 0.6) / size;
           double screenWidth =
               min(constraints.maxWidth, isHorizontal ? horizontalSize : size);
           scaleFactor = screenWidth / (isHorizontal ? horizontalSize : size);
@@ -375,7 +374,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         children: [
                           if (isHorizontal)
                             SizedBox(
-                              width: 640 * scaleFactor,
+                              width: 610 * scaleFactor,
                               child: Image.network(
                                   fit: BoxFit.contain,
                                   _selectedCard?.getDisplayImgUrl() ?? ''),
@@ -418,16 +417,25 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Row(
       children: [
         SizedBox(
-          width: (isHorizontal ? 1142 : 492) * scaleFactor,
-          child: Center(
-            child: Text(
-              widget.deck.deckName,
-              style: TextStyle(
-                  fontSize: 25 * scaleFactor,
-                  fontFamily: 'JalnanGothic',
-                  color:
-                      deckImageColorService.selectedDeckImageColor.textColor),
-            ),
+          width: (isHorizontal ? 950 : 328) * scaleFactor,
+          child: Row(
+            children: [
+             
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Text(
+                    widget.deck.deckName,
+                    style: TextStyle(
+                        fontSize: 25 * scaleFactor,
+                        fontFamily: 'JalnanGothic',
+                        color: deckImageColorService
+                            .selectedDeckImageColor.textColor),
+                  ),
+                ),
+              ),
+              
+            ],
           ),
         ),
         SizedBox(
@@ -441,6 +449,18 @@ class _DeckImagePageState extends State<DeckImagePage> {
                 barColor: deckImageColorService.selectedDeckImageColor.barColor,
                 backGroundColor:
                     deckImageColorService.selectedDeckImageColor.cardColor),
+          ),
+        ),
+        SizedBox(
+          width: 164 * scaleFactor,
+          child: QrImageView(
+            data: widget.deck.getQrUrl(),
+            // embeddedImage: AssetImage('assets/images/img.png'),
+            // embeddedImageStyle: QrEmbeddedImageStyle(
+            //   size: Size(40 * scaleFactor, 40 * scaleFactor
+            //   ), // 이미지 크기
+            // ),
+            version: QrVersions.auto,
           ),
         ),
       ],
@@ -507,14 +527,14 @@ class _DeckImagePageState extends State<DeckImagePage> {
         padding: EdgeInsets.all(8.0 * scaleFactor),
         child: Column(
           children: [
-            Text(
-              name,
-              style: TextStyle(
-                  fontFamily: 'JalnanGothic',
-                  fontSize: 16 * scaleFactor,
-                  color:
-                      deckImageColorService.selectedDeckImageColor.textColor),
-            ),
+            // Text(
+            //   name,
+            //   style: TextStyle(
+            //       fontFamily: 'JalnanGothic',
+            //       fontSize: 16 * scaleFactor,
+            //       color:
+            //           deckImageColorService.selectedDeckImageColor.textColor),
+            // ),
             GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,

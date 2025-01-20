@@ -10,6 +10,7 @@ import '../service/card_overlay_service.dart';
 import 'card.dart';
 
 class DeckBuild {
+  String baseUrl = const String.fromEnvironment('SERVER_URL');
   int? deckId;
   Map<DigimonCard, int> deckMap = {};
   List<DigimonCard> deckCards = [];
@@ -357,6 +358,23 @@ class DeckBuild {
     html.window.localStorage['deck'] = jsonString;
   }
 
+  String getQrUrl() {
+    String url = "$baseUrl/qr?";
+
+    Map<int, int> combinedMap = {
+      ...deckMap.map((key, value) => MapEntry(key.cardId!, value)),
+      ...tamaMap.map((key, value) => MapEntry(key.cardId!, value)),
+    };
+
+    String deckParam = combinedMap.entries
+        .map((entry) => "${entry.key}=${entry.value}")
+        .join(",");
+
+    String encoded = Uri.encodeComponent(deckParam);
+
+    url += "deck=$encoded";
+    return url;
+  }
 // int digimonCardComparator(DigimonCard a, DigimonCard b) {
 //   if (a.cardType != b.cardType) {
 //     return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);

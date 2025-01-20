@@ -61,6 +61,23 @@ class DeckApi {
     }
     return null;
   }
+  Future<DeckView?> importDeckQr(String deckMapString) async {
+    try {
+      var response = await dioClient.dio
+          .get('$baseUrl/api/deck/import/qr', queryParameters: {
+            'deck': deckMapString
+      });
+      if (response.statusCode == 200) {
+        return DeckView.fromJson(response.data);
+      } else if (response.statusCode == 401) {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
+    return null;
+  }
 
   Map<DigimonCard, int> parseJsonToCardAndCntMap(String jsonString) {
     final parsedJson = json.decode(jsonString);

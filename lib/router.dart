@@ -5,6 +5,7 @@ import 'package:digimon_meta_site_flutter/page/deck_image_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_list_page.dart';
 import 'package:digimon_meta_site_flutter/page/kakao_login_page.dart';
 import 'package:digimon_meta_site_flutter/page/main_page.dart';
+import 'package:digimon_meta_site_flutter/page/qr_deck_import_page.dart';
 import 'package:flutter/material.dart';
 
 import 'model/deck-build.dart';
@@ -21,6 +22,7 @@ class AppRouter extends _$AppRouter {
   List<AutoRoute> get routes => [
     AutoRoute(page: DeckImageRoute.page,path: "/deck-image",guards: [DeckGuard()]),
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
+    AutoRoute(page: QrDeckImportRoute.page,path: "/qr", meta: {'deck': 'String',},),
     AutoRoute(
       initial: true,
       path: '/',

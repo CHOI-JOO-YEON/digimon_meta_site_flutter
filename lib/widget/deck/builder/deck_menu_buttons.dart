@@ -2,12 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:digimon_meta_site_flutter/service/lang_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../api/deck_api.dart';
 import '../../../enums/site_enum.dart';
 import '../../../model/deck-build.dart';
 import '../../../model/deck-view.dart';
@@ -69,7 +71,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
                 cardColorList.length,
-                (index) {
+                    (index) {
                   String color = cardColorList[index];
                   Color buttonColor = ColorService.getColorFromString(color);
 
@@ -174,8 +176,12 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               content: SizedBox(
-                width: MediaQuery.sizeOf(context).width / 3,
-                height: MediaQuery.sizeOf(context).height / 2,
+                width: MediaQuery
+                    .sizeOf(context)
+                    .width / 3,
+                height: MediaQuery
+                    .sizeOf(context)
+                    .height / 2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -220,8 +226,10 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                             value: entry.key,
                             child: Text(
                               '${entry.value.name} ['
-                              '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                              '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
+                                  '${DateFormat('yyyy-MM-dd').format(
+                                  entry.value.startDate)} ~ '
+                                  '${DateFormat('yyyy-MM-dd').format(
+                                  entry.value.endDate)}]',
                               // overflow: TextOverflow.ellipsis,
                             ),
                           );
@@ -239,8 +247,10 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           return DropdownMenuItem<int>(
                             value: entry.key,
                             child: Text('${entry.value.name} ['
-                                '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
-                                '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
+                                '${DateFormat('yyyy-MM-dd').format(
+                                entry.value.startDate)} ~ '
+                                '${DateFormat('yyyy-MM-dd').format(
+                                entry.value.endDate)}]'),
                           );
                         }),
                       ],
@@ -253,7 +263,9 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     const Divider(),
                     const Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
                     Text(
-                        '${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}',
+                        '${DateFormat('yyyy-MM-dd').format(
+                            limitProvider.selectedLimit!
+                                .restrictionBeginDate)}',
                         style: const TextStyle(fontSize: 20))
                   ],
                 ),
@@ -262,7 +274,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 ElevatedButton(
                   onPressed: () async {
                     List<String> cardColorList =
-                        widget.deck.getOrderedCardColorList();
+                    widget.deck.getOrderedCardColorList();
                     Set<String> set = cardColorList.toSet();
                     widget.deck.colorArrange(set);
                     if (widget.deck.colors.isEmpty) {
@@ -274,7 +286,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       return;
                     }
                     DeckBuild? deck =
-                        await DeckService().save(widget.deck, context);
+                    await DeckService().save(widget.deck, context);
                     if (deck != null) {
                       widget.deck.deckId = deck.deckId;
                       widget.deck.isSave = true;
@@ -380,7 +392,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showImportDialog(BuildContext context) {
-    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -398,23 +409,76 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: SiteName.values.map((siteName) {
-                        String name = siteName.getName;
-                        return Expanded(
-                          child: ListTile(
-                            title: Text(name),
-                            leading: Radio<SiteName>(
-                              value: siteName,
-                              groupValue: _selectedButton,
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedButton = value!;
-                                });
-                              },
+                      children: [
+                        ...SiteName.values.map((siteName) {
+                          String name = siteName.getName;
+                          return Expanded(
+                            child: ListTile(
+                              title: Text(name),
+                              leading: Radio<SiteName>(
+                                value: siteName,
+                                groupValue: _selectedButton,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedButton = value!;
+                                  });
+                                },
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+
+                        IconButton(
+                          icon: const Icon(Icons.image),
+                          onPressed: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.image,
+                            );
+                            if (result != null && result.files.isNotEmpty) {
+                              final bytes = result.files.first.bytes;
+                              if (bytes != null) {
+                                final decodedData = await DeckService()
+                                    .decodeQrCodeFromImage(bytes);
+                                if (decodedData != null) {
+                                  final uri = Uri.parse(decodedData);
+
+                                  final deckString =
+                                  uri.queryParameters['deck'];
+                                  
+                                  if(deckString == null) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    _showShortDialog(context, "잘못된 QR코드입니다.");
+                                    return;
+                                  }
+                                  var deckView =
+                                  await DeckApi().importDeckQr(deckString);
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  Navigator.of(context).pop();
+                                  if (deckView != null) {
+                                    widget.import(deckView);
+                                  } else {
+                                    _showShortDialog(context, "잘못된 QR코드입니다.");
+                                  }
+                                } else {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  Navigator.of(context).pop();
+                                  _showShortDialog(context, "이미지에서 QR 코드를 찾을 수 없습니다.");
+                                }
+                              }
+                            }
+                          },
+                          tooltip: 'QR 코드 이미지',
+                        ),
+                      ],
                     ),
                     TextField(
                       controller: _textEditingController,
@@ -432,26 +496,28 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   onPressed: isLoading
                       ? null
                       : () async {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          try {
-                            var deckResponseDto = await DeckService().import(
-                                _selectedButton.convertStringToMap(
-                                    _textEditingController.value.text));
-                            if (deckResponseDto != null) {
-                              widget.import(deckResponseDto);
-                            }
-                            setState(() {
-                              isLoading = false;
-                            });
-                            Navigator.of(context).pop();
-                          } catch (e) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        },
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      var deckResponseDto = await DeckService().import(
+                        _selectedButton.convertStringToMap(
+                          _textEditingController.value.text,
+                        ),
+                      );
+                      if (deckResponseDto != null) {
+                        widget.import(deckResponseDto);
+                      }
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Navigator.of(context).pop();
+                    } catch (e) {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  },
                   child: const Text('가져오기'),
                 ),
               ],
@@ -507,8 +573,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       controller: _textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                          // hintText: 'Paste your deck.',
-                          ),
+                        // hintText: 'Paste your deck.',
+                      ),
                       enabled: false,
                     ),
                     Row(
@@ -518,7 +584,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
-                                    text: _textEditingController.text))
+                                text: _textEditingController.text))
                                 .then((_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -541,8 +607,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showRandomHandDialog(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     final double maxWidth = screenWidth * 0.9;
     final double maxHeight = screenHeight * 0.9;
@@ -585,11 +657,19 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
 
   void _showDeckSettingDialog(BuildContext context) {
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+        MediaQuery
+            .of(context)
+            .orientation == Orientation.portrait;
     double width = isPortrait
-        ? MediaQuery.sizeOf(context).width * 0.9
-        : MediaQuery.sizeOf(context).width / 3;
-    double height = MediaQuery.sizeOf(context).height / 2;
+        ? MediaQuery
+        .sizeOf(context)
+        .width * 0.9
+        : MediaQuery
+        .sizeOf(context)
+        .width / 3;
+    double height = MediaQuery
+        .sizeOf(context)
+        .height / 2;
     CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
@@ -600,228 +680,237 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             bool isStrict = widget.deck.isStrict;
             List<SortCriterion> sortPriority = List.from(
               deckSortProvider.sortPriority.map(
-                (criterion) => SortCriterion(
-                  criterion.field,
-                  ascending: criterion.ascending,
-                  orderMap: criterion.orderMap != null
-                      ? Map<String, int>.from(criterion.orderMap!)
-                      : null,
-                ),
+                    (criterion) =>
+                    SortCriterion(
+                      criterion.field,
+                      ascending: criterion.ascending,
+                      orderMap: criterion.orderMap != null
+                          ? Map<String, int>.from(criterion.orderMap!)
+                          : null,
+                    ),
               ),
             );
 
             return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
-              return SizedBox(
-                width: width,
-                height: height,
-                child: AlertDialog(
-                  actions: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('취소'),
+                  return SizedBox(
+                    width: width,
+                    height: height,
+                    child: AlertDialog(
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('취소'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (!widget.deck.isStrict && isStrict) {
+                                  // Show warning dialog when enabling strict mode
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('경고'),
+                                        content: Text(
+                                            '엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
+                                        actions: [
+                                          TextButton(
+                                            child: Text('취소'),
+                                            onPressed: () {
+                                              Navigator.of(context)
+                                                  .pop(); // Close warning dialog
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text('확인'),
+                                            onPressed: () {
+                                              // Apply changes after confirmation
+                                              if (selectedLimit != null) {
+                                                limitProvider.updateSelectLimit(
+                                                    selectedLimit!
+                                                        .restrictionBeginDate);
+                                              }
+                                              widget.clear();
+                                              widget.deck.updateIsStrict(
+                                                  isStrict);
+                                              deckSortProvider
+                                                  .setSortPriority(
+                                                  sortPriority);
+                                              widget.reload();
+                                              Navigator.of(context)
+                                                  .pop(); // Close warning dialog
+                                              Navigator.of(context)
+                                                  .pop(); // Close settings dialog
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  // Proceed without warning
+                                  if (selectedLimit != null) {
+                                    limitProvider.updateSelectLimit(
+                                        selectedLimit!.restrictionBeginDate);
+                                  }
+                                  widget.deck.updateIsStrict(isStrict);
+                                  deckSortProvider.setSortPriority(
+                                      sortPriority);
+                                  widget.reload();
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: const Text('확인'),
+                            ),
+                          ],
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (!widget.deck.isStrict && isStrict) {
-                              // Show warning dialog when enabling strict mode
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('경고'),
-                                    content: Text(
-                                        '엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('취소'),
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close warning dialog
-                                        },
+                      ],
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                '금지/제한: ',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: DropdownButtonFormField<LimitDto>(
+                                  value: selectedLimit,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      selectedLimit = newValue;
+                                    });
+                                  },
+                                  items:
+                                  limitProvider.limits.values.map((limitDto) {
+                                    return DropdownMenuItem<LimitDto>(
+                                      value: limitDto,
+                                      child: Text(
+                                        '${DateFormat('yyyy-MM-dd').format(
+                                            limitDto.restrictionBeginDate)}',
                                       ),
-                                      TextButton(
-                                        child: Text('확인'),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                '엄격한 덱 작성 모드',
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              Switch(
+                                inactiveThumbColor: Colors.red,
+                                value: isStrict,
+                                onChanged: (bool v) {
+                                  setState(() {
+                                    isStrict = v;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('정렬 우선순위 변경',
+                                  style: TextStyle(fontSize: 20)),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      sortPriority = List.from(
+                                          deckSortProvider.sortPriority.map(
+                                                (criterion) =>
+                                                SortCriterion(
+                                                  criterion.field,
+                                                  ascending: criterion
+                                                      .ascending,
+                                                  orderMap: criterion
+                                                      .orderMap != null
+                                                      ? Map<String, int>.from(
+                                                      criterion.orderMap!)
+                                                      : null,
+                                                ),
+                                          ));
+                                    });
+                                    deckSortProvider.reset();
+                                  },
+                                  icon: Icon(Icons.refresh))
+                            ],
+                          ),
+                          SizedBox(
+                            width: width * 0.8,
+                            height: height * 0.6,
+                            child: ReorderableListView.builder(
+                              shrinkWrap: true,
+                              itemCount: sortPriority.length,
+                              onReorder: (int oldIndex, int newIndex) {
+                                if (newIndex > oldIndex) {
+                                  newIndex -= 1;
+                                }
+                                final SortCriterion item =
+                                sortPriority.removeAt(oldIndex);
+                                sortPriority.insert(newIndex, item);
+                                setState(() {});
+                              },
+                              itemBuilder: (BuildContext context, int index) {
+                                final criterion = sortPriority[index];
+                                return ListTile(
+                                  key: ValueKey('${criterion.field}-$index'),
+                                  title: Text(deckSortProvider
+                                      .getSortPriorityKor(criterion.field)),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (criterion.field == 'cardType' ||
+                                          criterion.field == 'color1' ||
+                                          criterion.field == 'color2')
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          icon: Icon(Icons.edit),
+                                          onPressed: () {
+                                            _showOrderMapDialog(
+                                                context, criterion,
+                                                setState, width * 0.8);
+                                          },
+                                        ),
+                                      IconButton(
+                                        tooltip: '오름차순/내림차순',
+                                        icon: (criterion.ascending ?? true)
+                                            ? const Icon(Icons.arrow_drop_up)
+                                            : const Icon(Icons.arrow_drop_down),
                                         onPressed: () {
-                                          // Apply changes after confirmation
-                                          if (selectedLimit != null) {
-                                            limitProvider.updateSelectLimit(
-                                                selectedLimit!
-                                                    .restrictionBeginDate);
-                                          }
-                                          widget.clear();
-                                          widget.deck.updateIsStrict(isStrict);
-                                          deckSortProvider
-                                              .setSortPriority(sortPriority);
-                                          widget.reload();
-                                          Navigator.of(context)
-                                              .pop(); // Close warning dialog
-                                          Navigator.of(context)
-                                              .pop(); // Close settings dialog
+                                          setState(() {
+                                            criterion.ascending =
+                                            !(criterion.ascending ?? true);
+                                          });
                                         },
                                       ),
                                     ],
-                                  );
-                                },
-                              );
-                            } else {
-                              // Proceed without warning
-                              if (selectedLimit != null) {
-                                limitProvider.updateSelectLimit(
-                                    selectedLimit!.restrictionBeginDate);
-                              }
-                              widget.deck.updateIsStrict(isStrict);
-                              deckSortProvider.setSortPriority(sortPriority);
-                              widget.reload();
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          child: const Text('확인'),
-                        ),
-                      ],
-                    ),
-                  ],
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            '금지/제한: ',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: DropdownButtonFormField<LimitDto>(
-                              value: selectedLimit,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedLimit = newValue;
-                                });
-                              },
-                              items:
-                                  limitProvider.limits.values.map((limitDto) {
-                                return DropdownMenuItem<LimitDto>(
-                                  value: limitDto,
-                                  child: Text(
-                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
                                   ),
                                 );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            '엄격한 덱 작성 모드',
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          Switch(
-                            inactiveThumbColor: Colors.red,
-                            value: isStrict,
-                            onChanged: (bool v) {
-                              setState(() {
-                                isStrict = v;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('정렬 우선순위 변경',
-                              style: TextStyle(fontSize: 20)),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  sortPriority = List.from(
-                                      deckSortProvider.sortPriority.map(
-                                    (criterion) => SortCriterion(
-                                      criterion.field,
-                                      ascending: criterion.ascending,
-                                      orderMap: criterion.orderMap != null
-                                          ? Map<String, int>.from(
-                                              criterion.orderMap!)
-                                          : null,
-                                    ),
-                                  ));
-                                });
-                                deckSortProvider.reset();
                               },
-                              icon: Icon(Icons.refresh))
+                            ),
+                          )
                         ],
                       ),
-                      SizedBox(
-                        width: width * 0.8,
-                        height: height * 0.6,
-                        child: ReorderableListView.builder(
-                          shrinkWrap: true,
-                          itemCount: sortPriority.length,
-                          onReorder: (int oldIndex, int newIndex) {
-                            if (newIndex > oldIndex) {
-                              newIndex -= 1;
-                            }
-                            final SortCriterion item =
-                                sortPriority.removeAt(oldIndex);
-                            sortPriority.insert(newIndex, item);
-                            setState(() {});
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            final criterion = sortPriority[index];
-                            return ListTile(
-                              key: ValueKey('${criterion.field}-$index'),
-                              title: Text(deckSortProvider
-                                  .getSortPriorityKor(criterion.field)),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (criterion.field == 'cardType' ||
-                                      criterion.field == 'color1' ||
-                                      criterion.field == 'color2')
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () {
-                                        _showOrderMapDialog(context,
-                                            criterion, setState, width * 0.8);
-                                      },
-                                    ),
-                                  IconButton(
-                                    tooltip: '오름차순/내림차순',
-                                    icon: (criterion.ascending ?? true)
-                                        ? const Icon(Icons.arrow_drop_up)
-                                        : const Icon(Icons.arrow_drop_down),
-                                    onPressed: () {
-                                      setState(() {
-                                        criterion.ascending =
-                                            !(criterion.ascending ?? true);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            });
+                    ),
+                  );
+                });
           },
         );
       },
@@ -836,53 +925,54 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            title: Text(
-                '${DeckSortProvider().getSortPriorityKor(criterion.field)} 순서 변경'),
-            content: SizedBox(
-              width: width,
-              child: ReorderableListView(
-                shrinkWrap: true,
-                onReorder: (int oldIndex, int newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final String item = items.removeAt(oldIndex);
-                    items.insert(newIndex, item);
-                  });
-                },
-                children: [
-                  for (int index = 0; index < items.length; index++)
-                    ListTile(
-                      key: ValueKey(items[index]),
-                      title: Text(LangService().getKorText(items[index])),
-                    ),
+              return AlertDialog(
+                title: Text(
+                    '${DeckSortProvider().getSortPriorityKor(
+                        criterion.field)} 순서 변경'),
+                content: SizedBox(
+                  width: width,
+                  child: ReorderableListView(
+                    shrinkWrap: true,
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (newIndex > oldIndex) {
+                          newIndex -= 1;
+                        }
+                        final String item = items.removeAt(oldIndex);
+                        items.insert(newIndex, item);
+                      });
+                    },
+                    children: [
+                      for (int index = 0; index < items.length; index++)
+                        ListTile(
+                          key: ValueKey(items[index]),
+                          title: Text(LangService().getKorText(items[index])),
+                        ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    child: Text('취소'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text('확인'),
+                    onPressed: () {
+                      // Update the orderMap
+                      parentSetState(() {
+                        criterion.orderMap = {
+                          for (int i = 0; i < items.length; i++) items[i]: i + 1
+                        };
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                child: Text('취소'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  // Update the orderMap
-                  parentSetState(() {
-                    criterion.orderMap = {
-                      for (int i = 0; i < items.length; i++) items[i]: i + 1
-                    };
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
+              );
+            });
       },
     );
   }
@@ -929,165 +1019,167 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
-      double iconSize = isPortrait
-          ? constraints.maxWidth * 0.09
-          : constraints.maxWidth * 0.04;
-      return Consumer<UserProvider>(builder:
-          (BuildContext context, UserProvider userProvider, Widget? child) {
-        bool hasManagerRole = userProvider.hasManagerRole();
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Wrap(
-            alignment: WrapAlignment.start,
-            spacing: iconSize * 0.01,
-            children: [
-              ConstrainedBox(
-                constraints:
+          final isPortrait =
+              MediaQuery
+                  .of(context)
+                  .orientation == Orientation.portrait;
+          double iconSize = isPortrait
+              ? constraints.maxWidth * 0.09
+              : constraints.maxWidth * 0.04;
+          return Consumer<UserProvider>(builder:
+              (BuildContext context, UserProvider userProvider, Widget? child) {
+            bool hasManagerRole = userProvider.hasManagerRole();
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                spacing: iconSize * 0.01,
+                children: [
+                  ConstrainedBox(
+                    constraints:
                     BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    showDeckResetDialog(context);
-                  },
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.add_box),
-                  tooltip: '새로 만들기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    showDeckClearDialog(context);
-                  },
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.clear),
-                  tooltip: '비우기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _showDeckCopyDialog(context),
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.copy),
-                  tooltip: '복사해서 새로운 덱 만들기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () async {
-                    if (userProvider.isLogin) {
-                      Map<int, FormatDto> formats =
-                          await DeckService().getFormats(widget.deck);
-                      _showSaveDialog(context, formats);
-                    } else {
-                      _showLoginDialog(context);
-                    }
-                  },
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.save),
-                  tooltip: '저장',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _showImportDialog(context),
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.download),
-                  tooltip: '가져오기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _showExportDialog(context),
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.upload),
-                  tooltip: '내보내기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    CardOverlayService().removeAllOverlays();
-                    context.router.push(DeckImageRoute(deck: widget.deck));
-                  },
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.image),
-                  tooltip: '이미지 저장',
-                ),
-              ),
-
-              // ConstrainedBox(
-              //   constraints: BoxConstraints.tightFor(
-              //       width: iconSize, height: iconSize),
-              //   child: IconButton(
-              //     padding: EdgeInsets.zero,
-              //     onPressed: () => _showRandomHandDialog(context),
-              //     iconSize: iconSize,
-              //     icon: const Icon(Icons.back_hand_rounded),
-              //     tooltip: '랜덤 핸드',
-              //   ),
-              // ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => showDeckReceiptDialog(context),
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.receipt_long),
-                  tooltip: '대회 제출용 레시피',
-                ),
-              ),
-              ConstrainedBox(
-                constraints:
-                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => _showDeckSettingDialog(context),
-                  iconSize: iconSize,
-                  icon: const Icon(Icons.settings),
-                  tooltip: '덱 설정',
-                ),
-              ),
-              if (hasManagerRole) // 권한 체크 조건
-                ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                      width: iconSize, height: iconSize),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () async {
-                      await DeckService().exportToTTSFile(widget.deck);
-                    },
-                    iconSize: iconSize,
-                    icon: const Icon(Icons.videogame_asset_outlined),
-                    // 예시 아이콘, 실제 사용할 아이콘으로 변경
-                    tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        showDeckResetDialog(context);
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.add_box),
+                      tooltip: '새로 만들기',
+                    ),
                   ),
-                ),
-            ],
-          ),
-        );
-      });
-    });
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        showDeckClearDialog(context);
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.clear),
+                      tooltip: '비우기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckCopyDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.copy),
+                      tooltip: '복사해서 새로운 덱 만들기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        if (userProvider.isLogin) {
+                          Map<int, FormatDto> formats =
+                          await DeckService().getFormats(widget.deck);
+                          _showSaveDialog(context, formats);
+                        } else {
+                          _showLoginDialog(context);
+                        }
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.save),
+                      tooltip: '저장',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showImportDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.download),
+                      tooltip: '가져오기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showExportDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.upload),
+                      tooltip: '내보내기',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        CardOverlayService().removeAllOverlays();
+                        context.router.push(DeckImageRoute(deck: widget.deck));
+                      },
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.image),
+                      tooltip: '이미지 저장',
+                    ),
+                  ),
+
+                  // ConstrainedBox(
+                  //   constraints: BoxConstraints.tightFor(
+                  //       width: iconSize, height: iconSize),
+                  //   child: IconButton(
+                  //     padding: EdgeInsets.zero,
+                  //     onPressed: () => _showRandomHandDialog(context),
+                  //     iconSize: iconSize,
+                  //     icon: const Icon(Icons.back_hand_rounded),
+                  //     tooltip: '랜덤 핸드',
+                  //   ),
+                  // ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => showDeckReceiptDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.receipt_long),
+                      tooltip: '대회 제출용 레시피',
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints:
+                    BoxConstraints.tightFor(width: iconSize, height: iconSize),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckSettingDialog(context),
+                      iconSize: iconSize,
+                      icon: const Icon(Icons.settings),
+                      tooltip: '덱 설정',
+                    ),
+                  ),
+                  if (hasManagerRole) // 권한 체크 조건
+                    ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                          width: iconSize, height: iconSize),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () async {
+                          await DeckService().exportToTTSFile(widget.deck);
+                        },
+                        iconSize: iconSize,
+                        icon: const Icon(Icons.videogame_asset_outlined),
+                        // 예시 아이콘, 실제 사용할 아이콘으로 변경
+                        tooltip: 'TTS 파일 내보내기', // 툴팁 내용도 상황에 맞게 변경
+                      ),
+                    ),
+                ],
+              ),
+            );
+          });
+        });
   }
 }
