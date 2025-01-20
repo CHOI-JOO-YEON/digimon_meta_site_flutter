@@ -29,16 +29,19 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
 
   Future<void> _processDeckParam() async {
     final param = widget.deckParam;
-    
+    print(1);
+    print(param);
     DeckBuild deck = DeckBuild(context);
     if (param != null && param.isNotEmpty) {
-
+      print(2);
       var deckView = await DeckApi().importDeckQr(widget.deckParam!);
       if (deckView != null) {
+        print(3);
         deck.import(deckView);
       }
       
     }
+    print(4);
     context.navigateTo(DeckBuilderRoute(deck: deck));
   }
 
