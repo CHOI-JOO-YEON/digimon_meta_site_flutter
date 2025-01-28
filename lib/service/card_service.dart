@@ -532,13 +532,17 @@ class CardService {
 
     final matchStyles = [
       {
-        'pattern': r'《리커버리 \+\d+《[^《》]*》》',
+        'pattern': r'《[^《》]*《[^《》]*》[^《》]*》',
         'color': const Color.fromRGBO(206, 101, 1, 1),
       },
-      {
-        'pattern': r'《오버플로우 《-?\d+》》',
-        'color': const Color.fromRGBO(206, 101, 1, 1),
-      },
+      // {
+      //   'pattern': r'《오버플로우 《-?\d+》》',
+      //   'color': const Color.fromRGBO(206, 101, 1, 1),
+      // },
+      // {
+      //   'pattern': r'《디코드《[^《》]+》》',
+      //   'color': const Color.fromRGBO(206, 101, 1, 1),
+      // },
       {
         'pattern': r'《[^《》]*》',
         'color': const Color.fromRGBO(206, 101, 1, 1),
@@ -559,7 +563,7 @@ class CardService {
         'pattern': r'〔[^〔〕]*〕',
         'colorEvaluator': (String matchedText) =>
             matchedText.contains('조그레스') || matchedText.contains('진화')
-                ? const Color.fromRGBO(33, 37, 131, 1)
+                ? const Color.fromRGBO(59, 88, 101, 1.0)
                 : const Color.fromRGBO(163, 23, 99, 1),
       },
       {
