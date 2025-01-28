@@ -3,8 +3,10 @@ import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../../../provider/text_simplify_provider.dart';
+import '../../../service/size_service.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
@@ -42,7 +44,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !isLoading &&
         widget.currentPage < widget.totalPages) {
       loadMoreItems();
@@ -66,16 +68,19 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // 텍스트 간소화 스위치를 Consumer로 감싸 프로바이더 상태를 반영
         Consumer<TextSimplifyProvider>(
           builder: (context, textSimplifyProvider, child) {
             return Row(
               children: [
                 Text('텍스트 간소화'),
-                Switch(
-                  value: textSimplifyProvider.getTextSimplify(),
-                  onChanged: (v) => textSimplifyProvider.updateTextSimplify(v),
-                  inactiveThumbColor: Colors.red,
+                Transform.scale(
+                  scale: SizeService.switchScale(context),
+                  child: Switch(
+                    value: textSimplifyProvider.getTextSimplify(),
+                    onChanged: (v) =>
+                        textSimplifyProvider.updateTextSimplify(v),
+                    inactiveThumbColor: Colors.red,
+                  ),
                 ),
               ],
             );
@@ -88,91 +93,99 @@ class _CardScrollListViewState extends State<CardScrollListView> {
             itemBuilder: (context, index) {
               if (index < widget.cards.length) {
                 final card = widget.cards[index];
-                Color color = ColorService.getColorFromString(card.color1!);
-                if (color == Colors.white) {
-                  color = Colors.grey;
-                }
                 return Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Theme.of(context).cardColor,
-                    ),
-                    child: ListTile(
-                      leading: Image.network(
-                        card.getDisplaySmallImgUrl()!,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.broken_image);
-                        },
+                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                  child: GestureDetector(
+                    onTap: () => widget.cardPressEvent(card),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            SizeService.roundRadius(context)),
+                        color: Colors.grey[300],
                       ),
-                      title: Row(
-                        children: [
-                          Text('${card.cardNo}'),
-                          Text(
-                            ' ${card.getDisplayName()}',
-                            style: TextStyle(
-                              fontFamily: card.getDisplayLocale() == 'JPN'
-                                  ? "MPLUSC"
-                                  : "JalnanGothic",
-                            ),
-                          ),
-                        ],
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (card.getDisplayEffect() != null)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(top: 4),
-                                    padding: EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: color.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: EffectText(
-                                      text: card.getDisplayEffect()!,
-                                      prefix: '상단 텍스트',
-                                      locale: card.getDisplayLocale()!,
-                                    ),
+                      child: Container(
+                        padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                flex: 4,
+                                child: GestureDetector(
+                                  onTap: () => CardService().showImageDialog(
+                                    context,
+                                    card,
+                                    widget.searchNote,
                                   ),
-                                ),
-                              ],
-                            ),
-                          if (card.getDisplaySourceEffect() != null)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(top: 4),
-                                    padding: EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: color.withOpacity(0.6),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: EffectText(
-                                      text: card.getDisplaySourceEffect()!,
-                                      prefix: '하단 텍스트',
-                                      locale: card.getDisplayLocale()!,
-                                    ),
+                                  child: Image.network(
+                                    card.getDisplaySmallImgUrl()!,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.broken_image);
+                                    },
                                   ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.zoom_in),
-                        onPressed: () => CardService().showImageDialog(
-                          context,
-                          card,
-                          widget.searchNote,
+                                )),
+                            Expanded(flex: 1, child: Container(),),
+                            Expanded(
+                                flex: 16,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${card.cardNo} ${card.getDisplayName()}',
+                                      style: TextStyle(
+                                        fontFamily:
+                                            card.getDisplayLocale() == 'JPN'
+                                                ? "MPLUSC"
+                                                : "JalnanGothic",
+                                      ),
+                                    ),
+                                    if (card.getDisplayEffect() != null)
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              margin: EdgeInsets.only(top: 4),
+                                              padding: EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).cardColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: EffectText(
+                                                text: card.getDisplayEffect()!,
+                                                prefix: '상단 텍스트',
+                                                locale: card.getDisplayLocale()!,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    if (card.getDisplaySourceEffect() != null)
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              margin: EdgeInsets.only(top: 4),
+                                              padding: EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).cardColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: EffectText(
+                                                text: card
+                                                    .getDisplaySourceEffect()!,
+                                                prefix: '하단 텍스트',
+                                                locale: card.getDisplayLocale()!,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ))
+                          ],
                         ),
                       ),
-                      onTap: () => widget.cardPressEvent(card),
                     ),
                   ),
                 );
@@ -201,7 +214,8 @@ class EffectText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isTextSimplify = Provider.of<TextSimplifyProvider>(context).getTextSimplify();
+    bool isTextSimplify =
+        Provider.of<TextSimplifyProvider>(context).getTextSimplify();
     final List<InlineSpan> spans = [];
     spans.add(TextSpan(
       text: prefix,

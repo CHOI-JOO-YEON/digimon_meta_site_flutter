@@ -106,4 +106,16 @@ class SizeService {
       ],
     ).value;
   }
+
+  static double switchScale(BuildContext context) {
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: 1,
+      conditionalValues: [
+        const Condition.smallerThan(name: TABLET, value: 0.6),
+        const Condition.smallerThan(name: DESKTOP, value: 0.8),
+        const Condition.largerThan(name: DESKTOP, value: 1.2),
+      ],
+    ).value;
+  }
 }
