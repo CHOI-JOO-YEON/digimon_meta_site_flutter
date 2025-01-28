@@ -37,8 +37,7 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
       }
       
     }
-    print(1);
-    context.navigateTo(DeckBuilderRoute(deck: deck));
+    context.router.replaceAll([DeckBuilderRoute(deck: deck)]);
   }
 
   Map<int, int> parseDeckString(String str) {
