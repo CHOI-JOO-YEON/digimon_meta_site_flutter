@@ -7,19 +7,30 @@ import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
 import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:zxing2/qrcode.dart';
 import 'dart:html' as html;
+import '../enums/site_enum.dart';
 import '../model/card.dart';
 import '../model/deck-build.dart';
+import 'package:auto_route/auto_route.dart';
 
 import '../model/format.dart';
+import '../model/limit_dto.dart';
+import '../provider/deck_sort_provider.dart';
 import '../provider/limit_provider.dart';
 import 'package:image/image.dart' as imglib;
+
+import '../router.dart';
+import 'card_overlay_service.dart';
+import 'color_service.dart';
+import 'lang_service.dart';
 
 class DeckService {
   DeckApi deckApi = DeckApi();
@@ -79,7 +90,7 @@ class DeckService {
   Future<PagedResponseDeckDto?> getDeck(
       DeckSearchParameter deckSearchParameter, BuildContext context) async {
     LimitProvider limitProvider = Provider.of(context, listen: false);
-    
+
     if (limitProvider.selectedLimit != null) {
       deckSearchParameter.limitId = limitProvider.selectedLimit!.id;
     }
@@ -87,11 +98,13 @@ class DeckService {
     PagedResponseDeckDto? decks =
         await DeckApi().findDecks(deckSearchParameter);
 
-    if(decks != null) {
-      FormatDeckCountProvider formatDeckCountProvider = Provider.of(context, listen: false);
-      deckSearchParameter.isMyDeck?formatDeckCountProvider.setFormatMyDeckCount(decks):formatDeckCountProvider.setFormatAllDeckCount(decks);
+    if (decks != null) {
+      FormatDeckCountProvider formatDeckCountProvider =
+          Provider.of(context, listen: false);
+      deckSearchParameter.isMyDeck
+          ? formatDeckCountProvider.setFormatMyDeckCount(decks)
+          : formatDeckCountProvider.setFormatAllDeckCount(decks);
     }
-    
 
     return decks;
   }
@@ -259,36 +272,26 @@ class DeckService {
     deck.import(deckResponseDto);
     return deck;
   }
-  
+
   Future<String?> decodeQrCodeFromImage(Uint8List imageBytes) async {
-    // 1) 이미지 디코딩
     final rawImage = imglib.decodeImage(imageBytes);
     if (rawImage == null) {
-      // 디코딩 실패 (이미지가 아니거나 손상됨)
       return null;
     }
 
     final imageData = rawImage.data; // ImageData? 타입
     if (imageData == null) {
-      // data가 없는 경우 (이론상 잘 없지만 안전하게 체크)
       return null;
     }
 
-    // 보통 imageData.type == ImageDataType.uint8 (RGBA 8비트)
-    // buffer가 실제 픽셀 바이트 배열 (Uint8List or null)
     final buffer = imageData.getBytes();
     if (buffer == null || buffer is! Uint8List) {
-      // RGBA 픽셀 데이터를 읽을 수 없음
       return null;
     }
 
-    // 2) RGBA -> ARGB 변환
-    //   RGBA(4 bytes) = R, G, B, A 순서
-    //   ARGB(32bit int) = 0xAARRGGBB 순서
     final width = rawImage.width;
     final height = rawImage.height;
     final pixelCount = width * height;
-    // 픽셀 하나당 4바이트이므로, buffer 길이는 pixelCount*4 이상이어야 함
     if (buffer.length < pixelCount * 4) {
       return null;
     }
@@ -299,11 +302,9 @@ class DeckService {
       final g = buffer[i * 4 + 1];
       final b = buffer[i * 4 + 2];
       final a = buffer[i * 4 + 3];
-      // 0xAARRGGBB 형태의 int (alpha가 최상위 바이트)
       int32Data[i] = (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    // 3) zxing2로 QR 디코딩
     final luminanceSource = RGBLuminanceSource(width, height, int32Data);
     final binarizer = HybridBinarizer(luminanceSource);
     final bitmap = BinaryBitmap(binarizer);
@@ -311,11 +312,898 @@ class DeckService {
     final reader = QRCodeReader();
     try {
       final result = reader.decode(bitmap);
-      return result.text; // QR 코드 내용
+      return result.text;
     } catch (e) {
-      // QR/바코드 인식 실패
       return null;
     }
   }
 
+  void showDeckReceiptDialog(BuildContext context, DeckBuild deck) {
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('대회 제출용 레시피 다운로드'),
+          content: const SizedBox(
+            width: 300,
+            child: Text(
+              '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 넘는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
+              softWrap: true,
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              child: const Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text(
+                '다운로드',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                await DeckService().generateDeckRecipePDF(deck);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showDeckCopyDialog(BuildContext context, DeckBuild deck) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('덱 복사'),
+          content: Text('이 덱을 카피하여 새로운 덱을 만들겠습니까?'),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('예'),
+              onPressed: () {
+                DeckBuild newDeck = DeckBuild.deckBuild(deck, context);
+                Navigator.of(context).pop();
+
+                context.navigateTo(DeckBuilderRoute(deck: newDeck));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showExportDialog(BuildContext context, DeckBuild deck) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        SiteName selectedButton = SiteName.values.first;
+        TextEditingController textEditingController = TextEditingController(
+          text: selectedButton.ExportToSiteDeckCode(deck),
+        );
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Export to'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: SiteName.values.map((siteName) {
+                        String name = siteName.getName;
+                        return Expanded(
+                          child: ListTile(
+                            title: Text(name),
+                            leading: Radio<SiteName>(
+                              value: siteName,
+                              groupValue: selectedButton,
+                              onChanged: (SiteName? value) {
+                                setState(() {
+                                  selectedButton = value!;
+                                  textEditingController.text =
+                                      selectedButton.ExportToSiteDeckCode(deck);
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    TextField(
+                      controller: textEditingController,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: 'Paste your deck.',
+                      ),
+                      enabled: false,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.copy),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(
+                                    text: textEditingController.text))
+                                .then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Copied to clipboard'),
+                                ),
+                              );
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void showOrderMapDialog(BuildContext context, SortCriterion criterion,
+      StateSetter parentSetState, double width) {
+    List<String> items = criterion.orderMap!.keys.toList();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: Text(
+                '${DeckSortProvider().getSortPriorityKor(criterion.field)} 순서 변경'),
+            content: SizedBox(
+              width: width,
+              child: ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (int oldIndex, int newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) {
+                      newIndex -= 1;
+                    }
+                    final String item = items.removeAt(oldIndex);
+                    items.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (int index = 0; index < items.length; index++)
+                    ListTile(
+                      key: ValueKey(items[index]),
+                      title: Text(LangService().getKorText(items[index])),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text('취소'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  // Update the orderMap
+                  parentSetState(() {
+                    criterion.orderMap = {
+                      for (int i = 0; i < items.length; i++) items[i]: i + 1
+                    };
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  void showDeckSettingDialog(
+      BuildContext context, DeckBuild deck, Function() reload) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double width = isPortrait
+        ? MediaQuery.sizeOf(context).width * 0.9
+        : MediaQuery.sizeOf(context).width / 3;
+    double height = MediaQuery.sizeOf(context).height / 2;
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer2<LimitProvider, DeckSortProvider>(
+          builder: (context, limitProvider, deckSortProvider, child) {
+            LimitDto? selectedLimit = limitProvider.selectedLimit;
+            bool isStrict = deck.isStrict;
+            List<SortCriterion> sortPriority = List.from(
+              deckSortProvider.sortPriority.map(
+                (criterion) => SortCriterion(
+                  criterion.field,
+                  ascending: criterion.ascending,
+                  orderMap: criterion.orderMap != null
+                      ? Map<String, int>.from(criterion.orderMap!)
+                      : null,
+                ),
+              ),
+            );
+
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return SizedBox(
+                width: width,
+                height: height,
+                child: AlertDialog(
+                  actions: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('취소'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (!deck.isStrict && isStrict) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('경고'),
+                                    content: Text(
+                                        '엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close warning dialog
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('확인'),
+                                        onPressed: () {
+                                          // Apply changes after confirmation
+                                          if (selectedLimit != null) {
+                                            limitProvider.updateSelectLimit(
+                                                selectedLimit!
+                                                    .restrictionBeginDate);
+                                          }
+                                          deck.clear();
+                                          deck.updateIsStrict(isStrict);
+                                          deckSortProvider
+                                              .setSortPriority(sortPriority);
+                                          reload();
+                                          Navigator.of(context)
+                                              .pop(); // Close warning dialog
+                                          Navigator.of(context)
+                                              .pop(); // Close settings dialog
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              // Proceed without warning
+                              if (selectedLimit != null) {
+                                limitProvider.updateSelectLimit(
+                                    selectedLimit!.restrictionBeginDate);
+                              }
+                              deck.updateIsStrict(isStrict);
+                              deckSortProvider.setSortPriority(sortPriority);
+                              reload();
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: const Text('확인'),
+                        ),
+                      ],
+                    ),
+                  ],
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            '금지/제한: ',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: DropdownButtonFormField<LimitDto>(
+                              value: selectedLimit,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedLimit = newValue;
+                                });
+                              },
+                              items:
+                                  limitProvider.limits.values.map((limitDto) {
+                                return DropdownMenuItem<LimitDto>(
+                                  value: limitDto,
+                                  child: Text(
+                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            '엄격한 덱 작성 모드',
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          Switch(
+                            inactiveThumbColor: Colors.red,
+                            value: isStrict,
+                            onChanged: (bool v) {
+                              setState(() {
+                                isStrict = v;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('정렬 우선순위 변경',
+                              style: TextStyle(fontSize: 20)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  sortPriority = List.from(
+                                      deckSortProvider.sortPriority.map(
+                                    (criterion) => SortCriterion(
+                                      criterion.field,
+                                      ascending: criterion.ascending,
+                                      orderMap: criterion.orderMap != null
+                                          ? Map<String, int>.from(
+                                              criterion.orderMap!)
+                                          : null,
+                                    ),
+                                  ));
+                                });
+                                deckSortProvider.reset();
+                              },
+                              icon: Icon(Icons.refresh))
+                        ],
+                      ),
+                      SizedBox(
+                        width: width * 0.8,
+                        height: height * 0.6,
+                        child: ReorderableListView.builder(
+                          shrinkWrap: true,
+                          itemCount: sortPriority.length,
+                          onReorder: (int oldIndex, int newIndex) {
+                            if (newIndex > oldIndex) {
+                              newIndex -= 1;
+                            }
+                            final SortCriterion item =
+                                sortPriority.removeAt(oldIndex);
+                            sortPriority.insert(newIndex, item);
+                            setState(() {});
+                          },
+                          itemBuilder: (BuildContext context, int index) {
+                            final criterion = sortPriority[index];
+                            return ListTile(
+                              key: ValueKey('${criterion.field}-$index'),
+                              title: Text(deckSortProvider
+                                  .getSortPriorityKor(criterion.field)),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (criterion.field == 'cardType' ||
+                                      criterion.field == 'color1' ||
+                                      criterion.field == 'color2')
+                                    IconButton(
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(Icons.edit),
+                                      onPressed: () {
+                                        showOrderMapDialog(context, criterion,
+                                            setState, width * 0.8);
+                                      },
+                                    ),
+                                  IconButton(
+                                    tooltip: '오름차순/내림차순',
+                                    icon: (criterion.ascending ?? true)
+                                        ? const Icon(Icons.arrow_drop_up)
+                                        : const Icon(Icons.arrow_drop_down),
+                                    onPressed: () {
+                                      setState(() {
+                                        criterion.ascending =
+                                            !(criterion.ascending ?? true);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            });
+          },
+        );
+      },
+    );
+  }
+
+  void showImportDialog(BuildContext context, Function(DeckView) import) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        SiteName _selectedButton = SiteName.values.first;
+        TextEditingController _textEditingController = TextEditingController();
+        bool isLoading = false;
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Import from'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ...SiteName.values.map((siteName) {
+                          String name = siteName.getName;
+                          return Expanded(
+                            child: ListTile(
+                              title: Text(name),
+                              leading: Radio<SiteName>(
+                                value: siteName,
+                                groupValue: _selectedButton,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedButton = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        if (false)
+                          IconButton(
+                            icon: const Icon(Icons.image),
+                            onPressed: () async {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              final result =
+                                  await FilePicker.platform.pickFiles(
+                                type: FileType.image,
+                              );
+                              if (result != null && result.files.isNotEmpty) {
+                                final bytes = result.files.first.bytes;
+                                if (bytes != null) {
+                                  final decodedData = await DeckService()
+                                      .decodeQrCodeFromImage(bytes);
+                                  if (decodedData != null) {
+                                    final uri = Uri.parse(decodedData);
+
+                                    print(uri);
+                                    final deckString =
+                                        uri.queryParameters['deck'];
+
+                                    if (deckString == null) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                      _showShortDialog(context, "잘못된 QR코드입니다.");
+                                      return;
+                                    }
+                                    var deckView = await DeckApi()
+                                        .importDeckQr(deckString);
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    Navigator.of(context).pop();
+                                    if (deckView != null) {
+                                      import(deckView);
+                                    } else {
+                                      _showShortDialog(context, "잘못된 QR코드입니다.");
+                                    }
+                                  } else {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    Navigator.of(context).pop();
+                                    _showShortDialog(
+                                        context, "이미지에서 QR 코드를 찾을 수 없습니다.");
+                                  }
+                                }
+                              }
+                            },
+                            tooltip: 'QR 코드 이미지',
+                          ),
+                      ],
+                    ),
+                    TextField(
+                      controller: _textEditingController,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        hintText: '여기에 덱 코드를 붙여넣으세요',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                if (isLoading) const CircularProgressIndicator(),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            var deckResponseDto = await DeckService().import(
+                              _selectedButton.convertStringToMap(
+                                _textEditingController.value.text,
+                              ),
+                            );
+                            if (deckResponseDto != null) {
+                              import(deckResponseDto);
+                            }
+                            setState(() {
+                              isLoading = false;
+                            });
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        },
+                  child: const Text('가져오기'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showShortDialog(BuildContext context, String text) {
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: Text(text),
+            // content:
+            actions: [
+              ElevatedButton(
+                child: const Text('닫기'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ]);
+      },
+    );
+  }
+  void showDeckClearDialog(BuildContext context, DeckBuild deck, Function() reload) {
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('덱 비우기'),
+          content: const Text('덱을 비우시겠습니까?'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              child: const Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text(
+                '예',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deck.clear();
+                reload();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Widget _colorSelectionWidget(DeckBuild deck) {
+    CardOverlayService().removeAllOverlays();
+    List<String> cardColorList = deck.getOrderedCardColorList();
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Column(
+          children: [
+            const Text('덱 컬러 선택', style: TextStyle(fontSize: 25)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(
+                cardColorList.length,
+                    (index) {
+                  String color = cardColorList[index];
+                  Color buttonColor = ColorService.getColorFromString(color);
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (deck.colors.contains(color)) {
+                          deck.colors.remove(color);
+                        } else {
+                          deck.colors.add(color);
+                        }
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: deck.colors.contains(color)
+                                ? buttonColor
+                                : buttonColor.withOpacity(0.3),
+                          ),
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          color,
+                          style: TextStyle(
+                              fontSize: 12.0,
+                              color: deck.colors.contains(color)
+                                  ? Colors.black
+                                  : Colors.grey),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSaveDialog(BuildContext context, Map<int, FormatDto> formats, DeckBuild deck, Function() reload) {
+    CardOverlayService().removeAllOverlays();
+    LimitProvider limitProvider = Provider.of(context, listen: false);
+
+    var korFormats = formats.entries
+        .where((entry) => entry.value.isOnlyEn == false)
+        .toList();
+    if (!formats.keys.contains(deck.formatId)) {
+      if (!korFormats.isEmpty) {
+        deck.formatId = korFormats.first.key;
+      } else {
+        var enFormats = formats.entries
+            .where((entry) => entry.value.isOnlyEn == true)
+            .toList()
+            .reversed;
+        if (enFormats.length == 0) {
+          deck.formatId = korFormats.first.key;
+        } else {
+          deck.formatId = enFormats.first.key;
+        }
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              content: SizedBox(
+                width: MediaQuery
+                    .sizeOf(context)
+                    .width / 3,
+                height: MediaQuery
+                    .sizeOf(context)
+                    .height / 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          deck.isPublic ? '전체 공개' : '비공개',
+                          style: const TextStyle(fontSize: 25),
+                        ),
+                        Switch(
+                          inactiveThumbColor: Colors.red,
+                          value: deck.isPublic,
+                          onChanged: (bool v) {
+                            setState(() {
+                              deck.isPublic = v;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    _colorSelectionWidget(deck),
+                    const Divider(),
+                    const Text('포맷', style: TextStyle(fontSize: 25)),
+                    DropdownButton<int>(
+                      isExpanded: true,
+                      value: deck.formatId,
+                      hint: Text(formats[deck.formatId]?.name ?? "포맷 "),
+                      items: [
+                        const DropdownMenuItem<int>(
+                          enabled: false,
+                          child: Text(
+                            '일반 포맷',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        ...formats.entries
+                            .where((entry) => entry.value.isOnlyEn == false)
+                            .map((entry) {
+                          return DropdownMenuItem<int>(
+                            value: entry.key,
+                            child: Text(
+                              '${entry.value.name} ['
+                                  '${DateFormat('yyyy-MM-dd').format(
+                                  entry.value.startDate)} ~ '
+                                  '${DateFormat('yyyy-MM-dd').format(
+                                  entry.value.endDate)}]',
+                              // overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }),
+                        const DropdownMenuItem<int>(
+                          enabled: false,
+                          child: Text('미발매 포맷 [예상 발매 일정]',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        ...formats.entries
+                            .where((entry) => entry.value.isOnlyEn == true)
+                            .toList()
+                            .reversed
+                            .map((entry) {
+                          return DropdownMenuItem<int>(
+                            value: entry.key,
+                            child: Text('${entry.value.name} ['
+                                '${DateFormat('yyyy-MM-dd').format(
+                                entry.value.startDate)} ~ '
+                                '${DateFormat('yyyy-MM-dd').format(
+                                entry.value.endDate)}]'),
+                          );
+                        }),
+                      ],
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          deck.formatId = newValue!;
+                        });
+                      },
+                    ),
+                    const Divider(),
+                    const Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
+                    Text(
+                        '${DateFormat('yyyy-MM-dd').format(
+                            limitProvider.selectedLimit!
+                                .restrictionBeginDate)}',
+                        style: const TextStyle(fontSize: 20))
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  onPressed: () async {
+                    List<String> cardColorList =
+                    deck.getOrderedCardColorList();
+                    Set<String> set = cardColorList.toSet();
+                    deck.colorArrange(set);
+                    if (deck.colors.isEmpty) {
+                      _showShortDialog(context, "색을 하나 이상 골라야 합니다.");
+                      return;
+                    }
+                    if (deck.formatId == null) {
+                      _showShortDialog(context, "포맷을 골라야 합니다.");
+                      return;
+                    }
+                    DeckBuild? newDeck =
+                    await save(deck, context);
+                    if (newDeck != null) {
+                      deck.deckId = newDeck.deckId;
+                      deck.isSave = true;
+                      reload();
+                      Navigator.of(context).pop();
+                      _showShortDialog(context, "저장 성공");
+                    } else {
+                      _showShortDialog(context, "저장 실패");
+                    }
+                  },
+                  child: const Text('저장'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  void showDeckResetDialog(BuildContext context, Function() init) {
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('새로 만들기'),
+          content: const Text('새로운 덱을 작성하시겠습니까? \n저장되지 않은 변경사항은 사라집니다.'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            ElevatedButton(
+              child: const Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text(
+                '예',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                init();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

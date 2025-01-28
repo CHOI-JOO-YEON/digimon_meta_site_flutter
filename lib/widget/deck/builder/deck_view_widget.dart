@@ -46,7 +46,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   clearDeck() {
     widget.deck.clear();
-
     setState(() {});
   }
 
@@ -127,7 +126,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 Expanded(
                     child: DeckMenuButtons(
                   deck: widget.deck,
-                  clear: clearDeck,
                   init: initDeck,
                   import: widget.import,
                   newCopy: newCopy,
