@@ -376,6 +376,11 @@ class DeckBuild {
     url += "deck=$encoded";
     return url;
   }
+
+  @override
+  String toString() {
+    return 'DeckBuild{baseUrl: $baseUrl, deckId: $deckId, deckMap: $deckMap, deckCards: $deckCards, tamaMap: $tamaMap, tamaCards: $tamaCards, cardMap: $cardMap, deckCount: $deckCount, tamaCount: $tamaCount, deckName: $deckName, colors: $colors, author: $author, authorId: $authorId, isSave: $isSave, deckSortProvider: $deckSortProvider, cardNoCntMap: $cardNoCntMap, formatId: $formatId, isPublic: $isPublic, isStrict: $isStrict}';
+  }
 // int digimonCardComparator(DigimonCard a, DigimonCard b) {
 //   if (a.cardType != b.cardType) {
 //     return _cardTypeOrder[a.cardType]!.compareTo(_cardTypeOrder[b.cardType]!);
@@ -403,4 +408,6 @@ class DeckBuild {
 //
 //   return 0;
 // }
+
+  
 }

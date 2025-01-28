@@ -62,12 +62,15 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
     return Column(
       children: [
         ElevatedButton(onPressed: (){
+          print(deck);
           context.replaceRoute(DeckBuilderRoute(deck: deck));
         }, child: Text('replace')),
         ElevatedButton(onPressed: (){
+          print(deck);
           context.navigateTo(DeckBuilderRoute(deck: deck));
         }, child: Text('naviagte')),
         ElevatedButton(onPressed: (){
+          print(deck);
           context.pushRoute(DeckBuilderRoute(deck: deck));
         }, child: Text('push')),
       ],
