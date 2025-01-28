@@ -60,9 +60,9 @@ class MainPage extends StatelessWidget {
                                     : ResponsiveRowColumnType.ROW,
                                 rowMainAxisAlignment: MainAxisAlignment.start,
                                 rowCrossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                    CrossAxisAlignment.start,
                                 columnMainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                    MainAxisAlignment.start,
                                 columnCrossAxisAlignment:
                                     CrossAxisAlignment.start,
                                 children: [
@@ -122,7 +122,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.build,
-                                  size: SizeService.largeIconSize(context),
+                                  // size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait
@@ -136,7 +136,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.list,
-                                  size: SizeService.largeIconSize(context),
+                                  // size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait
@@ -148,7 +148,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.collections_bookmark_rounded,
-                                  size: SizeService.largeIconSize(context),
+                                  // size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait

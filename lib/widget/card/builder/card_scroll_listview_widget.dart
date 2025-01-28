@@ -101,7 +101,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                             SizeService.roundRadius(context)),
-                        color: Colors.grey[300],
+                        color: Colors.grey[400],
                       ),
                       child: Container(
                         padding: EdgeInsets.all(SizeService.paddingSize(context)),
@@ -136,6 +136,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                             card.getDisplayLocale() == 'JPN'
                                                 ? "MPLUSC"
                                                 : "JalnanGothic",
+                                        fontSize: SizeService.bodyFontSize(context)
                                       ),
                                     ),
                                     if (card.getDisplayEffect() != null)
@@ -231,7 +232,7 @@ class EffectText extends StatelessWidget {
       text: TextSpan(
         children: spans,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: SizeService.bodyFontSize(context),
           color: Colors.black,
           height: 1.4,
           fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic",

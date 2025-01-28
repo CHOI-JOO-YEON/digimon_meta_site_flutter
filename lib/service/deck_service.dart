@@ -7,7 +7,9 @@ import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
 import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -628,9 +630,10 @@ class DeckService {
                     children: [
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             '금지/제한: ',
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(
+                                fontSize: SizeService.bodyFontSize(context)),
                           ),
                           const SizedBox(
                             width: 10,
@@ -649,6 +652,10 @@ class DeckService {
                                   value: limitDto,
                                   child: Text(
                                     '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                    style: TextStyle(
+                                      fontSize:
+                                          SizeService.bodyFontSize(context),
+                                    ),
                                   ),
                                 );
                               }).toList(),
@@ -662,16 +669,20 @@ class DeckService {
                         children: [
                           Text(
                             '엄격한 덱 작성 모드',
-                            style: const TextStyle(fontSize: 20),
+                            style: TextStyle(
+                                fontSize: SizeService.bodyFontSize(context)),
                           ),
-                          Switch(
-                            inactiveThumbColor: Colors.red,
-                            value: isStrict,
-                            onChanged: (bool v) {
-                              setState(() {
-                                isStrict = v;
-                              });
-                            },
+                          Transform.scale(
+                            scale: SizeService.switchScale(context),
+                            child: Switch(
+                              inactiveThumbColor: Colors.red,
+                              value: isStrict,
+                              onChanged: (bool v) {
+                                setState(() {
+                                  isStrict = v;
+                                });
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -679,8 +690,11 @@ class DeckService {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('정렬 우선순위 변경',
-                              style: TextStyle(fontSize: 20)),
+                          Text(
+                            '정렬 우선순위 변경',
+                            style: TextStyle(
+                                fontSize: SizeService.bodyFontSize(context)),
+                          ),
                           IconButton(
                               onPressed: () {
                                 setState(() {
@@ -721,7 +735,11 @@ class DeckService {
                             return ListTile(
                               key: ValueKey('${criterion.field}-$index'),
                               title: Text(deckSortProvider
-                                  .getSortPriorityKor(criterion.field)),
+                                  .getSortPriorityKor(criterion.field),
+                                style: TextStyle(
+                                  fontSize: SizeService.smallFontSize(context)
+                                ),
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -924,7 +942,9 @@ class DeckService {
       },
     );
   }
-  void showDeckClearDialog(BuildContext context, DeckBuild deck, Function() reload) {
+
+  void showDeckClearDialog(
+      BuildContext context, DeckBuild deck, Function() reload) {
     CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
@@ -956,6 +976,7 @@ class DeckService {
       },
     );
   }
+
   Widget _colorSelectionWidget(DeckBuild deck) {
     CardOverlayService().removeAllOverlays();
     List<String> cardColorList = deck.getOrderedCardColorList();
@@ -968,7 +989,7 @@ class DeckService {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(
                 cardColorList.length,
-                    (index) {
+                (index) {
                   String color = cardColorList[index];
                   Color buttonColor = ColorService.getColorFromString(color);
 
@@ -1015,7 +1036,8 @@ class DeckService {
     );
   }
 
-  void showSaveDialog(BuildContext context, Map<int, FormatDto> formats, DeckBuild deck, Function() reload) {
+  void showSaveDialog(BuildContext context, Map<int, FormatDto> formats,
+      DeckBuild deck, Function() reload) {
     CardOverlayService().removeAllOverlays();
     LimitProvider limitProvider = Provider.of(context, listen: false);
 
@@ -1045,12 +1067,8 @@ class DeckService {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               content: SizedBox(
-                width: MediaQuery
-                    .sizeOf(context)
-                    .width / 3,
-                height: MediaQuery
-                    .sizeOf(context)
-                    .height / 2,
+                width: MediaQuery.sizeOf(context).width / 3,
+                height: MediaQuery.sizeOf(context).height / 2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1095,10 +1113,8 @@ class DeckService {
                             value: entry.key,
                             child: Text(
                               '${entry.value.name} ['
-                                  '${DateFormat('yyyy-MM-dd').format(
-                                  entry.value.startDate)} ~ '
-                                  '${DateFormat('yyyy-MM-dd').format(
-                                  entry.value.endDate)}]',
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                              '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]',
                               // overflow: TextOverflow.ellipsis,
                             ),
                           );
@@ -1116,10 +1132,8 @@ class DeckService {
                           return DropdownMenuItem<int>(
                             value: entry.key,
                             child: Text('${entry.value.name} ['
-                                '${DateFormat('yyyy-MM-dd').format(
-                                entry.value.startDate)} ~ '
-                                '${DateFormat('yyyy-MM-dd').format(
-                                entry.value.endDate)}]'),
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.startDate)} ~ '
+                                '${DateFormat('yyyy-MM-dd').format(entry.value.endDate)}]'),
                           );
                         }),
                       ],
@@ -1132,9 +1146,7 @@ class DeckService {
                     const Divider(),
                     const Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
                     Text(
-                        '${DateFormat('yyyy-MM-dd').format(
-                            limitProvider.selectedLimit!
-                                .restrictionBeginDate)}',
+                        '${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}',
                         style: const TextStyle(fontSize: 20))
                   ],
                 ),
@@ -1142,8 +1154,7 @@ class DeckService {
               actions: <Widget>[
                 ElevatedButton(
                   onPressed: () async {
-                    List<String> cardColorList =
-                    deck.getOrderedCardColorList();
+                    List<String> cardColorList = deck.getOrderedCardColorList();
                     Set<String> set = cardColorList.toSet();
                     deck.colorArrange(set);
                     if (deck.colors.isEmpty) {
@@ -1154,8 +1165,7 @@ class DeckService {
                       _showShortDialog(context, "포맷을 골라야 합니다.");
                       return;
                     }
-                    DeckBuild? newDeck =
-                    await save(deck, context);
+                    DeckBuild? newDeck = await save(deck, context);
                     if (newDeck != null) {
                       deck.deckId = newDeck.deckId;
                       deck.isSave = true;
@@ -1175,6 +1185,7 @@ class DeckService {
       },
     );
   }
+
   void showDeckResetDialog(BuildContext context, Function() init) {
     CardOverlayService().removeAllOverlays();
     showDialog(

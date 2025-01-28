@@ -16,7 +16,7 @@ class SizeService {
   static double bodyFontSize(BuildContext context) {
     return ResponsiveValue<double>(
       context,
-      defaultValue: 14,
+      defaultValue: 16,
       conditionalValues: [
         const Condition.smallerThan(name: TABLET, value: 10),
         const Condition.smallerThan(name: DESKTOP, value: 12),
@@ -28,7 +28,7 @@ class SizeService {
   static double smallFontSize(BuildContext context) {
     return ResponsiveValue<double>(
       context,
-      defaultValue: 12,
+      defaultValue: 14,
       conditionalValues: [
         const Condition.smallerThan(name: TABLET, value: 8),
         const Condition.smallerThan(name: DESKTOP, value: 10),
@@ -62,7 +62,7 @@ class SizeService {
   static double largeIconSize(BuildContext context) {
     return ResponsiveValue<double>(
       context,
-      defaultValue: 30,
+      defaultValue: 40,
       conditionalValues: [
         const Condition.smallerThan(name: TABLET, value: 26),
         const Condition.smallerThan(name: DESKTOP, value: 28),
@@ -83,16 +83,15 @@ class SizeService {
     ).value;
   }
   static double roundRadius(BuildContext context) {
-    return 5;
-    // return ResponsiveValue<double>(
-    //   context,
-    //   defaultValue: 5,
-    //   conditionalValues: [
-    //     const Condition.smallerThan(name: TABLET, value: 2.5),
-    //     const Condition.smallerThan(name: DESKTOP, value: 4),
-    //     const Condition.largerThan(name: DESKTOP, value: 7),
-    //   ],
-    // ).value;
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: 5,
+      conditionalValues: [
+        const Condition.smallerThan(name: TABLET, value: 2.5),
+        const Condition.smallerThan(name: DESKTOP, value: 4),
+        const Condition.largerThan(name: DESKTOP, value: 7),
+      ],
+    ).value;
   }
   static double thumbRadius(BuildContext context) {
     return ResponsiveValue<double>(
@@ -121,11 +120,11 @@ class SizeService {
   static double switchScale(BuildContext context) {
     return ResponsiveValue<double>(
       context,
-      defaultValue: 1,
+      defaultValue: 0.8,
       conditionalValues: [
         const Condition.smallerThan(name: TABLET, value: 0.6),
-        const Condition.smallerThan(name: DESKTOP, value: 0.8),
-        const Condition.largerThan(name: DESKTOP, value: 1.2),
+        const Condition.smallerThan(name: DESKTOP, value: 0.7),
+        const Condition.largerThan(name: DESKTOP, value: 1),
       ],
     ).value;
   }
