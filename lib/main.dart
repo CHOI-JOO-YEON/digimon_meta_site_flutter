@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'dart:html' as html;
+import 'package:responsive_framework/responsive_framework.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -129,6 +130,16 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       routerConfig: widget.router.config(),
+      
+      builder: (context, child) =>  ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 480, name: MOBILE),
+          const Breakpoint(start: 481, end: 800, name: TABLET),
+          const Breakpoint(start: 801, end: 1000, name: DESKTOP),
+          const Breakpoint(start: 1000, end: double.infinity, name: '4K'),
+        ],
+      ),
     );
   }
 
