@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_list_viewer.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/my_deck_list_viewer.dart';
 import 'package:flutter/material.dart';
@@ -88,12 +89,12 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
-    if (isPortrait) {
-      fontSize *= 2;
-    }
+    // final isPortrait =
+    //     MediaQuery.of(context).orientation == Orientation.portrait;
+    // double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
+    // if (isPortrait) {
+    //   fontSize *= 2;
+    // }
     return isLoading
         ? const Center(child: CircularProgressIndicator())
         : Consumer<UserProvider>(builder: (context, userProvider, child) {
@@ -112,7 +113,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
                     Tab(
                       child: Text(
                         '전체 덱',
-                        style: TextStyle(fontSize: fontSize),
+                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
                       ),
                       
                     ),
@@ -120,7 +121,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
                       child: Text(
                         '나의 덱',
                         style: TextStyle(
-                            fontSize: fontSize,
+                            fontSize: SizeService.bodyFontSize(context),
                             color: _isDisabled[1] ? Colors.grey : Colors.black),
                       ),
                     ),

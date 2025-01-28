@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -157,14 +158,6 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
-    double iconSize = MediaQuery.sizeOf(context).width * 0.02;
-    if (isPortrait) {
-      fontSize *= 2;
-      iconSize *= 2;
-    }
     return Column(
       children: [
         Row(
@@ -187,8 +180,8 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   return DropdownButtonHideUnderline(
                     child: DropdownButton<FormatDto>(
                       isExpanded: true,
-                      hint: _selectedFormat==null?Text('포맷', style: TextStyle(fontSize: fontSize),): 
-                          dropDownFormatItem(_selectedFormat!, fontSize, selectedDeckCountStr),
+                      hint: _selectedFormat==null?Text('포맷', style: TextStyle(fontSize: SizeService.smallFontSize(context)),): 
+                          dropDownFormatItem(_selectedFormat!, SizeService.smallFontSize(context), selectedDeckCountStr),
                       value: _selectedFormat,
                       items: [
                         const DropdownMenuItem<FormatDto>(
@@ -207,7 +200,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
                           return DropdownMenuItem<FormatDto>(
                             value: format,
-                              child: dropDownFormatItem(format, fontSize, deckCountStr)
+                              child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
                           );
                         }),
                         const DropdownMenuItem<FormatDto>(
@@ -228,7 +221,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
                           return DropdownMenuItem<FormatDto>(
                             value: format,
-                            child: dropDownFormatItem(format, fontSize, deckCountStr)
+                            child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
                           );
                         }),
                       ],
@@ -249,17 +242,17 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             IconButton(
               padding: EdgeInsets.zero,
               onPressed: () => _showDeckSettingDialog(context),
-              iconSize: fontSize,
+              iconSize: SizeService.mediumIconSize(context),
               icon: const Icon(Icons.settings),
               tooltip: '검색 설정',
             ),
             Expanded(
               flex: 3,
               child: TextField(
-                style: TextStyle(fontSize: fontSize),
+                style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                 decoration: InputDecoration(
                   labelText: '검색어',
-                  labelStyle: TextStyle(fontSize: fontSize),
+                  labelStyle: TextStyle(fontSize: SizeService.smallFontSize(context)),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -279,12 +272,12 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   },
                   child: Text(
                     '검색',
-                    style: TextStyle(fontSize: fontSize),
+                    style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                   )),
             )
           ],
         ),
-        SizedBox(height: fontSize),
+        SizedBox(height: SizeService.smallFontSize(context)),
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           ...List.generate(
             colors.length,
@@ -303,8 +296,8 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   });
                 },
                 child: Container(
-                  width: iconSize,
-                  height: iconSize,
+                  width: SizeService.mediumIconSize(context),
+                  height: SizeService.mediumIconSize(context),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: widget.searchParameter.colors.contains(color)
@@ -326,9 +319,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           ),
           Text(
             'OR',
-            style: TextStyle(fontSize: fontSize),
+            style: TextStyle(fontSize: SizeService.smallFontSize(context)),
           ),
-          SizedBox(width: fontSize),
+          SizedBox(width: SizeService.smallFontSize(context)),
           Radio(
             value: 1,
             groupValue: widget.searchParameter.colorOperation,
@@ -340,7 +333,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           ),
           Text(
             'AND',
-            style: TextStyle(fontSize: fontSize),
+            style: TextStyle(fontSize: SizeService.smallFontSize(context)),
           ),
         ]),
       ],

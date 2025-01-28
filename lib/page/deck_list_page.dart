@@ -16,13 +16,16 @@ import '../model/deck-build.dart';
 import '../router.dart';
 import 'package:auto_route/auto_route.dart';
 
+import '../service/size_service.dart';
+
 @RoutePage()
 class DeckListPage extends StatefulWidget {
   final String? searchParameterString;
 
-  const DeckListPage(
-      {super.key,
-      @QueryParam('searchParameter') this.searchParameterString,});
+  const DeckListPage({
+    super.key,
+    @QueryParam('searchParameter') this.searchParameterString,
+  });
 
   @override
   State<DeckListPage> createState() => _DeckListPageState();
@@ -76,10 +79,6 @@ class _DeckListPageState extends State<DeckListPage> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.012, 15);
-    if (isPortrait) {
-      fontSize *= 2;
-    }
     return isPortrait
         ? LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
@@ -93,21 +92,38 @@ class _DeckListPageState extends State<DeckListPage> {
                 panelBuilder: (ScrollController sc) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.only(
-                          left: MediaQuery.sizeOf(context).width * 0.01,
-                          right: MediaQuery.sizeOf(context).width * 0.01,
-                          bottom: MediaQuery.sizeOf(context).width * 0.01),
+                          left:  SizeService.paddingSize(context),
+                          right: SizeService.paddingSize(context),
+                          bottom: SizeService.paddingSize(context)),
                       child: Column(
                         children: [
                           SizedBox(
                             height: 50,
                             child: Row(
                               children: [
-                                Expanded(flex: 2, child: Container()),
+                                Expanded(
+                                  flex: 1,
+                                  child: TextButton(
+                                      onPressed: () {
+                                        _scrollController.animateTo(
+                                          0,
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      },
+                                      child: Text(
+                                        '메인',
+                                        style: TextStyle(
+                                            fontSize: SizeService.bodyFontSize(
+                                                context)),
+                                      )),
+                                ),
                                 Expanded(
                                     flex: 3,
                                     child: Row(
@@ -148,7 +164,9 @@ class _DeckListPageState extends State<DeckListPage> {
                                         Text(
                                           '덱 검색 패널',
                                           style: TextStyle(
-                                              fontSize: fontSize,
+                                              fontSize:
+                                                  SizeService.bodyFontSize(
+                                                      context),
                                               color: Theme.of(context)
                                                   .primaryColor),
                                         ),
@@ -186,46 +204,24 @@ class _DeckListPageState extends State<DeckListPage> {
                                       ],
                                     )),
                                 Expanded(
-                                    flex: 2,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 1,
-                                          child: TextButton(
-                                              onPressed: () {
-                                                _scrollController.animateTo(
-                                                  0,
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  curve: Curves.easeInOut,
-                                                );
-                                              },
-                                              child: Text(
-                                                '메인덱',
-                                                style: TextStyle(
-                                                    fontSize: fontSize),
-                                              )),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: TextButton(
-                                              onPressed: () {
-                                                _scrollController.animateTo(
-                                                  _scrollController
-                                                      .position.maxScrollExtent,
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  curve: Curves.easeInOut,
-                                                );
-                                              },
-                                              child: Text(
-                                                '타마덱',
-                                                style: TextStyle(
-                                                    fontSize: fontSize),
-                                              )),
-                                        )
-                                      ],
-                                    ))
+                                  flex: 1,
+                                  child: TextButton(
+                                      onPressed: () {
+                                        _scrollController.animateTo(
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          curve: Curves.easeInOut,
+                                        );
+                                      },
+                                      child: Text(
+                                        '타마',
+                                        style: TextStyle(
+                                            fontSize: SizeService.bodyFontSize(
+                                                context)),
+                                      )),
+                                )
                               ],
                             ),
                           ),
@@ -248,8 +244,7 @@ class _DeckListPageState extends State<DeckListPage> {
                 },
                 body: Container(
                   color: Theme.of(context).highlightColor,
-                  padding:
-                      EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
                   child: SingleChildScrollView(
                     controller: _scrollController,
                     child: _selectedDeck == null
@@ -261,7 +256,8 @@ class _DeckListPageState extends State<DeckListPage> {
                                 searchNote: searchNote,
                               ),
                               SizedBox(
-                                height: MediaQuery.sizeOf(context).height * 0.2,
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.17,
                               )
                             ],
                           ),
@@ -269,7 +265,7 @@ class _DeckListPageState extends State<DeckListPage> {
                 ));
           })
         : Padding(
-            padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+            padding: EdgeInsets.all(SizeService.paddingSize(context)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

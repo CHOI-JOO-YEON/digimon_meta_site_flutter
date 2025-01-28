@@ -9,6 +9,7 @@ import '../../../model/deck-view.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
 import '../../../service/deck_service.dart';
+import '../../../service/size_service.dart';
 
 class DeckMenuButtons extends StatefulWidget {
   final DeckBuild deck;
@@ -167,10 +168,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
-      double iconSize =
-          isPortrait ? constraints.maxWidth * 0.09 : constraints.maxWidth * 0.04;
       return Consumer<UserProvider>(
         builder: (BuildContext context, UserProvider userProvider,
             Widget? child) {
@@ -179,51 +176,51 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             alignment: Alignment.centerLeft,
             child: Wrap(
               alignment: WrapAlignment.start,
-              spacing: iconSize*0.01,
+              spacing: SizeService.spacingSize(context),
               children: [
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: iconSize, height: iconSize),
+                      width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: () => _showDeckCopyDialog(context),
-                    iconSize: iconSize,
+                    iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.copy),
                     tooltip: '복사해서 새로운 덱 만들기',
                   ),
                 ),
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: iconSize, height: iconSize),
+                      width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: () => _showExportDialog(context),
-                    iconSize: iconSize,
+                    iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.upload),
                     tooltip: '내보내기',
                   ),
                 ),
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: iconSize, height: iconSize),
+                      width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: () {
                       context.router
                           .push(DeckImageRoute(deck: widget.deck));
                     },
-                    iconSize: iconSize,
+                    iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.image),
                     tooltip: '이미지 저장',
                   ),
                 ),
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: iconSize, height: iconSize),
+                      width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: () => showDeckReceiptDialog(context),
-                    iconSize: iconSize,
+                    iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.receipt_long),
                     tooltip: '대회 제출용 레시피',
                   ),
@@ -231,14 +228,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 if (hasManagerRole)
                   ConstrainedBox(
                     constraints: BoxConstraints.tightFor(
-                        width: iconSize, height: iconSize),
+                        width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () async {
                         await DeckService()
                             .exportToTTSFile(widget.deck);
                       },
-                      iconSize: iconSize,
+                      iconSize: SizeService.largeIconSize(context),
                       icon: const Icon(Icons.videogame_asset_outlined),
                       tooltip: 'TTS 파일 내보내기',
                     ),

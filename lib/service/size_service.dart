@@ -48,7 +48,17 @@ class SizeService {
       ],
     ).value;
   }
-
+  static double mediumIconSize(BuildContext context) {
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: 20,
+      conditionalValues: [
+        const Condition.smallerThan(name: TABLET, value: 16),
+        const Condition.smallerThan(name: DESKTOP, value: 18),
+        const Condition.largerThan(name: DESKTOP, value: 22),
+      ],
+    ).value;
+  }
   static double largeIconSize(BuildContext context) {
     return ResponsiveValue<double>(
       context,

@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Make sure to import the provider package
 
@@ -91,7 +92,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                         ),
                       ),
                       Expanded(
-                        flex: isPortrait ? 1 : 2,
+                        flex: 2,
                         child: CustomSlider(
                           sliderValue: _rowNumber,
                           sliderAction: updateRowNumber,
@@ -115,12 +116,10 @@ class _DeckViewerViewState extends State<DeckViewerView> {
           ),
         ),
         SizedBox(
-          height: height * 0.03,
-          child: Container(
-            child: Text(
-              '메인',
-              style: TextStyle(fontSize: height * 0.02),
-            ),
+          height: SizeService.bodyFontSize(context) * 1.5,
+          child: Text(
+            '메인',
+            style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
           ),
         ),
         Container(
@@ -138,18 +137,16 @@ class _DeckViewerViewState extends State<DeckViewerView> {
           ),
         ),
         SizedBox(
-          height: height * 0.03,
-          child: Container(
-            child: Text(
-              '디지타마',
-              style: TextStyle(fontSize: height * 0.02),
-            ),
+          height: SizeService.bodyFontSize(context) * 1.5,
+          child: Text(
+            '디지타마',
+            style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
           ),
         ),
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
           ),
           child: DeckScrollGridView(
             deckCount: widget.deck.tamaMap,
