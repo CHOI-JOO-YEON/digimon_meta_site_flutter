@@ -371,11 +371,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
         builder: (context, constraints) {
           final isPortrait =
               MediaQuery.of(context).orientation == Orientation.portrait;
+          double maxWidth = MediaQuery.of(context).size.width;
           bottomSheetScale = isPortrait
-              ? (constraints.maxWidth * 2) / size
-              : (constraints.maxWidth * 0.6) / size;
+              ? (maxWidth * 2) / size
+              : (maxWidth * 0.6) / size;
           double screenWidth =
-              min(constraints.maxWidth, isHorizontal ? horizontalSize : size);
+              min(maxWidth, isHorizontal ? horizontalSize : size);
           scaleFactor = screenWidth / (isHorizontal ? horizontalSize : size);
           return SingleChildScrollView(
             child: Align(
@@ -464,8 +465,10 @@ class _DeckImagePageState extends State<DeckImagePage> {
                   deckImageColorService.selectedDeckImageColor.cardColor),
         ),
         if (isQrShow)
+        SizedBox(width: 10 * scaleFactor,),
+        if (isQrShow)
           SizedBox(
-            width: 164 * scaleFactor,
+            width: 154 * scaleFactor,
             height: 150 * scaleFactor,
             child: QrImageView(
               padding: EdgeInsets.all(2 * scaleFactor),
