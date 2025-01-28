@@ -83,15 +83,16 @@ class SizeService {
     ).value;
   }
   static double roundRadius(BuildContext context) {
-    return ResponsiveValue<double>(
-      context,
-      defaultValue: 5,
-      conditionalValues: [
-        const Condition.smallerThan(name: TABLET, value: 2.5),
-        const Condition.smallerThan(name: DESKTOP, value: 4),
-        const Condition.largerThan(name: DESKTOP, value: 7),
-      ],
-    ).value;
+    return 5;
+    // return ResponsiveValue<double>(
+    //   context,
+    //   defaultValue: 5,
+    //   conditionalValues: [
+    //     const Condition.smallerThan(name: TABLET, value: 2.5),
+    //     const Condition.smallerThan(name: DESKTOP, value: 4),
+    //     const Condition.largerThan(name: DESKTOP, value: 7),
+    //   ],
+    // ).value;
   }
   static double thumbRadius(BuildContext context) {
     return ResponsiveValue<double>(
@@ -125,6 +126,18 @@ class SizeService {
         const Condition.smallerThan(name: TABLET, value: 0.6),
         const Condition.smallerThan(name: DESKTOP, value: 0.8),
         const Condition.largerThan(name: DESKTOP, value: 1.2),
+      ],
+    ).value;
+  }
+
+  static double headerHeight(BuildContext context) {
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: 100,
+      conditionalValues: [
+        const Condition.smallerThan(name: TABLET, value: 120),
+        const Condition.smallerThan(name: DESKTOP, value: 120),
+        const Condition.largerThan(name: DESKTOP, value: 80),
       ],
     ).value;
   }

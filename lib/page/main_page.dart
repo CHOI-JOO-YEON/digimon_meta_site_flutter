@@ -7,6 +7,7 @@ import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'dart:html' as html;
 import '../provider/user_provider.dart';
 
@@ -42,7 +43,7 @@ class MainPage extends StatelessWidget {
           body: Column(
             children: [
               SizedBox(
-                height: max(MediaQuery.sizeOf(context).height * 0.1, 80),
+                height: SizeService.headerHeight(context),
                 child: Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     return Row(
@@ -50,56 +51,67 @@ class MainPage extends StatelessWidget {
                         Expanded(
                           flex: 1,
                           child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (userProvider.isLogin)
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${userProvider.nickname}',
-                                        style: TextStyle(fontSize: fontSize),
+                              padding: EdgeInsets.all(
+                                  SizeService.paddingSize(context)*2),
+                              child: ResponsiveRowColumn(
+                                layout: ResponsiveBreakpoints.of(context)
+                                        .smallerThan('4K')
+                                    ? ResponsiveRowColumnType.COLUMN
+                                    : ResponsiveRowColumnType.ROW,
+                                rowMainAxisAlignment: MainAxisAlignment.start,
+                                rowCrossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                columnMainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                columnCrossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  if (userProvider.isLogin)
+                                    ResponsiveRowColumnItem(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${userProvider.nickname}',
+                                            style:
+                                                TextStyle(fontSize: fontSize),
+                                          ),
+                                          Text(
+                                            '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
+                                            style:
+                                                TextStyle(fontSize: fontSize),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
-                                        style: TextStyle(fontSize: fontSize),
-                                      ),
-                                    ],
+                                    ),
+                                  ResponsiveRowColumnItem(
+                                    child: SizedBox(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.009,
+                                      // height: 8,
+                                    ),
                                   ),
-                                SizedBox(
-                                    width: MediaQuery.sizeOf(context).width *
-                                        0.009),
-                                userProvider.isLogin
-                                    ? Center(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            userProvider.logout();
-                                          },
-                                          child: Text(
-                                            '로그아웃',
-                                            style:
-                                                TextStyle(fontSize: fontSize),
-                                          ),
-                                        ),
-                                      )
-                                    : Center(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            openOAuthPopup();
-                                          },
-                                          child: Text(
-                                            '로그인',
-                                            style:
-                                                TextStyle(fontSize: fontSize),
-                                          ),
-                                        ),
+                                  ResponsiveRowColumnItem(
+                                    child: GestureDetector(
+                                      child: Text(
+                                        userProvider.isLogin ? '로그아웃' : '로그인',
+                                        style: TextStyle(
+                                            fontSize: fontSize,
+                                            color:
+                                                Theme.of(context).primaryColor),
                                       ),
-                              ],
-                            ),
-                          ),
+                                      onTap: () {
+                                        userProvider.isLogin
+                                            ? userProvider.logout()
+                                            : openOAuthPopup();();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )),
                         ),
                         Expanded(
                           flex: 1,

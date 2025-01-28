@@ -11,13 +11,16 @@ class DeckStat extends StatelessWidget {
   final Color? textColor;
   final Color? barColor;
   final Color? backGroundColor;
+  final double? radius;
 
   const DeckStat(
       {super.key,
       required this.deck,
       this.textColor,
       this.barColor,
-      this.backGroundColor});
+      this.backGroundColor,
+      this.radius,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +36,7 @@ class DeckStat extends StatelessWidget {
         height: constraints.maxHeight,
         decoration: BoxDecoration(
             borderRadius:
-                BorderRadius.circular(SizeService.roundRadius(context)),
+                BorderRadius.circular(radius??SizeService.roundRadius(context)),
             color: backGroundColor ?? Theme.of(context).cardColor),
         child: Center(
           child: Container(
@@ -128,9 +131,9 @@ class DeckStat extends StatelessWidget {
                           color: barColor ?? Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(
-                                SizeService.roundRadius(context)),
+                                radius??SizeService.roundRadius(context)),
                             topRight: Radius.circular(
-                                SizeService.roundRadius(context)),
+                                radius??SizeService.roundRadius(context)),
                           ),
                         ),
                         alignment: Alignment.bottomCenter,

@@ -54,7 +54,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
       barrierColor: Colors.transparent,
       backgroundColor: Colors.grey[100],
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
@@ -130,7 +130,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                           )
                         ]),
                     SizedBox(height: 20 * bottomSheetScale),
-                    Divider(thickness: 2),
+                    const Divider(thickness: 2),
                     if (selectColorSetKey != 'custom')
                       Expanded(
                         child: ListView.builder(
@@ -256,17 +256,27 @@ class _DeckImagePageState extends State<DeckImagePage> {
       }
     }
 
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+    double maxWidth = MediaQuery.of(context).size.width;
+
+    bottomSheetScale =
+        isPortrait ? (maxWidth * 2) / size : (maxWidth * 0.6) / size;
+
+    double screenWidth = min(maxWidth, isHorizontal ? horizontalSize : size);
+
+    scaleFactor = screenWidth / (isHorizontal ? horizontalSize : size);
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
             width: size,
             child: AppBar(
               backgroundColor: Theme.of(context).colorScheme.background,
-              title: Text('이미지 내보내기',
-                  style: const TextStyle(fontFamily: 'JalnanGothic')),
+              title: const Text('이미지 내보내기',
+                  style: TextStyle(fontFamily: 'JalnanGothic')),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.download),
@@ -274,15 +284,15 @@ class _DeckImagePageState extends State<DeckImagePage> {
                 ),
                 PopupMenuButton<String>(
                   tooltip: '메뉴',
-                  icon: Icon(Icons.settings),
+                  icon: const Icon(Icons.settings),
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<String>>[
                     PopupMenuItem<String>(
-                      child: Text('색상 변경'),
+                      child: const Text('색상 변경'),
                       onTap: () => _showColorSetsBottomSheet(),
                     ),
                     PopupMenuItem<String>(
-                        child: Text('색상 초기화'),
+                        child: const Text('색상 초기화'),
                         onTap: () {
                           setState(() {
                             deckImageColorService.resetColor();
@@ -294,7 +304,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('덱 정보 표시'),
+                              const Text('덱 정보 표시'),
                               Switch(
                                 inactiveThumbColor: Colors.red,
                                 value: showInfo,
@@ -318,7 +328,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('대표 카드 표시'),
+                              const Text('대표 카드 표시'),
                               Switch(
                                 inactiveThumbColor: Colors.red,
                                 value: isHorizontal,
@@ -342,7 +352,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('QR 코드 표시(개발 중)'),
+                              const Text('QR 코드 표시(개발 중)'),
                               Switch(
                                 inactiveThumbColor: Colors.red,
                                 value: isQrShow,
@@ -367,60 +377,50 @@ class _DeckImagePageState extends State<DeckImagePage> {
           ),
         ),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isPortrait =
-              MediaQuery.of(context).orientation == Orientation.portrait;
-          double maxWidth = MediaQuery.of(context).size.width;
-          bottomSheetScale = isPortrait
-              ? (maxWidth * 2) / size
-              : (maxWidth * 0.6) / size;
-          double screenWidth =
-              min(maxWidth, isHorizontal ? horizontalSize : size);
-          scaleFactor = screenWidth / (isHorizontal ? horizontalSize : size);
-          return SingleChildScrollView(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: RepaintBoundary(
-                key: globalKey,
-                child: Container(
-                  width: screenWidth,
-                  padding: EdgeInsets.all(8 * scaleFactor),
-                  decoration: BoxDecoration(
-                    color: deckImageColorService
-                        .selectedDeckImageColor.backGroundColor,
-                    borderRadius: BorderRadius.circular(10 * scaleFactor),
-                  ),
-                  child: Column(
-                    children: [
-                      if (showInfo) _deckImageHeaderWidget(scaleFactor),
-                      Row(
-                        children: [
-                          if (isHorizontal)
-                            SizedBox(
-                              width: 610 * scaleFactor,
-                              child: Image.network(
-                                  fit: BoxFit.contain,
-                                  _selectedCard?.getDisplayImgUrl() ?? ''),
-                            ),
-                          if (isHorizontal)
-                            SizedBox(
-                              width: 10 * scaleFactor,
-                            ),
+      body: SingleChildScrollView(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: RepaintBoundary(
+            key: globalKey,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Container(
+                width: size,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: deckImageColorService
+                      .selectedDeckImageColor.backGroundColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    if (showInfo) _deckImageHeaderWidget(scaleFactor),
+                    Row(
+                      children: [
+                        if (isHorizontal)
                           SizedBox(
-                            width: 984 * scaleFactor,
-                            child: _deckImageCenterWidget(scaleFactor, context),
+                            width: 610,
+                            child: Image.network(
+                                fit: BoxFit.contain,
+                                _selectedCard?.getDisplayImgUrl() ?? ''),
                           ),
-                        ],
-                      ),
-                      _deckImageFooterWidget(scaleFactor)
-                    ],
-                  ),
+                        if (isHorizontal)
+                          const SizedBox(
+                            width: 10,
+                          ),
+                        SizedBox(
+                          width: 984,
+                          child: _deckImageCenterWidget(scaleFactor, context),
+                        ),
+                      ],
+                    ),
+                    _deckImageFooterWidget(scaleFactor)
+                  ],
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -441,12 +441,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Row(
       children: [
         SizedBox(
-          width: ((isHorizontal ? 950 : 328) + (isQrShow ? 0 : 164)) * scaleFactor,
+          width: ((isHorizontal ? 950 : 328) + (isQrShow ? 0 : 164)),
           child: Center(
             child: Text(
               widget.deck.deckName,
               style: TextStyle(
-                  fontSize: 25 * scaleFactor,
+                  fontSize: 25,
                   fontFamily: 'JalnanGothic',
                   color:
                       deckImageColorService.selectedDeckImageColor.textColor),
@@ -454,30 +454,28 @@ class _DeckImagePageState extends State<DeckImagePage> {
           ),
         ),
         SizedBox(
-          width: 492 * scaleFactor,
-          height: 150 * scaleFactor,
+          width: 492,
+          height: 150,
           child: DeckStat(
-              deck: widget.deck,
-              textColor:
-                  deckImageColorService.selectedDeckImageColor.textColor,
-              barColor: deckImageColorService.selectedDeckImageColor.barColor,
-              backGroundColor:
-                  deckImageColorService.selectedDeckImageColor.cardColor),
+            deck: widget.deck,
+            textColor: deckImageColorService.selectedDeckImageColor.textColor,
+            barColor: deckImageColorService.selectedDeckImageColor.barColor,
+            backGroundColor:
+                deckImageColorService.selectedDeckImageColor.cardColor,
+            radius: 10,
+          ),
         ),
         if (isQrShow)
-        SizedBox(width: 10 * scaleFactor,),
+          const SizedBox(
+            width: 10,
+          ),
         if (isQrShow)
           SizedBox(
-            width: 154 * scaleFactor,
-            height: 150 * scaleFactor,
+            width: 154,
+            height: 150,
             child: QrImageView(
-              padding: EdgeInsets.all(2 * scaleFactor),
+              padding: const EdgeInsets.all(2),
               data: widget.deck.getQrUrl(),
-              // embeddedImage: AssetImage('assets/images/img.png'),
-              // embeddedImageStyle: QrEmbeddedImageStyle(
-              //   size: Size(40 * scaleFactor, 40 * scaleFactor
-              //   ), // 이미지 크기
-              // ),
               version: QrVersions.auto,
             ),
           ),
@@ -492,7 +490,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         Text(
           'Image created using DGCHub (dgchub.com)',
           style: TextStyle(
-              fontSize: 10 * scaleFactor,
+              fontSize: 10,
               color: deckImageColorService.selectedDeckImageColor.textColor),
         )
       ],
@@ -507,7 +505,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Column(
       key: gridKey,
       children: [
-        SizedBox(height: 5 * scaleFactor),
+        const SizedBox(height: 5),
         _buildGridView(
             context,
             displayTamas,
@@ -515,7 +513,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
             deckImageColorService.selectedDeckImageColor.cardColor,
             '디지타마 덱',
             scaleFactor),
-        SizedBox(height: 5 * scaleFactor),
+        const SizedBox(height: 5),
         _buildGridView(
             context,
             displayDecks,
@@ -523,7 +521,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
             deckImageColorService.selectedDeckImageColor.cardColor,
             '메인 덱',
             scaleFactor),
-        SizedBox(height: 5 * scaleFactor),
+        const SizedBox(height: 5),
       ],
     );
   }
@@ -539,17 +537,17 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Container(
       decoration: BoxDecoration(
         color: backColor,
-        borderRadius: BorderRadius.circular(10 * scaleFactor),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
-        padding: EdgeInsets.all(8.0 * scaleFactor),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             // Text(
             //   name,
             //   style: TextStyle(
             //       fontFamily: 'JalnanGothic',
-            //       fontSize: 16 * scaleFactor,
+            //       fontSize: 16 ,
             //       color:
             //           deckImageColorService.selectedDeckImageColor.textColor),
             // ),
@@ -558,7 +556,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                 crossAxisCount: crossAxisCount,
                 childAspectRatio: 0.715,
               ),
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: cards.length,
               itemBuilder: (context, index) {
