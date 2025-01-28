@@ -58,6 +58,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();
@@ -86,6 +87,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      routerDelegate: widget.router.delegate(),
+      routeInformationParser: widget.router.defaultRouteParser(),
       title: 'DGCHub',
       theme: ThemeData(
        fontFamily: 'JalnanGothic',
