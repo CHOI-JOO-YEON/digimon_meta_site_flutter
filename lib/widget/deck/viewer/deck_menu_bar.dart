@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -28,34 +29,26 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
 
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
-      double fontSize =
-          isPortrait ? constraints.maxWidth * 0.1 : constraints.maxWidth * 0.05;
         return Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             Expanded(
               flex: 3,
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
-                        style: TextStyle(fontSize: fontSize*0.8),),
-                      Text(
-                        widget.deck.deckName,
-                        style: TextStyle(fontSize: fontSize
-                          // ,overflow: TextOverflow.ellipsis,
-                        ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
+                      style: TextStyle(fontSize: SizeService.smallFontSize(context)),),
+                    Text(
+                      widget.deck.deckName,
+                      style: TextStyle(fontSize: SizeService.bodyFontSize(context)
+                        // ,overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

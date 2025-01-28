@@ -21,7 +21,7 @@ class SearchParameter{
   int page = 1;
   int size = 84;
 
-  int parallelOption = 0; // 0= all, 1= onlyNormal, 2=onlyParallel
+  int parallelOption = 0; 
 
   String orderOption = "sortString";
   bool isOrderDesc = false;
@@ -83,5 +83,35 @@ class SearchParameter{
   @override
   String toString() {
     return 'SearchParameter{ searchString: $searchString, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
+  }
+
+  void reset() {
+    searchString = null;
+    noteId = null;
+    colors ={};
+    colorOperation = null;
+    lvs = null;
+
+    cardTypes = null;
+    typeOperation =1; 
+
+    types = {};
+
+    minPlayCost=0; 
+    maxPlayCost=20;
+    minDp=1000;
+    maxDp=17000;
+    minDigivolutionCost=0;
+    maxDigivolutionCost=8;
+    rarities = null;
+
+    page = 1;
+    size = 84;
+
+    parallelOption = 0;
+
+    orderOption = "sortString";
+    isOrderDesc = false;
+    isEnglishCardInclude = true;
   }
 }

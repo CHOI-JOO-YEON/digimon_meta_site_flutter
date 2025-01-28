@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
@@ -45,7 +46,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   clearDeck() {
     widget.deck.clear();
-
     setState(() {});
   }
 
@@ -99,7 +99,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
         SizedBox(
           height: height * 0.3,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(SizeService.paddingSize(context)),
             child: Column(
               children: [
                 Expanded(
@@ -114,7 +114,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                             textEditingController: textEditingController,
                           )),
                       Expanded(
-                        flex: isPortrait ? 1 : 2,
+                        flex: 2,
                         child: CustomSlider(
                             sliderValue: _rowNumber,
                             sliderAction: updateRowNumber),
@@ -126,7 +126,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 Expanded(
                     child: DeckMenuButtons(
                   deck: widget.deck,
-                  clear: clearDeck,
                   init: initDeck,
                   import: widget.import,
                   newCopy: newCopy,
@@ -140,13 +139,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         SizedBox(
-          height: height * 0.03,
-          child: Text('메인', style: TextStyle(fontSize: height * 0.02)),
+          height: SizeService.bodyFontSize(context) * 1.5,
+          child: Center(child: Text('메인', style: TextStyle(fontSize: SizeService.bodyFontSize(context)))),
         ),
         Container(
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(5)),
+              borderRadius: BorderRadius.circular(SizeService.roundRadius(context))),
           child: DeckScrollGridView(
             deckCount: widget.deck.deckMap,
             deck: widget.deck.deckCards,
@@ -159,14 +158,14 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         SizedBox(
-          height: height * 0.03,
-          child: Container(
-              child: Text('디지타마', style: TextStyle(fontSize: height * 0.02))),
+          height: SizeService.bodyFontSize(context) * 1.5,
+          child: Center(
+              child: Text('디지타마', style: TextStyle(fontSize: SizeService.bodyFontSize(context)))),
         ),
         Container(
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(5)),
+              borderRadius: BorderRadius.circular(SizeService.roundRadius(context))),
           child: DeckScrollGridView(
             deckCount: widget.deck.tamaMap,
             deck: widget.deck.tamaCards,

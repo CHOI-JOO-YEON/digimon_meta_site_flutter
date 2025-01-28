@@ -225,7 +225,8 @@ class DeckBuild {
   bool isCanAdd(card) {
     int limit = LimitService().getCardLimit(card);
     int cnt = cardNoCntMap[card.cardNo] ?? 0;
-    if (cnt >= limit) {
+    
+    if (cnt >= limit && isStrict) {
       return false;
     }
     return true;

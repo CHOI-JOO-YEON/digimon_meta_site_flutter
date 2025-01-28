@@ -176,9 +176,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     : MediaQuery.sizeOf(context).width * 0.4,
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // 컬럼 크기를 내용에 맞게 조절
+                    mainAxisSize: MainAxisSize.min, 
                     children: [
-                      //검색어
                       TextField(
                         controller: _dialogSearchStringEditingController,
                         decoration: const InputDecoration(
@@ -204,7 +203,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           },
                         ),
                       ),
-                      //lv 고르기
                       const Text(
                         'LV',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -673,9 +671,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
       },
     );
   }
+  
+  void resetSearchCondition(){
+    _searchStringEditingController =
+        TextEditingController(text: '');
+    widget.searchParameter.reset();
+    widget.updateSearchParameter();
+    setState(() {});
+  }
 
   Comparator<NoteDto> noteDtoComparator = (a, b) {
-    // releaseDate가 null인 경우 우선순위에서 뒤로 가도록 처리
     if (a.releaseDate == null && b.releaseDate == null) {
       return a.name.compareTo(b.name);
     } else if (a.releaseDate == null) {
@@ -684,13 +689,11 @@ class _CardSearchBarState extends State<CardSearchBar> {
       return -1;
     }
 
-    // releaseDate가 내림차순으로 정렬
     int releaseDateComparison = b.releaseDate!.compareTo(a.releaseDate!);
     if (releaseDateComparison != 0) {
       return releaseDateComparison;
     }
 
-    // releaseDate가 같은 경우 priority 오름차순으로 정렬
     if (a.priority == null && b.priority == null) {
       return 0;
     } else if (a.priority == null) {
@@ -844,6 +847,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 padding: EdgeInsets.zero,
                 onPressed: _showFilterDialog,
                 icon: const Icon(Icons.menu))),
+        Expanded(
+            flex: 1,
+            child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: resetSearchCondition,
+                icon: const Icon(Icons.refresh))),
         if (widget.viewMode != null)
           Expanded(
             flex: 1,

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
+import '../../../service/size_service.dart';
 
 class MyDeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
@@ -148,12 +149,6 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
-    if (isPortrait) {
-      fontSize *= 2;
-    }
     return Column(
       children: [
         DeckSearchBar(
@@ -176,17 +171,23 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                 final deck = decks[index];
                 return ListTile(
                   trailing: SizedBox(
-                    width: 100,
+                    width: SizeService.mediumIconSize(context) * 5,
                     child: Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.mode),
+                          icon: Icon(
+                            Icons.mode,
+                            size: SizeService.mediumIconSize(context),
+                          ),
                           onPressed: () {
                             showModifyConfirmationDialog(context, deck);
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: Icon(
+                            Icons.delete,
+                            size: SizeService.mediumIconSize(context),
+                          ),
                           onPressed: () {
                             showDeleteConfirmationDialog(context, deck.deckId!);
                           },
@@ -199,10 +200,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                   ),
                   selected: index == _selectedIndex,
                   title: Text(deck.deckName ?? '',
-                      style: TextStyle(fontSize: fontSize)),
+                      style: TextStyle(
+                          fontSize: SizeService.bodyFontSize(context))),
                   subtitle: Text(
                       '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
-                      style: TextStyle(fontSize: fontSize * 0.8)),
+                      style: TextStyle(
+                          fontSize: SizeService.smallFontSize(context))),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);
@@ -216,7 +219,11 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.arrow_back,
+                size: SizeService.smallIconSize(context),
+              ),
               onPressed: currentPage > 1
                   ? () {
                       searchDecks(currentPage - 1);
@@ -224,9 +231,13 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
                   : null,
             ),
             Text('Page $currentPage of $maxPage',
-                style: TextStyle(fontSize: fontSize)),
+                style: TextStyle(fontSize: SizeService.smallFontSize(context))),
             IconButton(
-              icon: Icon(Icons.arrow_forward),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.arrow_forward,
+                size: SizeService.smallIconSize(context),
+              ),
               onPressed: currentPage < maxPage
                   ? () {
                       searchDecks(currentPage + 1);

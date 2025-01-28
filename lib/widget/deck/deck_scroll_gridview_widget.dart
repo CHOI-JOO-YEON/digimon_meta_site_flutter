@@ -34,24 +34,23 @@ class DeckScrollGridView extends StatefulWidget {
 
 class _DeckScrollGridViewState extends State<DeckScrollGridView>
     with WidgetsBindingObserver {
-  Size _lastSize = Size.zero; // 이전 화면 크기를 저장하는 변수
+  Size _lastSize = Size.zero;
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addObserver(this); // Observer 등록
     _scrollController.addListener(() {
-      // 스크롤이 발생할 때 오버레이 위치 업데이트
       widget.cardOverlayService.removeAllOverlays();
     });
   }
 
-  final ScrollController _scrollController = ScrollController(); // 스크롤 컨트롤러 추가
+  final ScrollController _scrollController = ScrollController(); 
 
   @override
   void dispose() {
     _scrollController.dispose();
-    WidgetsBinding.instance.removeObserver(this); // Observer 해제
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -69,8 +68,8 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     final Size newSize = MediaQuery.of(context).size;
 
     if (newSize != _lastSize) {
-      widget.cardOverlayService.removeAllOverlays(); // 오버레이 제거
-      _lastSize = newSize; // 새로운 사이즈로 업데이트
+      widget.cardOverlayService.removeAllOverlays(); 
+      _lastSize = newSize;
     }
   }
 
@@ -80,11 +79,8 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
       builder: (BuildContext context, BoxConstraints constraints) {
         return GridView.builder(
           shrinkWrap: true,
-          // 내부 요소에 따라 그리드 높이 조절
           controller: _scrollController,
-          // ScrollController 연결
           physics: const NeverScrollableScrollPhysics(),
-          // 그리드뷰 자체 스크롤 비활성화
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,

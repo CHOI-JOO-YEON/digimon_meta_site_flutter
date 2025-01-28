@@ -12,6 +12,7 @@ import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
@@ -31,10 +32,11 @@ class DeckBuilderPage extends StatefulWidget {
   final String? searchParameterString;
   final DeckBuild? deck;
 
-  const DeckBuilderPage(
-      {super.key,
-      this.deck,
-      @QueryParam('searchParameter') this.searchParameterString,});
+  const DeckBuilderPage({
+    super.key,
+    this.deck,
+    @QueryParam('searchParameter') this.searchParameterString,
+  });
 
   @override
   State<DeckBuilderPage> createState() => _DeckBuilderPageState();
@@ -244,9 +246,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
-    double fontSize = min(MediaQuery.sizeOf(context).width * 0.012, 15);
     if (isPortrait) {
-      fontSize *= 2;
       if (init) {
         viewMode = "list";
       }
@@ -279,20 +279,37 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           panelBuilder: (ScrollController sc) {
             return Container(
               decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(5)),
+                  color: Colors.grey[200],
+                  borderRadius:
+                      BorderRadius.circular(SizeService.roundRadius(context))),
               child: Padding(
                 padding: EdgeInsets.only(
-                    left: MediaQuery.sizeOf(context).width * 0.01,
-                    right: MediaQuery.sizeOf(context).width * 0.01,
-                    bottom: MediaQuery.sizeOf(context).width * 0.01),
+                    left: SizeService.paddingSize(context),
+                    right: SizeService.paddingSize(context),
+                    bottom: SizeService.paddingSize(context)),
                 child: Column(
                   children: [
                     SizedBox(
                       height: 50,
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Container()),
+                          Expanded(
+                            flex: 1,
+                            child: TextButton(
+                                onPressed: () {
+                                  _scrollController.animateTo(
+                                    0,
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                child: Text(
+                                  '메인',
+                                  style: TextStyle(
+                                      fontSize:
+                                          SizeService.bodyFontSize(context)),
+                                )),
+                          ),
                           Expanded(
                               flex: 3,
                               child: Row(
@@ -329,7 +346,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   Text(
                                     '카드 검색 패널',
                                     style: TextStyle(
-                                        fontSize: fontSize,
+                                        fontSize:
+                                            SizeService.bodyFontSize(context),
                                         color: Theme.of(context).primaryColor),
                                   ),
                                   IconButton(
@@ -361,44 +379,22 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                 ],
                               )),
                           Expanded(
-                              flex: 2,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: TextButton(
-                                        onPressed: () {
-                                          _scrollController.animateTo(
-                                            0,
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            curve: Curves.easeInOut,
-                                          );
-                                        },
-                                        child: Text(
-                                          '메인덱',
-                                          style: TextStyle(fontSize: fontSize),
-                                        )),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: TextButton(
-                                        onPressed: () {
-                                          _scrollController.animateTo(
-                                            _scrollController
-                                                .position.maxScrollExtent,
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            curve: Curves.easeInOut,
-                                          );
-                                        },
-                                        child: Text(
-                                          '타마덱',
-                                          style: TextStyle(fontSize: fontSize),
-                                        )),
-                                  )
-                                ],
-                              ))
+                            flex: 1,
+                            child: TextButton(
+                                onPressed: () {
+                                  _scrollController.animateTo(
+                                    _scrollController.position.maxScrollExtent,
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                child: Text(
+                                  '타마',
+                                  style: TextStyle(
+                                      fontSize:
+                                          SizeService.bodyFontSize(context)),
+                                )),
+                          )
                         ],
                       ),
                     ),
@@ -408,7 +404,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           children: [
                             SizedBox(
                                 height: 50,
-                                // flex: 1,
                                 child: CardSearchBar(
                                   notes: notes,
                                   searchParameter: searchParameter,
@@ -457,7 +452,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           },
           body: Container(
             color: Theme.of(context).highlightColor,
-            padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+            padding: EdgeInsets.all(SizeService.paddingSize(context)),
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Column(
@@ -470,7 +465,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     cardOverlayService: _cardOverlayService,
                   ),
                   SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.2,
+                    height: MediaQuery.sizeOf(context).height * 0.17,
                   )
                 ],
               ),
@@ -480,7 +475,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       });
     } else {
       return Padding(
-        padding: EdgeInsets.all(MediaQuery.sizeOf(context).height * 0.01),
+        padding: EdgeInsets.all(SizeService.paddingSize(context)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -488,7 +483,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius:
+                        BorderRadius.circular(SizeService.roundRadius(context)),
                     color: Theme.of(context).highlightColor),
                 child: SingleChildScrollView(
                   child: DeckBuilderView(
@@ -509,12 +505,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).highlightColor,
-                  borderRadius: BorderRadius.circular(5),
-                  // border: Border.all()
+                  borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
                 ),
                 child: Padding(
-                  padding:
-                      EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.01),
+                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
                   child: Column(
                     children: [
                       Expanded(

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/card.dart';
@@ -10,13 +11,16 @@ class DeckStat extends StatelessWidget {
   final Color? textColor;
   final Color? barColor;
   final Color? backGroundColor;
+  final double? radius;
 
   const DeckStat(
       {super.key,
       required this.deck,
       this.textColor,
       this.barColor,
-      this.backGroundColor});
+      this.backGroundColor,
+      this.radius,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,8 @@ class DeckStat extends StatelessWidget {
       return Container(
         height: constraints.maxHeight,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius:
+                BorderRadius.circular(radius??SizeService.roundRadius(context)),
             color: backGroundColor ?? Theme.of(context).cardColor),
         child: Center(
           child: Container(
@@ -48,41 +53,41 @@ class DeckStat extends StatelessWidget {
 
   Map<String, int> _calculateCardCounts() {
     Map<String, int> counts = {
-      'Lv-': 0,
-      'Lv2': 0,
-      'Lv3': 0,
-      'Lv4': 0,
-      'Lv5': 0,
-      'Lv6': 0,
-      'Lv7': 0,
-      'TM': 0,
-      'OP': 0,
+      '-': 0,
+      '2': 0,
+      '3': 0,
+      '4': 0,
+      '5': 0,
+      '6': 0,
+      '7': 0,
+      'T': 0,
+      'O': 0,
     };
 
     for (var card in deck.deckMap.keys) {
       if (card.lv == 0) {
-        counts['Lv-'] = counts['Lv-']! + deck.deckMap[card]!;
+        counts['-'] = counts['-']! + deck.deckMap[card]!;
       } else if (card.lv == 2) {
-        counts['Lv2'] = counts['Lv2']! + deck.deckMap[card]!;
+        counts['2'] = counts['2']! + deck.deckMap[card]!;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
-        counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.deckMap[card]!;
+        counts['${card.lv}'] = counts['${card.lv}']! + deck.deckMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['TM'] = counts['TM']! + deck.deckMap[card]!;
+        counts['T'] = counts['T']! + deck.deckMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['OP'] = counts['OP']! + deck.deckMap[card]!;
+        counts['O'] = counts['O']! + deck.deckMap[card]!;
       }
     }
     for (var card in deck.tamaMap.keys) {
       if (card.lv == 0) {
-        counts['Lv-'] = counts['Lv-']! + deck.tamaMap[card]!;
+        counts['-'] = counts['-']! + deck.tamaMap[card]!;
       } else if (card.lv == 2) {
-        counts['Lv2'] = counts['Lv2']! + deck.tamaMap[card]!;
+        counts['2'] = counts['2']! + deck.tamaMap[card]!;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
-        counts['Lv${card.lv}'] = counts['Lv${card.lv}']! + deck.tamaMap[card]!;
+        counts['${card.lv}'] = counts['${card.lv}']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'TAMER') {
-        counts['TM'] = counts['TM']! + deck.tamaMap[card]!;
+        counts['T'] = counts['T']! + deck.tamaMap[card]!;
       } else if (card.cardType == 'OPTION') {
-        counts['OP'] = counts['OP']! + deck.tamaMap[card]!;
+        counts['O'] = counts['O']! + deck.tamaMap[card]!;
       }
     }
     return counts;
@@ -116,18 +121,23 @@ class DeckStat extends StatelessWidget {
                 children: [
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
-                      width: double.infinity,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        color: barColor ?? Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(width * 0.02),
-                          topRight: Radius.circular(width * 0.02),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: width * 0.01, right: width * 0.01),
+                      child: Container(
+                        width: double.infinity,
+                        height: barHeight,
+                        decoration: BoxDecoration(
+                          color: barColor ?? Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(
+                                radius??SizeService.roundRadius(context)),
+                            topRight: Radius.circular(
+                                radius??SizeService.roundRadius(context)),
+                          ),
                         ),
-                        // border: Border.all(color: Colors.white),
+                        alignment: Alignment.bottomCenter,
                       ),
-                      alignment: Alignment.bottomCenter,
                     ),
                   ),
                 ],

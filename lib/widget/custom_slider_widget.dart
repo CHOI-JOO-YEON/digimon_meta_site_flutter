@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
 
 class CustomSlider extends StatefulWidget {
@@ -21,14 +22,7 @@ class _CustomSliderState extends State<CustomSlider> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double thumbRadius = screenWidth / 150; // 예시 계산
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-
-    if(isPortrait){
-      thumbRadius*=2;
-    }
-
+  
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -37,9 +31,7 @@ class _CustomSliderState extends State<CustomSlider> {
             SliderTheme(
 
               data: SliderTheme.of(context).copyWith(
-                thumbShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius),
-                overlayShape: RoundSliderThumbShape(enabledThumbRadius: thumbRadius*1.1),
-
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: SizeService.thumbRadius(context)),
               ),
               child:  Slider(
                 value: _currentSliderValue,
