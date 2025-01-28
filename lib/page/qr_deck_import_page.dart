@@ -59,8 +59,18 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(onPressed: (){
-      context.replaceRoute(DeckBuilderRoute(deck: deck));
-    }, child: Text('!!!!!!!!!'));
+    return Column(
+      children: [
+        ElevatedButton(onPressed: (){
+          context.replaceRoute(DeckBuilderRoute(deck: deck));
+        }, child: Text('replace')),
+        ElevatedButton(onPressed: (){
+          context.navigateTo(DeckBuilderRoute(deck: deck));
+        }, child: Text('naviagte')),
+        ElevatedButton(onPressed: (){
+          context.pushRoute(DeckBuilderRoute(deck: deck));
+        }, child: Text('push')),
+      ],
+    );
   }
 }
