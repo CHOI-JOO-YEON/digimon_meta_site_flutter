@@ -24,22 +24,21 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _processDeckParam();
+    Future.delayed(const Duration(seconds: 0), () async {
+      await _processDeckParam();
     });
   }
 
   Future<void> _processDeckParam() async {
     final param = widget.deckParam;
-    DeckBuild deck = DeckBuild(context);
+    deck = DeckBuild(context);
     if (param != null && param.isNotEmpty) {
       var deckView = await DeckApi().importDeckQr(widget.deckParam!);
       if (deckView != null) {
-        deck.import(deckView);
+        deck!.import(deckView);
       }
-      
     }
-    
+    context.replaceRoute(DeckBuilderRoute(deck: deck));
   }
 
   Map<int, int> parseDeckString(String str) {
@@ -61,7 +60,6 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(onPressed: (){
-      
       context.replaceRoute(DeckBuilderRoute(deck: deck));
     }, child: Text('!!!!!!!!!'));
   }
