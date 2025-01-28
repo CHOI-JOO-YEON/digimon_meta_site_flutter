@@ -428,6 +428,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                           );
                         }).toList(),
 
+                        if(false)
                         IconButton(
                           icon: const Icon(Icons.image),
                           onPressed: () async {

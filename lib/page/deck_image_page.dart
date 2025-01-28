@@ -28,6 +28,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   DeckImageColorService deckImageColorService = DeckImageColorService();
   bool isHorizontal = false;
   bool showInfo = true;
+  bool isQrShow = false;
   final GlobalKey gridKey = GlobalKey();
   DigimonCard? _selectedCard;
   double size = 1000;
@@ -301,7 +302,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                   setState(() {
                                     showInfo = value;
                                   });
-                                  // 상위 setState 호출
                                   this.setState(() {
                                     showInfo = value;
                                   });
@@ -326,9 +326,32 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                   setState(() {
                                     isHorizontal = value;
                                   });
-                                  // 상위 setState 호출
                                   this.setState(() {
                                     isHorizontal = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('QR 코드 표시(개발 중)'),
+                              Switch(
+                                inactiveThumbColor: Colors.red,
+                                value: isQrShow,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isQrShow = value;
+                                  });
+                                  this.setState(() {
+                                    isQrShow = value;
                                   });
                                 },
                               ),
@@ -417,52 +440,44 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Row(
       children: [
         SizedBox(
-          width: (isHorizontal ? 950 : 328) * scaleFactor,
-          child: Row(
-            children: [
-             
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Text(
-                    widget.deck.deckName,
-                    style: TextStyle(
-                        fontSize: 25 * scaleFactor,
-                        fontFamily: 'JalnanGothic',
-                        color: deckImageColorService
-                            .selectedDeckImageColor.textColor),
-                  ),
-                ),
-              ),
-              
-            ],
+          width: ((isHorizontal ? 950 : 328) + (isQrShow ? 0 : 164)) * scaleFactor,
+          child: Center(
+            child: Text(
+              widget.deck.deckName,
+              style: TextStyle(
+                  fontSize: 25 * scaleFactor,
+                  fontFamily: 'JalnanGothic',
+                  color:
+                      deckImageColorService.selectedDeckImageColor.textColor),
+            ),
           ),
         ),
         SizedBox(
           width: 492 * scaleFactor,
-          child: SizedBox(
+          height: 150 * scaleFactor,
+          child: DeckStat(
+              deck: widget.deck,
+              textColor:
+                  deckImageColorService.selectedDeckImageColor.textColor,
+              barColor: deckImageColorService.selectedDeckImageColor.barColor,
+              backGroundColor:
+                  deckImageColorService.selectedDeckImageColor.cardColor),
+        ),
+        if (isQrShow)
+          SizedBox(
+            width: 164 * scaleFactor,
             height: 150 * scaleFactor,
-            child: DeckStat(
-                deck: widget.deck,
-                textColor:
-                    deckImageColorService.selectedDeckImageColor.textColor,
-                barColor: deckImageColorService.selectedDeckImageColor.barColor,
-                backGroundColor:
-                    deckImageColorService.selectedDeckImageColor.cardColor),
+            child: QrImageView(
+              padding: EdgeInsets.all(2 * scaleFactor),
+              data: widget.deck.getQrUrl(),
+              // embeddedImage: AssetImage('assets/images/img.png'),
+              // embeddedImageStyle: QrEmbeddedImageStyle(
+              //   size: Size(40 * scaleFactor, 40 * scaleFactor
+              //   ), // 이미지 크기
+              // ),
+              version: QrVersions.auto,
+            ),
           ),
-        ),
-        SizedBox(
-          width: 164 * scaleFactor,
-          child: QrImageView(
-            data: widget.deck.getQrUrl(),
-            // embeddedImage: AssetImage('assets/images/img.png'),
-            // embeddedImageStyle: QrEmbeddedImageStyle(
-            //   size: Size(40 * scaleFactor, 40 * scaleFactor
-            //   ), // 이미지 크기
-            // ),
-            version: QrVersions.auto,
-          ),
-        ),
       ],
     );
   }
