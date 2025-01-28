@@ -19,6 +19,8 @@ class QrDeckImportPage extends StatefulWidget {
 }
 
 class _QrDeckImportPageState extends State<QrDeckImportPage> {
+  
+  DeckBuild? deck;
   @override
   void initState() {
     super.initState();
@@ -37,7 +39,7 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
       }
       
     }
-    // context.replaceRoute(DeckBuilderRoute(deck: deck));
+    
   }
 
   Map<int, int> parseDeckString(String str) {
@@ -58,6 +60,9 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return ElevatedButton(onPressed: (){
+      
+      context.replaceRoute(DeckBuilderRoute(deck: deck));
+    }, child: Text('!!!!!!!!!'));
   }
 }
