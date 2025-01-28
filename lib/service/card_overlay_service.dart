@@ -25,11 +25,16 @@ class CardOverlayService {
     final offset = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final maxHeight = screenHeight * 0.5; // 화면 높이의 절반을 최대 높이로 설정
+    double maxHeight = screenHeight * 0.5;
 
     final aspectRatio = renderBox.size.width / renderBox.size.height;
-    final maxWidth = maxHeight * aspectRatio; // 최대 높이에 맞는 너비 계산
 
+    double maxWidth = maxHeight * aspectRatio;
+
+    if (maxWidth > screenWidth / 2) {
+      maxWidth = screenWidth / 2;
+      maxHeight = maxWidth / aspectRatio;
+    }
     final bool onRightSide = (index % rowNumber) < rowNumber / 2;
     final double overlayLeft =
         onRightSide ? offset.dx + renderBox.size.width : offset.dx - maxWidth;
