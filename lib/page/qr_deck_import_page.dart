@@ -34,9 +34,9 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
     final param = widget.deckParam;
     if (param != null && param.isNotEmpty) {
       deckView = await DeckApi().importDeckQr(widget.deckParam!);
+      deckView?.deckName = 'QR';
     }
-    print(deckView);
-    // context.replaceRoute(DeckBuilderRoute(deck: deck));
+    context.navigateTo(DeckBuilderRoute(deckView: deckView));
   }
 
   Map<int, int> parseDeckString(String str) {
@@ -57,21 +57,22 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ElevatedButton(onPressed: (){
-          print(deckView);
-          context.replaceRoute(DeckBuilderRoute(deckView: deckView));
-        }, child: Text('replace')),
-        ElevatedButton(onPressed: (){
-          print(deckView);
-          context.navigateTo(DeckBuilderRoute(deckView: deckView));
-        }, child: Text('naviagte')),
-        ElevatedButton(onPressed: (){
-          print(deckView);
-          context.pushRoute(DeckBuilderRoute(deckView: deckView));
-        }, child: Text('push')),
-      ],
-    );
+    // return Column(
+    //   children: [
+    //     ElevatedButton(onPressed: (){
+    //       print(deckView);
+    //       context.replaceRoute(DeckBuilderRoute(deckView: deckView));
+    //     }, child: Text('replace')),
+    //     ElevatedButton(onPressed: (){
+    //       print(deckView);
+    //       context.navigateTo(DeckBuilderRoute(deckView: deckView));
+    //     }, child: Text('naviagte')),
+    //     ElevatedButton(onPressed: (){
+    //       print(deckView);
+    //       context.pushRoute(DeckBuilderRoute(deckView: deckView));
+    //     }, child: Text('push')),
+    //   ],
+    // );
+    return Container();
   }
 }
