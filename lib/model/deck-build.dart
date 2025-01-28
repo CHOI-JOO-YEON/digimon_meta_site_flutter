@@ -73,7 +73,7 @@ class DeckBuild {
     deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
     deckSortProvider!.addListener(deckSort);
     deckId = deckView.deckId;
-    deckName = deckView.deckName!;
+    deckName = deckView.deckName??'';
     author = deckView.authorName;
     authorId = deckView.authorId;
     formatId = deckView.formatId;
@@ -89,7 +89,7 @@ class DeckBuild {
       isSave = false;
     }
 
-    for (var color in deckView.colors!) {
+    for (var color in deckView.colors??[]) {
       colors.add(color);
     }
   }

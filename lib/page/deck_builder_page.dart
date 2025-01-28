@@ -31,11 +31,13 @@ import '../widget/card/builder/card_search_bar.dart';
 class DeckBuilderPage extends StatefulWidget {
   final String? searchParameterString;
   final DeckBuild? deck;
+  final DeckView? deckView;
 
   const DeckBuilderPage({
     super.key,
     this.deck,
     @QueryParam('searchParameter') this.searchParameterString,
+    this.deckView,
   });
 
   @override
@@ -94,7 +96,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             json.decode(widget.searchParameterString!));
       }
 
-      if (widget.deck != null) {
+      if (widget.deckView != null) {
+        deck = DeckBuild.deckView(widget.deckView!, context);
+        deck.saveMapToLocalStorage();
+      } else if (widget.deck != null) {
         deck = widget.deck!;
         deck.saveMapToLocalStorage();
       } else {
@@ -505,7 +510,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).highlightColor,
-                  borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
+                  borderRadius:
+                      BorderRadius.circular(SizeService.roundRadius(context)),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(SizeService.paddingSize(context)),

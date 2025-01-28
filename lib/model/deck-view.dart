@@ -74,4 +74,9 @@ class DeckView {
     }
     return cardAndCntMap;
   }
+
+  @override
+  String toString() {
+    return 'DeckView{authorId: $authorId, authorName: $authorName, deckId: $deckId, deckName: $deckName, cardAndCntMap: $cardAndCntMap, colors: $colors, formatId: $formatId, isPublic: $isPublic}';
+  }
 }

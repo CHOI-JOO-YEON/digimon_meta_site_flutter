@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 
 import '../model/deck-build.dart';
+import '../model/deck-view.dart';
 import '../router.dart';
 @RoutePage()
 class QrDeckImportPage extends StatefulWidget {
@@ -20,7 +21,7 @@ class QrDeckImportPage extends StatefulWidget {
 
 class _QrDeckImportPageState extends State<QrDeckImportPage> {
   
-  DeckBuild? deck;
+  DeckView? deckView;
   @override
   void initState() {
     super.initState();
@@ -31,13 +32,10 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
 
   Future<void> _processDeckParam() async {
     final param = widget.deckParam;
-    deck = DeckBuild(context);
     if (param != null && param.isNotEmpty) {
-      var deckView = await DeckApi().importDeckQr(widget.deckParam!);
-      if (deckView != null) {
-        deck!.import(deckView);
-      }
+      deckView = await DeckApi().importDeckQr(widget.deckParam!);
     }
+    print(deckView);
     // context.replaceRoute(DeckBuilderRoute(deck: deck));
   }
 
@@ -62,16 +60,16 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
     return Column(
       children: [
         ElevatedButton(onPressed: (){
-          print(deck);
-          context.replaceRoute(DeckBuilderRoute(deck: deck));
+          print(deckView);
+          context.replaceRoute(DeckBuilderRoute(deckView: deckView));
         }, child: Text('replace')),
         ElevatedButton(onPressed: (){
-          print(deck);
-          context.navigateTo(DeckBuilderRoute(deck: deck));
+          print(deckView);
+          context.navigateTo(DeckBuilderRoute(deckView: deckView));
         }, child: Text('naviagte')),
         ElevatedButton(onPressed: (){
-          print(deck);
-          context.pushRoute(DeckBuilderRoute(deck: deck));
+          print(deckView);
+          context.pushRoute(DeckBuilderRoute(deckView: deckView));
         }, child: Text('push')),
       ],
     );

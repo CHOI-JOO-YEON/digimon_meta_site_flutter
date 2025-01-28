@@ -9,6 +9,7 @@ import 'package:digimon_meta_site_flutter/page/qr_deck_import_page.dart';
 import 'package:flutter/material.dart';
 
 import 'model/deck-build.dart';
+import 'model/deck-view.dart';
 import 'model/search_parameter.dart';
 
 part 'router.gr.dart';
