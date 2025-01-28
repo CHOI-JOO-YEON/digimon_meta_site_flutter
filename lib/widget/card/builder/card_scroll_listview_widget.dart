@@ -101,7 +101,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                             SizeService.roundRadius(context)),
-                        color: Colors.grey[400],
+                        color: Theme.of(context).cardColor,
                       ),
                       child: Container(
                         padding: EdgeInsets.all(SizeService.paddingSize(context)),
@@ -109,7 +109,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                                flex: 4,
+                                flex: 8,
                                 child: GestureDetector(
                                   onTap: () => CardService().showImageDialog(
                                     context,
@@ -125,7 +125,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                 )),
                             Expanded(flex: 1, child: Container(),),
                             Expanded(
-                                flex: 16,
+                                flex: 32,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -136,7 +136,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                             card.getDisplayLocale() == 'JPN'
                                                 ? "MPLUSC"
                                                 : "JalnanGothic",
-                                        fontSize: SizeService.bodyFontSize(context)
+                                        fontSize: SizeService.bodyFontSize(context),
+                                        fontWeight: FontWeight.bold
                                       ),
                                     ),
                                     if (card.getDisplayEffect() != null)
@@ -147,7 +148,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                               margin: EdgeInsets.only(top: 4),
                                               padding: EdgeInsets.all(4),
                                               decoration: BoxDecoration(
-                                                color: Theme.of(context).cardColor,
+                                                color: Theme.of(context).highlightColor,
                                                 borderRadius:
                                                     BorderRadius.circular(4),
                                               ),
@@ -168,7 +169,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                               margin: EdgeInsets.only(top: 4),
                                               padding: EdgeInsets.all(4),
                                               decoration: BoxDecoration(
-                                                color: Theme.of(context).cardColor,
+                                                color: Theme.of(context).highlightColor,
                                                 borderRadius:
                                                     BorderRadius.circular(4),
                                               ),

@@ -28,7 +28,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   DeckImageColorService deckImageColorService = DeckImageColorService();
   bool isHorizontal = false;
   bool showInfo = true;
-  bool isQrShow = false;
+  bool isQrShow = true;
   final GlobalKey gridKey = GlobalKey();
   DigimonCard? _selectedCard;
   double size = 1000;
@@ -239,7 +239,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         double targetWidth = isHorizontal ? horizontalSize : size;
 
         var pixelRatio = targetWidth / boundarySize.width;
-        pixelRatio *= 1.3;
+        pixelRatio *= 1.1;
 
         ui.Image image = await boundary.toImage(
           pixelRatio: pixelRatio,
@@ -346,30 +346,30 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         },
                       ),
                     ),
-                    PopupMenuItem<String>(
-                      child: StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('QR 코드 표시(개발 중)'),
-                              Switch(
-                                inactiveThumbColor: Colors.red,
-                                value: isQrShow,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isQrShow = value;
-                                  });
-                                  this.setState(() {
-                                    isQrShow = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+                    // PopupMenuItem<String>(
+                    //   child: StatefulBuilder(
+                    //     builder: (BuildContext context, StateSetter setState) {
+                    //       return Row(
+                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //         children: [
+                    //           const Text('QR 코드 표시(개발 중)'),
+                    //           Switch(
+                    //             inactiveThumbColor: Colors.red,
+                    //             value: isQrShow,
+                    //             onChanged: (value) {
+                    //               setState(() {
+                    //                 isQrShow = value;
+                    //               });
+                    //               this.setState(() {
+                    //                 isQrShow = value;
+                    //               });
+                    //             },
+                    //           ),
+                    //         ],
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -385,7 +385,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Container(
-                width: size,
+                width: isHorizontal?horizontalSize: size,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: deckImageColorService

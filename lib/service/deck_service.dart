@@ -819,7 +819,7 @@ class DeckService {
                             ),
                           );
                         }).toList(),
-                        if (false)
+                        // if (false)
                           IconButton(
                             icon: const Icon(Icons.image),
                             onPressed: () async {
@@ -837,8 +837,6 @@ class DeckService {
                                       .decodeQrCodeFromImage(bytes);
                                   if (decodedData != null) {
                                     final uri = Uri.parse(decodedData);
-
-                                    print(uri);
                                     final deckString =
                                         uri.queryParameters['deck'];
 
