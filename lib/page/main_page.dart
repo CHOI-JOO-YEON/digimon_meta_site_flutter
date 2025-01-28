@@ -110,7 +110,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.build,
-                                  size: SizeService.LargeIconSize(context),
+                                  size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait
@@ -124,7 +124,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.list,
-                                  size: SizeService.LargeIconSize(context),
+                                  size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait
@@ -136,7 +136,7 @@ class MainPage extends StatelessWidget {
                                 icon: Center(
                                     child: Icon(
                                   Icons.collections_bookmark_rounded,
-                                  size: SizeService.LargeIconSize(context),
+                                  size: SizeService.largeIconSize(context),
                                 )),
                                 iconMargin: EdgeInsets.zero,
                                 child: isPortrait

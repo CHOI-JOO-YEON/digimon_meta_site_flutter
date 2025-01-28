@@ -3,6 +3,7 @@ import 'package:digimon_meta_site_flutter/widget/tab_tooltip.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/deck-build.dart';
+import '../../../service/size_service.dart';
 
 class DeckBuilderMenuBar extends StatefulWidget {
   final DeckBuild deck;
@@ -46,47 +47,41 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
-      double fontSize =
-          isPortrait ? constraints.maxWidth * 0.1 : constraints.maxWidth * 0.05;
       return Column(
         children: [
           Expanded(
               flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        flex: 12,
-                        child: TextField(
-                          style: TextStyle(fontSize: fontSize),
-                          controller: widget.textEditingController,
-                          onChanged: (v) {
-                            widget.deck.deckName = v;
-                          },
-                        )),
-                    Expanded(
-                        flex: 2,
-                        child: widget.deck.isSave
-                            ? Container()
-                            : const TabTooltip(
-                                message: '변경 사항이 저장되지 않았습니다.',
-                                child:
-                                    Icon(Icons.warning, color: Colors.amber),
-                              )),
-                  ],
-                ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      flex: 12,
+                      child: TextField(
+                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
+                        controller: widget.textEditingController,
+                        onChanged: (v) {
+                          widget.deck.deckName = v;
+                        },
+                      )),
+                  Expanded(
+                      flex: 2,
+                      child: widget.deck.isSave
+                          ? Container()
+                          : const TabTooltip(
+                              message: '변경 사항이 저장되지 않았습니다.',
+                              child:
+                                  Icon(Icons.warning, color: Colors.amber),
+                            )),
+                ],
               )),
           Expanded(
               flex: 2,
               child: SizedBox(
-                  width: constraints.maxWidth,
-                  child: DeckCount(
-                    deck: widget.deck,
-                  )))
+                width: constraints.maxWidth,
+                child: DeckCount(
+                  deck: widget.deck,
+                ),
+              ))
         ],
       );
     });
