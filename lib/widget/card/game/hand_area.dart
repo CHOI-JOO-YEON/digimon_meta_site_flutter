@@ -40,11 +40,7 @@ class HandArea extends StatelessWidget {
           Text(
             '패 (${gameState.hand.length})',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: cardWidth * 0.15,
-              fontWeight: FontWeight.bold,
-              // color: Colors.white,
-            ),
+            
           ),
           
           DraggableDigimonListWidget(

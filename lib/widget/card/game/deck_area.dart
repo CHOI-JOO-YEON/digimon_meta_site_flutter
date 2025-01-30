@@ -1,5 +1,6 @@
 import 'package:digimon_meta_site_flutter/widget/card/game/card_back_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/game/draggable_card_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,24 +16,23 @@ class DeckArea extends StatelessWidget {
     final gameState = Provider.of<GameState>(context);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ElevatedButton(
-          onPressed: () {
-            gameState.drawCard();
-          },
-          child: Text('드로우'),
+       
+        GestureDetector(
+          onTap: ()=>gameState.drawCard(),
+          child: CardBackWidget(
+            width: cardWidth,
+            text: '덱',
+            count: gameState.mainDeck.length,
+          ),
         ),
-        ElevatedButton(
-          onPressed: () {
-            gameState.showCard();
-          },
-          child: Text('카드 공개'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(onPressed: ()=>gameState.showCard(), icon: Icon(Icons.search), tooltip: '오픈',)
+          ],
         ),
-        CardBackWidget(
-          width: cardWidth,
-          text: '덱',
-          count: gameState.mainDeck.length,
-        )
       ],
     );
   }
