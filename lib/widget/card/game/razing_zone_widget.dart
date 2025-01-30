@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/widget/card/game/card_back_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/game/field_zone_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,33 +22,31 @@ class RaisingZoneWidget extends StatelessWidget {
 
     return Column(
       children: [
-        const Text('육성 존'),
         Expanded(
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                   flex: 1,
-                  child: SizedBox(
-                    width: cardWidth,
-                    height: cardWidth * 1.404,
+                  child: GestureDetector(
+                    onTap: () => raisingZone.hatchEgg(gameState),
+                    child: CardBackWidget(
+                      width: cardWidth,
+                      text: '디지타마',
+                      count: gameState.digitamaDeck.length
+                    ),
                   )),
               Expanded(
                   child: Padding(
                 padding: EdgeInsets.all(cardWidth * 0.025),
                 child: FieldZoneWidget(
                   fieldZone: raisingZone.fieldZone,
-                  cardWidth: cardWidth,
+                  cardWidth: cardWidth * 0.85,
                   isRaising: true,
                 ),
               )),
             ],
           ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            raisingZone.hatchEgg(gameState);
-          },
-          child: const Text('부화'),
         ),
       ],
     );

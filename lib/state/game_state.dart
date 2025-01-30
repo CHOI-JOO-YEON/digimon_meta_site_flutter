@@ -24,6 +24,10 @@ class GameState extends ChangeNotifier {
   DigimonCard? selectedCard;
   bool isShowTrash = false;
 
+  double showCardWidth(double cardWidth) {
+    return cardWidth * 0.85;
+  }
+
   void updateDragStatus(String key, bool status) {
     dragStatusMap[key] = status;
     notifyListeners();
@@ -318,6 +322,7 @@ class GameState extends ChangeNotifier {
   }
 
   void moveCards(MoveCard move, List<DigimonCard> cards) {
+    print(move);
     List<DigimonCard> toCards = getCardListById(move.toId);
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
@@ -326,16 +331,14 @@ class GameState extends ChangeNotifier {
 
       //add
       toCards.insertAll(move.toStartIndex, cards);
-      
-      
-      if(move.toId == 'security' && move.fromId == 'security') {
+
+      if (move.toId == 'security' && move.fromId == 'security') {
         bool status = securityFlipStatus.removeAt(move.fromStartIndex);
         securityFlipStatus.insert(move.toStartIndex, status);
-      }
-      else if (move.fromId == 'security') {
+      } else if (move.fromId == 'security') {
         securityFlipStatus.removeRange(
             move.fromStartIndex, move.fromEndIndex + 1);
-      }else if (move.toId == 'security') {
+      } else if (move.toId == 'security') {
         for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
           securityFlipStatus.insert(move.toStartIndex + i, true);
         }
@@ -346,17 +349,15 @@ class GameState extends ChangeNotifier {
 
       //remove
       fromCards.removeRange(move.fromStartIndex, move.fromEndIndex + 1);
-      if(move.toId == 'security' && move.fromId == 'security') {
+      if (move.toId == 'security' && move.fromId == 'security') {
         bool status = securityFlipStatus[move.fromStartIndex];
         securityFlipStatus.insert(move.toStartIndex, status);
         securityFlipStatus.removeAt(move.fromStartIndex);
-      }
-      else if (move.toId == 'security') {
+      } else if (move.toId == 'security') {
         for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
           securityFlipStatus.insert(move.toStartIndex + i, true);
         }
-      }
-      else if (move.fromId == 'security') {
+      } else if (move.fromId == 'security') {
         securityFlipStatus.removeRange(
             move.fromStartIndex, move.fromEndIndex + 1);
       }
@@ -401,7 +402,8 @@ class GameState extends ChangeNotifier {
 
   void shuffleSecurity() {
     securityStack.shuffle();
-    securityFlipStatus = List.filled(securityStack.length, false);
+    securityFlipStatus =
+        List.filled(securityStack.length, false, growable: true);
 
     notifyListeners();
   }
@@ -420,6 +422,10 @@ class RaisingZone extends ChangeNotifier {
   FieldZone fieldZone = FieldZone(key: "raising");
   String key = "tama";
 
+  int getTamaDeckLength() {
+    return _digitamaDeck.length;
+  }
+
   void hatchEgg(GameState gameState) {
     if (_digitamaDeck.isNotEmpty) {
       DigimonCard eggCard = _digitamaDeck.removeLast();
@@ -427,6 +433,7 @@ class RaisingZone extends ChangeNotifier {
           _digitamaDeck.length, key, gameState);
 
       notifyListeners();
+      gameState.notifyListeners();
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:digimon_meta_site_flutter/widget/card/game/draggable_digimon_list_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/game/trash_show_cards_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,16 +7,6 @@ import 'package:provider/provider.dart';
 import '../../../model/card.dart';
 import '../../../state/game_state.dart';
 import 'draggable_card_widget.dart';
-
-class CustomScrollBehavior extends MaterialScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.unknown,
-      };
-}
 
 class ShowCards extends StatefulWidget {
   final double cardWidth;
@@ -128,238 +119,166 @@ class _ShowCardsState extends State<ShowCards> {
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
-    final scrollController = ScrollController();
-
+    double resizingCardWidth = widget.cardWidth * 0.85;
     return Column(
       children: [
-        
-        
         SizedBox(
-          height: widget.cardWidth*2.7,
-          child: gameState.isShowDialog()?Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: widget.cardWidth * 0.2,
-                    onPressed: () {
-                      setState(() {
-                        _isShow = !_isShow;
-                      });
-                    },
-                    icon: const Icon(Icons.remove_red_eye_outlined),
-                  ),
-                ],
-              ),
-              if (_isShow)
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(widget.cardWidth * 0.1),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          TextButton(
-                            onPressed: () => _sendSelectedToDeckBottom(gameState),
-                            child: const Text('덱 아래로 보내기'),
-                          ),
-                          TextButton(
-                            onPressed: () => _sendSelectedToDeckTop(gameState),
-                            child: const Text('덱 위로 보내기'),
-                          ),
-                          TextButton(
-                            onPressed: () => _sendSelectedToTrash(gameState),
-                            child: const Text('트래시로 보내기'),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () => _selectAll(gameState.shows.length),
-                            child: const Text('모두 선택'),
-                          ),
-                          TextButton(
-                            onPressed: _clearSelection,
-                            child: const Text('모두 선택 해제'),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(widget.cardWidth * 0.1),
-                        child: DragTarget<Map<String, dynamic>>(
-                          onWillAccept: (data) => true,
-                          onAcceptWithDetails: (details) {
-                            final data = details.data;
-                            final sourceId = data['sourceId'] as String? ?? '';
-                            final fromIndex = data['fromIndex'] as int? ?? -1;
-                            final card = data['card'] as DigimonCard?;
-                            final draggedCards = data['cards'] == null
-                                ? []
-                                : data['cards'] as List<DigimonCard>;
-          
-                            final renderBox =
-                                context.findRenderObject() as RenderBox;
-                            final localOffset =
-                                renderBox.globalToLocal(details.offset);
-                            final scrollOffset = scrollController.hasClients
-                                ? scrollController.offset
-                                : 0.0;
-                            final adjustedX = localOffset.dx + scrollOffset;
-          
-                            int toIndex = (adjustedX / widget.cardWidth).floor();
-          
-                            if (toIndex < fromIndex) {
-                              toIndex = ((adjustedX + widget.cardWidth) /
-                                      widget.cardWidth)
-                                  .floor();
-                            }
-          
-                            if (sourceId == id) {
-                              toIndex =
-                                  toIndex.clamp(0, gameState.shows.length - 1);
-                              gameState.reorderShow(fromIndex, toIndex);
-                              return;
-                            }
-          
-                            toIndex = toIndex.clamp(0, gameState.shows.length);
-                            if (draggedCards.isNotEmpty) {
-                              for (var i = draggedCards.length - 1; i >= 0; i--) {
-                                gameState.addCardToShowsAt(
-                                    draggedCards[i], toIndex++, sourceId, i);
-                              }
-                              if (data['removeCards'] != null) {
-                                data['removeCards']();
-                              }
-                            } else if (card != null) {
-                              gameState.addCardToShowsAt(
-                                  card, toIndex, sourceId, fromIndex);
-                              if (data['removeCard'] != null) {
-                                data['removeCard']();
-                              }
-                            }
+          height: widget.cardWidth * 2.7,
+          child: gameState.isShowDialog()
+              ? Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          iconSize: widget.cardWidth * 0.2,
+                          onPressed: () {
+                            setState(() {
+                              _isShow = !_isShow;
+                            });
                           },
-                          builder: (context, candidateData, rejectedData) {
-                            return SizedBox(
-                              height: widget.cardWidth * 1.404 +
-                                  widget.cardWidth * 0.3,
-                              child: ScrollConfiguration(
-                                behavior: CustomScrollBehavior(),
-                                child: RawScrollbar(
-                                  controller: scrollController,
-                                  thumbVisibility: true,
-                                  thickness: 8.0,
-                                  radius: const Radius.circular(4.0),
-                                  thumbColor: Colors.black,
-                                  trackColor: Colors.blue.shade100,
-                                  trackBorderColor: Colors.blue.shade300,
-                                  child: ListView.builder(
-                                    controller: scrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: gameState.shows.length,
-                                    itemBuilder: (context, index) {
-                                      final card = gameState.shows[index];
-          
-                                      final isSelected =
-                                          _selectedIndices.contains(index);
-                                      final selectionOrder =
-                                          _getSelectionOrder(index);
-          
-                                      return Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: widget.cardWidth * 0.02,
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Draggable<Map<String, dynamic>>(
-                                              data: {
-                                                'card': card,
-                                                'fromIndex': index,
-                                                'sourceId': id,
-                                                'removeCard': () {
-                                                  gameState.removeCardFromShowsAt(
-                                                      index);
-                                                },
-                                              },
-                                              feedback:
-                                                  ChangeNotifierProvider.value(
-                                                value: gameState,
-                                                child: Material(
-                                                  color: Colors.transparent,
-                                                  child: _buildCardWithSelection(
-                                                    card: card,
-                                                    cardWidth: widget.cardWidth,
-                                                    isSelected: isSelected,
-                                                    selectionOrder:
-                                                        selectionOrder,
-                                                  ),
-                                                ),
-                                              ),
-                                              childWhenDragging: Opacity(
-                                                opacity: 0.5,
-                                                child: CardWidget(
-                                                  card: card,
-                                                  cardWidth: widget.cardWidth,
-                                                  rest: () {},
-                                                ),
-                                              ),
-                                              child: CardWidget(
-                                                card: card,
-                                                cardWidth: widget.cardWidth,
-                                                rest: () {},
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: widget.cardWidth * 0.2,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Checkbox(
-                                                    value: isSelected,
-                                                    onChanged: (value) {
-                                                      _toggleSelection(index);
-                                                    },
-                                                  ),
-                                                  if (isSelected)
-                                                    Text(
-                                                      '$selectionOrder',
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
+                          icon: const Icon(Icons.remove_red_eye_outlined),
+                        ),
+                      ],
+                    ),
+                    if (_isShow)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius:
+                              BorderRadius.circular(widget.cardWidth * 0.1),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () =>
+                                      _sendSelectedToDeckBottom(gameState),
+                                  child: const Text('덱 아래로 보내기'),
                                 ),
+                                TextButton(
+                                  onPressed: () =>
+                                      _sendSelectedToDeckTop(gameState),
+                                  child: const Text('덱 위로 보내기'),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      _sendSelectedToTrash(gameState),
+                                  child: const Text('트래시로 보내기'),
+                                ),
+                                const Spacer(),
+                                TextButton(
+                                  onPressed: () =>
+                                      _selectAll(gameState.shows.length),
+                                  child: const Text('모두 선택'),
+                                ),
+                                TextButton(
+                                  onPressed: _clearSelection,
+                                  child: const Text('모두 선택 해제'),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(widget.cardWidth * 0.1),
+                              child: DraggableDigimonListWidget(
+                                id: id,
+                                cardWidth: resizingCardWidth,
+                                height: resizingCardWidth * 2,
+                                children: gameState.shows
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                  int index = entry.key;
+                                  DigimonCard card = entry.value;
+                                  final isSelected =
+                                      _selectedIndices.contains(index);
+                                  final selectionOrder =
+                                      _getSelectionOrder(index);
+
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: widget.cardWidth * 0.02,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Draggable<MoveCard>(
+                                          data: MoveCard(
+                                              fromId: id,
+                                              fromStartIndex: index,
+                                              fromEndIndex: index),
+                                          feedback:
+                                              ChangeNotifierProvider.value(
+                                            value: gameState,
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: _buildCardWithSelection(
+                                                card: card,
+                                                cardWidth: resizingCardWidth,
+                                                isSelected: isSelected,
+                                                selectionOrder: selectionOrder,
+                                              ),
+                                            ),
+                                          ),
+                                          childWhenDragging: Opacity(
+                                            opacity: 0.5,
+                                            child: CardWidget(
+                                              card: card,
+                                              cardWidth: resizingCardWidth,
+                                              rest: () {},
+                                            ),
+                                          ),
+                                          child: CardWidget(
+                                            card: card,
+                                            cardWidth: resizingCardWidth,
+                                            rest: () {},
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: widget.cardWidth * 0.2,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Checkbox(
+                                                value: isSelected,
+                                                onChanged: (value) {
+                                                  _toggleSelection(index);
+                                                },
+                                              ),
+                                              if (isSelected)
+                                                Text(
+                                                  '$selectionOrder',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
                               ),
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-            ],
-          ):Container(),
+                  ],
+                )
+              : Container(),
         ),
         SizedBox(
           height: widget.cardWidth * 0.1,
         ),
-        
-        if(gameState.isShowTrash)
-        TrashShowCardsWidget(
-          cardWidth: widget.cardWidth,
-        )
+        if (gameState.isShowTrash)
+          TrashShowCardsWidget(
+            cardWidth: widget.cardWidth,
+          )
       ],
     );
   }

@@ -20,12 +20,13 @@ class DraggableDigimonListWidget extends StatefulWidget {
   final String id;
   final double cardWidth;
   final List<Widget> children;
+  final double height;
 
   const DraggableDigimonListWidget({
     super.key,
     required this.id,
     required this.children,
-    required this.cardWidth,
+    required this.cardWidth, required this.height,
   });
 
   @override
@@ -50,7 +51,6 @@ class _DraggableDigimonListWidgetState
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
-    double cardHeight = widget.cardWidth * 1.404;
 
     final ScrollController scrollController = ScrollController();
     return DragTarget<MoveCard>(
@@ -82,7 +82,7 @@ class _DraggableDigimonListWidgetState
       },
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
-            height: cardHeight,
+            height: widget.height,
             child: ScrollConfiguration(
                 behavior: CustomScrollBehavior(),
                 child: RawScrollbar(

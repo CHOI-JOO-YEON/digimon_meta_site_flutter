@@ -30,7 +30,7 @@ class DeckArea extends StatelessWidget {
         ),
         CardBackWidget(
           width: cardWidth,
-          text: 'DECK',
+          text: '덱',
           count: gameState.mainDeck.length,
         )
       ],
