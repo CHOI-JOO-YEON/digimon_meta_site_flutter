@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/widget/card/game/card_back_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/game/draggable_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,6 @@ class DeckArea extends StatelessWidget {
 
     return Column(
       children: [
-        Text('덱 (${gameState.mainDeck.length})'),
         ElevatedButton(
           onPressed: () {
             gameState.drawCard();
@@ -28,12 +28,11 @@ class DeckArea extends StatelessWidget {
           },
           child: Text('카드 공개'),
         ),
-        Container(
+        CardBackWidget(
           width: cardWidth,
-          height: cardWidth * 1.404,
-          color: Colors.blue,
-          child: Center(child: Text('DECK')),
-        ),
+          text: 'DECK',
+          count: gameState.mainDeck.length,
+        )
       ],
     );
   }

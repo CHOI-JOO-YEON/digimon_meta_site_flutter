@@ -55,7 +55,6 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
             return Row(
               children: [
                 Expanded(
-                  flex: 1,
                   child: Column(
                     children: [
                       Row(

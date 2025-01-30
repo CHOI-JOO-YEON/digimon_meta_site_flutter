@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../state/game_state.dart';
+import 'card_back_widget.dart';
 
 class TrashArea extends StatelessWidget {
   final double cardWidth;
@@ -14,17 +15,11 @@ class TrashArea extends StatelessWidget {
 
     return Column(
       children: [
-        Text('트래시 (${gameState.trash.length})'),
         GestureDetector(
           onTap: (){
             gameState.updateShowTrash(!gameState.isShowTrash);
           },
-          child: Container(
-            width: cardWidth,
-            height: cardWidth * 1.404,
-            color: Colors.grey,
-            child: Center(child: Text('TRASH')),
-          ),
+          child: CardBackWidget(width: cardWidth, text: 'TRASH', count: gameState.trash.length,)
         ),
       ],
     );

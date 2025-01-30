@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../model/card.dart';
@@ -9,6 +12,7 @@ class GameState extends ChangeNotifier {
   List<DigimonCard> hand = [];
   List<DigimonCard> shows = [];
   List<DigimonCard> securityStack = [];
+  List<bool> securityFlipStatus = [];
   List<DigimonCard> trash = [];
   RaisingZone raisingZone = RaisingZone();
   Map<String, FieldZone> fieldZones = {};
@@ -20,17 +24,15 @@ class GameState extends ChangeNotifier {
   DigimonCard? selectedCard;
   bool isShowTrash = false;
 
-  void updateDragStatus(String key, bool status)
-  {
+  void updateDragStatus(String key, bool status) {
     dragStatusMap[key] = status;
     notifyListeners();
   }
-  
-  bool getDragStatus(String key)
-  {
+
+  bool getDragStatus(String key) {
     return dragStatusMap[key] ?? false;
   }
-  
+
   void updateShowTrash(bool value) {
     isShowTrash = value;
     notifyListeners();
@@ -57,10 +59,11 @@ class GameState extends ChangeNotifier {
     digitamaDeck.shuffle();
     raisingZone.setDigitamaDeck(digitamaDeck);
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < min(5, mainDeck.length); i++) {
       securityStack.add(mainDeck.removeLast());
+      securityFlipStatus.add(false);
     }
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < min(5, mainDeck.length); i++) {
       hand.add(mainDeck.removeLast());
     }
   }
@@ -323,12 +326,40 @@ class GameState extends ChangeNotifier {
 
       //add
       toCards.insertAll(move.toStartIndex, cards);
+      
+      
+      if(move.toId == 'security' && move.fromId == 'security') {
+        bool status = securityFlipStatus.removeAt(move.fromStartIndex);
+        securityFlipStatus.insert(move.toStartIndex, status);
+      }
+      else if (move.fromId == 'security') {
+        securityFlipStatus.removeRange(
+            move.fromStartIndex, move.fromEndIndex + 1);
+      }else if (move.toId == 'security') {
+        for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
+          securityFlipStatus.insert(move.toStartIndex + i, true);
+        }
+      }
     } else {
       //add
       toCards.insertAll(move.toStartIndex, cards);
 
       //remove
       fromCards.removeRange(move.fromStartIndex, move.fromEndIndex + 1);
+      if(move.toId == 'security' && move.fromId == 'security') {
+        bool status = securityFlipStatus[move.fromStartIndex];
+        securityFlipStatus.insert(move.toStartIndex, status);
+        securityFlipStatus.removeAt(move.fromStartIndex);
+      }
+      else if (move.toId == 'security') {
+        for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
+          securityFlipStatus.insert(move.toStartIndex + i, true);
+        }
+      }
+      else if (move.fromId == 'security') {
+        securityFlipStatus.removeRange(
+            move.fromStartIndex, move.fromEndIndex + 1);
+      }
     }
 
     notifyListeners();
@@ -353,6 +384,34 @@ class GameState extends ChangeNotifier {
       return fieldZones[id]!.stack;
     }
     return [];
+  }
+
+  void flipSecurity(int index) {
+    securityFlipStatus[index] = !securityFlipStatus[index];
+    notifyListeners();
+  }
+
+  void flipAllSecurity(bool status) {
+    for (int i = 0; i < securityFlipStatus.length; i++) {
+      securityFlipStatus[i] = status;
+    }
+
+    notifyListeners();
+  }
+
+  void shuffleSecurity() {
+    securityStack.shuffle();
+    securityFlipStatus = List.filled(securityStack.length, false);
+
+    notifyListeners();
+  }
+
+  void recoveryFromDeck() {
+    if (mainDeck.isNotEmpty) {
+      securityStack.add(mainDeck.removeLast());
+      securityFlipStatus.add(false);
+    }
+    notifyListeners();
   }
 }
 
@@ -501,7 +560,10 @@ class MoveCard {
   int fromStartIndex = 0;
   int fromEndIndex = 0;
 
-  MoveCard({required this.fromId,required this.fromStartIndex,required this.fromEndIndex});
+  MoveCard(
+      {required this.fromId,
+      required this.fromStartIndex,
+      required this.fromEndIndex});
 
   @override
   String toString() {
