@@ -105,11 +105,12 @@ class GameState extends ChangeNotifier {
       final toIndex = hand.length;
       hand.add(mainDeck.removeLast());
       addMoveStack(MoveCard.full(
-          toId: "hand",
-          fromId: "deck",
-          toStartIndex: toIndex,
-          fromStartIndex: fromIndex,
-          fromEndIndex: fromIndex));
+              toId: "hand",
+              fromId: "deck",
+              toStartIndex: toIndex,
+              fromStartIndex: fromIndex,
+              fromEndIndex: fromIndex)
+          .reverse());
       notifyListeners();
     }
   }
@@ -120,11 +121,12 @@ class GameState extends ChangeNotifier {
       final toIndex = shows.length;
       shows.add(mainDeck.removeLast());
       addMoveStack(MoveCard.full(
-          toId: "show",
-          fromId: "deck",
-          toStartIndex: toIndex,
-          fromStartIndex: fromIndex,
-          fromEndIndex: fromIndex));
+              toId: "show",
+              fromId: "deck",
+              toStartIndex: toIndex,
+              fromStartIndex: fromIndex,
+              fromEndIndex: fromIndex)
+          .reverse());
       notifyListeners();
     }
   }
@@ -244,6 +246,9 @@ class GameState extends ChangeNotifier {
       case "raising":
         return raisingZone.fieldZone.stack
             .sublist(fromStartIndex, fromEndIndex + 1);
+      case "tama":
+        return raisingZone._digitamaDeck
+            .sublist(fromStartIndex, fromEndIndex + 1);
       case "trash":
         return trash.sublist(fromStartIndex, fromEndIndex + 1);
       case "security":
@@ -259,6 +264,7 @@ class GameState extends ChangeNotifier {
   }
 
   void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
+    (move);
     List<DigimonCard> toCards = getCardListById(move.toId);
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
@@ -367,6 +373,8 @@ class GameState extends ChangeNotifier {
         return trash;
       case "security":
         return securityStack;
+      case "tama":
+        return raisingZone._digitamaDeck;
     }
     if (id.startsWith("field")) {
       return fieldZones[id]!.stack;
@@ -417,7 +425,7 @@ class RaisingZone extends ChangeNotifier {
     if (_digitamaDeck.isNotEmpty) {
       DigimonCard eggCard = _digitamaDeck.removeLast();
       fieldZone.addCardToStackAt(eggCard, fieldZone.stack.length,
-          _digitamaDeck.length, key, gameState);
+          _digitamaDeck.length, key, 'raising', gameState);
 
       notifyListeners();
       gameState.notifyListeners();
@@ -437,7 +445,7 @@ class FieldZone extends ChangeNotifier {
   FieldZone({required this.key});
 
   void addCardToStackAt(DigimonCard card, int toIndex, int fromIndex,
-      String from, GameState gameState) {
+      String from, String to, GameState gameState) {
     if (toIndex == stack.length && _rotatedCards.contains(stack.length - 1)) {
       _rotatedCards.remove(stack.length - 1);
       _rotatedCards.add(toIndex);
@@ -456,11 +464,12 @@ class FieldZone extends ChangeNotifier {
 
     stack.insert(toIndex, card);
     gameState.addMoveStack(MoveCard.full(
-        toId: "key",
-        fromId: from,
-        toStartIndex: toIndex,
-        fromStartIndex: fromIndex,
-        fromEndIndex: fromIndex));
+            toId: to,
+            fromId: from,
+            toStartIndex: toIndex,
+            fromStartIndex: fromIndex,
+            fromEndIndex: fromIndex)
+        .reverse());
     notifyListeners();
   }
 
@@ -526,7 +535,6 @@ class MoveCard {
       required this.fromEndIndex,
       required this.toId,
       required this.toStartIndex});
-
 
   @override
   String toString() {
