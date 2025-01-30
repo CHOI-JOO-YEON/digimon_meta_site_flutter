@@ -311,13 +311,12 @@ class CardService {
                                     },
                                   ),
                                   const SizedBox(height: 5),
-                                  // _effectWidget에 isTextSimplify 전달
                                   Consumer<TextSimplifyProvider>(
                                     builder: (context, textSimplifyProvider, child) {
                                       return Column(
                                         children: [
                                           if (localeCardData.effect != null)
-                                            _effectWidget(
+                                            effectWidget(
                                               context,
                                               localeCardData.effect!,
                                               '상단 텍스트',
@@ -328,7 +327,7 @@ class CardService {
                                             ),
                                           const SizedBox(height: 5),
                                           if (localeCardData.sourceEffect != null)
-                                            _effectWidget(
+                                            effectWidget(
                                               context,
                                               localeCardData.sourceEffect!,
                                               '하단 텍스트',
@@ -457,7 +456,7 @@ class CardService {
   }
 
 
-  Widget _effectWidget(BuildContext context, String text, String category,
+  Widget effectWidget(BuildContext context, String text, String category,
       Color categoryColor, double fontSize, String locale, bool isTextSimplify) {
     return Container(
       width: double.infinity,

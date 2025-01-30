@@ -3,6 +3,7 @@ import 'package:digimon_meta_site_flutter/page/collect_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_builder_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_image_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_list_page.dart';
+import 'package:digimon_meta_site_flutter/page/game_playground_page.dart';
 import 'package:digimon_meta_site_flutter/page/kakao_login_page.dart';
 import 'package:digimon_meta_site_flutter/page/main_page.dart';
 import 'package:digimon_meta_site_flutter/page/qr_deck_import_page.dart';
@@ -22,6 +23,7 @@ class AppRouter extends _$AppRouter {
   @override
   List<AutoRoute> get routes => [
     AutoRoute(page: DeckImageRoute.page,path: "/deck-image",guards: [DeckGuard()]),
+    AutoRoute(page: GamePlayGroundRoute.page,path: "/game",guards: [DeckGuard()]),
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
     AutoRoute(page: QrDeckImportRoute.page,path: "/qr", meta: {'deck': 'String',},),
     AutoRoute(
@@ -50,6 +52,8 @@ class DeckGuard extends AutoRouteGuard {
     final args = resolver.route.args;
 
     if (args is DeckImageRouteArgs ) {
+      resolver.next(true);
+    } else if(args is GamePlayGroundRouteArgs) {
       resolver.next(true);
     } else {
       router.replace(MainRoute(children: [DeckBuilderRoute()]));

@@ -59,14 +59,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   }
 
   void _showRandomHandDialog(BuildContext context) {
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
     final double maxWidth = screenWidth * 0.9;
     final double maxHeight = screenHeight * 0.9;
@@ -107,165 +101,181 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     );
   }
 
-
-
-  
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return Consumer<UserProvider>(builder:
-              (BuildContext context, UserProvider userProvider, Widget? child) {
-            bool hasManagerRole = userProvider.hasManagerRole();
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: Wrap(
-                alignment: WrapAlignment.start,
-                spacing: SizeService.spacingSize(context),
-                children: [
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        DeckService().showDeckResetDialog(context, widget.init);
-                      },
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.add_box),
-                      tooltip: '새로 만들기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showDeckClearDialog(context, widget.deck, widget.reload),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.clear),
-                      tooltip: '비우기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showDeckCopyDialog(context, widget.deck),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.copy),
-                      tooltip: '복사해서 새로운 덱 만들기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () async {
-                        if (userProvider.isLogin) {
-                          Map<int, FormatDto> formats =
-                          await DeckService().getFormats(widget.deck);
-                          DeckService().showSaveDialog(context, formats, widget.deck, widget.reload);
-                        } else {
-                          _showLoginDialog(context);
-                        }
-                      },
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.save),
-                      tooltip: '저장',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showImportDialog(context, widget.import),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.download),
-                      tooltip: '가져오기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showExportDialog(context, widget.deck),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.upload),
-                      tooltip: '내보내기',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        CardOverlayService().removeAllOverlays();
-                        context.router.push(DeckImageRoute(deck: widget.deck));
-                      },
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.image),
-                      tooltip: '이미지 저장',
-                    ),
-                  ),
-
-                  // ConstrainedBox(
-                  //   constraints: BoxConstraints.tightFor(
-                  //       width: iconSize, height: iconSize),
-                  //   child: IconButton(
-                  //     padding: EdgeInsets.zero,
-                  //     onPressed: () => _showRandomHandDialog(context),
-                  //     iconSize: iconSize,
-                  //     icon: const Icon(Icons.back_hand_rounded),
-                  //     tooltip: '랜덤 핸드',
-                  //   ),
-                  // ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showDeckReceiptDialog(context, widget.deck),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.receipt_long),
-                      tooltip: '대회 제출용 레시피',
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints:
-                    BoxConstraints.tightFor(width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => DeckService().showDeckSettingDialog(context,widget.deck, widget.reload),
-                      iconSize: SizeService.largeIconSize(context),
-                      icon: const Icon(Icons.settings),
-                      tooltip: '덱 설정',
-                    ),
-                  ),
-                  if (hasManagerRole) 
-                    ConstrainedBox(
-                      constraints: BoxConstraints.tightFor(
-                          width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () async {
-                          await DeckService().exportToTTSFile(widget.deck);
-                        },
-                        iconSize: SizeService.largeIconSize(context),
-                        icon: const Icon(Icons.videogame_asset_outlined),
-                        tooltip: 'TTS 파일 내보내기',
-                      ),
-                    ),
-                ],
+      return Consumer<UserProvider>(builder:
+          (BuildContext context, UserProvider userProvider, Widget? child) {
+        bool hasManagerRole = userProvider.hasManagerRole();
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Wrap(
+            alignment: WrapAlignment.start,
+            spacing: SizeService.spacingSize(context),
+            children: [
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    DeckService().showDeckResetDialog(context, widget.init);
+                  },
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.add_box),
+                  tooltip: '새로 만들기',
+                ),
               ),
-            );
-          });
-        });
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => DeckService()
+                      .showDeckClearDialog(context, widget.deck, widget.reload),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.clear),
+                  tooltip: '비우기',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () =>
+                      DeckService().showDeckCopyDialog(context, widget.deck),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.copy),
+                  tooltip: '복사해서 새로운 덱 만들기',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () async {
+                    if (userProvider.isLogin) {
+                      Map<int, FormatDto> formats =
+                          await DeckService().getFormats(widget.deck);
+                      DeckService().showSaveDialog(
+                          context, formats, widget.deck, widget.reload);
+                    } else {
+                      _showLoginDialog(context);
+                    }
+                  },
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.save),
+                  tooltip: '저장',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () =>
+                      DeckService().showImportDialog(context, widget.import),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.download),
+                  tooltip: '가져오기',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () =>
+                      DeckService().showExportDialog(context, widget.deck),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.upload),
+                  tooltip: '내보내기',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    CardOverlayService().removeAllOverlays();
+                    context.router.push(DeckImageRoute(deck: widget.deck));
+                  },
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.image),
+                  tooltip: '이미지 저장',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+            onPressed: () {
+            CardOverlayService().removeAllOverlays();
+            context.router.push(GamePlayGroundRoute(deckBuild: widget.deck));
+            },
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.back_hand_rounded),
+                  tooltip: '랜덤 핸드',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () =>
+                      DeckService().showDeckReceiptDialog(context, widget.deck),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.receipt_long),
+                  tooltip: '대회 제출용 레시피',
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: SizeService.largeIconSize(context),
+                    height: SizeService.largeIconSize(context)),
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => DeckService().showDeckSettingDialog(
+                      context, widget.deck, widget.reload),
+                  iconSize: SizeService.largeIconSize(context),
+                  icon: const Icon(Icons.settings),
+                  tooltip: '덱 설정',
+                ),
+              ),
+              if (hasManagerRole)
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: SizeService.largeIconSize(context),
+                      height: SizeService.largeIconSize(context)),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      await DeckService().exportToTTSFile(widget.deck);
+                    },
+                    iconSize: SizeService.largeIconSize(context),
+                    icon: const Icon(Icons.videogame_asset_outlined),
+                    tooltip: 'TTS 파일 내보내기',
+                  ),
+                ),
+            ],
+          ),
+        );
+      });
+    });
   }
 }
