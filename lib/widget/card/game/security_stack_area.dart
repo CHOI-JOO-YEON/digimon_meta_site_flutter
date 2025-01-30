@@ -107,57 +107,57 @@ class _SecurityCardWidgetState extends State<SecurityCardWidget> {
       bottom: widget.index * widget.spacing,
       child: Align(
         alignment: Alignment.center,
-        child: Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              widget.gameState.securityFlipStatus[widget.index]
-                  ? Draggable<MoveCard>(
-                      data: MoveCard(
-                          fromId: widget.id,
-                          fromStartIndex: widget.index,
-                          fromEndIndex: widget.index),
-                      feedback: ChangeNotifierProvider.value(
-                        value: widget.gameState,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: CardWidget(
-                            card: widget.card,
-                            cardWidth: widget.cardWidth * 0.85,
-                            rest: () {},
-                          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            widget.gameState.securityFlipStatus[widget.index]
+                ? Draggable<MoveCard>(
+                    dragAnchorStrategy: pointerDragAnchorStrategy,
+                    feedbackOffset: const Offset(10, 0),
+                    data: MoveCard(
+                        fromId: widget.id,
+                        fromStartIndex: widget.index,
+                        fromEndIndex: widget.index),
+                    feedback: ChangeNotifierProvider.value(
+                      value: widget.gameState,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: CardWidget(
+                          card: widget.card,
+                          cardWidth: widget.cardWidth * 0.85,
+                          rest: () {},
                         ),
                       ),
-                      childWhenDragging: Opacity(
-                          opacity: 0.3,
-                          child: RotatedBox(
-                            quarterTurns: 3,
-                            child: CardWidget(
-                              card: widget.card,
-                              cardWidth: widget.cardWidth,
-                              rest: () {},
-                            ),
-                          )),
-                      child: SizedBox(
-                          width: widget.cardWidth * 1.404,
-                          height: widget.cardWidth,
-                          child: RotatedBox(
-                            quarterTurns: 3,
-                            child: CardWidget(
-                              card: widget.card,
-                              cardWidth: widget.cardWidth,
-                              rest: () {},
-                            ),
-                          )))
-                  : RotatedBox(
-                      quarterTurns: 3,
-                      child: CardBackWidget(width: widget.cardWidth)),
-              IconButton(
-                  onPressed: () => widget.gameState.flipSecurity(widget.index),
-                  icon: Icon(Icons.flip))
-            ],
-          ),
+                    ),
+                    childWhenDragging: Opacity(
+                        opacity: 0.3,
+                        child: RotatedBox(
+                          quarterTurns: 3,
+                          child: CardWidget(
+                            card: widget.card,
+                            cardWidth: widget.cardWidth,
+                            rest: () {},
+                          ),
+                        )),
+                    child: SizedBox(
+                        width: widget.cardWidth * 1.404,
+                        height: widget.cardWidth,
+                        child: RotatedBox(
+                          quarterTurns: 3,
+                          child: CardWidget(
+                            card: widget.card,
+                            cardWidth: widget.cardWidth,
+                            rest: () {},
+                          ),
+                        )))
+                : RotatedBox(
+                    quarterTurns: 3,
+                    child: CardBackWidget(width: widget.cardWidth)),
+            IconButton(
+                onPressed: () => widget.gameState.flipSecurity(widget.index),
+                icon: Icon(Icons.flip))
+          ],
         ),
       ),
     );
