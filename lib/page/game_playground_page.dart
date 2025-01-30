@@ -59,8 +59,15 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                     children: [
                       Row(
                         children: [
-                          IconButton(onPressed: ()=> gameState.undo(), icon: Icon(Icons.undo)),
-                          IconButton(onPressed: ()=> gameState.redo(), icon: Icon(Icons.redo))
+                          IconButton(
+                              onPressed: () => gameState.undo(),
+                              icon: Icon(Icons.undo)),
+                          IconButton(
+                              onPressed: () => gameState.redo(),
+                              icon: Icon(Icons.redo)),
+                          IconButton(
+                              onPressed: () => gameState.init(widget.deckBuild),
+                              icon: Icon(Icons.refresh)),
                         ],
                       ),
                       gameState.getSelectedCard() == null
@@ -70,7 +77,6 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                 child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: gameState
@@ -303,12 +309,13 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                       ),
                       if (gameState.isShowDialog() || gameState.isShowTrash)
                         Align(
-                          alignment: Alignment.center,
+                            alignment: Alignment.center,
                             child: SizedBox(
                                 height: cardWidth * 6,
                                 width: cardWidth * 6,
-                                child: ShowCards(cardWidth: cardWidth,))
-                        ),
+                                child: ShowCards(
+                                  cardWidth: cardWidth,
+                                ))),
                     ],
                   ),
                 ),

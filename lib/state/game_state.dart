@@ -18,11 +18,9 @@ class GameState extends ChangeNotifier {
   RaisingZone raisingZone = RaisingZone();
   Map<String, FieldZone> fieldZones = {};
 
-  // List<MoveLog> undoStack = [];
   List<MoveCard> undoStack = [];
   List<MoveCard> redoStack = [];
 
-  // List<MoveLog> redoStack = [];
   Map<String, bool> dragStatusMap = {};
 
   int memory = 0;
@@ -46,8 +44,25 @@ class GameState extends ChangeNotifier {
     isShowTrash = value;
     notifyListeners();
   }
-
   GameState(DeckBuild deckBuild) {
+    init(deckBuild);
+  }
+  void init(DeckBuild deckBuild)
+  {
+    mainDeck.clear();
+    digitamaDeck.clear();
+    hand.clear();
+    shows.clear();
+    securityStack.clear();
+    securityFlipStatus.clear();
+    trash.clear();
+    raisingZone = RaisingZone();
+    fieldZones.clear();
+
+    undoStack.clear();
+    redoStack.clear();
+
+    dragStatusMap = {};
     for (int i = 0; i < 16; i++) {
       String key = "field$i";
       fieldZones[key] = FieldZone(key: key);
@@ -75,6 +90,7 @@ class GameState extends ChangeNotifier {
     for (int i = 0; i < min(5, mainDeck.length); i++) {
       hand.add(mainDeck.removeLast());
     }
+    notifyListeners();
   }
 
   void addFieldZone(int count) {
@@ -84,6 +100,7 @@ class GameState extends ChangeNotifier {
     }
     notifyListeners();
   }
+
 
   DigimonCard? getSelectedCard() {
     return selectedCard;
