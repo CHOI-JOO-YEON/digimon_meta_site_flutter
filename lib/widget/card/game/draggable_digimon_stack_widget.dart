@@ -79,7 +79,7 @@ class _DraggableDigimonStackWidgetState
         move.toStartIndex = calculateToIndex(
             cardInsertHeight, widget.spacing, widget.digimonStack.length);
 
-        gameState.moveCards(move, cards);
+        gameState.moveCards(move, cards,true);
       },
       builder: (context, candidateData, rejectedData) {
         return LayoutBuilder(

@@ -29,7 +29,7 @@ class TrashArea extends StatelessWidget {
               return;
             }
             move.toStartIndex = gameState.trash.length;
-            gameState.moveCards(move, cards);
+            gameState.moveCards(move, cards, true);
           },
           builder: (BuildContext context, List<MoveCard?> candidateData,
               List<dynamic> rejectedData) {

@@ -1,6 +1,7 @@
-import 'dart:html';
 import 'dart:math';
+import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../model/card.dart';
@@ -16,8 +17,12 @@ class GameState extends ChangeNotifier {
   List<DigimonCard> trash = [];
   RaisingZone raisingZone = RaisingZone();
   Map<String, FieldZone> fieldZones = {};
-  List<MoveLog> undoStack = [];
-  List<MoveLog> redoStack = [];
+
+  // List<MoveLog> undoStack = [];
+  List<MoveCard> undoStack = [];
+  List<MoveCard> redoStack = [];
+
+  // List<MoveLog> redoStack = [];
   Map<String, bool> dragStatusMap = {};
 
   int memory = 0;
@@ -80,38 +85,6 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void undo() {
-    if (undoStack.isEmpty) return;
-    MoveLog moveLog = undoStack.removeLast();
-    DigimonCard? card = getCardByLog(moveLog.to, moveLog.toIndex);
-    if (card != null) {
-      addCardByLog(moveLog.from, moveLog.fromIndex, card);
-    }
-    redoStack.add(MoveLog.reverse(moveLog));
-    if (moveLog.size != null) {
-      for (int i = 1; i < moveLog.size!; i++) {
-        undo();
-      }
-    }
-    notifyListeners();
-  }
-
-  void redo() {
-    if (redoStack.isEmpty) return;
-    MoveLog moveLog = redoStack.removeLast();
-    DigimonCard? card = getCardByLog(moveLog.to, moveLog.toIndex);
-    if (card != null) {
-      addCardByLog(moveLog.from, moveLog.fromIndex, card);
-    }
-    undoStack.add(MoveLog.reverse(moveLog));
-    if (moveLog.size != null) {
-      for (int i = 1; i < moveLog.size!; i++) {
-        undo();
-      }
-    }
-    notifyListeners();
-  }
-
   DigimonCard? getSelectedCard() {
     return selectedCard;
   }
@@ -121,8 +94,8 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addMoveStack(MoveLog moveLog) {
-    undoStack.add(moveLog);
+  void addMoveStack(MoveCard move) {
+    undoStack.add(move);
     redoStack.clear();
   }
 
@@ -131,8 +104,12 @@ class GameState extends ChangeNotifier {
       final fromIndex = mainDeck.length - 1;
       final toIndex = hand.length;
       hand.add(mainDeck.removeLast());
-      addMoveStack(MoveLog(
-          to: "hand", from: "deck", toIndex: toIndex, fromIndex: fromIndex));
+      addMoveStack(MoveCard.full(
+          toId: "hand",
+          fromId: "deck",
+          toStartIndex: toIndex,
+          fromStartIndex: fromIndex,
+          fromEndIndex: fromIndex));
       notifyListeners();
     }
   }
@@ -142,8 +119,12 @@ class GameState extends ChangeNotifier {
       final fromIndex = mainDeck.length - 1;
       final toIndex = shows.length;
       shows.add(mainDeck.removeLast());
-      addMoveStack(MoveLog(
-          to: "show", from: "deck", toIndex: toIndex, fromIndex: fromIndex));
+      addMoveStack(MoveCard.full(
+          toId: "show",
+          fromId: "deck",
+          toStartIndex: toIndex,
+          fromStartIndex: fromIndex,
+          fromEndIndex: fromIndex));
       notifyListeners();
     }
   }
@@ -153,81 +134,37 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void reorderHand(int fromIndex, int toIndex) {
-    if (fromIndex < 0 || fromIndex == toIndex) return;
-    final card = hand.removeAt(fromIndex);
-    hand.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "hand", from: "hand", toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void reorderShow(int fromIndex, int toIndex) {
-    if (fromIndex < 0 || fromIndex == toIndex) return;
-
-    final card = shows.removeAt(fromIndex);
-    shows.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "show", from: "show", toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void reorderTrash(int fromIndex, int toIndex) {
-    if (fromIndex < 0 || fromIndex == toIndex) return;
-
-    final card = trash.removeAt(fromIndex);
-    trash.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "trash", from: "trash", toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void addCardToHandAt(
-      DigimonCard card, int toIndex, String from, int fromIndex) {
-    hand.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "hand", from: from, toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void addCardToShowsAt(
-      DigimonCard card, int toIndex, String from, int fromIndex) {
-    shows.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "show", from: from, toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void addCardToTrashAt(
-      DigimonCard card, int toIndex, String from, int fromIndex) {
-    trash.insert(toIndex, card);
-    addMoveStack(MoveLog(
-        to: "trash", from: from, toIndex: toIndex, fromIndex: fromIndex));
-    notifyListeners();
-  }
-
   void addCardToDeckBottom(DigimonCard card, String from, int fromIndex) {
     mainDeck.insert(0, card);
-    addMoveStack(
-        MoveLog(to: "deck", from: from, toIndex: 0, fromIndex: fromIndex));
+    addMoveStack(MoveCard.full(
+        toId: "deck",
+        fromId: from,
+        toStartIndex: 0,
+        fromStartIndex: fromIndex,
+        fromEndIndex: fromIndex));
     notifyListeners();
   }
 
   void addCardToDeckTop(DigimonCard card, String from, int fromIndex) {
     int toIndex = mainDeck.length;
     mainDeck.add(card);
-    addMoveStack(MoveLog(
-        to: "deck", from: from, toIndex: toIndex, fromIndex: fromIndex));
+    addMoveStack(MoveCard.full(
+        toId: "deck",
+        fromId: from,
+        toStartIndex: toIndex,
+        fromStartIndex: fromIndex,
+        fromEndIndex: fromIndex));
     notifyListeners();
   }
 
   void addCardToTrash(DigimonCard card, String from, int fromIndex) {
     trash.add(card);
-    addMoveStack(MoveLog(
-        to: "trash",
-        from: from,
-        toIndex: trash.length - 1,
-        fromIndex: fromIndex));
+    addMoveStack(MoveCard.full(
+        toId: "trash",
+        fromId: from,
+        toStartIndex: trash.length - 1,
+        fromStartIndex: fromIndex,
+        fromEndIndex: fromIndex));
     notifyListeners();
   }
 
@@ -321,8 +258,7 @@ class GameState extends ChangeNotifier {
     return [];
   }
 
-  void moveCards(MoveCard move, List<DigimonCard> cards) {
-    print(move);
+  void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
     List<DigimonCard> toCards = getCardListById(move.toId);
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
@@ -362,8 +298,59 @@ class GameState extends ChangeNotifier {
             move.fromStartIndex, move.fromEndIndex + 1);
       }
     }
+    if (isSaveStack) {
+      undoStack.add(move.reverse());
+      redoStack.clear();
+    }
+    notifyListeners();
+  }
+
+  void moveOrderedCards(MoveCard move, bool isSaveStack) {
+    List<DigimonCard> toCards = getCardListById(move.toId);
+    List<DigimonCard> fromCards = getCardListById(move.fromId);
+    PriorityQueue<(int, DigimonCard)> pq =
+        PriorityQueue<(int, DigimonCard)>((a, b) => a.$1.compareTo(b.$1));
+
+    for (var m in move.moveSet) {
+      pq.add((m.to, fromCards.removeAt(m.from)));
+    }
+
+    while (pq.isNotEmpty) {
+      var m = pq.removeFirst();
+      toCards.insert(m.$1, m.$2);
+    }
+    if (isSaveStack) {
+      undoStack.add(move.reverse());
+      redoStack.clear();
+    }
 
     notifyListeners();
+  }
+
+  void undo() {
+    if (undoStack.isEmpty) return;
+    MoveCard move = undoStack.removeLast();
+    if (move.moveSet.isNotEmpty) {
+      moveOrderedCards(move, false);
+    } else {
+      List<DigimonCard> cards = getCardsBySourceId(
+          move.fromId, move.fromStartIndex, move.fromEndIndex);
+      moveCards(move, cards, false);
+    }
+    redoStack.add(move.reverse());
+  }
+
+  void redo() {
+    if (redoStack.isEmpty) return;
+    MoveCard move = redoStack.removeLast();
+    if (move.moveSet.isNotEmpty) {
+      moveOrderedCards(move, false);
+    } else {
+      List<DigimonCard> cards = getCardsBySourceId(
+          move.fromId, move.fromStartIndex, move.fromEndIndex);
+      moveCards(move, cards, false);
+    }
+    undoStack.add(move.reverse());
   }
 
   List<DigimonCard> getCardListById(String id) {
@@ -449,23 +436,6 @@ class FieldZone extends ChangeNotifier {
 
   FieldZone({required this.key});
 
-  void reorderStack(int fromIndex, int toIndex, GameState gameState) {
-    if (fromIndex == toIndex) return;
-
-    // if (fromIndex < toIndex) {
-    //   final card = stack[fromIndex];
-    //   stack.insert
-    // }
-    final card = stack.removeAt(fromIndex);
-    stack.insert(toIndex, card);
-    MoveLog moveLog =
-        MoveLog(to: key, from: key, toIndex: toIndex, fromIndex: fromIndex);
-    print(moveLog);
-    gameState.addMoveStack(moveLog);
-
-    notifyListeners();
-  }
-
   void addCardToStackAt(DigimonCard card, int toIndex, int fromIndex,
       String from, GameState gameState) {
     if (toIndex == stack.length && _rotatedCards.contains(stack.length - 1)) {
@@ -485,8 +455,12 @@ class FieldZone extends ChangeNotifier {
     }
 
     stack.insert(toIndex, card);
-    gameState.addMoveStack(
-        MoveLog(to: key, from: from, toIndex: toIndex, fromIndex: fromIndex));
+    gameState.addMoveStack(MoveCard.full(
+        toId: "key",
+        fromId: from,
+        toStartIndex: toIndex,
+        fromStartIndex: fromIndex,
+        fromEndIndex: fromIndex));
     notifyListeners();
   }
 
@@ -530,35 +504,6 @@ class FieldZone extends ChangeNotifier {
   }
 }
 
-class MoveLog {
-  String to = "";
-  String from = "";
-
-  int toIndex = 0;
-  int fromIndex = 0;
-  int? size;
-
-  MoveLog(
-      {required this.to,
-      required this.from,
-      required this.toIndex,
-      required this.fromIndex,
-      this.size});
-
-  MoveLog.reverse(MoveLog moveLog) {
-    to = moveLog.from;
-    toIndex = moveLog.fromIndex;
-    from = moveLog.to;
-    fromIndex = moveLog.toIndex;
-    size = moveLog.size;
-  }
-
-  @override
-  String toString() {
-    return 'MoveLog{to: $to, from: $from, toIndex: $toIndex, fromIndex: $fromIndex, size: $size}';
-  }
-}
-
 class MoveCard {
   String toId = "";
   String fromId = "";
@@ -566,14 +511,52 @@ class MoveCard {
   int toStartIndex = 0;
   int fromStartIndex = 0;
   int fromEndIndex = 0;
+  SplayTreeSet<MoveIndex> moveSet =
+      SplayTreeSet<MoveIndex>((a, b) => b.from.compareTo(a.from));
 
-  MoveCard(
+  MoveCard({
+    required this.fromId,
+    required this.fromStartIndex,
+    required this.fromEndIndex,
+  });
+
+  MoveCard.full(
       {required this.fromId,
       required this.fromStartIndex,
-      required this.fromEndIndex});
+      required this.fromEndIndex,
+      required this.toId,
+      required this.toStartIndex});
+
 
   @override
   String toString() {
-    return 'Move{toId: $toId, fromId: $fromId, toStartIndex: $toStartIndex, fromStartIndex: $fromStartIndex, fromEndIndex: $fromEndIndex}';
+    return 'MoveCard{toId: $toId, fromId: $fromId, toStartIndex: $toStartIndex, fromStartIndex: $fromStartIndex, fromEndIndex: $fromEndIndex, moveSet: $moveSet}';
+  }
+
+  MoveCard reverse() {
+    int size = fromEndIndex - fromStartIndex;
+    var reverse = MoveCard(
+        fromId: toId,
+        fromStartIndex: toStartIndex,
+        fromEndIndex: toStartIndex + size);
+    reverse.toStartIndex = fromStartIndex;
+    reverse.toId = fromId;
+    for (var move in moveSet) {
+      reverse.moveSet.add(MoveIndex(move.from, move.to));
+    }
+
+    return reverse;
+  }
+}
+
+class MoveIndex {
+  int to;
+  int from;
+
+  MoveIndex(this.to, this.from);
+
+  @override
+  String toString() {
+    return 'MoveIndex{to: $to, from: $from}';
   }
 }

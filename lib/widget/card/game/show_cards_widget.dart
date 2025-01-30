@@ -53,45 +53,28 @@ class _ShowCardsState extends State<ShowCards> {
 
   void _sendSelectedToDeckTop(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
-
-    final selectedCards = _selectedIndices
-        .map((idx) => (card: gameState.shows[idx], fromIndex: idx))
-        .toList();
-
-    final reversedIdx = _selectedIndices.toList()
-      ..sort((a, b) => b.compareTo(a));
-    for (final idx in reversedIdx) {
-      gameState.removeCardFromShowsAt(idx);
+    
+    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0,);
+    move.toId = 'deck';
+    int toIndex = gameState.mainDeck.length;
+    for(var i in _selectedIndices.reversed) {
+      move.moveSet.add(MoveIndex(toIndex++, i));
     }
-
-    for (int i = selectedCards.length - 1; i >= 0; i--) {
-      final card = selectedCards[i].card;
-      final fromIndex = selectedCards[i].fromIndex;
-      gameState.addCardToDeckTop(card, id, fromIndex);
-    }
-
     _clearSelection();
+    gameState.moveOrderedCards(move, true);
   }
 
   void _sendSelectedToDeckBottom(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
 
-    final selectedCards = _selectedIndices
-        .map((idx) => (card: gameState.shows[idx], fromIndex: idx))
-        .toList();
-
-    final reversedIdx = _selectedIndices.toList()
-      ..sort((a, b) => b.compareTo(a));
-    for (final idx in reversedIdx) {
-      gameState.removeCardFromShowsAt(idx);
-    }
-
-    for (final tuple in selectedCards) {
-      final card = tuple.card;
-      final fromIndex = tuple.fromIndex;
-      gameState.addCardToDeckBottom(card, id, fromIndex);
+    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0,);
+    move.toId = 'deck';
+    int toIndex = 0;
+    for(var i in _selectedIndices.reversed) {
+      move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
+    gameState.moveOrderedCards(move, true);
   }
 
   void _sendSelectedToTrash(GameState gameState) {

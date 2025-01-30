@@ -78,7 +78,7 @@ class _DraggableDigimonListWidgetState
 
         move.toStartIndex = calculateToIndex(effectiveX, widget.cardWidth);
 
-        gameState.moveCards(move, cards);
+        gameState.moveCards(move, cards, true);
       },
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
