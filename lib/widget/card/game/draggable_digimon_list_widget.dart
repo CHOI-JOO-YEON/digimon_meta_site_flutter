@@ -26,7 +26,8 @@ class DraggableDigimonListWidget extends StatefulWidget {
     super.key,
     required this.id,
     required this.children,
-    required this.cardWidth, required this.height,
+    required this.cardWidth,
+    required this.height,
   });
 
   @override
@@ -83,21 +84,19 @@ class _DraggableDigimonListWidgetState
       builder: (context, candidateData, rejectedData) {
         return SizedBox(
             height: widget.height,
-            child: ScrollConfiguration(
-                behavior: CustomScrollBehavior(),
-                child: RawScrollbar(
-                    controller: scrollController,
-                    thumbVisibility: true,
-                    thickness: 8.0,
-                    radius: const Radius.circular(4.0),
-                    thumbColor: Colors.blueAccent,
-                    trackColor: Colors.blue.shade100,
-                    trackBorderColor: Colors.blue.shade300,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      controller: scrollController,
-                      children: widget.children,
-                    ))));
+            child: RawScrollbar(
+                controller: scrollController,
+                thumbVisibility: true,
+                thickness: 8.0,
+                radius: const Radius.circular(4.0),
+                thumbColor: Colors.blueAccent,
+                trackColor: Colors.blue.shade100,
+                trackBorderColor: Colors.blue.shade300,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  controller: scrollController,
+                  children: widget.children,
+                )));
       },
     );
   }
