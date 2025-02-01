@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:digimon_meta_site_flutter/api/card_api.dart';
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
@@ -12,17 +13,17 @@ import '../provider/text_simplify_provider.dart';
 import 'color_service.dart';
 
 class CardService {
-
   void showImageDialog(
       BuildContext context, DigimonCard card, Function(int)? searchNote) {
     CardOverlayService cardOverlayService = CardOverlayService();
     cardOverlayService.removeAllOverlays();
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     final screenWidth = MediaQuery.of(context).size.width;
     final fontSize = min(screenWidth * 0.03, 15.0);
     bool showUsedCards = false;
     UseCardResponseDto useCardResponseDto =
-    UseCardResponseDto(usedCardList: [], totalCount: 0, initialize: false);
+        UseCardResponseDto(usedCardList: [], totalCount: 0, initialize: false);
 
     int selectedLocaleIndex = 0;
 
@@ -32,7 +33,7 @@ class CardService {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             LocaleCardData localeCardData =
-            card.localeCardData[selectedLocaleIndex];
+                card.localeCardData[selectedLocaleIndex];
 
             return AlertDialog(
               content: Stack(
@@ -56,8 +57,9 @@ class CardService {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container(
-                            width:
-                            isPortrait ? screenWidth * 0.8 : screenWidth * 0.3,
+                            width: isPortrait
+                                ? screenWidth * 0.8
+                                : screenWidth * 0.3,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -66,7 +68,7 @@ class CardService {
                                     width: double.infinity,
                                     child: Wrap(
                                       crossAxisAlignment:
-                                      WrapCrossAlignment.center,
+                                          WrapCrossAlignment.center,
                                       spacing: 10,
                                       children: [
                                         Text(
@@ -74,14 +76,14 @@ class CardService {
                                           style: TextStyle(
                                               fontSize: fontSize,
                                               color:
-                                              Theme.of(context).hintColor),
+                                                  Theme.of(context).hintColor),
                                         ),
                                         Text(
                                           '${card.rarity}',
                                           style: TextStyle(
                                               fontSize: fontSize,
-                                              color:
-                                              Theme.of(context).primaryColor),
+                                              color: Theme.of(context)
+                                                  .primaryColor),
                                         ),
                                         Text(
                                           '${card.getKorCardType()}',
@@ -89,20 +91,21 @@ class CardService {
                                               fontSize: fontSize,
                                               color: ColorService
                                                   .getColorFromString(
-                                                  card.color1!)),
+                                                      card.color1!)),
                                         ),
                                         if (card.lv != null)
                                           ElevatedButton(
                                             onPressed: null,
                                             style: ElevatedButton.styleFrom(
                                               disabledBackgroundColor:
-                                              Theme.of(context).cardColor,
+                                                  Theme.of(context).cardColor,
                                               disabledForegroundColor:
-                                              Colors.black,
+                                                  Colors.black,
                                             ),
                                             child: Text(
-                                              'Lv.${card.lv==0?'-':card.lv}',
-                                              style: TextStyle(fontSize: fontSize),
+                                              'Lv.${card.lv == 0 ? '-' : card.lv}',
+                                              style:
+                                                  TextStyle(fontSize: fontSize),
                                             ),
                                           ),
                                       ],
@@ -115,7 +118,8 @@ class CardService {
                                         .entries
                                         .map((entry) {
                                       int index = entry.key;
-                                      LocaleCardData localeCardData = entry.value;
+                                      LocaleCardData localeCardData =
+                                          entry.value;
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 4.0),
@@ -130,14 +134,14 @@ class CardService {
                                             style: TextStyle(
                                               fontSize: fontSize * 0.8,
                                               color:
-                                              selectedLocaleIndex == index
-                                                  ? Theme.of(context)
-                                                  .primaryColor
-                                                  : Colors.grey,
+                                                  selectedLocaleIndex == index
+                                                      ? Theme.of(context)
+                                                          .primaryColor
+                                                      : Colors.grey,
                                               fontWeight:
-                                              selectedLocaleIndex == index
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
+                                                  selectedLocaleIndex == index
+                                                      ? FontWeight.bold
+                                                      : FontWeight.normal,
                                             ),
                                           ),
                                         ),
@@ -153,30 +157,32 @@ class CardService {
                                         style: TextStyle(
                                           fontSize: fontSize * 1.2,
                                           fontFamily:
-                                          localeCardData.locale == 'JPN'
-                                              ? "MPLUSC"
-                                              : "JalnanGothic",
+                                              localeCardData.locale == 'JPN'
+                                                  ? "MPLUSC"
+                                                  : "JalnanGothic",
                                         ),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: 10),
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         flex: 6,
                                         child: Column(
                                           children: [
-                                            LayoutBuilder(builder:
-                                                (BuildContext context,
+                                            LayoutBuilder(builder: (BuildContext
+                                                    context,
                                                 BoxConstraints constraints) {
                                               return SizedBox(
                                                 width: constraints.maxWidth,
                                                 child: Stack(
                                                   children: [
                                                     SizedBox(
-                                                      width: constraints.maxWidth,
+                                                      width:
+                                                          constraints.maxWidth,
                                                       child: Image.network(
                                                         card.getDisplayImgUrl() ??
                                                             '',
@@ -187,33 +193,36 @@ class CardService {
                                                       right: 0,
                                                       bottom: 0,
                                                       child: Container(
-                                                        decoration: BoxDecoration(
-                                                          color: Theme.of(context)
-                                                              .canvasColor,
-                                                          shape: BoxShape.circle,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .canvasColor,
+                                                          shape:
+                                                              BoxShape.circle,
                                                         ),
                                                         child: IconButton(
-                                                          padding: EdgeInsets.zero,
-                                                          tooltip:
-                                                          '이미지 다운로드',
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          tooltip: '이미지 다운로드',
                                                           onPressed: () async {
-                                                            if (card
-                                                                .getDisplayImgUrl() !=
+                                                            if (card.getDisplayImgUrl() !=
                                                                 null) {
                                                               await WebImageDownloader
                                                                   .downloadImageFromWeb(
-                                                                card
-                                                                    .getDisplayImgUrl()!,
+                                                                card.getDisplayImgUrl()!,
                                                                 name:
-                                                                '${card.cardNo}_${card.getDisplayName()}.png',
+                                                                    '${card.cardNo}_${card.getDisplayName()}.png',
                                                               );
                                                             }
                                                           },
                                                           icon: Icon(
                                                             Icons.download,
-                                                            color: Theme.of(context)
+                                                            color: Theme.of(
+                                                                    context)
                                                                 .primaryColor,
-                                                            size: fontSize * 1.5,
+                                                            size:
+                                                                fontSize * 1.5,
                                                           ),
                                                         ),
                                                       ),
@@ -235,16 +244,18 @@ class CardService {
                                                     context,
                                                     [card.getKorForm()],
                                                     '형태',
-                                                    ColorService.getColorFromString(
-                                                        card.color1!),
+                                                    ColorService
+                                                        .getColorFromString(
+                                                            card.color1!),
                                                     fontSize),
                                               if (card.attribute != null)
                                                 _attributeWidget(
                                                     context,
                                                     [card.attribute!],
                                                     '속성',
-                                                    ColorService.getColorFromString(
-                                                        card.color1!),
+                                                    ColorService
+                                                        .getColorFromString(
+                                                            card.color1!),
                                                     fontSize),
                                               if (card.types != null &&
                                                   card.types!.isNotEmpty)
@@ -252,8 +263,9 @@ class CardService {
                                                     context,
                                                     card.types!,
                                                     '유형',
-                                                    ColorService.getColorFromString(
-                                                        card.color1!),
+                                                    ColorService
+                                                        .getColorFromString(
+                                                            card.color1!),
                                                     fontSize),
                                             ],
                                           ),
@@ -293,49 +305,57 @@ class CardService {
                                   const SizedBox(height: 5),
                                   // 텍스트 간소화 스위치
                                   Consumer<TextSimplifyProvider>(
-                                    builder: (context, textSimplifyProvider, child) {
+                                    builder:
+                                        (context, textSimplifyProvider, child) {
                                       return Row(
                                         children: [
                                           Text('텍스트 간소화'),
-                                          Switch(
-                                            value:
-                                            textSimplifyProvider.getTextSimplify(),
-                                            onChanged: (v) {
-                                              textSimplifyProvider
-                                                  .updateTextSimplify(v);
-                                            },
-                                            inactiveThumbColor: Colors.red,
-                                          )
+                                          Transform.scale(
+                                              scale: SizeService.switchScale(
+                                                  context),
+                                              child: Switch(
+                                                value: textSimplifyProvider
+                                                    .getTextSimplify(),
+                                                onChanged: (v) =>
+                                                    textSimplifyProvider
+                                                        .updateTextSimplify(v),
+                                                inactiveThumbColor: Colors.red,
+                                              )),
                                         ],
                                       );
                                     },
                                   ),
                                   const SizedBox(height: 5),
-                                  // _effectWidget에 isTextSimplify 전달
                                   Consumer<TextSimplifyProvider>(
-                                    builder: (context, textSimplifyProvider, child) {
+                                    builder:
+                                        (context, textSimplifyProvider, child) {
                                       return Column(
                                         children: [
                                           if (localeCardData.effect != null)
-                                            _effectWidget(
+                                            effectWidget(
                                               context,
                                               localeCardData.effect!,
                                               '상단 텍스트',
-                                              ColorService.getColorFromString(card.color1!),
+                                              ColorService.getColorFromString(
+                                                  card.color1!),
                                               fontSize,
                                               localeCardData.locale,
-                                              textSimplifyProvider.getTextSimplify(),
+                                              textSimplifyProvider
+                                                  .getTextSimplify(),
                                             ),
                                           const SizedBox(height: 5),
-                                          if (localeCardData.sourceEffect != null)
-                                            _effectWidget(
+                                          if (localeCardData.sourceEffect !=
+                                              null)
+                                            effectWidget(
                                               context,
                                               localeCardData.sourceEffect!,
                                               '하단 텍스트',
-                                              ColorService.getColorFromString(card.color1!),
+                                              ColorService.getColorFromString(
+                                                  card.color1!),
                                               fontSize,
                                               localeCardData.locale,
-                                              textSimplifyProvider.getTextSimplify(),
+                                              textSimplifyProvider
+                                                  .getTextSimplify(),
                                             ),
                                         ],
                                       );
@@ -382,27 +402,27 @@ class CardService {
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
                                     itemCount:
-                                    useCardResponseDto.usedCardList.length,
+                                        useCardResponseDto.usedCardList.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
-                                      final usedCardInfo =
-                                      useCardResponseDto.usedCardList[index];
+                                      final usedCardInfo = useCardResponseDto
+                                          .usedCardList[index];
                                       final usedCard = usedCardInfo.card;
                                       return Container(
                                         margin: EdgeInsets.all(5),
                                         decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius:
-                                            BorderRadius.circular(5)),
+                                                BorderRadius.circular(5)),
                                         child: ListTile(
-                                          leading: Image.network(
-                                              usedCard.getDisplaySmallImgUrl() ??
-                                                  ''),
+                                          leading: Image.network(usedCard
+                                                  .getDisplaySmallImgUrl() ??
+                                              ''),
                                           title: Text(
                                             usedCard.getDisplayName() ?? '',
                                             style: TextStyle(
-                                                color:
-                                                getColor(usedCardInfo.ratio)),
+                                                color: getColor(
+                                                    usedCardInfo.ratio)),
                                           ),
                                           subtitle: Text(
                                               '덱: ${usedCardInfo.count}, 비율: ${(usedCardInfo.ratio * 100).toStringAsFixed(0)}%'),
@@ -414,7 +434,7 @@ class CardService {
                                           trailing: Text(
                                             '${usedCardInfo.rank}위',
                                             style:
-                                            TextStyle(fontSize: fontSize),
+                                                TextStyle(fontSize: fontSize),
                                           ),
                                         ),
                                       );
@@ -433,15 +453,13 @@ class CardService {
                           if (showUsedCards) {
                             if (!useCardResponseDto.initialize) {
                               useCardResponseDto =
-                              await CardApi().getUseCard(card.cardId!);
+                                  await CardApi().getUseCard(card.cardId!);
                             }
                           }
                           setState(() {});
                         },
                         child: Text(
-                          showUsedCards
-                              ? '카드 정보로 돌아가기'
-                              : '같이 사용된 카드 보기',
+                          showUsedCards ? '카드 정보로 돌아가기' : '같이 사용된 카드 보기',
                           style: TextStyle(fontSize: fontSize),
                         ),
                       ),
@@ -456,9 +474,14 @@ class CardService {
     );
   }
 
-
-  Widget _effectWidget(BuildContext context, String text, String category,
-      Color categoryColor, double fontSize, String locale, bool isTextSimplify) {
+  Widget effectWidget(
+      BuildContext context,
+      String text,
+      String category,
+      Color categoryColor,
+      double fontSize,
+      String locale,
+      bool isTextSimplify) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -777,7 +800,8 @@ class CardService {
     return spans;
   }
 
-  Widget buildEffectText(String text, double fontSize, String locale, bool isTextSimplify) {
+  Widget buildEffectText(
+      String text, double fontSize, String locale, bool isTextSimplify) {
     final List<InlineSpan> spans = [];
 
     spans.addAll(getSpansByLocale(locale, text, isTextSimplify));

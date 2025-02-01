@@ -66,6 +66,16 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    GamePlayGroundRoute.name: (routeData) {
+      final args = routeData.argsAs<GamePlayGroundRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: GamePlayGroundPage(
+          key: args.key,
+          deckBuild: args.deckBuild,
+        ),
+      );
+    },
     KakaoLoginRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -256,6 +266,44 @@ class DeckListRouteArgs {
   @override
   String toString() {
     return 'DeckListRouteArgs{key: $key, searchParameterString: $searchParameterString}';
+  }
+}
+
+/// generated route for
+/// [GamePlayGroundPage]
+class GamePlayGroundRoute extends PageRouteInfo<GamePlayGroundRouteArgs> {
+  GamePlayGroundRoute({
+    Key? key,
+    required DeckBuild deckBuild,
+    List<PageRouteInfo>? children,
+  }) : super(
+          GamePlayGroundRoute.name,
+          args: GamePlayGroundRouteArgs(
+            key: key,
+            deckBuild: deckBuild,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'GamePlayGroundRoute';
+
+  static const PageInfo<GamePlayGroundRouteArgs> page =
+      PageInfo<GamePlayGroundRouteArgs>(name);
+}
+
+class GamePlayGroundRouteArgs {
+  const GamePlayGroundRouteArgs({
+    this.key,
+    required this.deckBuild,
+  });
+
+  final Key? key;
+
+  final DeckBuild deckBuild;
+
+  @override
+  String toString() {
+    return 'GamePlayGroundRouteArgs{key: $key, deckBuild: $deckBuild}';
   }
 }
 
