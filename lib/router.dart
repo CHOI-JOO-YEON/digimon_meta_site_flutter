@@ -11,14 +11,13 @@ import 'package:flutter/material.dart';
 
 import 'model/deck-build.dart';
 import 'model/deck-view.dart';
-import 'model/search_parameter.dart';
 
 part 'router.gr.dart';
 
 
 
 @AutoRouterConfig()
-class AppRouter extends _$AppRouter {
+class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [

@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -9,101 +10,6 @@
 
 part of 'router.dart';
 
-abstract class _$AppRouter extends RootStackRouter {
-  // ignore: unused_element
-  _$AppRouter({super.navigatorKey});
-
-  @override
-  final Map<String, PageFactory> pagesMap = {
-    CollectRoute.name: (routeData) {
-      final queryParams = routeData.queryParams;
-      final args = routeData.argsAs<CollectRouteArgs>(
-          orElse: () => CollectRouteArgs(
-              searchParameterString: queryParams.optString('searchParameter')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: CollectPage(
-          key: args.key,
-          searchParameterString: args.searchParameterString,
-        ),
-      );
-    },
-    DeckBuilderRoute.name: (routeData) {
-      final queryParams = routeData.queryParams;
-      final args = routeData.argsAs<DeckBuilderRouteArgs>(
-          orElse: () => DeckBuilderRouteArgs(
-              searchParameterString: queryParams.optString('searchParameter')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: DeckBuilderPage(
-          key: args.key,
-          deck: args.deck,
-          searchParameterString: args.searchParameterString,
-          deckView: args.deckView,
-        ),
-      );
-    },
-    DeckImageRoute.name: (routeData) {
-      final args = routeData.argsAs<DeckImageRouteArgs>();
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: DeckImagePage(
-          key: args.key,
-          deck: args.deck,
-        ),
-      );
-    },
-    DeckListRoute.name: (routeData) {
-      final queryParams = routeData.queryParams;
-      final args = routeData.argsAs<DeckListRouteArgs>(
-          orElse: () => DeckListRouteArgs(
-              searchParameterString: queryParams.optString('searchParameter')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: DeckListPage(
-          key: args.key,
-          searchParameterString: args.searchParameterString,
-        ),
-      );
-    },
-    GamePlayGroundRoute.name: (routeData) {
-      final args = routeData.argsAs<GamePlayGroundRouteArgs>();
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: GamePlayGroundPage(
-          key: args.key,
-          deckBuild: args.deckBuild,
-        ),
-      );
-    },
-    KakaoLoginRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: const KakaoLoginPage(),
-      );
-    },
-    MainRoute.name: (routeData) {
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: MainPage(),
-      );
-    },
-    QrDeckImportRoute.name: (routeData) {
-      final queryParams = routeData.queryParams;
-      final args = routeData.argsAs<QrDeckImportRouteArgs>(
-          orElse: () =>
-              QrDeckImportRouteArgs(deckParam: queryParams.optString('deck')));
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: QrDeckImportPage(
-          key: args.key,
-          deckParam: args.deckParam,
-        ),
-      );
-    },
-  };
-}
-
 /// generated route for
 /// [CollectPage]
 class CollectRoute extends PageRouteInfo<CollectRouteArgs> {
@@ -112,26 +18,37 @@ class CollectRoute extends PageRouteInfo<CollectRouteArgs> {
     String? searchParameterString,
     List<PageRouteInfo>? children,
   }) : super(
-          CollectRoute.name,
-          args: CollectRouteArgs(
-            key: key,
-            searchParameterString: searchParameterString,
-          ),
-          rawQueryParams: {'searchParameter': searchParameterString},
-          initialChildren: children,
-        );
+         CollectRoute.name,
+         args: CollectRouteArgs(
+           key: key,
+           searchParameterString: searchParameterString,
+         ),
+         rawQueryParams: {'searchParameter': searchParameterString},
+         initialChildren: children,
+       );
 
   static const String name = 'CollectRoute';
 
-  static const PageInfo<CollectRouteArgs> page =
-      PageInfo<CollectRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<CollectRouteArgs>(
+        orElse:
+            () => CollectRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter'),
+            ),
+      );
+      return CollectPage(
+        key: args.key,
+        searchParameterString: args.searchParameterString,
+      );
+    },
+  );
 }
 
 class CollectRouteArgs {
-  const CollectRouteArgs({
-    this.key,
-    this.searchParameterString,
-  });
+  const CollectRouteArgs({this.key, this.searchParameterString});
 
   final Key? key;
 
@@ -153,21 +70,37 @@ class DeckBuilderRoute extends PageRouteInfo<DeckBuilderRouteArgs> {
     DeckView? deckView,
     List<PageRouteInfo>? children,
   }) : super(
-          DeckBuilderRoute.name,
-          args: DeckBuilderRouteArgs(
-            key: key,
-            deck: deck,
-            searchParameterString: searchParameterString,
-            deckView: deckView,
-          ),
-          rawQueryParams: {'searchParameter': searchParameterString},
-          initialChildren: children,
-        );
+         DeckBuilderRoute.name,
+         args: DeckBuilderRouteArgs(
+           key: key,
+           deck: deck,
+           searchParameterString: searchParameterString,
+           deckView: deckView,
+         ),
+         rawQueryParams: {'searchParameter': searchParameterString},
+         initialChildren: children,
+       );
 
   static const String name = 'DeckBuilderRoute';
 
-  static const PageInfo<DeckBuilderRouteArgs> page =
-      PageInfo<DeckBuilderRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<DeckBuilderRouteArgs>(
+        orElse:
+            () => DeckBuilderRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter'),
+            ),
+      );
+      return DeckBuilderPage(
+        key: args.key,
+        deck: args.deck,
+        searchParameterString: args.searchParameterString,
+        deckView: args.deckView,
+      );
+    },
+  );
 }
 
 class DeckBuilderRouteArgs {
@@ -200,25 +133,24 @@ class DeckImageRoute extends PageRouteInfo<DeckImageRouteArgs> {
     required DeckBuild deck,
     List<PageRouteInfo>? children,
   }) : super(
-          DeckImageRoute.name,
-          args: DeckImageRouteArgs(
-            key: key,
-            deck: deck,
-          ),
-          initialChildren: children,
-        );
+         DeckImageRoute.name,
+         args: DeckImageRouteArgs(key: key, deck: deck),
+         initialChildren: children,
+       );
 
   static const String name = 'DeckImageRoute';
 
-  static const PageInfo<DeckImageRouteArgs> page =
-      PageInfo<DeckImageRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<DeckImageRouteArgs>();
+      return DeckImagePage(key: args.key, deck: args.deck);
+    },
+  );
 }
 
 class DeckImageRouteArgs {
-  const DeckImageRouteArgs({
-    this.key,
-    required this.deck,
-  });
+  const DeckImageRouteArgs({this.key, required this.deck});
 
   final Key? key;
 
@@ -238,26 +170,37 @@ class DeckListRoute extends PageRouteInfo<DeckListRouteArgs> {
     String? searchParameterString,
     List<PageRouteInfo>? children,
   }) : super(
-          DeckListRoute.name,
-          args: DeckListRouteArgs(
-            key: key,
-            searchParameterString: searchParameterString,
-          ),
-          rawQueryParams: {'searchParameter': searchParameterString},
-          initialChildren: children,
-        );
+         DeckListRoute.name,
+         args: DeckListRouteArgs(
+           key: key,
+           searchParameterString: searchParameterString,
+         ),
+         rawQueryParams: {'searchParameter': searchParameterString},
+         initialChildren: children,
+       );
 
   static const String name = 'DeckListRoute';
 
-  static const PageInfo<DeckListRouteArgs> page =
-      PageInfo<DeckListRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<DeckListRouteArgs>(
+        orElse:
+            () => DeckListRouteArgs(
+              searchParameterString: queryParams.optString('searchParameter'),
+            ),
+      );
+      return DeckListPage(
+        key: args.key,
+        searchParameterString: args.searchParameterString,
+      );
+    },
+  );
 }
 
 class DeckListRouteArgs {
-  const DeckListRouteArgs({
-    this.key,
-    this.searchParameterString,
-  });
+  const DeckListRouteArgs({this.key, this.searchParameterString});
 
   final Key? key;
 
@@ -277,25 +220,24 @@ class GamePlayGroundRoute extends PageRouteInfo<GamePlayGroundRouteArgs> {
     required DeckBuild deckBuild,
     List<PageRouteInfo>? children,
   }) : super(
-          GamePlayGroundRoute.name,
-          args: GamePlayGroundRouteArgs(
-            key: key,
-            deckBuild: deckBuild,
-          ),
-          initialChildren: children,
-        );
+         GamePlayGroundRoute.name,
+         args: GamePlayGroundRouteArgs(key: key, deckBuild: deckBuild),
+         initialChildren: children,
+       );
 
   static const String name = 'GamePlayGroundRoute';
 
-  static const PageInfo<GamePlayGroundRouteArgs> page =
-      PageInfo<GamePlayGroundRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<GamePlayGroundRouteArgs>();
+      return GamePlayGroundPage(key: args.key, deckBuild: args.deckBuild);
+    },
+  );
 }
 
 class GamePlayGroundRouteArgs {
-  const GamePlayGroundRouteArgs({
-    this.key,
-    required this.deckBuild,
-  });
+  const GamePlayGroundRouteArgs({this.key, required this.deckBuild});
 
   final Key? key;
 
@@ -311,28 +253,32 @@ class GamePlayGroundRouteArgs {
 /// [KakaoLoginPage]
 class KakaoLoginRoute extends PageRouteInfo<void> {
   const KakaoLoginRoute({List<PageRouteInfo>? children})
-      : super(
-          KakaoLoginRoute.name,
-          initialChildren: children,
-        );
+    : super(KakaoLoginRoute.name, initialChildren: children);
 
   static const String name = 'KakaoLoginRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const KakaoLoginPage();
+    },
+  );
 }
 
 /// generated route for
 /// [MainPage]
 class MainRoute extends PageRouteInfo<void> {
   const MainRoute({List<PageRouteInfo>? children})
-      : super(
-          MainRoute.name,
-          initialChildren: children,
-        );
+    : super(MainRoute.name, initialChildren: children);
 
   static const String name = 'MainRoute';
 
-  static const PageInfo<void> page = PageInfo<void>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return MainPage();
+    },
+  );
 }
 
 /// generated route for
@@ -343,26 +289,30 @@ class QrDeckImportRoute extends PageRouteInfo<QrDeckImportRouteArgs> {
     String? deckParam,
     List<PageRouteInfo>? children,
   }) : super(
-          QrDeckImportRoute.name,
-          args: QrDeckImportRouteArgs(
-            key: key,
-            deckParam: deckParam,
-          ),
-          rawQueryParams: {'deck': deckParam},
-          initialChildren: children,
-        );
+         QrDeckImportRoute.name,
+         args: QrDeckImportRouteArgs(key: key, deckParam: deckParam),
+         rawQueryParams: {'deck': deckParam},
+         initialChildren: children,
+       );
 
   static const String name = 'QrDeckImportRoute';
 
-  static const PageInfo<QrDeckImportRouteArgs> page =
-      PageInfo<QrDeckImportRouteArgs>(name);
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final queryParams = data.queryParams;
+      final args = data.argsAs<QrDeckImportRouteArgs>(
+        orElse:
+            () =>
+                QrDeckImportRouteArgs(deckParam: queryParams.optString('deck')),
+      );
+      return QrDeckImportPage(key: args.key, deckParam: args.deckParam);
+    },
+  );
 }
 
 class QrDeckImportRouteArgs {
-  const QrDeckImportRouteArgs({
-    this.key,
-    this.deckParam,
-  });
+  const QrDeckImportRouteArgs({this.key, this.deckParam});
 
   final Key? key;
 

@@ -22,7 +22,6 @@ class CardApi {
         throw Exception('Failed to load cards');
       }
     } catch (e) {
-      print(e);
       return CardResponseDto();
     }
   }

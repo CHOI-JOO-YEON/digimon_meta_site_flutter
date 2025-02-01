@@ -1,37 +1,34 @@
 import 'package:dio/browser.dart';
 import 'package:dio/dio.dart';
-
-
+import 'package:flutter/foundation.dart';
 
 typedef AuthErrorCallback = Function();
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
-  Dio _dio = Dio();
+  late final Dio _dio;
 
   AuthErrorCallback? _onAuthError;
 
-  factory DioClient() {
-    return _instance;
-  }
+  factory DioClient() => _instance;
 
   DioClient._internal() {
-    _dio.options.contentType = "application/json";
-    var adapter = BrowserHttpClientAdapter();
-    adapter.withCredentials = true;
-    _dio.httpClientAdapter = adapter;
+    _dio = Dio(BaseOptions(
+      contentType: "application/json",
+    ));
+
+    if (kIsWeb) {
+      _dio.httpClientAdapter = makeHttpClientAdapter();
+    }
 
     _dio.interceptors.add(InterceptorsWrapper(
-      onError: (DioError error, handler) {
+      onError: (DioException error, handler) {
         if (error.response?.statusCode == 401) {
-          // 401 에러가 감지되었을 때 콜백 함수 호출
           _onAuthError?.call();
-
         }
-        handler.next(error);
+        return handler.next(error);
       },
     ));
-    // 기타 필요한 Dio 설정
   }
 
   set onAuthError(AuthErrorCallback callback) {
@@ -39,4 +36,10 @@ class DioClient {
   }
 
   Dio get dio => _dio;
+}
+
+HttpClientAdapter makeHttpClientAdapter() {
+  final adapter = HttpClientAdapter() as BrowserHttpClientAdapter;
+  adapter.withCredentials = true;
+  return adapter;
 }
