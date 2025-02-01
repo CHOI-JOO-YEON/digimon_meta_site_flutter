@@ -23,7 +23,7 @@ class TrashShowCardsWidget extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('트래시 (${gameState.trash.length})'),
+          Text('트래시 (${gameState.trash.length})', style: TextStyle(fontSize: gameState.textWidth(cardWidth)),),
           Padding(
             padding: EdgeInsets.all(cardWidth * 0.1),
             child: DraggableDigimonListWidget(

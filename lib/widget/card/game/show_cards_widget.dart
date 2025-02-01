@@ -53,11 +53,16 @@ class _ShowCardsState extends State<ShowCards> {
 
   void _sendSelectedToDeckTop(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
-    
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
+
+    MoveCard move = MoveCard(
+      fromId: 'show',
+      fromStartIndex: 0,
+      fromEndIndex: 0,
+      isRest: false,
+    );
     move.toId = 'deck';
     int toIndex = gameState.mainDeck.length;
-    for(var i in _selectedIndices.reversed) {
+    for (var i in _selectedIndices.reversed) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -67,10 +72,15 @@ class _ShowCardsState extends State<ShowCards> {
   void _sendSelectedToDeckBottom(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
 
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
+    MoveCard move = MoveCard(
+      fromId: 'show',
+      fromStartIndex: 0,
+      fromEndIndex: 0,
+      isRest: false,
+    );
     move.toId = 'deck';
     int toIndex = 0;
-    for(var i in _selectedIndices.reversed) {
+    for (var i in _selectedIndices.reversed) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -80,10 +90,15 @@ class _ShowCardsState extends State<ShowCards> {
   void _sendSelectedToTrash(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
 
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
+    MoveCard move = MoveCard(
+      fromId: 'show',
+      fromStartIndex: 0,
+      fromEndIndex: 0,
+      isRest: false,
+    );
     move.toId = 'trash';
     int toIndex = 0;
-    for(var i in _selectedIndices) {
+    for (var i in _selectedIndices) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -97,7 +112,7 @@ class _ShowCardsState extends State<ShowCards> {
     return Column(
       children: [
         SizedBox(
-          height: widget.cardWidth * 2.7,
+          height: widget.cardWidth * 2.5,
           child: gameState.isShowDialog()
               ? Column(
                   children: [
@@ -130,27 +145,52 @@ class _ShowCardsState extends State<ShowCards> {
                                 TextButton(
                                   onPressed: () =>
                                       _sendSelectedToDeckBottom(gameState),
-                                  child: const Text('덱 아래로 보내기'),
+                                  child: Text(
+                                    '덱 아래로 보내기',
+                                    style: TextStyle(
+                                        fontSize: gameState
+                                            .textWidth(widget.cardWidth)),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () =>
                                       _sendSelectedToDeckTop(gameState),
-                                  child: const Text('덱 위로 보내기'),
+                                  child: Text(
+                                    '덱 위로 보내기',
+                                    style: TextStyle(
+                                        fontSize: gameState
+                                            .textWidth(widget.cardWidth)),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () =>
                                       _sendSelectedToTrash(gameState),
-                                  child: const Text('트래시로 보내기'),
+                                  child: Text(
+                                    '트래시로 보내기',
+                                    style: TextStyle(
+                                        fontSize: gameState
+                                            .textWidth(widget.cardWidth)),
+                                  ),
                                 ),
                                 const Spacer(),
                                 TextButton(
                                   onPressed: () =>
                                       _selectAll(gameState.shows.length),
-                                  child: const Text('모두 선택'),
+                                  child: Text(
+                                    '모두 선택',
+                                    style: TextStyle(
+                                        fontSize: gameState
+                                            .textWidth(widget.cardWidth)),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: _clearSelection,
-                                  child: const Text('모두 선택 해제'),
+                                  child: Text(
+                                    '모두 선택 해제',
+                                    style: TextStyle(
+                                        fontSize: gameState
+                                            .textWidth(widget.cardWidth)),
+                                  ),
                                 ),
                               ],
                             ),
@@ -159,7 +199,7 @@ class _ShowCardsState extends State<ShowCards> {
                               child: DraggableDigimonListWidget(
                                 id: id,
                                 cardWidth: resizingCardWidth,
-                                height: resizingCardWidth * 2,
+                                height: resizingCardWidth * 1.8,
                                 children: gameState.shows
                                     .asMap()
                                     .entries
@@ -182,7 +222,8 @@ class _ShowCardsState extends State<ShowCards> {
                                           data: MoveCard(
                                               fromId: id,
                                               fromStartIndex: index,
-                                              fromEndIndex: index, isRest: false),
+                                              fromEndIndex: index,
+                                              isRest: false),
                                           feedback:
                                               ChangeNotifierProvider.value(
                                             value: gameState,
@@ -210,28 +251,38 @@ class _ShowCardsState extends State<ShowCards> {
                                             rest: () {},
                                           ),
                                         ),
-                                        SizedBox(
-                                          height: widget.cardWidth * 0.2,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Checkbox(
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            ConstrainedBox(
+                                              constraints:
+                                                  BoxConstraints.tightFor(
+                                                      width: gameState
+                                                          .iconWidth(widget
+                                                              .cardWidth),
+                                                      height: gameState
+                                                          .iconWidth(widget
+                                                              .cardWidth)),
+                                              child: Checkbox(
                                                 value: isSelected,
                                                 onChanged: (value) {
                                                   _toggleSelection(index);
                                                 },
                                               ),
-                                              if (isSelected)
-                                                Text(
-                                                  '$selectionOrder',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.red,
-                                                  ),
+                                            ),
+                                            if (isSelected)
+                                              Text(
+                                                '$selectionOrder',
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      gameState.textWidth(
+                                                          widget.cardWidth),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red,
                                                 ),
-                                            ],
-                                          ),
+                                              ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -247,7 +298,7 @@ class _ShowCardsState extends State<ShowCards> {
               : Container(),
         ),
         SizedBox(
-          height: widget.cardWidth * 0.1,
+          height: widget.cardWidth * 0.2,
         ),
         if (gameState.isShowTrash)
           TrashShowCardsWidget(
