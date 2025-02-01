@@ -33,7 +33,7 @@ class CardWidget extends StatelessWidget {
           errorBuilder: (context, error, stackTrace) {
             return Container(
               color: Colors.grey,
-              child: Center(child: Text(card.getDisplayName() ?? 'Unknown')),
+              child: Center(child: Text(card.getDisplayName() ?? 'Unknown', style: TextStyle(fontSize: gameState.textWidth(cardWidth)))),
             );
           },
         ),

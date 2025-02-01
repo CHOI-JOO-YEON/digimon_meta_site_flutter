@@ -12,11 +12,13 @@ class FieldArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double resizingWidth = cardWidth * 0.85;
     return Consumer<GameState>(
       builder: (context, gameState, child) {
         return Column(
           children: [
-            const Text('필드'),
+            Text('필드',
+                style: TextStyle(fontSize: gameState.textWidth(cardWidth))),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -26,30 +28,30 @@ class FieldArea extends StatelessWidget {
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 8,
                           childAspectRatio: 0.35,
-                          crossAxisSpacing: cardWidth * 0.05),
+                          crossAxisSpacing: resizingWidth * 0.05),
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
                           fieldZone: gameState.fieldZones["field$index"]!,
-                          cardWidth: cardWidth,
+                          cardWidth: resizingWidth,
                           isRaising: false,
                         );
                       },
                     ),
                     SizedBox(
-                      height: cardWidth * 0.05,
+                      height: resizingWidth * 0.05,
                     ),
                     GridView.builder(
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 8,
                           childAspectRatio: 0.712,
-                          crossAxisSpacing: cardWidth * 0.05),
+                          crossAxisSpacing: resizingWidth * 0.05),
                       itemCount: gameState.fieldZones.length - 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
                           fieldZone: gameState.fieldZones["field${index + 8}"]!,
-                          cardWidth: cardWidth,
+                          cardWidth: resizingWidth,
                           isRaising: false,
                         );
                       },

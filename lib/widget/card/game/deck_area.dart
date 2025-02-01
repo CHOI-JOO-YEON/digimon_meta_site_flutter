@@ -18,9 +18,8 @@ class DeckArea extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-       
         GestureDetector(
-          onTap: ()=>gameState.drawCard(),
+          onTap: () => gameState.drawCard(),
           child: CardBackWidget(
             width: cardWidth,
             text: '덱',
@@ -30,7 +29,15 @@ class DeckArea extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(onPressed: ()=>gameState.showCard(), icon: Icon(Icons.search), tooltip: '오픈',)
+            IconButton(
+              onPressed: () => gameState.showCard(),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.search,
+                size: gameState.iconWidth(cardWidth),
+              ),
+              tooltip: '오픈',
+            )
           ],
         ),
       ],

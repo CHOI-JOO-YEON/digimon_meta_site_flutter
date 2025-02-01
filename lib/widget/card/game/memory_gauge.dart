@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../state/game_state.dart';
 
 class MemoryGauge extends StatefulWidget {
-  const MemoryGauge({super.key});
+  final double cardWidth;
+  const MemoryGauge({super.key, required this.cardWidth});
 
   @override
   _MemoryGaugeState createState() => _MemoryGaugeState();
 }
 
 class _MemoryGaugeState extends State<MemoryGauge> {
-  int? selectedMemory; // 현재 선택된 메모리 값
+  int? selectedMemory; 
 
   @override
   Widget build(BuildContext context) {
+    final gameState = Provider.of<GameState>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: List.generate(21, (index) {
-        int value = index - 10; // -10 ~ 10 범위
+        int value = index - 10; 
         bool isSelected = selectedMemory == value;
     
         Color bgColor;
@@ -35,10 +40,8 @@ class _MemoryGaugeState extends State<MemoryGauge> {
             });
           },
           child: Container(
-            height: 40,
-            width: 40,
-            // margin: const EdgeInsets.symmetric(horizontal: 2),
-            // padding: const EdgeInsets.all(8),
+            height: widget.cardWidth*0.32,
+            width: widget.cardWidth*0.32,
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(20),
@@ -55,8 +58,8 @@ class _MemoryGaugeState extends State<MemoryGauge> {
               child: Text(
                 value.abs().toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: gameState.titleWidth(widget.cardWidth), fontWeight: FontWeight.bold),
               ),
             ),
           ),

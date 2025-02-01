@@ -80,6 +80,18 @@ class GameState extends ChangeNotifier {
     return cardWidth * 0.85;
   }
 
+  double iconWidth(double cardWidth) {
+    return cardWidth * 0.2;
+  }
+
+  double titleWidth(double cardWidth) {
+    return cardWidth * 0.15;
+  }
+
+  double textWidth(double cardWidth) {
+    return cardWidth * 0.1;
+  }
+
   void updateDragStatus(String key, bool status) {
     dragStatusMap[key] = status;
     notifyListeners();
@@ -207,7 +219,7 @@ class GameState extends ChangeNotifier {
   void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
     List<DigimonCard> toCards = getCardListById(move.toId);
     bool isToCardsEmpty = toCards.isEmpty;
-    
+
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
       //remove
@@ -253,18 +265,18 @@ class GameState extends ChangeNotifier {
       } else if (move.fromId == 'raising') {
         fromFieldZone = fieldZones[move.fromId]!;
       }
-      
-      if (fromFieldZone != null  && fromFieldZone.stack.isEmpty) {
-         fromFieldZone.isRest =false;
+
+      if (fromFieldZone != null && fromFieldZone.stack.isEmpty) {
+        fromFieldZone.isRest = false;
       }
 
       FieldZone? toFieldZone;
       if (move.toId.startsWith('field')) {
         toFieldZone = fieldZones[move.toId]!;
-      } else if (move.toId   == 'raising') {
+      } else if (move.toId == 'raising') {
         toFieldZone = fieldZones[move.toId]!;
       }
-      if (toFieldZone != null  && isToCardsEmpty) {
+      if (toFieldZone != null && isToCardsEmpty) {
         toFieldZone.isRest = true;
       }
     }
@@ -444,7 +456,6 @@ class MoveCard {
       required this.fromEndIndex,
       required this.toId,
       required this.toStartIndex});
-
 
   @override
   String toString() {

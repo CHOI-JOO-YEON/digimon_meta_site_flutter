@@ -55,10 +55,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
             return Container(
               color: Theme.of(context).cardColor,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(width*0.01),
                       child: Column(
                         children: [
                           Container(
@@ -68,21 +69,54 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                 ),
                             child: Row(
                               children: [
-                                IconButton(
-                                  onPressed: () => gameState.undo(),
-                                  icon: const Icon(Icons.undo),
-                                  tooltip: '뒤로',
+                                ConstrainedBox(
+                                  constraints: BoxConstraints.tightFor(
+                                      width: gameState.iconWidth(cardWidth),
+                                      height: gameState.iconWidth(cardWidth)),
+                                  child: IconButton(
+                                    onPressed: () => gameState.undo(),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.undo,
+                                      size: gameState.iconWidth(cardWidth),
+                                      color: gameState.undoStack.isEmpty
+                                          ? Colors.grey
+                                          : Colors.black,
+                                    ),
+                                    tooltip: '뒤로',
+                                  ),
                                 ),
-                                IconButton(
-                                  onPressed: () => gameState.redo(),
-                                  icon: const Icon(Icons.redo),
-                                  tooltip: '앞으로',
+                                ConstrainedBox(
+                                  constraints: BoxConstraints.tightFor(
+                                      width: gameState.iconWidth(cardWidth),
+                                      height: gameState.iconWidth(cardWidth)),
+                                  child: IconButton(
+                                    onPressed: () => gameState.redo(),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.redo,
+                                      size: gameState.iconWidth(cardWidth),
+                                      color: gameState.redoStack.isEmpty
+                                          ? Colors.grey
+                                          : Colors.black,
+                                    ),
+                                    tooltip: '앞으로',
+                                  ),
                                 ),
-                                IconButton(
-                                  onPressed: () =>
-                                      gameState.init(widget.deckBuild),
-                                  icon: const Icon(Icons.refresh),
-                                  tooltip: '초기화',
+                                ConstrainedBox(
+                                  constraints: BoxConstraints.tightFor(
+                                      width: gameState.iconWidth(cardWidth),
+                                      height: gameState.iconWidth(cardWidth)),
+                                  child: IconButton(
+                                    onPressed: () =>
+                                        gameState.init(widget.deckBuild),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.refresh,
+                                      size: gameState.iconWidth(cardWidth),
+                                    ),
+                                    tooltip: '초기화',
+                                  ),
                                 ),
                               ],
                             ),
@@ -115,12 +149,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                   localeCardData.locale,
                                                   style: TextStyle(
                                                     fontSize: fontSize * 0.8,
-                                                    color:
-                                                        selectedLocaleIndex ==
-                                                                index
-                                                            ? Theme.of(context)
-                                                                .primaryColor
-                                                            : Colors.grey,
+                                                    color: selectedLocaleIndex ==
+                                                            index
+                                                        ? Theme.of(context)
+                                                            .primaryColor
+                                                        : Colors.grey,
                                                     fontWeight:
                                                         selectedLocaleIndex ==
                                                                 index
@@ -137,8 +170,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                 MainAxisAlignment.start,
                                             children: [
                                               Text(
-                                                localeCardData?.name ??
-                                                    '데이터 없음',
+                                                localeCardData?.name ?? '데이터 없음',
                                                 style: TextStyle(
                                                   fontSize: fontSize * 1.5,
                                                   fontFamily:
@@ -164,8 +196,8 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                             BoxConstraints
                                                                 constraints) {
                                                       return SizedBox(
-                                                        width: constraints
-                                                            .maxWidth,
+                                                        width:
+                                                            constraints.maxWidth,
                                                         child: Stack(
                                                           children: [
                                                             SizedBox(
@@ -195,14 +227,15 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                 textSimplifyProvider, child) {
                                               return Row(
                                                 children: [
-                                                  const Text('텍스트 간소화'),
+                                                  Text('텍스트 간소화',
+                                                      style: TextStyle(
+                                                          fontSize: fontSize)),
                                                   Switch(
                                                     value: textSimplifyProvider
                                                         .getTextSimplify(),
                                                     onChanged: (v) {
                                                       textSimplifyProvider
-                                                          .updateTextSimplify(
-                                                              v);
+                                                          .updateTextSimplify(v);
                                                     },
                                                     inactiveThumbColor:
                                                         Colors.red,
@@ -269,7 +302,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                       children: [
                         Column(
                           children: [
-                            const Expanded(flex: 1, child: MemoryGauge()),
+                            Expanded(
+                                flex: 1,
+                                child: MemoryGauge(
+                                  cardWidth: cardWidth,
+                                )),
                             Expanded(
                               flex: 8,
                               child: Row(
@@ -298,7 +335,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                         Expanded(
                                             flex: 3,
                                             child: FieldArea(
-                                              cardWidth: cardWidth * 0.85,
+                                              cardWidth: cardWidth,
                                             )),
                                         Expanded(
                                             flex: 1,

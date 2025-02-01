@@ -37,12 +37,9 @@ class HandArea extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            '패 (${gameState.hand.length})',
-            textAlign: TextAlign.center,
-            
-          ),
-          
+          Text('패 (${gameState.hand.length})',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: gameState.textWidth(cardWidth))),
           DraggableDigimonListWidget(
             id: id,
             cardWidth: resizingCardWidth,
@@ -53,7 +50,10 @@ class HandArea extends StatelessWidget {
 
               return Draggable<MoveCard>(
                 data: MoveCard(
-                    fromId: id, fromStartIndex: index, fromEndIndex: index, isRest: false),
+                    fromId: id,
+                    fromStartIndex: index,
+                    fromEndIndex: index,
+                    isRest: false),
                 feedback: ChangeNotifierProvider.value(
                   value: gameState,
                   child: Material(

@@ -27,29 +27,66 @@ class SecurityStackArea extends StatelessWidget {
         Text(
           '시큐리티 (${gameState.securityStack.length})',
           textAlign: TextAlign.center,
+            style: TextStyle(fontSize: gameState.textWidth(cardWidth))
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              onPressed: () => gameState.shuffleSecurity(),
-              icon: Icon(Icons.shuffle),
-              tooltip: '셔플',
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: gameState.iconWidth(cardWidth),
+                  height: gameState.iconWidth(cardWidth)),
+              child: IconButton(
+                onPressed: () => gameState.shuffleSecurity(),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.shuffle,
+                  size: gameState.iconWidth(cardWidth),
+                ),
+                tooltip: '셔플',
+              ),
             ),
-            IconButton(
-              onPressed: () => gameState.flipAllSecurity(true),
-              icon: Icon(Icons.tag_faces),
-              tooltip: '전체 앞면',
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: gameState.iconWidth(cardWidth),
+                  height: gameState.iconWidth(cardWidth)),
+              child: IconButton(
+                onPressed: () => gameState.flipAllSecurity(true),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.tag_faces,
+                  size: gameState.iconWidth(cardWidth),
+                ),
+                tooltip: '전체 앞면',
+              ),
             ),
-            IconButton(
-              onPressed: () => gameState.flipAllSecurity(false),
-              icon: Icon(Icons.flip),
-              tooltip: '전체 뒷면',
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: gameState.iconWidth(cardWidth),
+                  height: gameState.iconWidth(cardWidth)),
+              child: IconButton(
+                onPressed: () => gameState.flipAllSecurity(false),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.flip,
+                  size: gameState.iconWidth(cardWidth),
+                ),
+                tooltip: '전체 뒷면',
+              ),
             ),
-            IconButton(
-              onPressed: () => gameState.recoveryFromDeck(),
-              icon: Icon(Icons.health_and_safety_outlined),
-              tooltip: '리커버리(덱)',
-            )
+            ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: gameState.iconWidth(cardWidth),
+                    height: gameState.iconWidth(cardWidth)),
+                child: IconButton(
+                  onPressed: () => gameState.recoveryFromDeck(),
+                  padding: EdgeInsets.zero,
+                  icon: Icon(
+                    Icons.health_and_safety_outlined,
+                    size: gameState.iconWidth(cardWidth),
+                  ),
+                  tooltip: '리커버리(덱)',
+                )),
           ],
         ),
         Expanded(
@@ -118,7 +155,8 @@ class _SecurityCardWidgetState extends State<SecurityCardWidget> {
                     data: MoveCard(
                         fromId: widget.id,
                         fromStartIndex: widget.index,
-                        fromEndIndex: widget.index, isRest: false),
+                        fromEndIndex: widget.index,
+                        isRest: false),
                     feedback: ChangeNotifierProvider.value(
                       value: widget.gameState,
                       child: Material(
@@ -154,9 +192,20 @@ class _SecurityCardWidgetState extends State<SecurityCardWidget> {
                 : RotatedBox(
                     quarterTurns: 3,
                     child: CardBackWidget(width: widget.cardWidth)),
-            IconButton(
+            ConstrainedBox(
+              constraints: BoxConstraints.tightFor(
+                  width: widget.gameState.iconWidth(widget.cardWidth),
+                  height: widget.gameState.iconWidth(widget.cardWidth)),
+              child: IconButton(
                 onPressed: () => widget.gameState.flipSecurity(widget.index),
-                icon: Icon(Icons.flip))
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.flip,
+                  size: widget.gameState.iconWidth(widget.cardWidth),
+                ),
+              )
+            ),
+            
           ],
         ),
       ),
