@@ -8,13 +8,13 @@ import 'package:provider/provider.dart';
 
 import '../../provider/limit_provider.dart';
 import '../../service/color_service.dart';
+import 'game/card_back_widget.dart';
 
 class CustomCard extends StatefulWidget {
   final double width;
   final DigimonCard card;
   final bool? isActive;
   final bool? zoomActive;
-
   final Function(DigimonCard)? cardPressEvent;
 
   final Function? onHover;
@@ -98,12 +98,11 @@ class _CustomCardState extends State<CustomCard> {
           }
         },
         // onDoubleTap: _handleDoubleTap,
-        onLongPress: (){
-          if(widget.onLongPress!=null) {
+        onLongPress: () {
+          if (widget.onLongPress != null) {
             widget.onLongPress!();
           }
-
-        } ,
+        },
         // onLongPressStart: _handleLongPressStart,
         // onLongPressEnd: _handleLongPressEnd,
         child: Consumer<LimitProvider>(
@@ -141,10 +140,10 @@ class _CustomCardState extends State<CustomCard> {
                             1,
                             0,
                           ]),
-                    child: Image.network(
-                      widget.card.getDisplaySmallImgUrl() ?? '',
-                      fit: BoxFit.fill,
-                    ),
+                    child:  Image.network(
+                            widget.card.getDisplaySmallImgUrl() ?? '',
+                            fit: BoxFit.fill,
+                          ),
                   ),
                 ),
                 if (widget.card.isParallel ?? false)
@@ -171,7 +170,9 @@ class _CustomCardState extends State<CustomCard> {
                             child: Text(
                               '패럴렐',
                               style: TextStyle(
-                                color: widget.card.color1=='WHITE'?Colors.black: Colors.white,
+                                color: widget.card.color1 == 'WHITE'
+                                    ? Colors.black
+                                    : Colors.white,
                                 fontSize: fontSize * 0.8,
                                 // fontWeight: FontWeight.bold,
                               ),

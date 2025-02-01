@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import 'package:auto_route/auto_route.dart';
+import '../model/card.dart';
 import '../model/deck-build.dart';
 import '../model/locale_card_data.dart';
 import '../provider/text_simplify_provider.dart';
@@ -59,7 +60,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.all(width*0.01),
+                      padding: EdgeInsets.all(width * 0.01),
                       child: Column(
                         children: [
                           Container(
@@ -118,6 +119,20 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                     tooltip: '초기화',
                                   ),
                                 ),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints.tightFor(
+                                      width: gameState.iconWidth(cardWidth),
+                                      height: gameState.iconWidth(cardWidth)),
+                                  child: IconButton(
+                                    onPressed: () => gameState.addTokenToHand(),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.token,
+                                      size: gameState.iconWidth(cardWidth),
+                                    ),
+                                    tooltip: '토큰 추가',
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -129,48 +144,12 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: gameState
-                                                .getSelectedCard()!
-                                                .localeCardData
-                                                .asMap()
-                                                .entries
-                                                .map((entry) {
-                                              int index = entry.key;
-                                              LocaleCardData localeCardData =
-                                                  entry.value;
-                                              return TextButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    selectedLocaleIndex = index;
-                                                  });
-                                                },
-                                                child: Text(
-                                                  localeCardData.locale,
-                                                  style: TextStyle(
-                                                    fontSize: fontSize * 0.8,
-                                                    color: selectedLocaleIndex ==
-                                                            index
-                                                        ? Theme.of(context)
-                                                            .primaryColor
-                                                        : Colors.grey,
-                                                    fontWeight:
-                                                        selectedLocaleIndex ==
-                                                                index
-                                                            ? FontWeight.bold
-                                                            : FontWeight.normal,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                          // SizedBox(height: 10),
-                                          Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
                                               Text(
-                                                localeCardData?.name ?? '데이터 없음',
+                                                localeCardData?.name ??
+                                                    '데이터 없음',
                                                 style: TextStyle(
                                                   fontSize: fontSize * 1.5,
                                                   fontFamily:
@@ -196,8 +175,8 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                             BoxConstraints
                                                                 constraints) {
                                                       return SizedBox(
-                                                        width:
-                                                            constraints.maxWidth,
+                                                        width: constraints
+                                                            .maxWidth,
                                                         child: Stack(
                                                           children: [
                                                             SizedBox(
@@ -235,7 +214,8 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                         .getTextSimplify(),
                                                     onChanged: (v) {
                                                       textSimplifyProvider
-                                                          .updateTextSimplify(v);
+                                                          .updateTextSimplify(
+                                                              v);
                                                     },
                                                     inactiveThumbColor:
                                                         Colors.red,

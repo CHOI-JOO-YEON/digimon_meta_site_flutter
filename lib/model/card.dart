@@ -31,6 +31,7 @@ class DigimonCard {
   int? noteId;
   bool isEn;
   List<LocaleCardData> localeCardData;
+  bool? isToken;
 
   String getKorCardType() {
     switch (cardType) {
@@ -87,31 +88,31 @@ class DigimonCard {
     return 'Lv.$digivolveCondition2에서 $digivolveCost2';
   }
 
-  DigimonCard(
-      {this.cardId,
-      this.cardNo,
-      this.lv,
-      this.dp,
-      this.playCost,
-      this.digivolveCost1,
-      this.digivolveCondition1,
-      this.digivolveCost2,
-      this.digivolveCondition2,
-      this.color1,
-      this.color2,
-      this.color3,
-      this.rarity,
-      this.cardType,
-      this.form,
-      this.attribute,
-      this.types,
-      this.isParallel,
-      this.sortString,
-      this.releaseDate,
-      this.noteId,
-      this.noteName,
-      required this.isEn,
-      required this.localeCardData});
+  DigimonCard({this.cardId,
+    this.cardNo,
+    this.lv,
+    this.dp,
+    this.playCost,
+    this.digivolveCost1,
+    this.digivolveCondition1,
+    this.digivolveCost2,
+    this.digivolveCondition2,
+    this.color1,
+    this.color2,
+    this.color3,
+    this.rarity,
+    this.cardType,
+    this.form,
+    this.attribute,
+    this.types,
+    this.isParallel,
+    this.sortString,
+    this.releaseDate,
+    this.noteId,
+    this.noteName,
+    this.isToken,
+    required this.isEn,
+    required this.localeCardData});
 
   factory DigimonCard.fromJson(Map<String, dynamic> json) {
     return DigimonCard(
@@ -162,16 +163,17 @@ class DigimonCard {
   }
 
   String? getDisplayImgUrl() {
-    for (var localeCardData in localeCardData) { 
-      if(localeCardData.imgUrl!=null) {
+    for (var localeCardData in localeCardData) {
+      if (localeCardData.imgUrl != null) {
         return localeCardData.imgUrl;
       }
     }
     return null;
   }
+
   String? getDisplaySmallImgUrl() {
     for (var localeCardData in localeCardData) {
-      if(localeCardData.smallImgUrl!=null) {
+      if (localeCardData.smallImgUrl != null) {
         return localeCardData.smallImgUrl;
       }
     }

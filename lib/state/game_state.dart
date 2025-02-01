@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../model/card.dart';
 import '../model/deck-build.dart';
+import '../model/locale_card_data.dart';
 
 class GameState extends ChangeNotifier {
   List<DigimonCard> mainDeck = [];
@@ -29,6 +30,22 @@ class GameState extends ChangeNotifier {
 
   GameState(DeckBuild deckBuild) {
     init(deckBuild);
+  }
+
+  void addTokenToHand() {
+    hand.add(DigimonCard(
+      isEn: false,
+      isToken: true,
+      color1: 'WHITE',
+      localeCardData: [
+        LocaleCardData(
+          name: '토큰',
+          locale: 'KOR',
+          effect: '이 카드는 토큰으로 사용할 수 있다.',
+        ),
+      ],
+    ));
+    notifyListeners();
   }
 
   void init(DeckBuild deckBuild) {
@@ -328,7 +345,6 @@ class GameState extends ChangeNotifier {
   void undo() {
     if (undoStack.isEmpty) return;
     MoveCard move = undoStack.removeLast();
-    print(move);
     if (move.moveSet.isNotEmpty) {
       moveOrderedCards(move, false);
     } else if (move.isMemory) {
