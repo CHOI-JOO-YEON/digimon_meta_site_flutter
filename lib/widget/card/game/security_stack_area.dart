@@ -118,7 +118,7 @@ class _SecurityCardWidgetState extends State<SecurityCardWidget> {
                     data: MoveCard(
                         fromId: widget.id,
                         fromStartIndex: widget.index,
-                        fromEndIndex: widget.index),
+                        fromEndIndex: widget.index, isRest: false),
                     feedback: ChangeNotifierProvider.value(
                       value: widget.gameState,
                       child: Material(

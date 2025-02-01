@@ -53,7 +53,7 @@ class HandArea extends StatelessWidget {
 
               return Draggable<MoveCard>(
                 data: MoveCard(
-                    fromId: id, fromStartIndex: index, fromEndIndex: index),
+                    fromId: id, fromStartIndex: index, fromEndIndex: index, isRest: false),
                 feedback: ChangeNotifierProvider.value(
                   value: gameState,
                   child: Material(

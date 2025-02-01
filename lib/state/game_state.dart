@@ -115,7 +115,7 @@ class GameState extends ChangeNotifier {
     undoStack.add(move);
     redoStack.clear();
   }
-  
+
   void drawCard() {
     if (mainDeck.isNotEmpty) {
       final fromIndex = mainDeck.length - 1;
@@ -171,7 +171,6 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  
   bool isShowDialog() {
     return shows.isNotEmpty;
   }
@@ -207,6 +206,8 @@ class GameState extends ChangeNotifier {
 
   void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
     List<DigimonCard> toCards = getCardListById(move.toId);
+    bool isToCardsEmpty = toCards.isEmpty;
+    
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
       //remove
@@ -245,6 +246,29 @@ class GameState extends ChangeNotifier {
             move.fromStartIndex, move.fromEndIndex + 1);
       }
     }
+    if (move.isRest) {
+      FieldZone? fromFieldZone;
+      if (move.fromId.startsWith('field')) {
+        fromFieldZone = fieldZones[move.fromId]!;
+      } else if (move.fromId == 'raising') {
+        fromFieldZone = fieldZones[move.fromId]!;
+      }
+      
+      if (fromFieldZone != null  && fromFieldZone.stack.isEmpty) {
+         fromFieldZone.isRest =false;
+      }
+
+      FieldZone? toFieldZone;
+      if (move.toId.startsWith('field')) {
+        toFieldZone = fieldZones[move.toId]!;
+      } else if (move.toId   == 'raising') {
+        toFieldZone = fieldZones[move.toId]!;
+      }
+      if (toFieldZone != null  && isToCardsEmpty) {
+        toFieldZone.isRest = true;
+      }
+    }
+
     if (isSaveStack) {
       undoStack.add(move.reverse());
       redoStack.clear();
@@ -364,12 +388,12 @@ class RaisingZone extends ChangeNotifier {
 
   void hatchEgg(GameState gameState) {
     if (_digitamaDeck.isNotEmpty) {
-      DigimonCard eggCard = _digitamaDeck.removeLast();
-      fieldZone.addCardToStackAt(eggCard, fieldZone.stack.length,
-          _digitamaDeck.length, key, 'raising', gameState);
-
-      notifyListeners();
-      gameState.notifyListeners();
+      DigimonCard eggCard = _digitamaDeck[0];
+      MoveCard move = MoveCard(
+          fromId: key, fromStartIndex: 0, fromEndIndex: 0, isRest: false);
+      move.toId = 'raising';
+      move.toStartIndex = fieldZone.stack.length;
+      gameState.moveCards(move, [eggCard], true);
     }
   }
 
@@ -380,77 +404,19 @@ class RaisingZone extends ChangeNotifier {
 
 class FieldZone extends ChangeNotifier {
   List<DigimonCard> stack = [];
-  final Set<int> _rotatedCards = {};
   final String key;
+  bool isRest = false;
 
   FieldZone({required this.key});
 
-  void addCardToStackAt(DigimonCard card, int toIndex, int fromIndex,
-      String from, String to, GameState gameState) {
-    if (toIndex == stack.length && _rotatedCards.contains(stack.length - 1)) {
-      _rotatedCards.remove(stack.length - 1);
-      _rotatedCards.add(toIndex);
-    } else {
-      List<int> addIndexes = [];
-      for (int i = toIndex; i < stack.length; i++) {
-        if (_rotatedCards.contains(i)) {
-          _rotatedCards.remove(i);
-          addIndexes.add(i + 1);
-        }
-      }
-      for (var i in addIndexes) {
-        _rotatedCards.add(i);
-      }
-    }
-
-    stack.insert(toIndex, card);
-    gameState.addMoveStack(MoveCard.full(
-            toId: to,
-            fromId: from,
-            toStartIndex: toIndex,
-            fromStartIndex: fromIndex,
-            fromEndIndex: fromIndex)
-        .reverse());
+  void updateRestStatus() {
+    isRest = !isRest;
     notifyListeners();
   }
 
-  void removeCardToStackAt(int index) {
-    if (index == stack.length - 1 && _rotatedCards.contains(stack.length - 1)) {
-      if (stack.length > 1) {
-        _rotatedCards.remove(stack.length - 1);
-        _rotatedCards.add(stack.length - 2);
-      } else {
-        _rotatedCards.clear();
-      }
-    } else {
-      List<int> addIndexes = [];
-      _rotatedCards.remove(index);
-
-      for (int i = index + 1; i < stack.length; i++) {
-        if (_rotatedCards.contains(i)) {
-          _rotatedCards.remove(i);
-          addIndexes.add(i - 1);
-        }
-      }
-      for (var i in addIndexes) {
-        _rotatedCards.add(i);
-      }
-    }
-    stack.removeAt(index);
-    notifyListeners();
-  }
-
-  void rotateIndex(int index) {
-    if (_rotatedCards.contains(index)) {
-      _rotatedCards.remove(index);
-    } else {
-      _rotatedCards.add(index);
-    }
-    notifyListeners();
-  }
-
-  bool isRotate(int index) {
-    return _rotatedCards.contains(index);
+  @override
+  String toString() {
+    return 'FieldZone{stack: $stack, key: $key, isRest: $isRest}';
   }
 }
 
@@ -461,6 +427,7 @@ class MoveCard {
   int toStartIndex = 0;
   int fromStartIndex = 0;
   int fromEndIndex = 0;
+  bool isRest = false;
   SplayTreeSet<MoveIndex> moveSet =
       SplayTreeSet<MoveIndex>((a, b) => b.from.compareTo(a.from));
 
@@ -468,6 +435,7 @@ class MoveCard {
     required this.fromId,
     required this.fromStartIndex,
     required this.fromEndIndex,
+    required this.isRest,
   });
 
   MoveCard.full(
@@ -477,9 +445,10 @@ class MoveCard {
       required this.toId,
       required this.toStartIndex});
 
+
   @override
   String toString() {
-    return 'MoveCard{toId: $toId, fromId: $fromId, toStartIndex: $toStartIndex, fromStartIndex: $fromStartIndex, fromEndIndex: $fromEndIndex, moveSet: $moveSet}';
+    return 'MoveCard{toId: $toId, fromId: $fromId, toStartIndex: $toStartIndex, fromStartIndex: $fromStartIndex, fromEndIndex: $fromEndIndex, isRest: $isRest, moveSet: $moveSet}';
   }
 
   MoveCard reverse() {
@@ -487,7 +456,8 @@ class MoveCard {
     var reverse = MoveCard(
         fromId: toId,
         fromStartIndex: toStartIndex,
-        fromEndIndex: toStartIndex + size);
+        fromEndIndex: toStartIndex + size,
+        isRest: isRest);
     reverse.toStartIndex = fromStartIndex;
     reverse.toId = fromId;
     for (var move in moveSet) {

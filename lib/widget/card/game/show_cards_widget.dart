@@ -54,7 +54,7 @@ class _ShowCardsState extends State<ShowCards> {
   void _sendSelectedToDeckTop(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
     
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0,);
+    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
     move.toId = 'deck';
     int toIndex = gameState.mainDeck.length;
     for(var i in _selectedIndices.reversed) {
@@ -67,7 +67,7 @@ class _ShowCardsState extends State<ShowCards> {
   void _sendSelectedToDeckBottom(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
 
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0,);
+    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
     move.toId = 'deck';
     int toIndex = 0;
     for(var i in _selectedIndices.reversed) {
@@ -80,7 +80,7 @@ class _ShowCardsState extends State<ShowCards> {
   void _sendSelectedToTrash(GameState gameState) {
     if (_selectedIndices.isEmpty) return;
 
-    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0,);
+    MoveCard move = MoveCard(fromId: 'show', fromStartIndex: 0, fromEndIndex: 0, isRest: false,);
     move.toId = 'trash';
     int toIndex = 0;
     for(var i in _selectedIndices) {
@@ -182,7 +182,7 @@ class _ShowCardsState extends State<ShowCards> {
                                           data: MoveCard(
                                               fromId: id,
                                               fromStartIndex: index,
-                                              fromEndIndex: index),
+                                              fromEndIndex: index, isRest: false),
                                           feedback:
                                               ChangeNotifierProvider.value(
                                             value: gameState,

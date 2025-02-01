@@ -26,8 +26,7 @@ class FieldZoneWidget extends StatelessWidget {
     double cardSpacing = cardHeight * 0.16;
     List<DigimonCard> cards = fieldZone.stack;
     String id = fieldZone.key;
-    
-    
+
     final gameState = Provider.of<GameState>(context);
     return ChangeNotifierProvider.value(
       value: fieldZone,
@@ -36,9 +35,8 @@ class FieldZoneWidget extends StatelessWidget {
           return Container(
             padding: EdgeInsets.all(cardWidth * 0.05),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(cardWidth * 0.1)
-            ),
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(cardWidth * 0.1)),
             child: DraggableDigimonStackWidget(
               digimonStack: cards,
               id: id,
@@ -52,7 +50,12 @@ class FieldZoneWidget extends StatelessWidget {
                   return Positioned(
                     bottom: index * cardSpacing,
                     child: Draggable<MoveCard>(
-                      data: MoveCard(fromId: id, fromStartIndex: index, fromEndIndex: index),
+                      data: MoveCard(
+                          fromId: id,
+                          fromStartIndex: index,
+                          fromEndIndex: index,
+                          isRest: cards.length==1 && fieldZone.isRest
+                      ),
                       feedback: ChangeNotifierProvider.value(
                         value: gameState,
                         child: Material(
@@ -60,7 +63,7 @@ class FieldZoneWidget extends StatelessWidget {
                           child: CardWidget(
                             card: card,
                             cardWidth: cardWidth,
-                            rest: () => fieldZone.rotateIndex(index),
+                            rest: () => {},
                           ),
                         ),
                       ),
@@ -69,15 +72,21 @@ class FieldZoneWidget extends StatelessWidget {
                         child: CardWidget(
                           card: card,
                           cardWidth: cardWidth,
-                          rest: () =>fieldZone.rotateIndex(index),
+                          rest: () {},
                         ),
                       ),
                       child: Transform.rotate(
-                        angle: fieldZone.isRotate(index) ? -pi / 8 : 0.0,
+                        angle: fieldZone.isRest && index == cards.length - 1
+                            ? -pi / 8
+                            : 0.0,
                         child: CardWidget(
                           card: card,
                           cardWidth: cardWidth,
-                          rest: () => fieldZone.rotateIndex(index),
+                          rest: () {
+                            if (index == cards.length - 1) {
+                              fieldZone.updateRestStatus();
+                            }
+                          },
                         ),
                       ),
                     ),
@@ -85,26 +94,25 @@ class FieldZoneWidget extends StatelessWidget {
                 }),
                 if (cards.isNotEmpty)
                   Positioned(
-                    bottom: cardHeight +
-                        cardSpacing * (cards.length - 2),
+                    bottom: cardHeight + cardSpacing * (cards.length - 2),
                     left: 0,
                     child: Draggable<MoveCard>(
-                      data: MoveCard(fromId: id, fromStartIndex: 0, fromEndIndex: cards.length - 1),
-                      
+                      data: MoveCard(
+                          fromId: id,
+                          fromStartIndex: 0,
+                          fromEndIndex: cards.length - 1,
+                          isRest: fieldZone.isRest
+                      ),
                       feedback: ChangeNotifierProvider.value(
                         value: gameState,
                         child: Material(
                           color: Colors.transparent,
                           child: SizedBox(
                             width: cardWidth,
-                            height: cardHeight +
-                                cardSpacing *
-                                    (cards.length - 1),
+                            height:
+                                cardHeight + cardSpacing * (cards.length - 1),
                             child: Stack(
-                              children: cards
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
+                              children: cards.asMap().entries.map((entry) {
                                 int index = entry.key;
                                 DigimonCard card = entry.value;
                                 return Positioned(
@@ -139,7 +147,6 @@ class FieldZoneWidget extends StatelessWidget {
                     ),
                   ),
               ],
-              
             ),
           );
         },
