@@ -1,9 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../../enums/site_enum.dart';
 import '../../../model/deck-build.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
@@ -70,6 +68,21 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.image),
                     tooltip: '이미지 저장',
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                      width: SizeService.largeIconSize(context),
+                      height: SizeService.largeIconSize(context)),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      context.router
+                          .push(GamePlayGroundRoute(deckBuild: widget.deck));
+                    },
+                    iconSize: SizeService.largeIconSize(context),
+                    icon: const Icon(Icons.gamepad),
+                    tooltip: '플레이그라운드',
                   ),
                 ),
                 ConstrainedBox(

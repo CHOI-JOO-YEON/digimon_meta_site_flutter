@@ -168,10 +168,11 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     height: SizeService.largeIconSize(context)),
                 child: IconButton(
                   padding: EdgeInsets.zero,
-            onPressed: () {
-            CardOverlayService().removeAllOverlays();
-            context.router.push(GamePlayGroundRoute(deckBuild: widget.deck));
-            },
+                  onPressed: () {
+                    CardOverlayService().removeAllOverlays();
+                    context.router
+                        .push(GamePlayGroundRoute(deckBuild: widget.deck));
+                  },
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.gamepad),
                   tooltip: '플레이그라운드',
