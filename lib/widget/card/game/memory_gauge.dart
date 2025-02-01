@@ -12,7 +12,6 @@ class MemoryGauge extends StatefulWidget {
 }
 
 class _MemoryGaugeState extends State<MemoryGauge> {
-  int? selectedMemory; 
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +19,8 @@ class _MemoryGaugeState extends State<MemoryGauge> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: List.generate(21, (index) {
-        int value = index - 10; 
-        bool isSelected = selectedMemory == value;
+        int value = index - 10;
+        bool isSelected = value == gameState.memory;
     
         Color bgColor;
         if (isSelected) {
@@ -35,9 +34,7 @@ class _MemoryGaugeState extends State<MemoryGauge> {
     
         return GestureDetector(
           onTap: () {
-            setState(() {
-              selectedMemory = (selectedMemory == value) ? null : value;
-            });
+            gameState.updateMemory(value);
           },
           child: Container(
             height: widget.cardWidth*0.32,

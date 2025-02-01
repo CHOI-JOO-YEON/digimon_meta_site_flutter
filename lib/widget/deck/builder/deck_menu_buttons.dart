@@ -1,22 +1,11 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
-import 'package:digimon_meta_site_flutter/service/color_service.dart';
-import 'package:digimon_meta_site_flutter/service/lang_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../api/deck_api.dart';
-import '../../../enums/site_enum.dart';
 import '../../../model/deck-build.dart';
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
-import '../../../model/limit_dto.dart';
-import '../../../provider/limit_provider.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
 import '../../../service/card_overlay_service.dart';
@@ -53,49 +42,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
       builder: (BuildContext context) {
         return const AlertDialog(
           content: Text('로그인이 필요합니다.'),
-        );
-      },
-    );
-  }
-
-  void _showRandomHandDialog(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-
-    final double maxWidth = screenWidth * 0.9;
-    final double maxHeight = screenHeight * 0.9;
-
-    final double aspectRatio = 6 / 4;
-
-    double width = maxWidth;
-    double height = width / aspectRatio;
-
-    if (height > maxHeight) {
-      height = maxHeight;
-      width = height * aspectRatio;
-    }
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double dialogWidth = constraints.maxWidth * 0.9;
-            final double dialogHeight = dialogWidth / aspectRatio;
-
-            return AlertDialog(
-              content: AspectRatio(
-                aspectRatio: aspectRatio,
-                child: SizedBox(
-                  width: dialogWidth,
-                  height: dialogHeight,
-                  child: RandomHandWidget(
-                    deck: widget.deck,
-                  ),
-                ),
-              ),
-            );
-          },
         );
       },
     );

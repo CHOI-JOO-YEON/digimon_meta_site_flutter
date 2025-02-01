@@ -41,6 +41,7 @@ class GameState extends ChangeNotifier {
     trash.clear();
     raisingZone = RaisingZone();
     fieldZones.clear();
+    memory = 0;
 
     undoStack.clear();
     redoStack.clear();
@@ -385,6 +386,11 @@ class GameState extends ChangeNotifier {
       securityStack.add(mainDeck.removeLast());
       securityFlipStatus.add(false);
     }
+    notifyListeners();
+  }
+
+  void updateMemory(int value) {
+    memory = value;
     notifyListeners();
   }
 }
