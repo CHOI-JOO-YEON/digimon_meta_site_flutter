@@ -39,7 +39,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       create: (_) => GameState(widget.deckBuild),
       child: Scaffold(
           appBar: AppBar(
-            title: const Text('플레이 그라운드'),
+            title: const Text('플레이그라운드'),
           ),
           body: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {

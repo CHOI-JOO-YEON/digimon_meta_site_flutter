@@ -227,8 +227,8 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             context.router.push(GamePlayGroundRoute(deckBuild: widget.deck));
             },
                   iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.back_hand_rounded),
-                  tooltip: '랜덤 핸드',
+                  icon: const Icon(Icons.gamepad),
+                  tooltip: '플레이그라운드',
                 ),
               ),
               ConstrainedBox(
