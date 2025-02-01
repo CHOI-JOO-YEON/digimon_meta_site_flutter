@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:digimon_meta_site_flutter/widget/card/game/draggable_digimon_list_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/game/trash_show_cards_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/card.dart';
@@ -112,22 +114,27 @@ class _ShowCardsState extends State<ShowCards> {
     return Column(
       children: [
         SizedBox(
-          height: widget.cardWidth * 2.5,
+          height: widget.cardWidth * 4,
           child: gameState.isShowDialog()
               ? Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: widget.cardWidth * 0.2,
-                          onPressed: () {
-                            setState(() {
-                              _isShow = !_isShow;
-                            });
-                          },
-                          icon: const Icon(Icons.remove_red_eye_outlined),
+                        ConstrainedBox(
+                          constraints: BoxConstraints.tightFor(
+                              width: gameState.iconWidth(widget.cardWidth),
+                              height: gameState.iconWidth(widget.cardWidth)),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: gameState.iconWidth(widget.cardWidth),
+                            onPressed: () {
+                              setState(() {
+                                _isShow = !_isShow;
+                              });
+                            },
+                            icon: const Icon(Icons.remove_red_eye_outlined),
+                          ),
                         ),
                       ],
                     ),
@@ -194,101 +201,121 @@ class _ShowCardsState extends State<ShowCards> {
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.all(widget.cardWidth * 0.1),
-                              child: DraggableDigimonListWidget(
-                                id: id,
-                                cardWidth: resizingCardWidth,
-                                height: resizingCardWidth * 1.8,
-                                children: gameState.shows
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  int index = entry.key;
-                                  DigimonCard card = entry.value;
-                                  final isSelected =
-                                      _selectedIndices.contains(index);
-                                  final selectionOrder =
-                                      _getSelectionOrder(index);
+                            DraggableDigimonListWidget(
+                              id: id,
+                              cardWidth: resizingCardWidth,
+                              height: resizingCardWidth * 1.8,
+                              children:
+                                  gameState.shows.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                DigimonCard card = entry.value;
+                                final isSelected =
+                                    _selectedIndices.contains(index);
+                                final selectionOrder =
+                                    _getSelectionOrder(index);
 
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: widget.cardWidth * 0.02,
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Draggable<MoveCard>(
-                                          data: MoveCard(
-                                              fromId: id,
-                                              fromStartIndex: index,
-                                              fromEndIndex: index,
-                                              isRest: false),
-                                          feedback:
-                                              ChangeNotifierProvider.value(
-                                            value: gameState,
-                                            child: Material(
-                                              color: Colors.transparent,
-                                              child: _buildCardWithSelection(
-                                                card: card,
-                                                cardWidth: resizingCardWidth,
-                                                isSelected: isSelected,
-                                                selectionOrder: selectionOrder,
-                                              ),
-                                            ),
-                                          ),
-                                          childWhenDragging: Opacity(
-                                            opacity: 0.5,
-                                            child: CardWidget(
-                                              card: card,
-                                              cardWidth: resizingCardWidth,
-                                              rest: () {},
-                                            ),
-                                          ),
-                                          child: CardWidget(
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Draggable<MoveCard>(
+                                      data: MoveCard(
+                                          fromId: id,
+                                          fromStartIndex: index,
+                                          fromEndIndex: index,
+                                          isRest: false),
+                                      feedback: ChangeNotifierProvider.value(
+                                        value: gameState,
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: _buildCardWithSelection(
                                             card: card,
                                             cardWidth: resizingCardWidth,
-                                            rest: () {},
+                                            isSelected: isSelected,
+                                            selectionOrder: selectionOrder,
                                           ),
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ConstrainedBox(
-                                              constraints:
-                                                  BoxConstraints.tightFor(
-                                                      width: gameState
-                                                          .iconWidth(widget
-                                                              .cardWidth),
-                                                      height: gameState
-                                                          .iconWidth(widget
-                                                              .cardWidth)),
-                                              child: Checkbox(
-                                                value: isSelected,
-                                                onChanged: (value) {
-                                                  _toggleSelection(index);
-                                                },
-                                              ),
+                                      ),
+                                      childWhenDragging: Opacity(
+                                        opacity: 0.5,
+                                        child: CardWidget(
+                                          card: card,
+                                          cardWidth: resizingCardWidth,
+                                          rest: () {},
+                                        ),
+                                      ),
+                                      child: CardWidget(
+                                        card: card,
+                                        cardWidth: resizingCardWidth,
+                                        rest: () {},
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        ConstrainedBox(
+                                            constraints:
+                                                BoxConstraints.tightFor(
+                                              width: gameState
+                                                  .iconWidth(resizingCardWidth),
+                                              height: gameState
+                                                  .iconWidth(resizingCardWidth),
                                             ),
-                                            if (isSelected)
-                                              Text(
-                                                '$selectionOrder',
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      gameState.textWidth(
-                                                          widget.cardWidth),
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.red,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                _toggleSelection(index);
+                                              },
+                                              child: Padding(
+                                                padding: EdgeInsets.all(
+                                                    resizingCardWidth * 0.02),
+                                                child: Container(
+                                                  width: gameState.iconWidth(
+                                                          resizingCardWidth) *
+                                                      0.7,
+                                                  height: gameState.iconWidth(
+                                                          resizingCardWidth) *
+                                                      0.7,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.rectangle,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    border: Border.all(
+                                                      color: isSelected
+                                                          ? Colors.blue
+                                                          : Colors.grey,
+                                                      width: 2,
+                                                    ),
+                                                    color: isSelected
+                                                        ? Colors.blue
+                                                        : Colors.transparent,
+                                                  ),
+                                                  child: isSelected
+                                                      ? Icon(Icons.check,
+                                                          size: gameState
+                                                                  .iconWidth(widget
+                                                                      .cardWidth) *
+                                                              0.5,
+                                                          color: Colors.white)
+                                                      : null,
                                                 ),
                                               ),
-                                          ],
-                                        ),
+                                            )),
+                                        if (isSelected)
+                                          Text(
+                                            '$selectionOrder',
+                                            style: TextStyle(
+                                              fontSize: gameState
+                                                  .textWidth(resizingCardWidth),
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
                                       ],
                                     ),
-                                  );
-                                }).toList(),
-                              ),
+                                  ],
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -298,7 +325,7 @@ class _ShowCardsState extends State<ShowCards> {
               : Container(),
         ),
         SizedBox(
-          height: widget.cardWidth * 0.2,
+          height: widget.cardWidth * 0.4,
         ),
         if (gameState.isShowTrash)
           TrashShowCardsWidget(
