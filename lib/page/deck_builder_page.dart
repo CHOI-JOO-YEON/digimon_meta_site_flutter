@@ -175,9 +175,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       CardOverlayService().removeAllOverlays();
       _onScroll();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _panelController.animatePanelToPosition(0.5);
-    });
+    if (_panelController.isAttached) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _panelController.animatePanelToPosition(0.5);
+      });
+    }
   }
 
   void _onScroll() {

@@ -59,6 +59,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +70,7 @@ class _MyAppState extends State<MyApp> {
     _initializeLimitProvider();
     _initializeCollectProvider();
   }
+
   void listenForOAuthToken() {
     html.window.addEventListener('message', (event) async {
       html.MessageEvent messageEvent = event as html.MessageEvent;
@@ -76,20 +78,30 @@ class _MyAppState extends State<MyApp> {
       await UserService().oauthLogin(code, context);
     });
   }
+
   Future<void> _initializeLimitProvider() async {
     final limitProvider = Provider.of<LimitProvider>(context, listen: false);
     await limitProvider.initialize();
   }
+
   Future<void> _initializeCollectProvider() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final collectProvider = Provider.of<CollectProvider>(context, listen: false);
+    final collectProvider =
+        Provider.of<CollectProvider>(context, listen: false);
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'DGCHub',
       theme: ThemeData(
-       fontFamily: 'JalnanGothic',
+        scaffoldBackgroundColor: Color.fromRGBO(245, 245, 245, 1),
+        dialogTheme: DialogTheme(
+            backgroundColor: Color.fromRGBO(220, 221, 231, 1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            )),
+        fontFamily: 'JalnanGothic',
         primarySwatch: const MaterialColor(0xFF1A237E, {
           50: Color(0xFFE8EAF6),
           100: Color(0xFFC5CAE9),
@@ -119,20 +131,15 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: const Color(0xFFF5F5F5),
           cardColor: const Color(0xFFFFFFFF),
         ),
-        // textTheme: const TextTheme(
-        //   headline1: TextStyle(color: Color(0xFF1A237E)),
-        //   headline2: TextStyle(color: Color(0xFF3949AB)),
-        //   headline3: TextStyle(color: Color(0xFF303F9F)),
-        //   headline4: TextStyle(color: Color(0xFF283593)),
-        //   headline5: TextStyle(color: Color(0xFF1A237E)),
-        //   headline6: TextStyle(color: Color(0xFF1A237E)),
-        //   bodyText1: TextStyle(color: Color(0xFF000000)),
-        //   bodyText2: TextStyle(color: Color(0xFF000000)),
-        // ),
+        textTheme: const TextTheme(
+          headlineLarge: TextStyle(color: Color(0xFF1A237E)),
+          headlineMedium: TextStyle(color: Color(0xFF303F9F)),
+          headlineSmall: TextStyle(color: Color(0xFF1A237E)),
+          bodyLarge: TextStyle(color: Color(0xFF000000)),
+        ),
       ),
       routerConfig: widget.router.config(),
-      
-      builder: (context, child) =>  ResponsiveBreakpoints.builder(
+      builder: (context, child) => ResponsiveBreakpoints.builder(
         child: child!,
         breakpoints: [
           const Breakpoint(start: 0, end: 480, name: MOBILE),
@@ -143,6 +150,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
-
 }

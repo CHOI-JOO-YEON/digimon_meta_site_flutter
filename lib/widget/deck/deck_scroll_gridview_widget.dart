@@ -35,6 +35,7 @@ class DeckScrollGridView extends StatefulWidget {
 class _DeckScrollGridViewState extends State<DeckScrollGridView>
     with WidgetsBindingObserver {
   Size _lastSize = Size.zero;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +46,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     });
   }
 
-  final ScrollController _scrollController = ScrollController(); 
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -68,7 +69,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     final Size newSize = MediaQuery.of(context).size;
 
     if (newSize != _lastSize) {
-      widget.cardOverlayService.removeAllOverlays(); 
+      widget.cardOverlayService.removeAllOverlays();
       _lastSize = newSize;
     }
   }
@@ -94,7 +95,6 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
 
             return Stack(
               children: [
-                
                 CustomCard(
                   key: cardKey,
                   card: card,
@@ -118,8 +118,10 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                           widget.isTama);
                     }
                   },
-                  onLongPress: () => CardService()
-                      .showImageDialog(context, card, widget.searchNote, 
+                  onLongPress: () => CardService().showImageDialog(
+                    context,
+                    card,
+                    widget.searchNote,
                   ),
                   onHover: (context) {
                     final RenderBox renderBox =
@@ -138,8 +140,9 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                   left: ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
                   bottom:
                       ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width:
+                        ((constraints.maxWidth / widget.rowNumber) * 0.9) / 6,
                     child: StrokeText(
                       text: '$count',
                       textStyle: TextStyle(
@@ -147,11 +150,12 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                             ((constraints.maxWidth / widget.rowNumber) * 0.9) /
                                 6,
                         color: Colors.black,
+                        fontFamily: 'JalnanGothic',
                       ),
                       strokeColor: Colors.white,
                       strokeWidth:
                           ((constraints.maxWidth / widget.rowNumber) * 0.9) /
-                              30,
+                              25,
                     ),
                   ),
                 ),
