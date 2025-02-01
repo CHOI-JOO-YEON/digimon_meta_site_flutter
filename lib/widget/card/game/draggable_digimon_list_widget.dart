@@ -53,7 +53,6 @@ class _DraggableDigimonListWidgetState
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
 
-    final ScrollController scrollController = ScrollController();
     return DragTarget<MoveCard>(
       onWillAcceptWithDetails: (data) => true,
       onAcceptWithDetails: (details) {
