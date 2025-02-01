@@ -34,7 +34,7 @@ class _MemoryGaugeState extends State<MemoryGauge> {
     
         return GestureDetector(
           onTap: () {
-            gameState.updateMemory(value);
+            gameState.updateMemory(value, true);
           },
           child: Container(
             height: widget.cardWidth*0.32,

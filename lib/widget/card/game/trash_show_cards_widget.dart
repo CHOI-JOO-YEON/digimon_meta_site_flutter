@@ -45,7 +45,7 @@ class TrashShowCardsWidget extends StatelessWidget {
                         data: MoveCard(
                             fromId: id,
                             fromStartIndex: index,
-                            fromEndIndex: index, isRest: false),
+                            fromEndIndex: index, restStatus: false),
                         feedback: Material(
                           color: Colors.transparent,
                           child: ChangeNotifierProvider.value(

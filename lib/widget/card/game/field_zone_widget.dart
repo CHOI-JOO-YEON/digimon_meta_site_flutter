@@ -54,8 +54,7 @@ class FieldZoneWidget extends StatelessWidget {
                           fromId: id,
                           fromStartIndex: index,
                           fromEndIndex: index,
-                          isRest: cards.length==1 && fieldZone.isRest
-                      ),
+                          restStatus: cards.length == 1 && fieldZone.isRest),
                       feedback: ChangeNotifierProvider.value(
                         value: gameState,
                         child: Material(
@@ -84,7 +83,7 @@ class FieldZoneWidget extends StatelessWidget {
                           cardWidth: cardWidth,
                           rest: () {
                             if (index == cards.length - 1) {
-                              fieldZone.updateRestStatus();
+                              fieldZone.updateRestStatus(true, gameState);
                             }
                           },
                         ),
@@ -101,8 +100,7 @@ class FieldZoneWidget extends StatelessWidget {
                           fromId: id,
                           fromStartIndex: 0,
                           fromEndIndex: cards.length - 1,
-                          isRest: fieldZone.isRest
-                      ),
+                          restStatus: fieldZone.isRest),
                       feedback: ChangeNotifierProvider.value(
                         value: gameState,
                         child: Material(

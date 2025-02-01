@@ -53,7 +53,7 @@ class HandArea extends StatelessWidget {
                     fromId: id,
                     fromStartIndex: index,
                     fromEndIndex: index,
-                    isRest: false),
+                    restStatus: false),
                 feedback: ChangeNotifierProvider.value(
                   value: gameState,
                   child: Material(

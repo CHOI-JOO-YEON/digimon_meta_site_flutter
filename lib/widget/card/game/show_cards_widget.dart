@@ -60,7 +60,7 @@ class _ShowCardsState extends State<ShowCards> {
       fromId: 'show',
       fromStartIndex: 0,
       fromEndIndex: 0,
-      isRest: false,
+      restStatus: false,
     );
     move.toId = 'deck';
     int toIndex = gameState.mainDeck.length;
@@ -78,7 +78,7 @@ class _ShowCardsState extends State<ShowCards> {
       fromId: 'show',
       fromStartIndex: 0,
       fromEndIndex: 0,
-      isRest: false,
+      restStatus: false,
     );
     move.toId = 'deck';
     int toIndex = 0;
@@ -96,7 +96,7 @@ class _ShowCardsState extends State<ShowCards> {
       fromId: 'show',
       fromStartIndex: 0,
       fromEndIndex: 0,
-      isRest: false,
+      restStatus: false,
     );
     move.toId = 'trash';
     int toIndex = 0;
@@ -222,7 +222,7 @@ class _ShowCardsState extends State<ShowCards> {
                                           fromId: id,
                                           fromStartIndex: index,
                                           fromEndIndex: index,
-                                          isRest: false),
+                                          restStatus: false),
                                       feedback: ChangeNotifierProvider.value(
                                         value: gameState,
                                         child: Material(
