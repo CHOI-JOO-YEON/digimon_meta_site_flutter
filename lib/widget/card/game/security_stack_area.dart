@@ -18,7 +18,7 @@ class SecurityStackArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
     double cardHeight = cardWidth * 1.404;
-    double cardSpacing = cardHeight * 0.16;
+    double cardSpacing = cardHeight * 0.25;
     List<DigimonCard> cards = gameState.securityStack;
     String id = 'security';
     return Column(

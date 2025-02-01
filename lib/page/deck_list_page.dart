@@ -46,6 +46,9 @@ class _DeckListPageState extends State<DeckListPage> {
       deckSearchParameter = DeckSearchParameter.fromJson(
           json.decode(widget.searchParameterString!));
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _panelController.animatePanelToPosition(0.5);
+    });
   }
 
   void updateSearchParameter() {
@@ -89,6 +92,7 @@ class _DeckListPageState extends State<DeckListPage> {
                 maxHeight: constraints.maxHeight,
                 snapPoint: 0.5,
                 isDraggable: false,
+                
                 panelBuilder: (ScrollController sc) {
                   return Container(
                     decoration: BoxDecoration(

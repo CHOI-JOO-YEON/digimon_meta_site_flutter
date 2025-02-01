@@ -82,7 +82,7 @@ class GameState extends ChangeNotifier {
   }
 
   double iconWidth(double cardWidth) {
-    return cardWidth * 0.2;
+    return cardWidth * 0.3;
   }
 
   double titleWidth(double cardWidth) {
