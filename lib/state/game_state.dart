@@ -27,28 +27,11 @@ class GameState extends ChangeNotifier {
   DigimonCard? selectedCard;
   bool isShowTrash = false;
 
-  double showCardWidth(double cardWidth) {
-    return cardWidth * 0.85;
-  }
-
-  void updateDragStatus(String key, bool status) {
-    dragStatusMap[key] = status;
-    notifyListeners();
-  }
-
-  bool getDragStatus(String key) {
-    return dragStatusMap[key] ?? false;
-  }
-
-  void updateShowTrash(bool value) {
-    isShowTrash = value;
-    notifyListeners();
-  }
   GameState(DeckBuild deckBuild) {
     init(deckBuild);
   }
-  void init(DeckBuild deckBuild)
-  {
+
+  void init(DeckBuild deckBuild) {
     mainDeck.clear();
     digitamaDeck.clear();
     hand.clear();
@@ -93,6 +76,24 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  double showCardWidth(double cardWidth) {
+    return cardWidth * 0.85;
+  }
+
+  void updateDragStatus(String key, bool status) {
+    dragStatusMap[key] = status;
+    notifyListeners();
+  }
+
+  bool getDragStatus(String key) {
+    return dragStatusMap[key] ?? false;
+  }
+
+  void updateShowTrash(bool value) {
+    isShowTrash = value;
+    notifyListeners();
+  }
+
   void addFieldZone(int count) {
     for (int i = fieldZones.length; i < count + fieldZones.length; i++) {
       String key = "field$i";
@@ -100,7 +101,6 @@ class GameState extends ChangeNotifier {
     }
     notifyListeners();
   }
-
 
   DigimonCard? getSelectedCard() {
     return selectedCard;
@@ -115,7 +115,7 @@ class GameState extends ChangeNotifier {
     undoStack.add(move);
     redoStack.clear();
   }
-
+  
   void drawCard() {
     if (mainDeck.isNotEmpty) {
       final fromIndex = mainDeck.length - 1;
@@ -148,11 +148,6 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  void updateMemory(int newMemory) {
-    memory = newMemory.clamp(-10, 10);
-    notifyListeners();
-  }
-
   void addCardToDeckBottom(DigimonCard card, String from, int fromIndex) {
     mainDeck.insert(0, card);
     addMoveStack(MoveCard.full(
@@ -176,79 +171,9 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addCardToTrash(DigimonCard card, String from, int fromIndex) {
-    trash.add(card);
-    addMoveStack(MoveCard.full(
-        toId: "trash",
-        fromId: from,
-        toStartIndex: trash.length - 1,
-        fromStartIndex: fromIndex,
-        fromEndIndex: fromIndex));
-    notifyListeners();
-  }
-
-  void removeCardFromHandAt(int index) {
-    hand.removeAt(index);
-    notifyListeners();
-  }
-
-  void removeCardFromShowsAt(int index) {
-    shows.removeAt(index);
-    notifyListeners();
-  }
-
-  void removeCardFromTrashAt(int index) {
-    trash.removeAt(index);
-    notifyListeners();
-  }
-
+  
   bool isShowDialog() {
     return shows.isNotEmpty;
-  }
-
-  DigimonCard? getCardByLog(String to, int toIndex) {
-    switch (to) {
-      case "hand":
-        return hand.removeAt(toIndex);
-      case "show":
-        return shows.removeAt(toIndex);
-      case "deck":
-        return mainDeck.removeAt(toIndex);
-      case "raising":
-        return raisingZone.fieldZone.stack.removeAt(toIndex);
-      case "trash":
-        return trash.removeAt(toIndex);
-    }
-
-    if (to.startsWith("field")) {
-      return fieldZones[to]!.stack.removeAt(toIndex);
-    }
-    return null;
-  }
-
-  void addCardByLog(String from, int fromIndex, DigimonCard card) {
-    switch (from) {
-      case "hand":
-        fromIndex.clamp(0, hand.length - 1);
-        return hand.insert(fromIndex, card);
-      case "show":
-        fromIndex.clamp(0, shows.length - 1);
-        return shows.insert(fromIndex, card);
-      case "deck":
-        fromIndex.clamp(0, mainDeck.length - 1);
-        return mainDeck.insert(fromIndex, card);
-      case "raising":
-        fromIndex.clamp(0, raisingZone.fieldZone.stack.length - 1);
-        return raisingZone.fieldZone.stack.insert(fromIndex, card);
-      case "trash":
-        fromIndex.clamp(0, trash.length - 1);
-        return trash.insert(fromIndex, card);
-    }
-
-    if (from.startsWith("field")) {
-      fromIndex.clamp(0, fieldZones[from]!.stack.length - 1);
-      return fieldZones[from]!.stack.insert(fromIndex, card);
-    }
   }
 
   List<DigimonCard> getCardsBySourceId(
@@ -281,7 +206,6 @@ class GameState extends ChangeNotifier {
   }
 
   void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
-    (move);
     List<DigimonCard> toCards = getCardListById(move.toId);
     List<DigimonCard> fromCards = getCardListById(move.fromId);
     if (move.toId == move.fromId && move.fromStartIndex > move.toStartIndex) {
