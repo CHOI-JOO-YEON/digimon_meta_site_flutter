@@ -46,11 +46,12 @@ class _DeckListPageState extends State<DeckListPage> {
       deckSearchParameter = DeckSearchParameter.fromJson(
           json.decode(widget.searchParameterString!));
     }
-    if (_panelController.isAttached) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (MediaQuery.of(context).orientation == Orientation.portrait &&
+          _panelController.isAttached) {
         _panelController.animatePanelToPosition(0.5);
-      });
-    }
+      }
+    });
   }
 
   void updateSearchParameter() {
