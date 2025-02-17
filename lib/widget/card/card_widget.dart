@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/widgets.dart';
@@ -82,13 +83,13 @@ class _CustomCardState extends State<CustomCard> {
     String color = widget.card.color2 ?? widget.card.color1!;
     return MouseRegion(
       onEnter: (event) {
-        if (widget.onHover != null) {
-          widget.onHover!(context);
+        if (event.kind == PointerDeviceKind.mouse) {
+          widget.onHover?.call(context);
         }
       },
       onExit: (event) {
-        if (widget.onExit != null) {
-          widget.onExit!();
+        if (event.kind == PointerDeviceKind.mouse) {
+          widget.onExit?.call();
         }
       },
       child: GestureDetector(
