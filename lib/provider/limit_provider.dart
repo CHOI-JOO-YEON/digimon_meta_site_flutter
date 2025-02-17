@@ -59,4 +59,23 @@ class LimitProvider with ChangeNotifier {
     }
     return latestLimit;
   }
+
+  bool isAllowedByLimitPair(String cardNo, Set<String> deckCardNos) {
+    if (_selectedLimit == null) {
+      return true;
+    }
+    for (var limitPair in _selectedLimit!.limitPairs) {
+      if (limitPair.acardPairNos.contains(cardNo)) {
+        if (limitPair.bcardPairNos.any((bCardNo) => deckCardNos.contains(bCardNo))) {
+          return false;
+        }
+      }
+      if (limitPair.bcardPairNos.contains(cardNo)) {
+        if (limitPair.acardPairNos.any((aCardNo) => deckCardNos.contains(aCardNo))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }

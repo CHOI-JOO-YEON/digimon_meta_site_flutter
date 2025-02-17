@@ -104,7 +104,8 @@ class DeckBuild {
       DigimonCard card = tamaEntry.key;
       int cnt = tamaEntry.value;
       for (int i = 0; i < cnt; i++) {
-        if (!isCanAdd(card)) {
+        String? result = canAddCard(card);
+        if (result != null) {
           return;
         }
         _addCard(card);
@@ -115,7 +116,8 @@ class DeckBuild {
       DigimonCard card = cardEntry.key;
       int cnt = cardEntry.value;
       for (int i = 0; i < cnt; i++) {
-        if (!isCanAdd(card)) {
+        String? result = canAddCard(card);
+        if (result != null) {
           return;
         }
         _addCard(card);
@@ -167,7 +169,8 @@ class DeckBuild {
         for (var cardEntry in deckView.cardAndCntMap!.entries) {
           DigimonCard card = cardEntry.key;
           for (int i = 0; i < cardEntry.value; i++) {
-            if (!isCanAdd(card)) {
+            String? result = canAddCard(card);
+            if (result != null) {
               return;
             }
             _addCard(card);
@@ -222,22 +225,28 @@ class DeckBuild {
     }
   }
 
-  bool isCanAdd(card) {
+  String? canAddCard(DigimonCard card) { 
     int limit = LimitService().getCardLimit(card);
     int cnt = cardNoCntMap[card.cardNo] ?? 0;
     
     if (cnt >= limit && isStrict) {
-      return false;
+      return '넣을 수 있는 매수를 초과했습니다';
     }
-    return true;
+    if (isStrict && !LimitService().isAllowedByLimitPair(card.cardNo!, cardNoCntMap.keys.toSet())) {
+      return 'A/B 제한에 해당하는 카드입니다.';
+    }
+    
+      return null;
   }
 
-  addSingleCard(DigimonCard card) {
-    if (!isCanAdd(card)) {
-      return;
+  String? addSingleCard(DigimonCard card) {
+    String? result = canAddCard(card);
+    if (result != null) {
+      return result;
     }
     _addCard(card);
     _postDeckChanged();
+    return null;
   }
 
   void _addCard(DigimonCard card) {

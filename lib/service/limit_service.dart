@@ -10,4 +10,8 @@ class LimitService {
     return min(LimitProvider().getCardAllowedQuantity(card.cardNo!),
         SpecialLimitCard.getLimitByCardNo(card.cardNo!));
   }
+
+  bool isAllowedByLimitPair(String cardNo, Set<String> deckCardNos) {
+    return LimitProvider().isAllowedByLimitPair(cardNo, deckCardNos);
+  }
 }

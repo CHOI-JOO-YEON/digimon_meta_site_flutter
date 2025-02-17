@@ -255,7 +255,7 @@ class _CollectPageState extends State<CollectPage> {
                                         cards: cards,
                                         rowNumber: isPortrait ? 5 : 8,
                                         loadMoreCards: loadMoreCard,
-                                        cardPressEvent: (card) {},
+                                        cardPressEvent: (card, {position}) {},
                                         totalPages: totalPages,
                                         currentPage: currentPage,
                                         isTextSimplify: false,
