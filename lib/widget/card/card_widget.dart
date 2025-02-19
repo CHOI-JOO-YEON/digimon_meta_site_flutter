@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
+import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -110,6 +111,8 @@ class _CustomCardState extends State<CustomCard> {
           builder: (context, limitProvider, child) {
             int allowedQuantity =
                 limitProvider.getCardAllowedQuantity(widget.card.cardNo!);
+            List<String> abPairBanCardNos =
+                limitProvider.getABPairBanCardNos(widget.card.cardNo!);
             return Stack(
               alignment: Alignment.bottomRight,
               children: [
@@ -141,10 +144,10 @@ class _CustomCardState extends State<CustomCard> {
                             1,
                             0,
                           ]),
-                    child:  Image.network(
-                            widget.card.getDisplaySmallImgUrl() ?? '',
-                            fit: BoxFit.fill,
-                          ),
+                    child: Image.network(
+                      widget.card.getDisplaySmallImgUrl() ?? '',
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 if (widget.card.isParallel ?? false)
@@ -183,7 +186,9 @@ class _CustomCardState extends State<CustomCard> {
                       },
                     ),
                   ),
-                if (allowedQuantity == 1 || allowedQuantity == 0)
+                if (allowedQuantity == 1 ||
+                    allowedQuantity == 0 ||
+                    abPairBanCardNos.isNotEmpty)
                   Positioned(
                     top: widget.width * 0.08,
                     right: widget.width * 0.08,
@@ -226,6 +231,32 @@ class _CustomCardState extends State<CustomCard> {
                                   color: Colors.white,
                                   fontSize: fontSize,
                                   fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        } else if (abPairBanCardNos.isNotEmpty) {
+                          return GestureDetector(
+                            onTap: () {
+                              ToastOverlay.show(context,
+                                  '${abPairBanCardNos.toString()} 카드와 함께 사용할 수 없습니다.');
+                            },
+                            child: Container(
+                              padding: EdgeInsets.zero,
+                              width: containerSize,
+                              height: containerSize,
+                              decoration: BoxDecoration(
+                                color: Colors.purple,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'AB',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: fontSize*0.7,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),

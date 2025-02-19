@@ -46,6 +46,21 @@ class LimitProvider with ChangeNotifier {
     return SpecialLimitCard.getLimitByCardNo(cardNo);
   }
 
+  List<String> getABPairBanCardNos(String cardNo) {
+    if (_selectedLimit == null) {
+      return [];
+    }
+    for (var limitPair in _selectedLimit!.limitPairs) {
+      if (limitPair.acardPairNos.contains(cardNo)) {
+        return limitPair.bcardPairNos;
+      }
+      if (limitPair.bcardPairNos.contains(cardNo)) {
+        return limitPair.acardPairNos;
+      }
+    }
+    return [];
+  }
+
   LimitDto? getCurrentLimit() {
     DateTime currentDate = DateTime.now();
     LimitDto? latestLimit;
