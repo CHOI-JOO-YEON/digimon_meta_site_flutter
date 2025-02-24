@@ -1,14 +1,11 @@
-import 'dart:math';
+
 
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:provider/provider.dart';
-
 import 'package:auto_route/auto_route.dart';
-import '../model/card.dart';
 import '../model/deck-build.dart';
 import '../model/locale_card_data.dart';
 import '../provider/text_simplify_provider.dart';

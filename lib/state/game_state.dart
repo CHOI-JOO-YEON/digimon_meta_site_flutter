@@ -259,7 +259,7 @@ class GameState extends ChangeNotifier {
             move.fromStartIndex, move.fromEndIndex + 1);
       } else if (move.toId == 'security') {
         for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
-          securityFlipStatus.insert(move.toStartIndex + i, true);
+          securityFlipStatus.insert(move.toStartIndex + i, move.isFace);
         }
       }
       if (move.toId == move.fromId) {
@@ -279,7 +279,7 @@ class GameState extends ChangeNotifier {
         securityFlipStatus.removeAt(move.fromStartIndex);
       } else if (move.toId == 'security') {
         for (int i = 0; i < move.fromEndIndex + 1 - move.fromStartIndex; i++) {
-          securityFlipStatus.insert(move.toStartIndex + i, true);
+          securityFlipStatus.insert(move.toStartIndex + i, move.isFace);
         }
       } else if (move.fromId == 'security') {
         securityFlipStatus.removeRange(
@@ -428,8 +428,18 @@ class GameState extends ChangeNotifier {
 
   void recoveryFromDeck() {
     if (mainDeck.isNotEmpty) {
+      final fromIndex = mainDeck.length - 1;
+      final toIndex = securityStack.length;
       securityStack.add(mainDeck.removeLast());
       securityFlipStatus.add(false);
+      var move = MoveCard.full(
+          toId: "security",
+          fromId: "deck",
+          toStartIndex: toIndex,
+          fromStartIndex: fromIndex,
+          fromEndIndex: fromIndex);
+      move.isFace = false;
+      addMoveStack(move.reverse());
     }
     notifyListeners();
   }
@@ -513,6 +523,7 @@ class MoveCard {
   bool isMemory = false;
 
   bool isRest = false;
+  bool isFace = false;
   String restId = "";
 
   SplayTreeSet<MoveIndex> moveSet =
@@ -556,6 +567,7 @@ class MoveCard {
     reverse.isMemory = isMemory;
     reverse.isRest = isRest;
     reverse.restId = restId;
+    reverse.isFace = isFace;
     for (var move in moveSet) {
       reverse.moveSet.add(MoveIndex(move.from, move.to));
     }
