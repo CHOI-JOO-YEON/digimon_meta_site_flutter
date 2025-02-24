@@ -348,7 +348,9 @@ class GameState extends ChangeNotifier {
     if (move.moveSet.isNotEmpty) {
       moveOrderedCards(move, false);
     } else if (move.isMemory) {
+      redoStack.add(MoveCard.memory(memory: memory));
       updateMemory(move.memory, false);
+      return;
     } else if (move.isRest) {
       FieldZone? fieldZone = getFiledZone(move.restId);
       if (fieldZone != null) {
@@ -368,7 +370,9 @@ class GameState extends ChangeNotifier {
     if (move.moveSet.isNotEmpty) {
       moveOrderedCards(move, false);
     } else if (move.isMemory) {
+      undoStack.add(MoveCard.memory(memory: memory));
       updateMemory(move.memory, false);
+      return;
     } else if (move.isRest) {
       FieldZone? fieldZone = getFiledZone(move.restId);
       if (fieldZone != null) {
@@ -523,7 +527,7 @@ class MoveCard {
   bool isMemory = false;
 
   bool isRest = false;
-  bool isFace = false;
+  bool isFace = true;
   String restId = "";
 
   SplayTreeSet<MoveIndex> moveSet =
