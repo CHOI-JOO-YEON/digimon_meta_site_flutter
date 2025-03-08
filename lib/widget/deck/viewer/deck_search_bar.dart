@@ -36,6 +36,7 @@ class DeckSearchBar extends StatefulWidget {
 
 class _DeckSearchBarState extends State<DeckSearchBar> {
   FormatDto? _selectedFormat;
+  late TextEditingController _searchController;
 
   List<String> colors = [
     "RED",
@@ -49,10 +50,23 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     _selectedFormat = widget.selectedFormat;
+    _searchController = TextEditingController(text: widget.searchParameter.searchString);
+  }
+
+  @override
+  void didUpdateWidget(DeckSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchParameter.searchString != _searchController.text) {
+      _searchController.text = widget.searchParameter.searchString;
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _showDeckSettingDialog(BuildContext context) {
@@ -249,17 +263,17 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             Expanded(
               flex: 3,
               child: TextField(
+                controller: _searchController,
                 style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                 decoration: InputDecoration(
                   labelText: '검색어',
                   labelStyle: TextStyle(fontSize: SizeService.smallFontSize(context)),
                 ),
                 onChanged: (value) {
-                  setState(() {
-                    widget.searchParameter.searchString = value;
-                  });
+                  widget.searchParameter.searchString = value;
                 },
                 onSubmitted: (value) {
+                  widget.searchParameter.searchString = value;
                   widget.search(1);
                 },
               ),

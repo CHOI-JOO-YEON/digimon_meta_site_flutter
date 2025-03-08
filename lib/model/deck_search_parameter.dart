@@ -60,6 +60,9 @@ class DeckSearchParameter {
       ..formatId = json['formatId'] as int?
       ..limitId = json['limitId'] as int?
       ..isOnlyValidDeckAll = json['isOnlyValidDeck'] as bool? ?? true
-      ..isOnlyValidDeckMy = json['isOnlyValidDeck'] as bool? ?? false;
+      ..isOnlyValidDeckMy = json['isOnlyValidDeck'] as bool? ?? false
+      ..formatId = json['formatId'] as int?
+      ;
+
   }
 }

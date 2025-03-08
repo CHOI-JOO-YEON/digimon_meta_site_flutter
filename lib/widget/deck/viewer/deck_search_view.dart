@@ -44,7 +44,14 @@ class _DeckSearchViewState extends State<DeckSearchView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(onTap);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          widget.deckSearchParameter.isMyDeck = _tabController.index == 1;
+          widget.updateSearchParameter();
+        });
+      }
+    });
 
     Future.delayed(const Duration(seconds: 0), () async {
       formats = await DeckService().getAllFormat();
@@ -67,15 +74,6 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
       setState(() {});
     });
-  }
-
-  onTap() {
-    if (_isDisabled[_tabController.index]) {
-      int index = _tabController.previousIndex;
-      setState(() {
-        _tabController.index = index;
-      });
-    }
   }
 
   @override

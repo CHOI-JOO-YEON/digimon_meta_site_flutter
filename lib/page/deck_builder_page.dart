@@ -226,7 +226,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     totalPages = cardResponseDto.totalPages!;
 
     isSearchLoading = false;
-    currentPage = searchParameter.page++;
+    currentPage = 1;
+    searchParameter.page = 2;
+    
+    updateSearchParameter();
     setState(() {});
   }
   addCardByDeck(DigimonCard card) {
