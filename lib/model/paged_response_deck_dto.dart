@@ -6,14 +6,12 @@ class PagedResponseDeckDto {
   int currentPage;
   int totalPages;
   int totalElements;
-  Map<int, int> formatDeckCount;
 
   PagedResponseDeckDto({
     required this.decks,
     required this.currentPage,
     required this.totalPages,
     required this.totalElements,
-    required this.formatDeckCount,
   });
 
   factory PagedResponseDeckDto.fromJson(Map<String, dynamic> json) {
@@ -22,12 +20,6 @@ class PagedResponseDeckDto {
       currentPage: json['currentPage'],
       totalPages: json['totalPages'],
       totalElements: json['totalElements'],
-      formatDeckCount: (json['formatDeckCount'] as Map<String, dynamic>).map(
-            (key, value) => MapEntry(
-            int.parse(key), 
-            value as int    
-        ),
-      ),
     );
   }
 }

@@ -40,9 +40,18 @@ class DeckService {
   Future<DeckBuild?> save(DeckBuild deck, BuildContext context) async {
     DeckView? responseDto = await deckApi.postDeck(deck);
     if (responseDto != null) {
+      _refreshFormatDeckCounts(context);
       return DeckBuild.deckView(responseDto, context);
     }
     return null;
+  }
+
+  void _refreshFormatDeckCounts(BuildContext context) {
+    try {
+      Provider.of<FormatDeckCountProvider>(context, listen: false).loadDeckCounts();
+    } catch (e) {
+      print('Error refreshing format deck counts: $e');
+    }
   }
 
   Future<DeckView?> import(Map<String, int> deck) async {
@@ -51,6 +60,14 @@ class DeckService {
       return responseDto;
     }
     return null;
+  }
+
+  Future<DeckView?> importAndRefreshCounts(Map<String, int> deck, BuildContext context) async {
+    DeckView? result = await import(deck);
+    if (result != null) {
+      _refreshFormatDeckCounts(context);
+    }
+    return result;
   }
 
   Future exportToTTSFile(DeckBuild deck) async {
@@ -100,19 +117,20 @@ class DeckService {
     PagedResponseDeckDto? decks =
         await DeckApi().findDecks(deckSearchParameter);
 
-    if (decks != null) {
-      FormatDeckCountProvider formatDeckCountProvider =
-          Provider.of(context, listen: false);
-      deckSearchParameter.isMyDeck
-          ? formatDeckCountProvider.setFormatMyDeckCount(decks)
-          : formatDeckCountProvider.setFormatAllDeckCount(decks);
-    }
 
     return decks;
   }
 
   Future<bool> deleteDeck(int deckId) async {
     return await DeckApi().deleteDeck(deckId);
+  }
+
+  Future<bool> deleteDeckAndRefreshCounts(int deckId, BuildContext context) async {
+    bool result = await deleteDeck(deckId);
+    if (result) {
+      _refreshFormatDeckCounts(context);
+    }
+    return result;
   }
 
   Future<void> generateDeckRecipePDF(DeckBuild deck) async {

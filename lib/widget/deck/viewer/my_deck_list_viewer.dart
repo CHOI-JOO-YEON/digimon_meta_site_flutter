@@ -81,7 +81,7 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   }
 
   void deleteDeck(int deckId) async {
-    bool isSuccess = await DeckService().deleteDeck(deckId);
+    bool isSuccess = await DeckService().deleteDeckAndRefreshCounts(deckId, context);
     if (isSuccess) {
       if (decks.length == 1) {
         await searchDecks(1);

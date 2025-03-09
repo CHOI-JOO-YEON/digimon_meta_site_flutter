@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../model/deck-build.dart';
 import '../model/paged_response_deck_dto.dart';
+import '../model/format_deck_count_dto.dart';
 
 class DeckApi {
   String baseUrl = const String.fromEnvironment('SERVER_URL');
@@ -173,6 +174,22 @@ class DeckApi {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<FormatDeckCountDto?> getDeckCount() async {
+    try {
+      var response = await dioClient.dio.get('$baseUrl/api/format/deck-count');
+      if (response.statusCode == 200) {
+        return FormatDeckCountDto.fromJson(response.data);
+      } else if (response.statusCode == 401) {
+        return null;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:auto_route/annotations.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
@@ -11,12 +10,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:provider/provider.dart';
 
 import '../model/deck-build.dart';
 import '../router.dart';
 import 'package:auto_route/auto_route.dart';
 
 import '../service/size_service.dart';
+import '../provider/format_deck_count_provider.dart';
+import '../provider/user_provider.dart';
 
 @RoutePage()
 class DeckListPage extends StatefulWidget {
@@ -37,21 +39,41 @@ class _DeckListPageState extends State<DeckListPage> {
   DeckSearchParameter deckSearchParameter =
       DeckSearchParameter(isMyDeck: false);
   DeckBuild? _selectedDeck;
+  DeckView? selectedDeck;
+  late FormatDeckCountProvider formatDeckCountProvider;
+  late UserProvider userProvider;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.searchParameterString != null) {
-      deckSearchParameter = DeckSearchParameter.fromJson(
-          json.decode(widget.searchParameterString!));
+      try {
+        Map<String, dynamic> searchMapData = jsonDecode(widget.searchParameterString!);
+        deckSearchParameter = DeckSearchParameter(isMyDeck: searchMapData['isMyDeck'] ?? false);
+      } catch (e) {
+        print('Error parsing search parameter: $e');
+      }
     }
+    
+    Future.microtask(() {
+      formatDeckCountProvider = Provider.of<FormatDeckCountProvider>(context, listen: false);
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+      
+      formatDeckCountProvider.loadDeckCounts();
+      
+      userProvider.addListener(_onUserLoginStateChanged);
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (MediaQuery.of(context).orientation == Orientation.portrait &&
           _panelController.isAttached) {
         _panelController.animatePanelToPosition(0.5);
       }
     });
+  }
+
+  void _onUserLoginStateChanged() {
+    formatDeckCountProvider.loadDeckCounts();
   }
 
   void updateSearchParameter() {
@@ -71,6 +93,7 @@ class _DeckListPageState extends State<DeckListPage> {
     if (mounted) {
       _scrollController.dispose();
     }
+    userProvider.removeListener(_onUserLoginStateChanged);
     super.dispose();
   }
 

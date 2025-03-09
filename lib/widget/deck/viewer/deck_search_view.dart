@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../../../model/format.dart';
 import '../../../provider/user_provider.dart';
+import '../../../provider/format_deck_count_provider.dart';
 
 class DeckSearchView extends StatefulWidget {
   final Function(DeckView) deckUpdate;
@@ -70,8 +71,11 @@ class _DeckSearchViewState extends State<DeckSearchView>
           break;
         }
       }
+      
+      // Load deck counts when formats are loaded
+      Provider.of<FormatDeckCountProvider>(context, listen: false).loadDeckCounts();
+      
       isLoading = false;
-
       setState(() {});
     });
   }
