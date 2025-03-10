@@ -86,8 +86,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
         return '황';
       case 'green':
         return '녹';
-      case 'green':
-        return '녹';
       case 'black':
         return '흑';
       case 'purple':
@@ -108,7 +106,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     widget.searchParameter.types.keys.forEach((typeId) {
       _selectedTypes[typeId] = _searchResults[typeId]!.name;
-
     });
     if (widget.searchParameter.noteId == null) {
       selectedNote = all;

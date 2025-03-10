@@ -3,6 +3,7 @@ import 'package:digimon_meta_site_flutter/model/used_card_info.dart';
 import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/type.dart';
+import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
 
 import '../model/note.dart';
@@ -10,18 +11,15 @@ import '../model/note.dart';
 class CardApi {
   String baseUrl = const String.fromEnvironment('SERVER_URL');
   DioClient dioClient = DioClient();
+  CardDataService cardDataService = CardDataService();
 
   Future<CardResponseDto> getCardsBySearchParameter(
       SearchParameter searchParameter) async {
     try {
-      var response = await dioClient.dio.get('$baseUrl/api/card/search',
-          queryParameters: searchParameter.toJson());
-      if (response.statusCode == 200) {
-        return CardResponseDto.fromJson(response.data);
-      } else {
-        throw Exception('Failed to load cards');
-      }
+      await cardDataService.initialize();
+      return cardDataService.searchCards(searchParameter);
     } catch (e) {
+      print('Error searching cards: $e');
       return CardResponseDto();
     }
   }

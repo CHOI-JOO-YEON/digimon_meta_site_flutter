@@ -21,7 +21,7 @@ class TypeService {
   Map<int, TypeDto> search(String word) {
     Map<int, TypeDto> result = {};
 
-    for (MapEntry<String,TypeDto> entry in map.entries) {
+    for (MapEntry<String, TypeDto> entry in map.entries) {
       if(entry.key.contains(word)) {
         result[entry.value.typeId] = entry.value;
       }

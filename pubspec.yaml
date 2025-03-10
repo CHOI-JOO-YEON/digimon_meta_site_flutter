@@ -105,6 +105,7 @@ flutter:
     - assets/doc/digimon_recipe.jpg
     - assets/images/img.png
     - assets/images/small_img.png
+    - assets/data/cards.json
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

@@ -4,6 +4,17 @@ class TypeDto {
 
   TypeDto({required this.typeId, required this.name});
 
+  Map<String, dynamic> toJson() {
+    return {
+      'typeId': typeId,
+      'name': name,
+    };
+  }
+
+  String toString() {
+    return 'TypeDto(typeId: $typeId, name: $name)';
+  }
+
   factory TypeDto.fromJson(Map<String, dynamic> json) {
     return TypeDto(
       typeId: json['id'],
