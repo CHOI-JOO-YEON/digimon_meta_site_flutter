@@ -69,30 +69,32 @@ class DeckBuild {
     saveMapToLocalStorage();
   }
 
-  DeckBuild.deckView(DeckView deckView, BuildContext context) {
-    deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
-    deckSortProvider!.addListener(deckSort);
-    deckId = deckView.deckId;
-    deckName = deckView.deckName??'';
-    author = deckView.authorName;
-    authorId = deckView.authorId;
-    formatId = deckView.formatId;
-    isPublic = deckView.isPublic ?? false;
+DeckBuild.deckView(DeckView deckView, BuildContext context) {
+  deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+  deckSortProvider!.addListener(deckSort);
+  deckId = deckView.deckId;
+  deckName = deckView.deckName??'';
+  author = deckView.authorName;
+  authorId = deckView.authorId;
+  formatId = deckView.formatId;
+  isPublic = deckView.isPublic ?? false;
 
-    if (deckView.cardAndCntMap != null) {
-      for (var cardEntry in deckView.cardAndCntMap!.entries) {
-        DigimonCard card = cardEntry.key;
-        for (int i = 0; i < cardEntry.value; i++) {
-          _addCard(card);
-        }
+  // Get cards using the helper method
+  Map<DigimonCard, int>? cardAndCntMap = deckView.getCardAndCntMap();
+  if (cardAndCntMap != null) {
+    for (var cardEntry in cardAndCntMap.entries) {
+      DigimonCard card = cardEntry.key;
+      for (int i = 0; i < cardEntry.value; i++) {
+        _addCard(card);
       }
-      isSave = false;
     }
-
-    for (var color in deckView.colors??[]) {
-      colors.add(color);
-    }
+    isSave = false;
   }
+
+  for (var color in deckView.colors??[]) {
+    colors.add(color);
+  }
+}
 
   DeckBuild.deckBuild(DeckBuild deck, BuildContext context) {
     deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
@@ -165,9 +167,9 @@ class DeckBuild {
   void import(DeckView? deckView) {
     if (deckView != null) {
       clear();
-      if (deckView.cardAndCntMap != null) {
-        for (var cardEntry in deckView.cardAndCntMap!.entries) {
-          DigimonCard card = cardEntry.key;
+      if (deckView.cardIdAndCntMap != null) {
+        for (var cardEntry in deckView.cardIdAndCntMap!.entries) {
+          DigimonCard card = cardMap[cardEntry.key]!;
           for (int i = 0; i < cardEntry.value; i++) {
             String? result = canAddCard(card);
             if (result != null) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'card.dart';
 
 class DeckView {
@@ -7,7 +8,7 @@ class DeckView {
   String? authorName;
   int? deckId;
   String? deckName;
-  Map<DigimonCard, int>? cardAndCntMap;
+  Map<int, int>? cardIdAndCntMap;
   List<String>? colors = [];
   int? formatId;
   bool? isPublic;
@@ -17,7 +18,7 @@ class DeckView {
       this.authorName,
       this.deckId,
       this.deckName,
-      this.cardAndCntMap,
+      this.cardIdAndCntMap,
       this.colors,
       this.formatId,
       this.isPublic}) {
@@ -49,13 +50,34 @@ class DeckView {
       colors = null;
     }
 
+    Map<int, int>? cardMap;
+    if (json['cards'] != null) {
+      if (json['cards'] is List) {
+        // Handle when cards is a list of objects
+        cardMap = parseJsonToCardIdAndCntMap(json['cards'] as List<dynamic>);
+      } else if (json['cards'] is Map) {
+        // Handle when cards is a map
+        cardMap = {};
+        final cardsMap = json['cards'] as Map<String, dynamic>;
+        cardsMap.forEach((key, value) {
+          try {
+            final cardId = int.parse(key);
+            final cnt = value as int;
+            cardMap![cardId] = cnt;
+          } catch (e) {
+            print('Error parsing card data: $e');
+          }
+        });
+      }
+    }
+
     return DeckView(
         authorId: json['authorId'],
         authorName: json['authorName'],
         deckId: json['deckId'],
         deckName: json['deckName'],
         colors: colors,
-        cardAndCntMap: parseJsonToCardAndCntMap(json['cards'] as List<dynamic>),
+        cardIdAndCntMap: cardMap,
         formatId: json['formatId'],
         isPublic: json['isPublic']);
   }
@@ -64,19 +86,34 @@ class DeckView {
     return jsonList.map((json) => DeckView.fromJson(json)).toList();
   }
 
-  static Map<DigimonCard, int> parseJsonToCardAndCntMap(
-      List<dynamic> cardsJson) {
-    Map<DigimonCard, int> cardAndCntMap = {};
+  static Map<int, int> parseJsonToCardIdAndCntMap(List<dynamic> cardsJson) {
+    Map<int, int> cardIdAndCntMap = {};
     for (var cardJson in cardsJson) {
-      DigimonCard card = DigimonCard.fromJson(cardJson as Map<String, dynamic>);
+      int cardId = cardJson['cardId'] as int;
       int cnt = cardJson['cnt'] as int;
-      cardAndCntMap[card] = cnt;
+      cardIdAndCntMap[cardId] = cnt;
     }
-    return cardAndCntMap;
+    return cardIdAndCntMap;
+  }
+
+  Map<DigimonCard, int>? getCardAndCntMap() {
+    if (cardIdAndCntMap == null) return null;
+    
+    Map<DigimonCard, int> result = {};
+    CardDataService cardService = CardDataService();
+    
+    cardIdAndCntMap!.forEach((cardId, cnt) {
+      DigimonCard? card = cardService.getCardById(cardId);
+      if (card != null) {
+        result[card] = cnt;
+      }
+    });
+    
+    return result;
   }
 
   @override
   String toString() {
-    return 'DeckView{authorId: $authorId, authorName: $authorName, deckId: $deckId, deckName: $deckName, cardAndCntMap: $cardAndCntMap, colors: $colors, formatId: $formatId, isPublic: $isPublic}';
+    return 'DeckView{authorId: $authorId, authorName: $authorName, deckId: $deckId, deckName: $deckName, cardIdAndCntMap: $cardIdAndCntMap, colors: $colors, formatId: $formatId, isPublic: $isPublic}';
   }
 }

@@ -55,8 +55,8 @@ class CardQuantityCalculator {
     Map<int, int> cardQuantitiesById = _formatCardQuantitiesById[formatId]!;
     Map<String, int> cardQuantitiesByCardNo = _formatCardQuantitiesByCardNo[formatId]!;
 
-    deck.cardAndCntMap!.forEach((card, count) {
-      int cardId = card.cardId!;
+    deck.cardIdAndCntMap!.forEach((cardId, count) {
+      DigimonCard card = _cardMap[cardId]!;
       String cardNo = card.cardNo!;
       _cardMap[cardId] = card;
       _cardNoMap[card.cardNo!] = card;
@@ -80,9 +80,8 @@ class CardQuantityCalculator {
     int formatId = deck.formatId!;
     Map<int, int> cardQuantities = _formatCardQuantitiesById[formatId]!;
     Map<String, int> cardQuantitiesByCardNo = _formatCardQuantitiesByCardNo[formatId]!;
-    deck.cardAndCntMap!.forEach((card, count) {
-      int cardId = card.cardId!;
-      String cardNo = card.cardNo!;
+    deck.cardIdAndCntMap!.forEach((cardId, count) {
+      String cardNo = _cardMap[cardId]!.cardNo!;
       if (cardQuantities.containsKey(cardId)) {
         cardQuantities[cardId] = cardQuantities[cardId]! - count;
         if (cardQuantities[cardId] == 0) {
