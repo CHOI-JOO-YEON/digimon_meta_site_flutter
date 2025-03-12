@@ -21,7 +21,7 @@ class QrDeckImportPage extends StatefulWidget {
 
 class _QrDeckImportPageState extends State<QrDeckImportPage> {
   
-  DeckView? deckView;
+  DeckBuild? deckBuild;
   @override
   void initState() {
     super.initState();
@@ -33,10 +33,10 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
   Future<void> _processDeckParam() async {
     final param = widget.deckParam;
     if (param != null && param.isNotEmpty) {
-      deckView = await DeckApi().importDeckQr(widget.deckParam!);
-      deckView?.deckName = 'QR';
+      deckBuild = DeckService().importDeckQr(param, context);
+      deckBuild?.deckName = 'QR';
     }
-    context.navigateTo(DeckBuilderRoute(deckView: deckView));
+    context.navigateTo(DeckBuilderRoute(deck: deckBuild));
   }
 
   Map<int, int> parseDeckString(String str) {

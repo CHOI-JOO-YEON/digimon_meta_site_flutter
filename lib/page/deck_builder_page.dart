@@ -259,8 +259,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     currentPage = searchParameter.page++;
   }
 
-  deckUpdate(DeckView deckResponseDto) {
-    deck.import(deckResponseDto);
+  deckUpdate(DeckBuild deckBuild) {
+    deck = deckBuild;
     setState(() {});
   }
 

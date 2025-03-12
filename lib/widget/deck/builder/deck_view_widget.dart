@@ -11,13 +11,12 @@ import 'package:flutter/widgets.dart';
 
 import '../../../model/card.dart';
 import '../../../model/deck-build.dart';
-import '../../../model/deck-view.dart';
 
 class DeckBuilderView extends StatefulWidget {
   final DeckBuild deck;
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
-  final Function(DeckView) import;
+  final Function(DeckBuild) import;
   final Function(int)? searchNote;
   final CardOverlayService cardOverlayService;
 

@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../model/deck-build.dart';
-import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 import '../../../provider/user_provider.dart';
 import '../../../router.dart';
 import '../../../service/card_overlay_service.dart';
 import '../../../service/deck_service.dart';
-import '../../random_hand_widget.dart';
 
 class DeckMenuButtons extends StatefulWidget {
   final DeckBuild deck;
@@ -18,7 +16,7 @@ class DeckMenuButtons extends StatefulWidget {
   final Function() newCopy;
   final Function() reload;
   final Function(List<String>) sortDeck;
-  final Function(DeckView) import;
+  final Function(DeckBuild) import;
 
   const DeckMenuButtons({
     super.key,

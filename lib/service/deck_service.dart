@@ -33,6 +33,7 @@ import '../router.dart';
 import 'card_overlay_service.dart';
 import 'color_service.dart';
 import 'lang_service.dart';
+import 'card_data_service.dart';
 
 class DeckService {
   DeckApi deckApi = DeckApi();
@@ -48,26 +49,25 @@ class DeckService {
 
   void _refreshFormatDeckCounts(BuildContext context) {
     try {
-      Provider.of<FormatDeckCountProvider>(context, listen: false).loadDeckCounts();
+      Provider.of<FormatDeckCountProvider>(context, listen: false)
+          .loadDeckCounts();
     } catch (e) {
       print('Error refreshing format deck counts: $e');
     }
   }
 
-  Future<DeckView?> import(Map<String, int> deck) async {
-    DeckView? responseDto = await deckApi.importDeck(deck);
-    if (responseDto != null) {
-      return responseDto;
-    }
-    return null;
-  }
-
-  Future<DeckView?> importAndRefreshCounts(Map<String, int> deck, BuildContext context) async {
-    DeckView? result = await import(deck);
-    if (result != null) {
-      _refreshFormatDeckCounts(context);
-    }
-    return result;
+  DeckBuild import(Map<String, int> deck, BuildContext context) {
+    DeckBuild deckBuild = DeckBuild(context); 
+    CardDataService cardDataService = CardDataService();
+    deck.forEach((cardNo, count) {
+      DigimonCard? card = cardDataService.getCardByCardNo(cardNo);
+      if (card != null) {
+        for (int i = 0; i < count; i++) {
+          deckBuild.addSingleCard(card);
+        }
+      }
+    });
+    return deckBuild;
   }
 
   Future exportToTTSFile(DeckBuild deck) async {
@@ -117,7 +117,6 @@ class DeckService {
     PagedResponseDeckDto? decks =
         await DeckApi().findDecks(deckSearchParameter);
 
-
     return decks;
   }
 
@@ -125,7 +124,8 @@ class DeckService {
     return await DeckApi().deleteDeck(deckId);
   }
 
-  Future<bool> deleteDeckAndRefreshCounts(int deckId, BuildContext context) async {
+  Future<bool> deleteDeckAndRefreshCounts(
+      int deckId, BuildContext context) async {
     bool result = await deleteDeck(deckId);
     if (result) {
       _refreshFormatDeckCounts(context);
@@ -278,18 +278,12 @@ class DeckService {
     Map<String, dynamic> map = jsonDecode(jsonString);
     String deckName = map['deckName'];
     bool isStrict = map['isStrict'];
-    Map<String, dynamic> deckMapJson =
-        Map<String, dynamic>.from(map['deckMap']);
+    Map<String, int> cardIdAndCntMap =
+        Map<String, int>.from(map['deckMap']);
 
-    DeckView? deckResponseDto = await DeckApi().importDeckThisSite(deckMapJson);
-
-    if (deckResponseDto == null) {
-      return null;
-    }
-    DeckBuild deck = DeckBuild(context);
+    DeckBuild deck = importDeckThisSite(cardIdAndCntMap, context);
     deck.deckName = deckName;
     deck.isStrict = isStrict;
-    deck.import(deckResponseDto);
     return deck;
   }
 
@@ -752,11 +746,12 @@ class DeckService {
                             final criterion = sortPriority[index];
                             return ListTile(
                               key: ValueKey('${criterion.field}-$index'),
-                              title: Text(deckSortProvider
-                                  .getSortPriorityKor(criterion.field),
+                              title: Text(
+                                deckSortProvider
+                                    .getSortPriorityKor(criterion.field),
                                 style: TextStyle(
-                                  fontSize: SizeService.smallFontSize(context)
-                                ),
+                                    fontSize:
+                                        SizeService.smallFontSize(context)),
                               ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -801,7 +796,7 @@ class DeckService {
     );
   }
 
-  void showImportDialog(BuildContext context, Function(DeckView) import) {
+  void showImportDialog(BuildContext context, Function(DeckBuild) import) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -838,57 +833,52 @@ class DeckService {
                           );
                         }).toList(),
                         // if (false)
-                          IconButton(
-                            icon: const Icon(Icons.image),
-                            onPressed: () async {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              final result =
-                                  await FilePicker.platform.pickFiles(
-                                type: FileType.image,
-                              );
-                              if (result != null && result.files.isNotEmpty) {
-                                final bytes = result.files.first.bytes;
-                                if (bytes != null) {
-                                  final decodedData = await DeckService()
-                                      .decodeQrCodeFromImage(bytes);
-                                  if (decodedData != null) {
-                                    final uri = Uri.parse(decodedData);
-                                    final deckString =
-                                        uri.queryParameters['deck'];
+                        IconButton(
+                          icon: const Icon(Icons.image),
+                          onPressed: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            final result = await FilePicker.platform.pickFiles(
+                              type: FileType.image,
+                            );
+                            if (result != null && result.files.isNotEmpty) {
+                              final bytes = result.files.first.bytes;
+                              if (bytes != null) {
+                                final decodedData = await DeckService()
+                                    .decodeQrCodeFromImage(bytes);
+                                if (decodedData != null) {
+                                  final uri = Uri.parse(decodedData);
+                                  final deckString =
+                                      uri.queryParameters['deck'];
 
-                                    if (deckString == null) {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                      _showShortDialog(context, "잘못된 QR코드입니다.");
-                                      return;
-                                    }
-                                    var deckView = await DeckApi()
-                                        .importDeckQr(deckString);
+                                  if (deckString == null) {
                                     setState(() {
                                       isLoading = false;
                                     });
-                                    Navigator.of(context).pop();
-                                    if (deckView != null) {
-                                      import(deckView);
-                                    } else {
-                                      _showShortDialog(context, "잘못된 QR코드입니다.");
-                                    }
-                                  } else {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                    Navigator.of(context).pop();
-                                    _showShortDialog(
-                                        context, "이미지에서 QR 코드를 찾을 수 없습니다.");
+                                    _showShortDialog(context, "잘못된 QR코드입니다.");
+                                    return;
                                   }
+                                  var deckBuild = DeckService()
+                                      .importDeckQr(deckString, context);
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  Navigator.of(context).pop();
+                                  import(deckBuild);
+                                } else {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  Navigator.of(context).pop();
+                                  _showShortDialog(
+                                      context, "이미지에서 QR 코드를 찾을 수 없습니다.");
                                 }
                               }
-                            },
-                            tooltip: 'QR 코드 이미지',
-                          ),
+                            }
+                          },
+                          tooltip: 'QR 코드 이미지',
+                        ),
                       ],
                     ),
                     TextField(
@@ -911,14 +901,13 @@ class DeckService {
                             isLoading = true;
                           });
                           try {
-                            var deckResponseDto = await DeckService().import(
+                            var deckBuild = DeckService().import(
                               _selectedButton.convertStringToMap(
                                 _textEditingController.value.text,
                               ),
+                              context,
                             );
-                            if (deckResponseDto != null) {
-                              import(deckResponseDto);
-                            }
+                            import(deckBuild);
                             setState(() {
                               isLoading = false;
                             });
@@ -1232,5 +1221,74 @@ class DeckService {
         );
       },
     );
+  }
+
+  DeckBuild importDeckQr(String deckMapString, BuildContext context) {
+    try {
+      // Parse the deck string into a map of cardId to count
+      Map<int, int> cardIdAndCntMap = parseDeckString(deckMapString);
+
+      // Create a new deck
+      DeckBuild deck = DeckBuild(context);
+
+      // Add each card to the deck
+      cardIdAndCntMap.forEach((cardId, count) {
+        DigimonCard? card = CardDataService().getCardById(cardId);
+        if (card != null) {
+          for (int i = 0; i < count; i++) {
+            deck.addSingleCard(card);
+          }
+        }
+      });
+
+      return deck;
+    } catch (e) {
+      return DeckBuild(context);
+    }
+  }
+
+  // Parse deck string with format "cardId1=count1,cardId2=count2,..."
+  Map<int, int> parseDeckString(String deckString) {
+    Map<int, int> result = {};
+
+    if (deckString.isEmpty) {
+      return result;
+    }
+
+    List<String> pairs = deckString.split(",");
+    for (String pair in pairs) {
+      if (pair.contains("=")) {
+        List<String> parts = pair.split("=");
+        if (parts.length == 2) {
+          try {
+            int key = int.parse(parts[0]);
+            int value = int.parse(parts[1]);
+            result[key] = value;
+          } catch (e) {}
+        }
+      }
+    }
+    return result;
+  }
+
+  DeckBuild importDeckThisSite(Map<String, int> cardIdAndCntMap, BuildContext context) {
+    try {
+      if (cardIdAndCntMap.isEmpty) return DeckBuild(context);
+
+      // Create a DeckView object with the parsed data
+      DeckBuild deck = DeckBuild(context);
+
+      cardIdAndCntMap.forEach((cardId, count) {
+        DigimonCard? card = CardDataService().getCardById(int.parse(cardId));
+        if (card != null) {
+          for (int i = 0; i < count; i++) {
+            deck.addSingleCard(card);
+          }
+        }
+      });
+      return deck;
+    } catch (e) {
+      return DeckBuild(context);
+    }
   }
 }

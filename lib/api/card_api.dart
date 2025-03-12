@@ -1,5 +1,4 @@
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
-import 'package:digimon_meta_site_flutter/model/used_card_info.dart';
 import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/type.dart';

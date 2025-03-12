@@ -11,6 +11,7 @@ class CardDataService {
   CardDataService._internal();
 
   Map<int, DigimonCard> _allCards = {};
+  Map<String, DigimonCard> _allCardsByCardNo = {};
   bool _isInitialized = false;
 
   Future<void> initialize() async {
@@ -25,6 +26,10 @@ class CardDataService {
       _allCards = {
         for (var json in jsonList)
           DigimonCard.fromJson(json).cardId!: DigimonCard.fromJson(json)
+      };
+      _allCardsByCardNo = {
+        for (var card in _allCards.values)
+          card.cardNo!: card
       };
       _isInitialized = true;
     } catch (e) {
@@ -183,5 +188,8 @@ class CardDataService {
   // ID로 카드를 얻기 위한 유틸리티 메서드
   DigimonCard? getCardById(int cardId) {
     return _allCards[cardId];
+  }
+  DigimonCard? getCardByCardNo(String cardNo) {
+    return _allCardsByCardNo[cardNo];
   }
 } 
