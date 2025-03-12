@@ -23,6 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:html' as html;
+import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -89,7 +91,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
-      notes.addAll(await CardApi().getNotes());
+      
+      final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+      if (!noteProvider.isInitialized) {
+        await noteProvider.initialize();
+      }
+      notes = await noteProvider.getNotes();
 
       await TypeService().init();
       if (widget.searchParameterString != null) {

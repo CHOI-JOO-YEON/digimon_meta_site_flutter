@@ -27,9 +27,7 @@ class CardDataService {
           DigimonCard.fromJson(json).cardId!: DigimonCard.fromJson(json)
       };
       _isInitialized = true;
-      print('CardDataService: ${_allCards.length}개 카드 로드 완료');
     } catch (e) {
-      print('CardDataService: 카드 로드 중 오류 발생 - $e');
       _isInitialized = false;
     }
   }

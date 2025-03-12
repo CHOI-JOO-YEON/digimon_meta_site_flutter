@@ -14,6 +14,7 @@ import 'package:url_strategy/url_strategy.dart';
 import 'dart:html' as html;
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
+import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => DeckSortProvider()),
       ChangeNotifierProvider(create: (_) => TextSimplifyProvider()),
       ChangeNotifierProvider(create: (_) => FormatDeckCountProvider()),
+      ChangeNotifierProvider(create: (_) => NoteProvider()),
       ChangeNotifierProxyProvider<UserProvider, CollectProvider>(
         create: (_) => CollectProvider(),
         update: (_, userProvider, collectProvider) {
