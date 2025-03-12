@@ -26,8 +26,7 @@ class DeckApi {
         return null;
       }
     } catch (e) {
-      print(e);
-      // throw Exception('Error occurred while fetching cards');
+      return null;
     }
   }
 
@@ -40,9 +39,7 @@ class DeckApi {
       } else if (response.statusCode == 401) {
         return null;
       }
-    } catch (e) {
-      print(e);
-      return null;
+    } catch (ignore) {
     }
     return null;
   }
@@ -57,7 +54,6 @@ class DeckApi {
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
     return null;

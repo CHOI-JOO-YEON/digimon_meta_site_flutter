@@ -1,4 +1,3 @@
-import 'package:digimon_meta_site_flutter/model/user.dart';
 import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';

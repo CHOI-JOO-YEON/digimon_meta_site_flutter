@@ -8,7 +8,7 @@ class SearchParameter{
   Set<String>? cardTypes;
   int typeOperation =1; //0 = and, 1 = or
 
-  Map<int, String> types = {};
+  Set<String> types = {};
 
   int? minPlayCost=0; //
   int? maxPlayCost=20;
@@ -38,9 +38,7 @@ class SearchParameter{
       ..lvs = json['lvs'] != null ? Set<int>.from(json['lvs']) : null
       ..cardTypes = json['cardTypes'] != null ? Set<String>.from(json['cardTypes']) : null
       ..typeOperation = json['typeOperation'] as int? ?? 1
-      ..types = (json['types'] as Map<String, dynamic>?)?.map(
-            (key, value) => MapEntry(int.parse(key), value as String),
-          ) ?? {}
+      ..types = (json['types'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {}
       ..minPlayCost = json['minPlayCost'] as int?
       ..maxPlayCost = json['maxPlayCost'] as int?
       ..minDp = json['minDp'] as int?
@@ -77,8 +75,7 @@ class SearchParameter{
     data['isOrderDesc'] = isOrderDesc;
     data['isEnglishCardInclude'] = isEnglishCardInclude;
     
-    // Convert the int keys to strings for JSON serialization
-    data['types'] = types.map((key, value) => MapEntry(key.toString(), value));
+    data['types'] = types.toList();
     data['typeOperation'] = typeOperation;
 
     return data;

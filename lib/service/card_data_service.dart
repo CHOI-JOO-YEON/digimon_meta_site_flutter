@@ -12,6 +12,7 @@ class CardDataService {
 
   Map<int, DigimonCard> _allCards = {};
   Map<String, DigimonCard> _allCardsByCardNo = {};
+  Set<String> _types = {};
   bool _isInitialized = false;
 
   Future<void> initialize() async {
@@ -22,24 +23,38 @@ class CardDataService {
       final String jsonString = await rootBundle.loadString('assets/data/cards.json');
       final List<dynamic> jsonList = json.decode(jsonString);
       
-      // JSON을 DigimonCard 객체로 파싱하고 Map으로 저장
-      _allCards = {
-        for (var json in jsonList)
-          DigimonCard.fromJson(json).cardId!: DigimonCard.fromJson(json)
-      };
-      _allCardsByCardNo = {
-        for (var card in _allCards.values)
-          card.cardNo!: card
-      };
+      jsonList.forEach((json) {
+        DigimonCard card = DigimonCard.fromJson(json);
+        _allCards[card.cardId!] = card;
+        _allCardsByCardNo[card.cardNo!] = card;
+        _types.addAll(card.types ?? []);
+      });
+
       _isInitialized = true;
     } catch (e) {
       _isInitialized = false;
     }
   }
 
-  CardResponseDto searchCards(SearchParameter searchParameter) {
+  Set<String> searchTypes(String word) {
+    Set<String> result = {};
+    
+    for (var type in _types) {
+      if (type.contains(word)) {
+        result.add(type);
+      }
+    }
+    
+    return result;
+  }
+
+  Set<String> getAllTypes() {
+    return _types;
+  }
+
+  Future<CardResponseDto> searchCards(SearchParameter searchParameter) async {
     if (!_isInitialized) {
-      return CardResponseDto(cards: [], totalPages: 0, totalElements: 0);
+      await initialize();
     }
 
     List<DigimonCard> allCardsList = _allCards.values.toList();
@@ -114,12 +129,12 @@ class CardDataService {
         if (!matches) return false;
       }
       
-      if (params.types.values.isNotEmpty) {
+      if (params.types.isNotEmpty) {
         bool typeMatches = false;
         
         if (params.typeOperation == 0) {
           typeMatches = true;
-          for (var typeValue in params.types.values) {
+          for (var typeValue in params.types) {
             if (!(card.types?.contains(typeValue) ?? false)) {
               typeMatches = false;
               break;
@@ -127,7 +142,7 @@ class CardDataService {
           }
         } else {
           for (var type in card.types ?? []) {
-            if (params.types.values.contains(type)) {
+            if (params.types.contains(type)) {
               typeMatches = true;
               break;
             }

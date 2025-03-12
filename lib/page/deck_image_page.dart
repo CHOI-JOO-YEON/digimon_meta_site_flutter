@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+// ignore: depend_on_referenced_packages
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/service/deck_image_color_service.dart';
 import 'package:flutter/material.dart';
@@ -252,7 +253,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
             name: '${widget.deck.deckName}.png',
             imageType: ImageType.png);
       } catch (e) {
-        print(e);
       }
     }
 

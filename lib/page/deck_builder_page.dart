@@ -1,19 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:digimon_meta_site_flutter/api/card_api.dart';
 import 'package:digimon_meta_site_flutter/model/card_search_response_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
-import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdiview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
@@ -98,7 +96,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       }
       notes = await noteProvider.getNotes();
 
-      await TypeService().init();
       if (widget.searchParameterString != null) {
         searchParameter = SearchParameter.fromJson(
             json.decode(widget.searchParameterString!));
@@ -228,7 +225,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
     searchParameter.page = 1;
     CardResponseDto cardResponseDto =
-        await CardApi().getCardsBySearchParameter(searchParameter);
+       await CardDataService().searchCards(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
 
@@ -254,7 +251,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   Future<void> loadMoreCard() async {
     CardResponseDto cardResponseDto =
-        await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardDataService().searchCards(searchParameter);
     cards.addAll(cardResponseDto.cards!);
     currentPage = searchParameter.page++;
   }

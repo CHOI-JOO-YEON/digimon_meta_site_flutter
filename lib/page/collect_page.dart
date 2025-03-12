@@ -4,19 +4,19 @@ import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/format.dart';
 import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:provider/provider.dart';
 
-import '../api/card_api.dart';
 import '../model/card.dart';
 import '../model/card_search_response_dto.dart';
 import '../model/note.dart';
 import '../model/search_parameter.dart';
 import '../provider/user_provider.dart';
 import '../service/deck_service.dart';
-import '../service/type_service.dart';
 import '../widget/card/builder/card_search_bar.dart';
 import '../widget/card/collect/collect_card_scroll_grdiview_widget.dart';
 import '../widget/card/collect/deck_calc_dialog.dart';
@@ -48,9 +48,6 @@ class _CollectPageState extends State<CollectPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed(const Duration(seconds: 0), () async {
-      await TypeService().init();
-    });
     initSearch();
   }
 
@@ -86,7 +83,7 @@ class _CollectPageState extends State<CollectPage> {
     setState(() {});
     if (notes.isEmpty) {
       notes.add(NoteDto(noteId: null, name: '모든 카드'));
-      notes.addAll(await CardApi().getNotes());
+      notes.addAll(await NoteProvider().getNotes());
     }
 
     if (formats.isEmpty) {
@@ -104,7 +101,7 @@ class _CollectPageState extends State<CollectPage> {
     }
     searchParameter.page = 1;
     CardResponseDto cardResponseDto =
-        await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardDataService().searchCards(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
 
@@ -115,7 +112,7 @@ class _CollectPageState extends State<CollectPage> {
 
   Future<void> loadMoreCard() async {
     CardResponseDto cardResponseDto =
-        await CardApi().getCardsBySearchParameter(searchParameter);
+        await CardDataService().searchCards(searchParameter);
     cards.addAll(cardResponseDto.cards!);
     currentPage = searchParameter.page++;
     setState(() {});

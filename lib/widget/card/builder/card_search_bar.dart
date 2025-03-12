@@ -1,12 +1,11 @@
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
-import 'package:digimon_meta_site_flutter/service/type_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../model/note.dart';
-import '../../../model/type.dart';
 import '../../../service/card_overlay_service.dart';
 
 class CardSearchBar extends StatefulWidget {
@@ -100,13 +99,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   void _showFilterDialog() {
     CardOverlayService().removeAllOverlays();
-    Map<int, TypeDto> _searchResults = TypeService().search("");
-    Map<int, String> _selectedTypes = widget.searchParameter.types;
+    Set<String> _searchResults = CardDataService().searchTypes("");
+    Set<String> _selectedTypes = widget.searchParameter.types;
     NoteDto? selectedNote;
 
-    widget.searchParameter.types.keys.forEach((typeId) {
-      _selectedTypes[typeId] = _searchResults[typeId]!.name;
-    });
     if (widget.searchParameter.noteId == null) {
       selectedNote = all;
     } else {
@@ -473,7 +469,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                 onChanged: (value) {
                                   setState(() {
                                     _searchResults =
-                                        TypeService().search(value);
+                                        CardDataService().searchTypes(value);
                                   });
                                 },
                                 decoration: const InputDecoration(
@@ -531,13 +527,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                               flex: 1,
                               child: ListView.builder(
                                 shrinkWrap: true,
-                                itemCount: _searchResults.values.length,
+                                itemCount: _searchResults.length,
                                 itemBuilder: (context, index) {
-                                  final type = _searchResults.values.elementAt(index);
+                                  final type = _searchResults.elementAt(index);
                                   return ListTile(
-                                    title: Text(type.name),
+                                    title: Text(type),
                                     onTap: () {
-                                      _selectedTypes[type.typeId] = type.name;
+                                      _selectedTypes.add(type);
                                       setState(() {});
                                     },
                                   );
@@ -550,13 +546,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                 child: Wrap(
                                   runSpacing: 4,
                                   spacing: 8,
-                                  children: _selectedTypes.entries
+                                  children: _selectedTypes
                                       .map((type) => Chip(
-                                            label: Text(type.value),
+                                            label: Text(type),
                                             deleteButtonTooltipMessage: '제거',
                                             onDeleted: () {
                                               setState(() {
-                                                _selectedTypes.remove(type.key);
+                                                _selectedTypes.remove(type);
                                               });
                                             },
                                           ))
