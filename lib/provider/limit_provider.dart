@@ -38,7 +38,7 @@ class LimitProvider with ChangeNotifier {
 
   int getCardAllowedQuantity(String cardNo) {
     if (_selectedLimit == null) {
-      return -1;
+      return 9999;
     }
     if (_selectedLimit!.allowedQuantityMap.containsKey(cardNo)) {
       return _selectedLimit!.allowedQuantityMap[cardNo]!;

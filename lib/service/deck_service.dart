@@ -1226,10 +1226,9 @@ class DeckService {
     try {
       // Parse the deck string into a map of cardId to count
       Map<int, int> cardIdAndCntMap = parseDeckString(deckMapString);
-
       // Create a new deck
       DeckBuild deck = DeckBuild(context);
-
+      deck.isStrict = false;
       // Add each card to the deck
       cardIdAndCntMap.forEach((cardId, count) {
         DigimonCard? card = CardDataService().getCardById(cardId);
@@ -1239,7 +1238,7 @@ class DeckService {
           }
         }
       });
-
+      deck.isStrict = true;
       return deck;
     } catch (e) {
       return DeckBuild(context);
