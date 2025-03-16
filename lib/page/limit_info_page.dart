@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/model/card.dart';
 
 @RoutePage()
 class LimitInfoPage extends StatefulWidget {
@@ -250,10 +251,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
               alignment: WrapAlignment.start,
               spacing: 8,
               runSpacing: 8,
-              children: limit.allowedQuantityMap.entries
+              children: _getSortedCardChips(
+                limit.allowedQuantityMap.entries
                   .where((e) => e.value == 0)
-                  .map((e) => _buildCardChip(context, e.key, Colors.red))
+                  .map((e) => e.key)
                   .toList(),
+                Colors.red
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -274,10 +278,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
               alignment: WrapAlignment.start,
               spacing: 8,
               runSpacing: 8,
-              children: limit.allowedQuantityMap.entries
+              children: _getSortedCardChips(
+                limit.allowedQuantityMap.entries
                   .where((e) => e.value == 1)
-                  .map((e) => _buildCardChip(context, e.key, Colors.orange))
+                  .map((e) => e.key)
                   .toList(),
+                Colors.orange
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -313,9 +320,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
             alignment: WrapAlignment.start,
             spacing: 8,
             runSpacing: 8,
-            children: pair.acardPairNos
-                .map((cardNo) => _buildCardChip(context, cardNo, Colors.purple.shade300))
-                .toList(),
+            children: _getSortedCardChips(pair.acardPairNos, Colors.purple.shade300),
           ),
         ),
         const SizedBox(height: 16),
@@ -328,14 +333,38 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
             alignment: WrapAlignment.start,
             spacing: 8,
             runSpacing: 8,
-            children: pair.bcardPairNos
-                .map((cardNo) => _buildCardChip(context, cardNo, Colors.purple.shade300))
-                .toList(),
+            children: _getSortedCardChips(pair.bcardPairNos, Colors.purple.shade300),
           ),
         ),
         const SizedBox(height: 8),
       ],
     );
+  }
+
+  // 카드 정렬 및 표시를 위한 메소드
+  List<Widget> _getSortedCardChips(List<String> cardNos, Color color) {
+    // 카드 정보와 번호를 함께 담는 리스트 생성
+    List<MapEntry<String, DigimonCard?>> cardEntries = [];
+    
+    for (var cardNo in cardNos) {
+      var card = CardDataService().getNonParallelCardByCardNo(cardNo);
+      cardEntries.add(MapEntry(cardNo, card));
+    }
+    
+    // 카드 발매일로 정렬 (카드 정보가 없는 경우 맨 뒤로)
+    cardEntries.sort((a, b) {
+      if (a.value == null && b.value == null) return 0;
+      if (a.value == null) return 1;
+      if (b.value == null) return -1;
+      
+      final DateTime dateA = a.value!.releaseDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final DateTime dateB = b.value!.releaseDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+      
+      return dateA.compareTo(dateB); // 오름차순 정렬
+    });
+    
+    // 정렬된 순서로 카드 위젯 생성
+    return cardEntries.map((entry) => _buildCardChip(context, entry.key, color)).toList();
   }
 
   Widget _buildCardChip(BuildContext context, String cardNo, Color color) {
