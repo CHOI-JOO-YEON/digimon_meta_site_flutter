@@ -147,6 +147,64 @@ class _CustomCardState extends State<CustomCard> {
                     child: Image.network(
                       widget.card.getDisplaySmallImgUrl() ?? '',
                       fit: BoxFit.fill,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / 
+                                  loadingProgress.expectedTotalBytes!
+                                : null,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        // 이미지 로드 실패 시 카드 번호와 이름을 표시
+                        final String cardNo = widget.card.cardNo ?? '';
+                        final String cardName = widget.card.localeCardData.isNotEmpty 
+                            ? widget.card.localeCardData[0].name ?? ''
+                            : '';
+                            
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(widget.width * 0.05),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(widget.width * 0.05),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    cardNo,
+                                    style: TextStyle(
+                                      fontSize: widget.width * 0.15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  if (cardName.isNotEmpty) 
+                                    Text(
+                                      cardName,
+                                      style: TextStyle(
+                                        fontSize: widget.width * 0.12,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

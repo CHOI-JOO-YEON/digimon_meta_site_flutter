@@ -23,11 +23,29 @@ class CardDataService {
       final String jsonString = await rootBundle.loadString('assets/data/cards.json');
       final List<dynamic> jsonList = json.decode(jsonString);
       
+      // 임시로 패럴렐 카드를 보관할 맵
+      Map<String, DigimonCard> parallelCards = {};
+      
       jsonList.forEach((json) {
         DigimonCard card = DigimonCard.fromJson(json);
         _allCards[card.cardId!] = card;
-        _allCardsByCardNo[card.cardNo!] = card;
+        
+        // 비패럴렐 카드는 바로 맵에 추가
+        if (!(card.isParallel ?? false)) {
+          _allCardsByCardNo[card.cardNo!] = card;
+        } else {
+          // 패럴렐 카드는 임시 맵에 저장
+          parallelCards[card.cardNo!] = card;
+        }
+        
         _types.addAll(card.types ?? []);
+      });
+      
+      // 비패럴렐 카드가 없는 경우에만 패럴렐 카드 추가
+      parallelCards.forEach((cardNo, card) {
+        if (!_allCardsByCardNo.containsKey(cardNo)) {
+          _allCardsByCardNo[cardNo] = card;
+        }
       });
 
       _isInitialized = true;
@@ -206,6 +224,16 @@ class CardDataService {
     return _allCards[cardId];
   }
   DigimonCard? getCardByCardNo(String cardNo) {
+    return _allCardsByCardNo[cardNo];
+  }
+  
+  // 패럴렐 카드의 번호를 받아 같은 번호의 비패럴렐 카드를 반환하는 메서드
+  DigimonCard? getNonParallelCardByCardNo(String cardNo) {
+    if (!_isInitialized) {
+      return null;
+    }
+    
+    // _allCardsByCardNo에는 이미 가능한 비패럴렐 카드가 저장되어 있음
     return _allCardsByCardNo[cardNo];
   }
 } 

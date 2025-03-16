@@ -30,7 +30,7 @@ class MainPage extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.portrait;
     return AutoTabsRouter.tabBar(
       physics: const NeverScrollableScrollPhysics(),
-      routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute()],
+      routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute(), InfoRoute()],
       builder: (context, child, controller) {
         controller.addListener(() {
           if (controller.indexIsChanging) {
@@ -154,6 +154,18 @@ class MainPage extends StatelessWidget {
                                 child: isPortrait
                                     ? null
                                     : Text('Collect',
+                                        style: TextStyle(fontSize: fontSize)),
+                              ),
+                              Tab(
+                                icon: Center(
+                                    child: Icon(
+                                  Icons.info_outline,
+                                  // size: SizeService.largeIconSize(context),
+                                )),
+                                iconMargin: EdgeInsets.zero,
+                                child: isPortrait
+                                    ? null
+                                    : Text('Info',
                                         style: TextStyle(fontSize: fontSize)),
                               )
                             ],

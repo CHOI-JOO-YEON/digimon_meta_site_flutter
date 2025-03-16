@@ -4,9 +4,13 @@ import 'package:digimon_meta_site_flutter/page/deck_builder_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_image_page.dart';
 import 'package:digimon_meta_site_flutter/page/deck_list_page.dart';
 import 'package:digimon_meta_site_flutter/page/game_playground_page.dart';
+import 'package:digimon_meta_site_flutter/page/info_page.dart';
 import 'package:digimon_meta_site_flutter/page/kakao_login_page.dart';
+import 'package:digimon_meta_site_flutter/page/keyword_info_page.dart';
+import 'package:digimon_meta_site_flutter/page/limit_info_page.dart';
 import 'package:digimon_meta_site_flutter/page/main_page.dart';
 import 'package:digimon_meta_site_flutter/page/qr_deck_import_page.dart';
+import 'package:digimon_meta_site_flutter/page/rule_info_page.dart';
 import 'package:flutter/material.dart';
 
 import 'model/deck-build.dart';
@@ -40,6 +44,11 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: 'collect', page: CollectRoute.page
           ,meta: {'searchParameter': 'String',},
         ),
+        AutoRoute(path: 'info', page: InfoRoute.page, children: [
+          AutoRoute(path: 'limit', page: LimitInfoRoute.page),
+          AutoRoute(path: 'keyword', page: KeywordInfoRoute.page),
+          AutoRoute(path: 'rule', page: RuleInfoRoute.page),
+        ]),
       ],
     ),
   ];

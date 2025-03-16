@@ -250,6 +250,22 @@ class GamePlayGroundRouteArgs {
 }
 
 /// generated route for
+/// [InfoPage]
+class InfoRoute extends PageRouteInfo<void> {
+  const InfoRoute({List<PageRouteInfo>? children})
+    : super(InfoRoute.name, initialChildren: children);
+
+  static const String name = 'InfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return InfoPage();
+    },
+  );
+}
+
+/// generated route for
 /// [KakaoLoginPage]
 class KakaoLoginRoute extends PageRouteInfo<void> {
   const KakaoLoginRoute({List<PageRouteInfo>? children})
@@ -261,6 +277,38 @@ class KakaoLoginRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const KakaoLoginPage();
+    },
+  );
+}
+
+/// generated route for
+/// [KeywordInfoPage]
+class KeywordInfoRoute extends PageRouteInfo<void> {
+  const KeywordInfoRoute({List<PageRouteInfo>? children})
+    : super(KeywordInfoRoute.name, initialChildren: children);
+
+  static const String name = 'KeywordInfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return KeywordInfoPage();
+    },
+  );
+}
+
+/// generated route for
+/// [LimitInfoPage]
+class LimitInfoRoute extends PageRouteInfo<void> {
+  const LimitInfoRoute({List<PageRouteInfo>? children})
+    : super(LimitInfoRoute.name, initialChildren: children);
+
+  static const String name = 'LimitInfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return LimitInfoPage();
     },
   );
 }
@@ -322,4 +370,20 @@ class QrDeckImportRouteArgs {
   String toString() {
     return 'QrDeckImportRouteArgs{key: $key, deckParam: $deckParam}';
   }
+}
+
+/// generated route for
+/// [RuleInfoPage]
+class RuleInfoRoute extends PageRouteInfo<void> {
+  const RuleInfoRoute({List<PageRouteInfo>? children})
+    : super(RuleInfoRoute.name, initialChildren: children);
+
+  static const String name = 'RuleInfoRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return RuleInfoPage();
+    },
+  );
 }
