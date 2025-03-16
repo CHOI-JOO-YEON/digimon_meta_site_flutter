@@ -35,13 +35,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
   TextEditingController? _dialogSearchStringEditingController;
   List<DropdownMenuItem<NoteDto>> dropDownMenuItems = [];
   final List<String> colors = [
-    'red',
-    'blue',
-    'yellow',
-    'green',
-    'black',
-    'purple',
-    'white'
+    'RED',
+    'BLUE',
+    'YELLOW',
+    'GREEN',
+    'BLACK',
+    'PURPLE',
+    'WHITE'
   ];
   final List<String> cardTypes = [
     'DIGITAMA',
@@ -77,19 +77,19 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   String getKorColorStringByEn(String s) {
     switch (s) {
-      case 'red':
+      case 'RED':
         return '적';
-      case 'blue':
+      case 'BLUE':
         return '청';
-      case 'yellow':
+      case 'YELLOW':
         return '황';
-      case 'green':
+      case 'GREEN':
         return '녹';
-      case 'black':
+      case 'BLACK':
         return '흑';
-      case 'purple':
+      case 'PURPLE':
         return '자';
-      case 'white':
+      case 'WHITE':
         return '백';
       default:
         return "에러";

@@ -114,8 +114,9 @@ class CardDataService {
         if (!matches) return false;
       }
       
+      
       if (params.colors != null && params.colors!.isNotEmpty) {
-        matches = params.colors!.contains(card.color1);
+        matches = params.colors!.contains(card.color1) || params.colors!.contains(card.color2) || params.colors!.contains(card.color3);
         if (!matches) return false;
       }
       
