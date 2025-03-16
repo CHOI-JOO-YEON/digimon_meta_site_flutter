@@ -162,7 +162,25 @@ class _CardSearchBarState extends State<CardSearchBar> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Text("세부 검색 조건"),
+              titlePadding: const EdgeInsets.all(16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Row(
+                children: [
+                  Icon(Icons.filter_list, size: 24, color: Theme.of(context).primaryColor),
+                  const SizedBox(width: 8),
+                  const Text("세부 검색 조건"),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
               content: SizedBox(
                 width: isPortrait
                     ? MediaQuery.sizeOf(context).width * 0.8
@@ -173,10 +191,33 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     children: [
                       TextField(
                         controller: _dialogSearchStringEditingController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '검색어',
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).primaryColor.withOpacity(0.7),
+                          ),
+                          hintText: '이름, 효과에 포함된 텍스트 검색...',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).primaryColor.withOpacity(0.6),
+                          ),
+                          prefixIcon: Icon(Icons.search, size: 20, color: Theme.of(context).primaryColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                          isDense: true,
                         ),
                       ),
+                      const SizedBox(height: 16),
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: DropdownButton<NoteDto>(
@@ -472,8 +513,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                         CardDataService().searchTypes(value);
                                   });
                                 },
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: '유형 검색',
+                                  labelStyle: TextStyle(
+                                    color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                  ),
                                 ),
                               ),
                             ),
@@ -570,8 +617,57 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 ),
               ),
               actions: [
-                TextButton(
-                  child: const Text("적용"),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("조건 초기화", style: TextStyle(fontWeight: FontWeight.w500)),
+                  onPressed: () {
+                    selectedNote = all;
+                    for (var color in colors) {
+                      selectedColorMap[color] = false;
+                    }
+
+                    for (var cardType in cardTypes) {
+                      selectedCardTypeMap[cardType] = false;
+                    }
+
+                    for (var lv in levels) {
+                      selectedLvMap[lv] = false;
+                    }
+
+                    for (var rarity in rarities) {
+                      selectedRarityMap[rarity] = false;
+                    }
+
+                    currentDpRange = const RangeValues(1000, 17000);
+
+                    currentPlayCostRange = const RangeValues(0, 20);
+                    currentDigivolutionCostRange = const RangeValues(0, 8);
+                    parallelOption = 0;
+                    _dialogSearchStringEditingController =
+                        TextEditingController(text: '');
+                    enCardInclude = true;
+                    _selectedTypes={};
+                    typeOperation=1;
+
+                    setState(() {});
+                  },
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                    elevation: 1,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("적용", style: TextStyle(fontWeight: FontWeight.w500)),
                   onPressed: () {
                     if (selectedNote != null) {
                       widget.searchParameter.noteId = selectedNote?.noteId;
@@ -621,40 +717,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     Navigator.pop(context);
 
                     widget.updateSearchParameter();
-                  },
-                ),
-                TextButton(
-                  child: const Text("조건 초기화"),
-                  onPressed: () {
-                    selectedNote = all;
-                    for (var color in colors) {
-                      selectedColorMap[color] = false;
-                    }
-
-                    for (var cardType in cardTypes) {
-                      selectedCardTypeMap[cardType] = false;
-                    }
-
-                    for (var lv in levels) {
-                      selectedLvMap[lv] = false;
-                    }
-
-                    for (var rarity in rarities) {
-                      selectedRarityMap[rarity] = false;
-                    }
-
-                    currentDpRange = const RangeValues(1000, 17000);
-
-                    currentPlayCostRange = const RangeValues(0, 20);
-                    currentDigivolutionCostRange = const RangeValues(0, 8);
-                    parallelOption = 0;
-                    _dialogSearchStringEditingController =
-                        TextEditingController(text: '');
-                    enCardInclude = true;
-                    _selectedTypes={};
-                    typeOperation=1;
-
-                    setState(() {});
                   },
                 ),
               ],
@@ -817,35 +879,83 @@ class _CardSearchBarState extends State<CardSearchBar> {
       children: [
         Expanded(
             flex: 8,
-            child: TextField(
-              controller: _searchStringEditingController,
-              onChanged: (value) {
-                widget.searchParameter.searchString = value;
-              },
-              onSubmitted: (value) {
-                widget.updateSearchParameter();
-              },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+              ),
+              child: TextField(
+                controller: _searchStringEditingController,
+                onChanged: (value) {
+                  widget.searchParameter.searchString = value;
+                },
+                onSubmitted: (value) {
+                  widget.updateSearchParameter();
+                },
+                decoration: InputDecoration(
+                  hintText: '이름, 효과에 포함된 텍스트 검색...',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).primaryColor.withOpacity(0.6),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    size: 20,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  suffixIcon: _searchStringEditingController?.text.isNotEmpty ?? false
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          size: 18,
+                          color: Colors.grey.shade600,
+                        ),
+                        onPressed: () {
+                          _searchStringEditingController?.clear();
+                          widget.searchParameter.searchString = '';
+                        },
+                      )
+                    : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                ),
+              ),
             )),
         Expanded(
             flex: 1,
-            child: IconButton(
-                padding: EdgeInsets.zero,
+            child: Container(
+              margin: const EdgeInsets.only(left: 8),
+              child: IconButton(
                 onPressed: () {
                   widget.updateSearchParameter();
                 },
-                icon: const Icon(Icons.search))),
+                icon: const Icon(Icons.search, size: 20),
+                padding: EdgeInsets.zero,
+                tooltip: '검색',
+              ),
+            )),
         Expanded(
             flex: 1,
-            child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: _showFilterDialog,
-                icon: const Icon(Icons.menu))),
+            child: Container(
+              margin: const EdgeInsets.only(left: 8),
+              child: IconButton(
+                  padding: const EdgeInsets.all(8),
+                  iconSize: 24,
+                  onPressed: _showFilterDialog,
+                  tooltip: '필터',
+                  icon: const Icon(Icons.menu)),
+            )),
         Expanded(
             flex: 1,
-            child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: resetSearchCondition,
-                icon: const Icon(Icons.refresh))),
+            child: Container(
+              margin: const EdgeInsets.only(left: 4),
+              child: IconButton(
+                  padding: const EdgeInsets.all(4),
+                  iconSize: 22,
+                  tooltip: '초기화',
+                  onPressed: resetSearchCondition,
+                  icon: const Icon(Icons.refresh)),
+            )),
         if (widget.viewMode != null)
           Expanded(
             flex: 1,

@@ -47,6 +47,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
   }
 
   final ScrollController _scrollController = ScrollController();
+  final Map<String, GlobalKey> _cardKeys = {};
 
   @override
   void dispose() {
@@ -91,7 +92,9 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
             DigimonCard card = widget.deck[index];
             int count = widget.deckCount[card]!;
 
-            GlobalKey cardKey = GlobalKey();
+            String cardId = card.cardId?.toString() ?? 'card_$index';
+            _cardKeys.putIfAbsent(cardId, () => GlobalKey());
+            GlobalKey cardKey = _cardKeys[cardId]!;
 
             return Stack(
               children: [

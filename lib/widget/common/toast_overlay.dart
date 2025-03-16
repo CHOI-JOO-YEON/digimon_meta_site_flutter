@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
+enum ToastType {
+  success,
+  info,
+  warning,
+  error,
+}
+
 class ToastOverlay {
   static void show(
     BuildContext context,
     String message, {
     Duration duration = const Duration(seconds: 2),
+    ToastType type = ToastType.info,
   }) {
     final overlay = OverlayEntry(
       builder: (context) => Positioned(
@@ -15,25 +23,39 @@ class ToastOverlay {
           color: Colors.transparent,
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              constraints: const BoxConstraints(maxWidth: 400),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(20),
+                color: _getBackgroundColor(type),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _getIcon(type),
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -45,5 +67,31 @@ class ToastOverlay {
     Future.delayed(duration, () {
       overlay.remove();
     });
+  }
+
+  static Color _getBackgroundColor(ToastType type) {
+    switch (type) {
+      case ToastType.success:
+        return const Color(0xFF4CAF50);
+      case ToastType.info:
+        return const Color(0xFF2196F3);
+      case ToastType.warning:
+        return const Color(0xFFFF9800);
+      case ToastType.error:
+        return const Color(0xFFF44336);
+    }
+  }
+
+  static IconData _getIcon(ToastType type) {
+    switch (type) {
+      case ToastType.success:
+        return Icons.check_circle_outline;
+      case ToastType.info:
+        return Icons.info_outline;
+      case ToastType.warning:
+        return Icons.warning_amber_outlined;
+      case ToastType.error:
+        return Icons.error_outline;
+    }
   }
 } 

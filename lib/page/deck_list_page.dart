@@ -51,7 +51,6 @@ class _DeckListPageState extends State<DeckListPage> {
         Map<String, dynamic> searchMapData = jsonDecode(widget.searchParameterString!);
         deckSearchParameter = DeckSearchParameter(isMyDeck: searchMapData['isMyDeck'] ?? false);
       } catch (e) {
-        print('Error parsing search parameter: $e');
       }
     }
     

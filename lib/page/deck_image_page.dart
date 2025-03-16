@@ -31,6 +31,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
   bool showInfo = true;
   bool isQrShow = true;
   final GlobalKey gridKey = GlobalKey();
+  final GlobalKey screenshotKey = GlobalKey();
   DigimonCard? _selectedCard;
   double size = 1000;
   double horizontalSize = 0;
@@ -229,10 +230,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey globalKey = GlobalKey();
     Future<void> captureAndDownloadImage(BuildContext context) async {
       try {
-        RenderRepaintBoundary boundary = globalKey.currentContext!
+        RenderRepaintBoundary boundary = screenshotKey.currentContext!
             .findRenderObject() as RenderRepaintBoundary;
 
         final boundarySize = boundary.size;
@@ -381,7 +381,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         child: Align(
           alignment: Alignment.topCenter,
           child: RepaintBoundary(
-            key: globalKey,
+            key: screenshotKey,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Container(
@@ -560,7 +560,10 @@ class _DeckImagePageState extends State<DeckImagePage> {
               shrinkWrap: true,
               itemCount: cards.length,
               itemBuilder: (context, index) {
+                // Generate a unique key for each item
+                final cardId = cards[index].cardId?.toString() ?? 'card_$index';
                 return GestureDetector(
+                  key: ValueKey('grid_$name\_$cardId\_$index'),
                   onTap: () {
                     _selectedCard = cards[index];
                     setState(() {});

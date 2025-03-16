@@ -65,7 +65,6 @@ class DeckView {
             final cnt = value as int;
             cardMap![cardId] = cnt;
           } catch (e) {
-            print('Error parsing card data: $e');
           }
         });
       }

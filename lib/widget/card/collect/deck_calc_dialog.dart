@@ -297,7 +297,7 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                           });
                                         },
                                       ),
-                                      Text('패레 구분'),
+                                      Text('카드번호로 그룹화 (패레 구분 안함)'),
                                     ],
                                   ),
                                 ),
@@ -309,42 +309,44 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                               itemCount: sortedCards.length,
                               itemBuilder: (context, index) {
                                 final card = sortedCards[index];
-                                final quantity = !_useCardNoAsKey
-                                    ? _calculator.maxQuantitiesByCardNo[
-                                            card.cardNo] ??
-                                        0
-                                    : _calculator
-                                            .maxQuantitiesById[card.cardId] ??
-                                        0;
-                                final nowQuantity = !_useCardNoAsKey?
-                                    collectProvider.getCardQuantityByCardNo(card.cardNo!)
-                                    : collectProvider
-                                    .getCardQuantityById(card.cardId!);
-
-                                if ((!_showExceededCards &&
-                                        nowQuantity < quantity) ||
-                                    _showExceededCards) {
-                                  if ((!_showEnCards && !card.isEn) ||
-                                      _showEnCards) {
-                                    return Card(
-                                      child: ListTile(
-                                        leading: Image.network(
-                                            card.getDisplaySmallImgUrl() ?? ''),
-                                        title: Text(
-                                            '${card.cardNo} ${card.getDisplayName()} ${card.rarity}' ??
-                                                ''),
-                                        subtitle: Text(
-                                          '소지: $nowQuantity / 필요: $quantity',
-                                          style: TextStyle(
-                                              color: nowQuantity >= quantity
-                                                  ? Colors.green
-                                                  : Colors.red),
-                                        ),
-                                      ),
-                                    );
-                                  }
+                                final quantity = _useCardNoAsKey
+                                    ? _calculator.maxQuantitiesByCardNo[card.cardNo] ?? 0
+                                    : _calculator.maxQuantitiesById[card.cardId] ?? 0;
+                                
+                                final nowQuantity = _useCardNoAsKey
+                                    ? collectProvider.getCardQuantityByCardNo(card.cardNo!)
+                                    : collectProvider.getCardQuantityById(card.cardId!);
+                                
+                                bool showCard = true;
+                                
+                                if (!_showExceededCards && nowQuantity >= quantity) {
+                                  showCard = false;
                                 }
-                                return SizedBox();
+                                
+                                if (!_showEnCards && card.isEn == true) {
+                                  showCard = false;
+                                }
+                                
+                                if (showCard) {
+                                  return Card(
+                                    child: ListTile(
+                                      leading: Image.network(
+                                          card.getDisplaySmallImgUrl() ?? ''),
+                                      title: Text(
+                                          '${card.cardNo} ${card.getDisplayName()} ${card.rarity}' ??
+                                              ''),
+                                      subtitle: Text(
+                                        '소지: $nowQuantity / 필요: $quantity',
+                                        style: TextStyle(
+                                            color: nowQuantity >= quantity
+                                                ? Colors.green
+                                                : Colors.red),
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return SizedBox();
+                                }
                               },
                             ),
                           ),

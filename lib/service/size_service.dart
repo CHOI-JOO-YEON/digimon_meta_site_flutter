@@ -130,14 +130,29 @@ class SizeService {
   }
 
   static double headerHeight(BuildContext context) {
-    return ResponsiveValue<double>(
-      context,
-      defaultValue: 100,
-      conditionalValues: [
-        const Condition.smallerThan(name: TABLET, value: 120),
-        const Condition.smallerThan(name: DESKTOP, value: 120),
-        const Condition.largerThan(name: DESKTOP, value: 80),
-      ],
-    ).value;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    
+    // 세로모드일 때 더 큰 값 반환
+    if (isPortrait) {
+      return ResponsiveValue<double>(
+        context,
+        defaultValue: 140,
+        conditionalValues: [
+          const Condition.smallerThan(name: TABLET, value: 150),
+          const Condition.smallerThan(name: DESKTOP, value: 150),
+          const Condition.largerThan(name: DESKTOP, value: 130),
+        ],
+      ).value;
+    } else {
+      return ResponsiveValue<double>(
+        context,
+        defaultValue: 100,
+        conditionalValues: [
+          const Condition.smallerThan(name: TABLET, value: 120),
+          const Condition.smallerThan(name: DESKTOP, value: 120),
+          const Condition.largerThan(name: DESKTOP, value: 80),
+        ],
+      ).value;
+    }
   }
 }

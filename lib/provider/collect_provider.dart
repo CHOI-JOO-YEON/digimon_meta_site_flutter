@@ -39,14 +39,13 @@ class CollectProvider with ChangeNotifier {
       return false;
     }
 
-
-
     List<CardCollectDto>? newList = await CollectApi().getCollect();
 
     clear();
-    if (list != null) {
-      for (CardCollectDto cardCollect in list) {
+    if (newList != null) {
+      for (CardCollectDto cardCollect in newList) {
         collectMapById[cardCollect.cardImgId]=cardCollect.quantity;
+        collectMapByCardNo[cardCollect.cardNo!] = (collectMapByCardNo[cardCollect.cardNo!] ?? 0) + cardCollect.quantity;
       }
     }
     notifyListeners();

@@ -23,6 +23,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:html' as html;
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:digimon_meta_site_flutter/widget/common/skeleton_loading.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -219,33 +220,59 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     initSearch();
   }
 
-  initSearch() async {
-    isSearchLoading = true;
-    setState(() {});
-
+  Future<void> initSearch() async {
+    setState(() {
+      isSearchLoading = true;
+    });
+    
+    // 페이지 번호 초기화
     searchParameter.page = 1;
+    
     CardResponseDto cardResponseDto =
-       await CardDataService().searchCards(searchParameter);
+        await CardDataService().searchCards(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
-
-    isSearchLoading = false;
     currentPage = 1;
     searchParameter.page = 2;
     
+    // 검색 결과에 따른 토스트 메시지 표시
+    if (cards.isEmpty) {
+      ToastOverlay.show(
+        context, 
+        '검색 결과가 없습니다. 다른 조건으로 검색해보세요.',
+        type: ToastType.info,
+      );
+    } else if (searchParameter.searchString != null && searchParameter.searchString!.isNotEmpty) {
+      ToastOverlay.show(
+        context, 
+        '${cards.length}개의 카드를 찾았습니다.',
+        type: ToastType.success,
+      );
+    }
+    
+    setState(() {
+      isSearchLoading = false;
+    });
+    
+    // 검색 파라미터 URL 업데이트
     updateSearchParameter();
-    setState(() {});
   }
+
   addCardByDeck(DigimonCard card) {
     String? result = deck.addSingleCard(card);
     if (result != null) {
-      ToastOverlay.show(context, result);
+      if (result.contains("추가")) {
+        ToastOverlay.show(context, result, type: ToastType.success);
+      } else {
+        ToastOverlay.show(context, result, type: ToastType.warning);
+      }
     }
     setState(() {});
   }
 
   removeCardByDeck(DigimonCard card) {
     deck.removeSingleCard(card);
+    ToastOverlay.show(context, "카드가 제거되었습니다.", type: ToastType.info);
     setState(() {});
   }
 
@@ -457,8 +484,48 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             currentPage: currentPage,
                                             searchNote: searchNote,
                                           ))
-                                    : const Center(
-                                        child: CircularProgressIndicator())),
+                                    : Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: viewMode == 'grid'
+                                            ? CardGridSkeletonLoading(
+                                                crossAxisCount: 6,
+                                                itemCount: 24,
+                                              )
+                                            : ListView.builder(
+                                                itemCount: 10,
+                                                itemBuilder: (context, index) {
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        CardSkeletonLoading(
+                                                          width: 80,
+                                                        ),
+                                                        const SizedBox(width: 12),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              SkeletonLoading(
+                                                                width: double.infinity,
+                                                                height: 24,
+                                                                borderRadius: 4,
+                                                              ),
+                                                              const SizedBox(height: 8),
+                                                              SkeletonLoading(
+                                                                width: 200,
+                                                                height: 16,
+                                                                borderRadius: 4,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                      )),
                             Expanded(
                                 flex: _panelController.panelPosition < 0.7
                                     ? 11
@@ -564,8 +631,48 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       currentPage: currentPage,
                                       searchNote: searchNote,
                                     ))
-                              : const Center(
-                                  child: CircularProgressIndicator()))
+                              : Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: viewMode == 'grid'
+                                      ? CardGridSkeletonLoading(
+                                          crossAxisCount: 6,
+                                          itemCount: 24,
+                                        )
+                                      : ListView.builder(
+                                          itemCount: 10,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                              child: Row(
+                                                children: [
+                                                  CardSkeletonLoading(
+                                                    width: 80,
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        SkeletonLoading(
+                                                          width: double.infinity,
+                                                          height: 24,
+                                                          borderRadius: 4,
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        SkeletonLoading(
+                                                          width: 200,
+                                                          height: 16,
+                                                          borderRadius: 4,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                )),
                     ],
                   ),
                 ),

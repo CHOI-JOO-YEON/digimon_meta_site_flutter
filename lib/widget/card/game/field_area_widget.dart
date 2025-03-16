@@ -32,6 +32,7 @@ class FieldArea extends StatelessWidget {
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
+                          key: ValueKey('field_zone_$index'),
                           fieldZone: gameState.fieldZones["field$index"]!,
                           cardWidth: resizingWidth,
                           isRaising: false,
@@ -50,6 +51,7 @@ class FieldArea extends StatelessWidget {
                       itemCount: gameState.fieldZones.length - 8,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
+                          key: ValueKey('field_zone_${index + 8}'),
                           fieldZone: gameState.fieldZones["field${index + 8}"]!,
                           cardWidth: resizingWidth,
                           isRaising: false,

@@ -41,14 +41,12 @@ class FormatDeckCountProvider with ChangeNotifier {
     isLoading = true;
     try {
       FormatDeckCountDto? deckCounts = await _deckApi.getDeckCount();
-      print('deckCounts: $deckCounts');
       if (deckCounts != null) {
         formatAllDeckCount = deckCounts.formatAllDeckCount;
         formatMyDeckCount = deckCounts.formatMyDeckCount;
         notifyListeners();
       }
     } catch (e) {
-      print('Error loading deck counts: $e');
     } finally {
       isLoading = false;
     }

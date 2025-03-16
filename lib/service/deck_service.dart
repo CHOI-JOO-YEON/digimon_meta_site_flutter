@@ -52,7 +52,6 @@ class DeckService {
       Provider.of<FormatDeckCountProvider>(context, listen: false)
           .loadDeckCounts();
     } catch (e) {
-      print('Error refreshing format deck counts: $e');
     }
   }
 

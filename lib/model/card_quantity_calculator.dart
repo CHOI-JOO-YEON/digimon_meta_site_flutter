@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'card.dart';
 import 'deck-view.dart';
+import '../service/card_data_service.dart';
 
 class CardQuantityCalculator {
   Map<int, Map<int, int>> _formatCardQuantitiesById = {};
@@ -55,24 +56,35 @@ class CardQuantityCalculator {
     Map<int, int> cardQuantitiesById = _formatCardQuantitiesById[formatId]!;
     Map<String, int> cardQuantitiesByCardNo = _formatCardQuantitiesByCardNo[formatId]!;
 
+    CardDataService cardService = CardDataService();
+    Map<int, DigimonCard> tempCardMap = {};
+    
     deck.cardIdAndCntMap!.forEach((cardId, count) {
-      DigimonCard card = _cardMap[cardId]!;
-      String cardNo = card.cardNo!;
-      _cardMap[cardId] = card;
-      _cardNoMap[card.cardNo!] = card;
-
-      if (cardQuantitiesById.containsKey(cardId)) {
-        cardQuantitiesById[cardId] = cardQuantitiesById[cardId]! + count;
-      } else {
-        cardQuantitiesById[cardId] = count;
+      DigimonCard? card = cardService.getCardById(cardId);
+      if (card != null) {
+        tempCardMap[cardId] = card;
+        _cardMap[cardId] = card;
+        _cardNoMap[card.cardNo!] = card;
       }
+    });
 
-      if (cardQuantitiesByCardNo.containsKey(cardNo)) {
-        cardQuantitiesByCardNo[cardNo] = cardQuantitiesByCardNo[cardNo]! + count;
-      } else {
-        cardQuantitiesByCardNo[cardNo] = count;
+    deck.cardIdAndCntMap!.forEach((cardId, count) {
+      if (tempCardMap.containsKey(cardId)) {
+        DigimonCard card = tempCardMap[cardId]!;
+        String cardNo = card.cardNo!;
+
+        if (cardQuantitiesById.containsKey(cardId)) {
+          cardQuantitiesById[cardId] = cardQuantitiesById[cardId]! + count;
+        } else {
+          cardQuantitiesById[cardId] = count;
+        }
+
+        if (cardQuantitiesByCardNo.containsKey(cardNo)) {
+          cardQuantitiesByCardNo[cardNo] = cardQuantitiesByCardNo[cardNo]! + count;
+        } else {
+          cardQuantitiesByCardNo[cardNo] = count;
+        }
       }
-
     });
   }
 
@@ -81,18 +93,21 @@ class CardQuantityCalculator {
     Map<int, int> cardQuantities = _formatCardQuantitiesById[formatId]!;
     Map<String, int> cardQuantitiesByCardNo = _formatCardQuantitiesByCardNo[formatId]!;
     deck.cardIdAndCntMap!.forEach((cardId, count) {
-      String cardNo = _cardMap[cardId]!.cardNo!;
-      if (cardQuantities.containsKey(cardId)) {
-        cardQuantities[cardId] = cardQuantities[cardId]! - count;
-        if (cardQuantities[cardId] == 0) {
-          cardQuantities.remove(cardId);
+      if (_cardMap.containsKey(cardId)) {
+        String cardNo = _cardMap[cardId]!.cardNo!;
+        
+        if (cardQuantities.containsKey(cardId)) {
+          cardQuantities[cardId] = cardQuantities[cardId]! - count;
+          if (cardQuantities[cardId] == 0) {
+            cardQuantities.remove(cardId);
+          }
         }
-      }
 
-      if (cardQuantitiesByCardNo.containsKey(cardNo)) {
-        cardQuantitiesByCardNo[cardNo] = cardQuantitiesByCardNo[cardNo]! - count;
-        if (cardQuantitiesByCardNo[cardNo] == 0) {
-          cardQuantitiesByCardNo.remove(cardNo);
+        if (cardQuantitiesByCardNo.containsKey(cardNo)) {
+          cardQuantitiesByCardNo[cardNo] = cardQuantitiesByCardNo[cardNo]! - count;
+          if (cardQuantitiesByCardNo[cardNo] == 0) {
+            cardQuantitiesByCardNo.remove(cardNo);
+          }
         }
       }
     });

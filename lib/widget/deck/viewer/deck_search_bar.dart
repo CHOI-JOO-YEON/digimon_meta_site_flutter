@@ -267,7 +267,14 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                 style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                 decoration: InputDecoration(
                   labelText: '검색어',
-                  labelStyle: TextStyle(fontSize: SizeService.smallFontSize(context)),
+                  labelStyle: TextStyle(
+                    fontSize: SizeService.smallFontSize(context),
+                    color: Theme.of(context).primaryColor.withOpacity(0.7),
+                  ),
+                  hintStyle: TextStyle(
+                    fontSize: SizeService.smallFontSize(context),
+                    color: Theme.of(context).primaryColor.withOpacity(0.6),
+                  ),
                 ),
                 onChanged: (value) {
                   widget.searchParameter.searchString = value;

@@ -36,6 +36,7 @@ class CardScrollGridView extends StatefulWidget {
 class _CardScrollGridViewState extends State<CardScrollGridView> {
   final ScrollController _scrollController = ScrollController();
   bool isLoading = false;
+  final Map<String, GlobalKey> _cardKeys = {};
 
   @override
   void initState() {
@@ -98,7 +99,10 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final cardKey = GlobalKey();
+    String cardId = widget.cards[index].cardId?.toString() ?? 'card_$index';
+    _cardKeys.putIfAbsent(cardId, () => GlobalKey());
+    final cardKey = _cardKeys[cardId]!;
+    
     return Padding(
       padding: EdgeInsets.zero,
       child: Column(
