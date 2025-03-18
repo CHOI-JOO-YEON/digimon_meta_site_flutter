@@ -759,13 +759,21 @@
   "cardCount" : 12,
   "isDisable" : false
 }, {
-  "noteId" : 79,
-  "name" : "테마 부스터 애니멀 콜로세움 [EX-05]",
+  "noteId" : 235,
+  "name" : "테마 부스터 애니멀 콜로세움 [EXK-05]",
   "releaseDate" : "2025-03-19",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 14,
-  "cardCount" : 74,
-  "isDisable" : false
+  "cardOrigin" : "BOOSTER_PACK",
+  "priority" : null,
+  "cardCount" : 94,
+  "isDisable" : null
+}, {
+  "noteId" : 236,
+  "name" : "테마 부스터 애니멀 콜로세움 [EXK-05] 박스 프로모",
+  "releaseDate" : "2025-03-19",
+  "cardOrigin" : "BOOSTER_PROMO",
+  "priority" : null,
+  "cardCount" : 19,
+  "isDisable" : null
 }, {
   "noteId" : 88,
   "name" : "테이머파티 - 더 비기닝",
