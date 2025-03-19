@@ -25,6 +25,8 @@ class CustomCard extends StatefulWidget {
   final Function? onDoubleTab;
   final Function(int)? searchNote;
 
+  final bool hideLimitBadges;
+
   const CustomCard({
     super.key,
     required this.width,
@@ -37,6 +39,7 @@ class CustomCard extends StatefulWidget {
     this.zoomActive,
     this.searchNote,
     this.onDoubleTab,
+    this.hideLimitBadges = false,
   });
 
   @override
@@ -277,6 +280,11 @@ class _CustomCardState extends State<CustomCard> {
                       right: widget.width * 0.08,
                       child: Builder(
                         builder: (context) {
+                          // hideLimitBadges가 true인 경우 배지를 표시하지 않음
+                          if (widget.hideLimitBadges) {
+                            return SizedBox();
+                          }
+                          
                           double containerSize = widget.width * 0.2;
                           double iconSize = widget.width * 0.15;
                           double fontSize = widget.width * 0.12;

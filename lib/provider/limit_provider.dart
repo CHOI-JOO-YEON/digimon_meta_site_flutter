@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:digimon_meta_site_flutter/api/limit_api.dart';
 import 'package:digimon_meta_site_flutter/enums/special_limit_card_enum.dart';
 import '../model/limit_dto.dart';
+import '../model/limit_comparison.dart';
 
 class LimitProvider with ChangeNotifier {
   static final LimitProvider _instance = LimitProvider._internal();
@@ -92,5 +93,21 @@ class LimitProvider with ChangeNotifier {
       }
     }
     return true;
+  }
+
+  // This method generates limit comparisons in chronological order
+  List<LimitComparison> getLimitComparisons() {
+    List<LimitComparison> comparisons = [];
+    List<DateTime> sortedDates = _limits.keys.toList()..sort();
+    
+    for (int i = 0; i < sortedDates.length; i++) {
+      LimitDto currentLimit = _limits[sortedDates[i]]!;
+      LimitDto? previousLimit = i > 0 ? _limits[sortedDates[i-1]] : null;
+      
+      LimitComparison comparison = LimitComparison.compare(currentLimit, previousLimit);
+      comparisons.add(comparison);
+    }
+    
+    return comparisons;
   }
 }
