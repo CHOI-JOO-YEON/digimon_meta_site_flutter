@@ -199,7 +199,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           labelStyle: TextStyle(
                             color: Theme.of(context).primaryColor.withOpacity(0.7),
                           ),
-                          hintText: '이름, 효과에 포함된 텍스트 검색...',
+                          hintText: '카드명/효과',
                           hintStyle: TextStyle(
                             color: Theme.of(context).primaryColor.withOpacity(0.6),
                           ),
@@ -897,7 +897,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   widget.updateSearchParameter();
                 },
                 decoration: InputDecoration(
-                  hintText: '이름, 효과에 포함된 텍스트 검색...',
+                  hintText: '카드명/효과',
                   hintStyle: TextStyle(
                     color: Theme.of(context).primaryColor.withOpacity(0.6),
                   ),
