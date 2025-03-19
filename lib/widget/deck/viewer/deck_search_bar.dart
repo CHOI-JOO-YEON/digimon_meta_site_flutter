@@ -37,6 +37,7 @@ class DeckSearchBar extends StatefulWidget {
 class _DeckSearchBarState extends State<DeckSearchBar> {
   FormatDto? _selectedFormat;
   late TextEditingController _searchController;
+  bool _isAdvancedOptionsExpanded = false;
 
   List<String> colors = [
     "RED",
@@ -172,94 +173,14 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    
     return Column(
       children: [
+        // 검색 필드 (항상 표시)
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 3,
-              child:  Consumer<FormatDeckCountProvider>(
-                builder: (context, deckCountProvider, child) {
-                  String selectedDeckCountStr = '';
-                  if (_selectedFormat != null) {
-                    final selectedDeckCount = deckCountProvider.getFormatDeckCount(
-                      _selectedFormat!.formatId,
-                      widget.isMyDeck,
-                    );
-                    selectedDeckCountStr =
-                    selectedDeckCount > 99 ? ' (99+)' : ' ($selectedDeckCount)';
-                  }
-
-                  return DropdownButtonHideUnderline(
-                    child: DropdownButton<FormatDto>(
-                      isExpanded: true,
-                      hint: _selectedFormat==null?Text('포맷', style: TextStyle(fontSize: SizeService.smallFontSize(context)),): 
-                          dropDownFormatItem(_selectedFormat!, SizeService.smallFontSize(context), selectedDeckCountStr),
-                      value: _selectedFormat,
-                      items: [
-                        const DropdownMenuItem<FormatDto>(
-                          enabled: false,
-                          child: Text(
-                            '일반 포맷',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        ...widget.formatList
-                            .where((format) => format.isOnlyEn == false)
-                            .map((format) {
-                          final deckCount = deckCountProvider
-                              .getFormatDeckCount(format.formatId, widget.isMyDeck);
-                          final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
-
-                          return DropdownMenuItem<FormatDto>(
-                            value: format,
-                              child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
-                          );
-                        }),
-                        const DropdownMenuItem<FormatDto>(
-                          enabled: false,
-                          child: Text(
-                            '미발매 포맷 [예상 발매 일정]',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        ...widget.formatList
-                            .where((format) => format.isOnlyEn == true)
-                            .toList()
-                            .reversed
-                            .map((format) {
-                          final deckCount = deckCountProvider
-                              .getFormatDeckCount(format.formatId, widget.isMyDeck);
-                          final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
-
-                          return DropdownMenuItem<FormatDto>(
-                            value: format,
-                            child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
-                          );
-                        }),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedFormat = value;
-                          widget.searchParameter.formatId = value?.formatId;
-                          widget.updateSelectFormat(_selectedFormat!);
-                          widget.search(1);
-                        });
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Expanded(flex: 1, child: ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => _showDeckSettingDialog(context),
-              iconSize: SizeService.mediumIconSize(context),
-              icon: const Icon(Icons.settings),
-              tooltip: '검색 설정',
-            ),
             Expanded(
               flex: 3,
               child: TextField(
@@ -271,6 +192,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     fontSize: SizeService.smallFontSize(context),
                     color: Theme.of(context).primaryColor.withOpacity(0.7),
                   ),
+                  prefixIcon: const Icon(Icons.search),
                   hintStyle: TextStyle(
                     fontSize: SizeService.smallFontSize(context),
                     color: Theme.of(context).primaryColor.withOpacity(0.6),
@@ -288,78 +210,215 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
             Expanded(
               flex: 1,
               child: TextButton(
-                  onPressed: () {
-                    widget.search(1);
-                  },
-                  child: Text(
-                    '검색',
-                    style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                  )),
-            )
+                onPressed: () {
+                  widget.search(1);
+                },
+                child: Text(
+                  '검색',
+                  style: TextStyle(fontSize: SizeService.smallFontSize(context)),
+                )
+              ),
+            ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                setState(() {
+                  _isAdvancedOptionsExpanded = !_isAdvancedOptionsExpanded;
+                });
+              },
+              iconSize: SizeService.mediumIconSize(context),
+              icon: Icon(_isAdvancedOptionsExpanded ? Icons.expand_less : Icons.expand_more),
+              tooltip: '고급 검색 옵션',
+            ),
           ],
         ),
-        SizedBox(height: SizeService.smallFontSize(context)),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          ...List.generate(
-            colors.length,
-            (index) {
-              String color = colors[index];
-              Color buttonColor = ColorService.getColorFromString(color);
+        
+        // 고급 검색 옵션 (확장/축소 가능)
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          height: _isAdvancedOptionsExpanded ? (isPortrait ? 200 : 150) : 0,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                // 포맷 선택
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: Consumer<FormatDeckCountProvider>(
+                        builder: (context, deckCountProvider, child) {
+                          String selectedDeckCountStr = '';
+                          if (_selectedFormat != null) {
+                            final selectedDeckCount = deckCountProvider.getFormatDeckCount(
+                              _selectedFormat!.formatId,
+                              widget.isMyDeck,
+                            );
+                            selectedDeckCountStr =
+                            selectedDeckCount > 99 ? ' (99+)' : ' ($selectedDeckCount)';
+                          }
 
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (widget.searchParameter.colors.contains(color)) {
-                      widget.searchParameter.colors.remove(color);
-                    } else {
-                      widget.searchParameter.colors.add(color);
-                    }
-                  });
-                },
-                child: Container(
-                  width: SizeService.mediumIconSize(context),
-                  height: SizeService.mediumIconSize(context),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: widget.searchParameter.colors.contains(color)
-                        ? buttonColor
-                        : buttonColor.withOpacity(0.3),
-                  ),
+                          return DropdownButtonHideUnderline(
+                            child: DropdownButton<FormatDto>(
+                              isExpanded: true,
+                              hint: _selectedFormat==null?Text('포맷', style: TextStyle(fontSize: SizeService.smallFontSize(context)),): 
+                                  dropDownFormatItem(_selectedFormat!, SizeService.smallFontSize(context), selectedDeckCountStr),
+                              value: _selectedFormat,
+                              items: [
+                                const DropdownMenuItem<FormatDto>(
+                                  enabled: false,
+                                  child: Text(
+                                    '일반 포맷',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                ...widget.formatList
+                                    .where((format) => format.isOnlyEn == false)
+                                    .map((format) {
+                                  final deckCount = deckCountProvider
+                                      .getFormatDeckCount(format.formatId, widget.isMyDeck);
+                                  final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
+
+                                  return DropdownMenuItem<FormatDto>(
+                                    value: format,
+                                      child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
+                                  );
+                                }),
+                                const DropdownMenuItem<FormatDto>(
+                                  enabled: false,
+                                  child: Text(
+                                    '미발매 포맷 [예상 발매 일정]',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                ...widget.formatList
+                                    .where((format) => format.isOnlyEn == true)
+                                    .toList()
+                                    .reversed
+                                    .map((format) {
+                                  final deckCount = deckCountProvider
+                                      .getFormatDeckCount(format.formatId, widget.isMyDeck);
+                                  final deckCountStr = deckCount > 99 ? '99+' : '$deckCount';
+
+                                  return DropdownMenuItem<FormatDto>(
+                                    value: format,
+                                    child: dropDownFormatItem(format, SizeService.smallFontSize(context), deckCountStr)
+                                  );
+                                }),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedFormat = value;
+                                  widget.searchParameter.formatId = value?.formatId;
+                                  widget.updateSelectFormat(_selectedFormat!);
+                                  widget.search(1);
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showDeckSettingDialog(context),
+                      iconSize: SizeService.mediumIconSize(context),
+                      icon: const Icon(Icons.settings),
+                      tooltip: '검색 설정',
+                    ),
+                  ],
                 ),
-              );
-            },
+                
+                const SizedBox(height: 12),
+                
+                // 색상 선택
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround, 
+                  children: [
+                    ...List.generate(
+                      colors.length,
+                      (index) {
+                        String color = colors[index];
+                        Color buttonColor = ColorService.getColorFromString(color);
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (widget.searchParameter.colors.contains(color)) {
+                                widget.searchParameter.colors.remove(color);
+                              } else {
+                                widget.searchParameter.colors.add(color);
+                              }
+                            });
+                          },
+                          child: Container(
+                            width: SizeService.mediumIconSize(context) * 1.5,
+                            height: SizeService.mediumIconSize(context) * 1.5,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: widget.searchParameter.colors.contains(color)
+                                  ? buttonColor
+                                  : buttonColor.withOpacity(0.3),
+                              border: Border.all(
+                                color: widget.searchParameter.colors.contains(color)
+                                    ? Colors.black
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 4),
+                
+                // OR/AND 선택
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Radio(
+                      value: 0,
+                      groupValue: widget.searchParameter.colorOperation,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.searchParameter.colorOperation = value as int;
+                        });
+                      },
+                    ),
+                    Text(
+                      'OR',
+                      style: TextStyle(fontSize: SizeService.smallFontSize(context)),
+                    ),
+                    SizedBox(width: SizeService.smallFontSize(context)),
+                    Radio(
+                      value: 1,
+                      groupValue: widget.searchParameter.colorOperation,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.searchParameter.colorOperation = value as int;
+                        });
+                      },
+                    ),
+                    Text(
+                      'AND',
+                      style: TextStyle(fontSize: SizeService.smallFontSize(context)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          Radio(
-            value: 0,
-            groupValue: widget.searchParameter.colorOperation,
-            onChanged: (value) {
-              setState(() {
-                widget.searchParameter.colorOperation = value as int;
-              });
-            },
-          ),
-          Text(
-            'OR',
-            style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-          ),
-          SizedBox(width: SizeService.smallFontSize(context)),
-          Radio(
-            value: 1,
-            groupValue: widget.searchParameter.colorOperation,
-            onChanged: (value) {
-              setState(() {
-                widget.searchParameter.colorOperation = value as int;
-              });
-            },
-          ),
-          Text(
-            'AND',
-            style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-          ),
-        ]),
+        ),
       ],
     );
   }
+
   Widget dropDownFormatItem(FormatDto formatDto, double fontSize, String selectedDeckCountStr)
   {
     String formatDateRange(DateTime startDate, DateTime endDate) {
