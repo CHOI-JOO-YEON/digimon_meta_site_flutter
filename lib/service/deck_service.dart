@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/paged_response_deck_dto.dart';
 import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
+import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -388,6 +389,13 @@ class DeckService {
               onPressed: () {
                 DeckBuild newDeck = DeckBuild.deckBuild(deck, context);
                 Navigator.of(context).pop();
+                
+                // 토스트 메시지 표시
+                ToastOverlay.show(
+                  context,
+                  '덱이 복사되었습니다.',
+                  type: ToastType.success
+                );
 
                 context.navigateTo(DeckBuilderRoute(deck: newDeck));
               },
@@ -454,10 +462,10 @@ class DeckService {
                             Clipboard.setData(ClipboardData(
                                     text: textEditingController.text))
                                 .then((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Copied to clipboard'),
-                                ),
+                              ToastOverlay.show(
+                                context,
+                                '클립보드에 복사되었습니다.',
+                                type: ToastType.success,
                               );
                             });
                           },
@@ -795,14 +803,14 @@ class DeckService {
     );
   }
 
-  void showImportDialog(BuildContext context, Function(DeckBuild) import) {
+  void showImportDialog(BuildContext context, Function(DeckBuild) importAction) {
+    CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        SiteName _selectedButton = SiteName.values.first;
-        TextEditingController _textEditingController = TextEditingController();
-        bool isLoading = false;
-
+        SiteName selectedButton = SiteName.values.first;
+        TextEditingController textEditingController = TextEditingController();
+        bool isSubmitted = false;
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
@@ -813,136 +821,103 @@ class DeckService {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ...SiteName.values.map((siteName) {
-                          String name = siteName.getName;
-                          return Expanded(
-                            child: ListTile(
-                              title: Text(name),
-                              leading: Radio<SiteName>(
-                                value: siteName,
-                                groupValue: _selectedButton,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedButton = value!;
-                                  });
-                                },
-                              ),
+                      children: SiteName.values.map((siteName) {
+                        String name = siteName.getName;
+                        return Expanded(
+                          child: ListTile(
+                            title: Text(name),
+                            leading: Radio<SiteName>(
+                              value: siteName,
+                              groupValue: selectedButton,
+                              onChanged: (SiteName? value) {
+                                setState(() {
+                                  selectedButton = value!;
+                                });
+                              },
                             ),
-                          );
-                        }).toList(),
-                        // if (false)
-                        IconButton(
-                          icon: const Icon(Icons.image),
-                          onPressed: () async {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            final result = await FilePicker.platform.pickFiles(
-                              type: FileType.image,
-                            );
-                            if (result != null && result.files.isNotEmpty) {
-                              final bytes = result.files.first.bytes;
-                              if (bytes != null) {
-                                final decodedData = await DeckService()
-                                    .decodeQrCodeFromImage(bytes);
-                                if (decodedData != null) {
-                                  final uri = Uri.parse(decodedData);
-                                  final deckString =
-                                      uri.queryParameters['deck'];
-
-                                  if (deckString == null) {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                    _showShortDialog(context, "잘못된 QR코드입니다.");
-                                    return;
-                                  }
-                                  var deckBuild = DeckService()
-                                      .importDeckQr(deckString, context);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  Navigator.of(context).pop();
-                                  import(deckBuild);
-                                } else {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  Navigator.of(context).pop();
-                                  _showShortDialog(
-                                      context, "이미지에서 QR 코드를 찾을 수 없습니다.");
-                                }
-                              }
-                            }
-                          },
-                          tooltip: 'QR 코드 이미지',
-                        ),
-                      ],
+                          ),
+                        );
+                      }).toList(),
                     ),
                     TextField(
-                      controller: _textEditingController,
+                      controller: textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: '여기에 덱 코드를 붙여넣으세요',
+                        hintText: 'Paste your deck.',
                       ),
+                      enabled: true,
                     ),
                   ],
                 ),
               ),
-              actions: <Widget>[
-                if (isLoading) const CircularProgressIndicator(),
+              actions: [
                 ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          try {
-                            var deckBuild = DeckService().import(
-                              _selectedButton.convertStringToMap(
-                                _textEditingController.value.text,
-                              ),
-                              context,
+                  onPressed: () {
+                    try {
+                      if (textEditingController.text.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('오류'),
+                              content: const Text('덱 코드를 입력해주세요.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('확인'),
+                                ),
+                              ],
                             );
-                            import(deckBuild);
-                            setState(() {
-                              isLoading = false;
-                            });
-                            Navigator.of(context).pop();
-                          } catch (e) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        },
-                  child: const Text('가져오기'),
+                          },
+                        );
+                        return;
+                      }
+                      isSubmitted = true;
+                      Map<String, int> map = {};
+                      map = selectedButton.convertStringToMap(
+                          textEditingController.text);
+                      Navigator.pop(context);
+                      DeckBuild deck = import(map, context);
+                      importAction(deck);
+                      
+                      // 토스트 메시지 표시
+                      ToastOverlay.show(
+                        context,
+                        '덱을 가져왔습니다.',
+                        type: ToastType.success
+                      );
+                      
+                    } catch (e) {
+                      if (!isSubmitted) {
+                        isSubmitted = true;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('오류'),
+                              content: const Text('덱 코드를 확인해주세요.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('확인'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('추가하기'),
                 ),
               ],
             );
           },
         );
-      },
-    );
-  }
-
-  void _showShortDialog(BuildContext context, String text) {
-    CardOverlayService().removeAllOverlays();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            title: Text(text),
-            // content:
-            actions: [
-              ElevatedButton(
-                child: const Text('닫기'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ]);
       },
     );
   }
@@ -1175,9 +1150,17 @@ class DeckService {
                       deck.isSave = true;
                       reload();
                       Navigator.of(context).pop();
-                      _showShortDialog(context, "저장 성공");
+                      ToastOverlay.show(
+                        context,
+                        '덱이 저장되었습니다.',
+                        type: ToastType.success
+                      );
                     } else {
-                      _showShortDialog(context, "저장 실패");
+                      ToastOverlay.show(
+                        context,
+                        '저장에 실패했습니다.',
+                        type: ToastType.error
+                      );
                     }
                   },
                   child: const Text('저장'),
@@ -1288,5 +1271,25 @@ class DeckService {
     } catch (e) {
       return DeckBuild(context);
     }
+  }
+
+  void _showShortDialog(BuildContext context, String text) {
+    CardOverlayService().removeAllOverlays();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(text),
+          actions: [
+            TextButton(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

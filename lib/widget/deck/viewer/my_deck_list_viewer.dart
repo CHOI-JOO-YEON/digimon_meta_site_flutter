@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 import '../../../service/size_service.dart';
+import '../../../widget/common/toast_overlay.dart' show ToastOverlay, ToastType;
 
 class MyDeckListViewer extends StatefulWidget {
   final List<FormatDto> formatList;
@@ -83,6 +84,12 @@ class _MyDeckListViewerState extends State<MyDeckListViewer> {
   void deleteDeck(int deckId) async {
     bool isSuccess = await DeckService().deleteDeckAndRefreshCounts(deckId, context);
     if (isSuccess) {
+      ToastOverlay.show(
+        context,
+        '덱이 삭제되었습니다.',
+        type: ToastType.success
+      );
+      
       if (decks.length == 1) {
         await searchDecks(1);
       } else {

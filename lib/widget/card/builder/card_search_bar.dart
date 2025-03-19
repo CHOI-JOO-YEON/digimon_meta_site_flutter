@@ -10,6 +10,7 @@ import '../../../model/note.dart';
 import '../../../provider/text_simplify_provider.dart';
 import '../../../service/card_overlay_service.dart';
 import '../../../service/size_service.dart';
+import '../../common/toast_overlay.dart';
 
 class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;
@@ -720,6 +721,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     Navigator.pop(context);
 
                     widget.updateSearchParameter();
+
+                    ToastOverlay.show(
+                      context,
+                      '검색 조건이 적용되었습니다.',
+                      type: ToastType.info
+                    );
                   },
                 ),
               ],
@@ -946,7 +953,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   return IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: 20,
-                    onPressed: () => textSimplifyProvider.updateTextSimplify(!textSimplifyProvider.getTextSimplify()),
+                    onPressed: () {
+                      bool newValue = !textSimplifyProvider.getTextSimplify();
+                      textSimplifyProvider.updateTextSimplify(newValue);
+                      
+                      ToastOverlay.show(
+                        context,
+                        newValue ? '텍스트 간소화가 적용되었습니다.' : '텍스트 간소화가 해제되었습니다.',
+                        type: newValue ? ToastType.success : ToastType.info
+                      );
+                    },
                     tooltip: '텍스트 간소화',
                     icon: Icon(
                       Icons.text_format,
@@ -963,7 +979,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
               child: IconButton(
                   padding: EdgeInsets.zero,
                   iconSize: 20,
-                  onPressed: _showFilterDialog,
+                  onPressed: () {
+                    _showFilterDialog();
+                  },
                   tooltip: '필터',
                   icon: const Icon(Icons.menu)),
             )),
@@ -975,7 +993,14 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   padding: EdgeInsets.zero,
                   iconSize: 20,
                   tooltip: '초기화',
-                  onPressed: resetSearchCondition,
+                  onPressed: () {
+                    resetSearchCondition();
+                    ToastOverlay.show(
+                      context,
+                      '검색 조건이 초기화되었습니다.',
+                      type: ToastType.warning
+                    );
+                  },
                   icon: const Icon(Icons.refresh)),
             )),
         if (widget.viewMode != null)

@@ -9,6 +9,7 @@ import '../../../provider/user_provider.dart';
 import '../../../router.dart';
 import '../../../service/card_overlay_service.dart';
 import '../../../service/deck_service.dart';
+import '../../common/toast_overlay.dart';
 
 class DeckMenuButtons extends StatefulWidget {
   final DeckBuild deck;
@@ -65,7 +66,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
-                    DeckService().showDeckResetDialog(context, widget.init);
+                    DeckService().showDeckResetDialog(context, () {
+                      widget.init();
+                      ToastOverlay.show(
+                        context,
+                        '새로운 덱이 생성되었습니다.',
+                        type: ToastType.success
+                      );
+                    });
                   },
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.add_box),
@@ -79,7 +87,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => DeckService()
-                      .showDeckClearDialog(context, widget.deck, widget.reload),
+                      .showDeckClearDialog(context, widget.deck, () {
+                        widget.reload();
+                        ToastOverlay.show(
+                          context,
+                          '덱이 비워졌습니다.',
+                          type: ToastType.warning
+                        );
+                      }),
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.clear),
                   tooltip: '비우기',
@@ -91,8 +106,10 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     height: SizeService.largeIconSize(context)),
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      DeckService().showDeckCopyDialog(context, widget.deck),
+                  onPressed: () => DeckService().showDeckCopyDialog(
+                      context,
+                      widget.deck,
+                  ),
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.copy),
                   tooltip: '복사해서 새로운 덱 만들기',
@@ -109,7 +126,14 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       Map<int, FormatDto> formats =
                           await DeckService().getFormats(widget.deck);
                       DeckService().showSaveDialog(
-                          context, formats, widget.deck, widget.reload);
+                          context, formats, widget.deck, () {
+                            widget.reload();
+                            ToastOverlay.show(
+                              context,
+                              '덱이 저장되었습니다.',
+                              type: ToastType.success
+                            );
+                          });
                     } else {
                       _showLoginDialog(context);
                     }
@@ -125,8 +149,16 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                     height: SizeService.largeIconSize(context)),
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      DeckService().showImportDialog(context, widget.import),
+                  onPressed: () {
+                    DeckService().showImportDialog(context, (deckBuild) {
+                      widget.import(deckBuild);
+                      ToastOverlay.show(
+                        context,
+                        '덱을 가져왔습니다.',
+                        type: ToastType.success
+                      );
+                    });
+                  },
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.download),
                   tooltip: '가져오기',
