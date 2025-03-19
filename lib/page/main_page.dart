@@ -66,7 +66,7 @@ class MainPage extends StatelessWidget {
                               children: [
                                 // 세로모드에서 로그인 정보
                                 Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
+                                  margin: const EdgeInsets.only(bottom: 4),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -125,7 +125,7 @@ class MainPage extends StatelessWidget {
                                 ),
                                 // 세로모드에서 탭바
                                 Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade50,
                                     borderRadius: BorderRadius.circular(12),
@@ -141,16 +141,16 @@ class MainPage extends StatelessWidget {
                                     controller: controller,
                                     labelStyle: TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: fontSize * 0.9,
+                                      fontSize: fontSize * 0.85,
                                     ),
                                     unselectedLabelStyle: TextStyle(
                                       fontWeight: FontWeight.normal,
-                                      fontSize: fontSize * 0.9,
+                                      fontSize: fontSize * 0.85,
                                     ),
                                     indicator: const UnderlineTabIndicator(
                                       borderSide: BorderSide.none,
                                     ),
-                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                                     labelPadding: EdgeInsets.zero,
                                     indicatorPadding: const EdgeInsets.all(4),
                                     labelColor: Theme.of(context).primaryColor,
@@ -338,13 +338,13 @@ class MainPage extends StatelessWidget {
 
   Widget _buildTabItem(BuildContext context, IconData icon, String label, bool isPortrait) {
     return Tab(
-      height: isPortrait ? 70 : 56,
+      height: isPortrait ? 50 : 56,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
-            size: isPortrait ? 28 : 22,
+            size: isPortrait ? 24 : 22,
           ),
           if (!isPortrait) const SizedBox(height: 4),
           if (!isPortrait)
