@@ -553,7 +553,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     cardOverlayService: _cardOverlayService,
                   ),
                   SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.25,
+                    height: MediaQuery.sizeOf(context).height * 0.7,
                   )
                 ],
               ),

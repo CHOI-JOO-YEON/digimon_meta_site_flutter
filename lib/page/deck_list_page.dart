@@ -286,7 +286,7 @@ class _DeckListPageState extends State<DeckListPage> {
                               ),
                               SizedBox(
                                 height:
-                                    MediaQuery.sizeOf(context).height * 0.25,
+                                    MediaQuery.sizeOf(context).height * 0.7,
                               )
                             ],
                           ),
