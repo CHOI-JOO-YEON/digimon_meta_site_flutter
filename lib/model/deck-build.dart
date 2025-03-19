@@ -29,7 +29,7 @@ class DeckBuild {
   DeckSortProvider? deckSortProvider;
   Map<String, int> cardNoCntMap = {};
   int? formatId;
-  bool isPublic = false;
+  bool isPublic = true;
   bool isStrict = true;
 
   void clear() {
@@ -52,7 +52,7 @@ class DeckBuild {
     author = null;
     authorId = null;
     formatId = null;
-    isPublic = false;
+    isPublic = true;
     colors = {};
     html.window.localStorage.remove('deck');
   }
@@ -60,7 +60,7 @@ class DeckBuild {
   void newCopy() {
     deckId = null;
     deckName = "$deckName Copy";
-    isPublic = false;
+    isPublic = true;
     isSave = false;
   }
 
