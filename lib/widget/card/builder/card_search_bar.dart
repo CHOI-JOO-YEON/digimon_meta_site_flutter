@@ -4,9 +4,12 @@ import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 import '../../../model/note.dart';
+import '../../../provider/text_simplify_provider.dart';
 import '../../../service/card_overlay_service.dart';
+import '../../../service/size_service.dart';
 
 class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;
@@ -878,7 +881,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     return Row(
       children: [
         Expanded(
-            flex: 8,
+            flex: 6,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.1),
@@ -924,7 +927,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.only(left: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               child: IconButton(
                 onPressed: () {
                   widget.updateSearchParameter();
@@ -937,10 +940,29 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.only(left: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              child: Consumer<TextSimplifyProvider>(
+                builder: (context, textSimplifyProvider, child) {
+                  return IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    onPressed: () => textSimplifyProvider.updateTextSimplify(!textSimplifyProvider.getTextSimplify()),
+                    tooltip: '텍스트 간소화',
+                    icon: Icon(
+                      Icons.text_format,
+                      color: textSimplifyProvider.getTextSimplify() ? Theme.of(context).primaryColor : Colors.grey,
+                    ),
+                  );
+                },
+              ),
+            )),
+        Expanded(
+            flex: 1,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               child: IconButton(
-                  padding: const EdgeInsets.all(8),
-                  iconSize: 24,
+                  padding: EdgeInsets.zero,
+                  iconSize: 20,
                   onPressed: _showFilterDialog,
                   tooltip: '필터',
                   icon: const Icon(Icons.menu)),
@@ -948,10 +970,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.only(left: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               child: IconButton(
-                  padding: const EdgeInsets.all(4),
-                  iconSize: 22,
+                  padding: EdgeInsets.zero,
+                  iconSize: 20,
                   tooltip: '초기화',
                   onPressed: resetSearchCondition,
                   icon: const Icon(Icons.refresh)),
@@ -959,17 +981,21 @@ class _CardSearchBarState extends State<CardSearchBar> {
         if (widget.viewMode != null)
           Expanded(
             flex: 1,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                if (widget.onViewModeChanged != null) {
-                  widget.onViewModeChanged!(
-                    widget.viewMode == 'grid' ? 'list' : 'grid',
-                  );
-                }
-              },
-              icon: Icon(
-                widget.viewMode == 'grid' ? Icons.view_list : Icons.grid_view,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                iconSize: 20,
+                onPressed: () {
+                  if (widget.onViewModeChanged != null) {
+                    widget.onViewModeChanged!(
+                      widget.viewMode == 'grid' ? 'list' : 'grid',
+                    );
+                  }
+                },
+                icon: Icon(
+                  widget.viewMode == 'grid' ? Icons.view_list : Icons.grid_view,
+                ),
               ),
             ),
           ),

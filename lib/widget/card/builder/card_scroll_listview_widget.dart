@@ -68,24 +68,6 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Consumer<TextSimplifyProvider>(
-          builder: (context, textSimplifyProvider, child) {
-            return Row(
-              children: [
-                Text('텍스트 간소화'),
-                Transform.scale(
-                  scale: SizeService.switchScale(context),
-                  child: Switch(
-                    value: textSimplifyProvider.getTextSimplify(),
-                    onChanged: (v) =>
-                        textSimplifyProvider.updateTextSimplify(v),
-                    inactiveThumbColor: Colors.red,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
