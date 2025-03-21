@@ -1,6 +1,7 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/material.dart';
 
+import '../../../service/card_overlay_service.dart';
 import '../../../service/card_service.dart';
 import '../card_widget.dart';
 
@@ -32,6 +33,7 @@ class CardScrollGridView extends StatefulWidget {
 class _CardScrollGridViewState extends State<CardScrollGridView> {
   final ScrollController _scrollController = ScrollController();
   bool isLoading = false;
+  final CardOverlayService _cardOverlayService = CardOverlayService();
 
   @override
   void initState() {
@@ -61,50 +63,6 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
     setState(() => isLoading = false);
   }
 
-  OverlayEntry? _overlayEntry;
-
-  void _showBigImage(BuildContext cardContext, String imgUrl, int index) {
-    final RenderBox renderBox = cardContext.findRenderObject() as RenderBox;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    final screenHeight = MediaQuery.of(cardContext).size.height;
-    final screenWidth = MediaQuery.of(cardContext).size.width;
-
-    final bool onRightSide = (index % 6) < 3;
-    final double overlayLeft = onRightSide
-        ? offset.dx + renderBox.size.width
-        : offset.dx - renderBox.size.width * 3;
-
-    final double overlayTop =
-        (offset.dy + renderBox.size.height * 3 > screenHeight)
-            ? screenHeight - renderBox.size.height * 3
-            : offset.dy;
-
-    final double correctedLeft = overlayLeft < 0 ? 0 : overlayLeft;
-
-    final double correctedWidth =
-        correctedLeft + renderBox.size.width * 3 > screenWidth
-            ? screenWidth - correctedLeft
-            : renderBox.size.width * 3;
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: correctedLeft,
-        top: overlayTop,
-        width: correctedWidth,
-        height: renderBox.size.height * 3,
-        child: Image.network(imgUrl, fit: BoxFit.cover),
-      ),
-    );
-
-    Overlay.of(cardContext)?.insert(_overlayEntry!);
-  }
-
-  void _hideBigImage() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -126,9 +84,17 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 card: widget.cards[index],
                 width: (constraints.maxWidth / widget.rowNumber) * 0.99,
                 cardPressEvent: widget.cardPressEvent,
-                onHover: (context) => _showBigImage(
-                    context, widget.cards[index].getDisplayImgUrl()!, index),
-                onExit: _hideBigImage,
+                onHover: (ctx) {
+                  final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
+                  _cardOverlayService.showBigImage(
+                    ctx, 
+                    widget.cards[index].getDisplayImgUrl()!, 
+                    renderBox, 
+                    widget.rowNumber, 
+                    index
+                  );
+                },
+                onExit: () => _cardOverlayService.hideBigImage(),
                 searchNote: widget.searchNote,
                 onLongPress: () => CardService().showImageDialog(
                     context, widget.cards[index], widget.searchNote),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class CardOverlayService {
   static final CardOverlayService _instance = CardOverlayService._internal();
@@ -65,17 +66,52 @@ class CardOverlayService {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
-              ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(imgUrl, fit: BoxFit.cover),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Skeleton loading with shimmer effect - only shown when image is loading
+                  Image.network(
+                    imgUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        // Image is loaded, show only the image
+                        return child;
+                      }
+                      // Image is still loading, show shimmer
+                      return _buildShimmerEffect();
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[100],
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                color: Colors.red[400],
+                                size: 40,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '이미지 로딩 실패',
+                                style: TextStyle(
+                                  color: Colors.red[400],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -83,6 +119,33 @@ class CardOverlayService {
     );
 
     Overlay.of(context)?.insert(_imageOverlayEntry!);
+  }
+
+  // Shimmer effect for skeleton loading
+  Widget _buildShimmerEffect() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        _ShimmerLoading(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.white,
+          ),
+        ),
+        // Loading indicator
+        SizedBox(
+          width: 30,
+          height: 30,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Colors.blue.shade300,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void removeAllOverlays() {
@@ -250,5 +313,69 @@ class CardOverlayService {
   void hideCardOptions() {
     _buttonOverlayEntry?.remove();
     _buttonOverlayEntry = null;
+  }
+}
+
+class _ShimmerLoading extends StatefulWidget {
+  final Widget child;
+
+  const _ShimmerLoading({
+    required this.child,
+  });
+
+  @override
+  _ShimmerLoadingState createState() => _ShimmerLoadingState();
+}
+
+class _ShimmerLoadingState extends State<_ShimmerLoading> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+    
+    _animation = Tween<double>(begin: -2, end: 2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: const [
+                Color(0xFFEBEBF4),
+                Color(0xFFF4F4F4),
+                Color(0xFFEBEBF4),
+              ],
+              stops: [
+                0.1,
+                0.3 + _animation.value.abs() * 0.5,
+                0.4 + _animation.value.abs() * 0.5,
+              ],
+            ),
+          ),
+          child: child,
+        );
+      },
+      child: widget.child,
+    );
   }
 }
