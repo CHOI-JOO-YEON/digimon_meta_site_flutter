@@ -418,7 +418,7 @@ class DeckService {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Text('Export to'),
+              title: const Text('내보내기'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -814,7 +814,7 @@ class DeckService {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: const Text('Import from'),
+              title: const Text('덱 가져오기'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -843,9 +843,97 @@ class DeckService {
                       controller: textEditingController,
                       maxLines: null,
                       decoration: const InputDecoration(
-                        hintText: 'Paste your deck.',
+                        hintText: '덱 코드를 붙여넣으세요.',
                       ),
                       enabled: true,
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('덱 이미지에서 가져오기'),
+                      onPressed: () async {
+                        // 로딩 다이얼로그 표시 - 파일 선택 전에 먼저 표시
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 20),
+                                  Text("QR 코드 이미지 불러오는 중...")
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                        
+                        try {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['jpg', 'jpeg', 'png'],
+                          );
+                          
+                          if (result != null) {
+                            // 로딩 다이얼로그 업데이트
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CircularProgressIndicator(),
+                                      SizedBox(width: 20),
+                                      Text("QR 코드 처리 중...")
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                            
+                            Uint8List fileBytes = result.files.first.bytes!;
+                            String? qrData = await decodeQrCodeFromImage(fileBytes);
+                            
+                            // 로딩 다이얼로그 닫기
+                            Navigator.pop(context);
+                            
+                            if (qrData != null) {
+                              DeckBuild deck = importDeckQr(qrData, context);
+                              Navigator.pop(context); // Import 다이얼로그 닫기
+                              importAction(deck);
+                              
+                              // 토스트 메시지 표시
+                              ToastOverlay.show(
+                                context,
+                                'QR코드에서 덱을 가져왔습니다.',
+                                type: ToastType.success
+                              );
+                            } else {
+                              ToastOverlay.show(
+                                context,
+                                'QR코드를 인식할 수 없습니다.',
+                                type: ToastType.error
+                              );
+                            }
+                          } else {
+                            // 파일 선택 취소 시 로딩 다이얼로그 닫기
+                            Navigator.pop(context);
+                          }
+                        } catch (e) {
+                          // 오류 발생 시 로딩 다이얼로그 닫기
+                          Navigator.pop(context);
+                          ToastOverlay.show(
+                            context,
+                            '이미지 처리 중 오류가 발생했습니다.',
+                            type: ToastType.error
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -912,7 +1000,7 @@ class DeckService {
                       }
                     }
                   },
-                  child: const Text('추가하기'),
+                  child: const Text('가져오기'),
                 ),
               ],
             );
@@ -1207,6 +1295,15 @@ class DeckService {
 
   DeckBuild importDeckQr(String deckMapString, BuildContext context) {
     try {
+      // URL 형식으로 되어 있는지 확인하고 파싱
+      if (deckMapString.contains('?deck=')) {
+        Uri uri = Uri.parse(deckMapString);
+        String? deckParam = uri.queryParameters['deck'];
+        if (deckParam != null) {
+          deckMapString = Uri.decodeComponent(deckParam);
+        }
+      }
+      
       // Parse the deck string into a map of cardId to count
       Map<int, int> cardIdAndCntMap = parseDeckString(deckMapString);
       // Create a new deck
