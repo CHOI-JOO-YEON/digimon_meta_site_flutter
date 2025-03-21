@@ -26,9 +26,6 @@ class CardOverlayService {
 
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
       int rowNumber, int index) {
-    if (isPanelOpen) {
-      return;
-    }
     final offset = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -111,9 +108,6 @@ class CardOverlayService {
   void showCardOptions(BuildContext context, RenderBox renderBox,
       Function onMinusTap, Function onPlusTap, bool isTama) {
     removeAllOverlays();
-    if (isPanelOpen) {
-      return;
-    }
     
     // 현재 선택된 카드 정보 저장
     _selectedCardRenderBox = renderBox;

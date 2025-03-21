@@ -311,12 +311,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
             } else {
               _cardOverlayService.updatePanelStatus(false);
             }
-            if (v > 0.1 && !_overlayRemoved) {
-              _cardOverlayService.removeAllOverlays();
-              _overlayRemoved = true;
-            } else if (v <= 0.1) {
-              _overlayRemoved = false;
-            }
+            _overlayRemoved = false;
           },
           controller: _panelController,
           renderPanelSheet: false,
