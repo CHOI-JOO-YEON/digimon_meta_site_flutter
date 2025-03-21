@@ -26,6 +26,16 @@ class CustomCard extends StatefulWidget {
   final Function(int)? searchNote;
 
   final bool hideLimitBadges;
+  final bool hoverEffect;
+  
+  // 카드 증감 기능 관련 속성 추가
+  final Function(DigimonCard)? addCard;
+  final Function(DigimonCard)? removeCard;
+  final int? cardCount;
+  
+  // 증감 모드 관련 추가 속성
+  final bool isButtonsActive;
+  final Function(bool)? onButtonsToggle;
 
   const CustomCard({
     super.key,
@@ -40,24 +50,75 @@ class CustomCard extends StatefulWidget {
     this.searchNote,
     this.onDoubleTab,
     this.hideLimitBadges = false,
+    this.hoverEffect = false,
+    
+    // 추가된 파라미터
+    this.addCard,
+    this.removeCard,
+    this.cardCount,
+    this.isButtonsActive = false,
+    this.onButtonsToggle,
   });
 
   @override
   State<CustomCard> createState() => _CustomCardState();
 }
 
-class _CustomCardState extends State<CustomCard> {
+class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateMixin {
   Timer? _timer;
   bool _isHovered = false;
+  bool _isShowingButtons = false;
+  late AnimationController _animationController;
+  int? _previousCount;
+  bool _isHighlighted = false;
 
   @override
   void initState() {
     super.initState();
-    setState(() {});
+    _isShowingButtons = widget.isButtonsActive;
+    _previousCount = widget.cardCount;
+    
+    // 애니메이션 컨트롤러 초기화
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _isHighlighted = false;
+        });
+        _animationController.reset();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(CustomCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 외부에서 isButtonsActive가 변경되면 내부 상태도 업데이트
+    if (oldWidget.isButtonsActive != widget.isButtonsActive) {
+      _isShowingButtons = widget.isButtonsActive;
+    }
+    
+    // 카드 수량이 변경되었는지 확인하고 애니메이션 실행
+    if (widget.cardCount != null && _previousCount != widget.cardCount) {
+      _triggerAnimation();
+      _previousCount = widget.cardCount;
+    }
+  }
+
+  void _triggerAnimation() {
+    setState(() {
+      _isHighlighted = true;
+    });
+    _animationController.forward();
   }
 
   @override
   void dispose() {
+    _animationController.dispose();
     _timer?.cancel();
     if (widget.onExit != null) {
       widget.onExit!();
@@ -83,6 +144,20 @@ class _CustomCardState extends State<CustomCard> {
     }
   }
 
+  void _toggleButtons() {
+    if (widget.addCard != null && widget.removeCard != null) {
+      final newState = !_isShowingButtons;
+      setState(() {
+        _isShowingButtons = newState;
+      });
+      
+      // 버튼 상태가 변경되면 부모에게 알림
+      if (widget.onButtonsToggle != null) {
+        widget.onButtonsToggle!(newState);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String color = widget.card.color2 ?? widget.card.color1!;
@@ -105,12 +180,14 @@ class _CustomCardState extends State<CustomCard> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        transform: _isHovered 
+        transform: _isHovered && widget.hoverEffect
             ? (Matrix4.identity()..scale(1.03))
             : Matrix4.identity(),
         child: GestureDetector(
           onTap: () {
-            if (widget.cardPressEvent != null) {
+            if (widget.addCard != null && widget.removeCard != null) {
+              _toggleButtons(); // 증감 버튼 토글
+            } else if (widget.cardPressEvent != null) {
               widget.cardPressEvent!(widget.card);
             }
           },
@@ -384,9 +461,150 @@ class _CustomCardState extends State<CustomCard> {
                         ),
                       ),
                     ),
+                  // 카드 수량 표시
+                  if (widget.cardCount != null)
+                    Positioned(
+                      left: 0,
+                      bottom: 0,
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: widget.width * 0.07,
+                          vertical: widget.width * 0.04,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _isHighlighted 
+                              ? Colors.orange.withOpacity(0.9)
+                              : Colors.black.withOpacity(0.7),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(8),
+                          ),
+                          boxShadow: _isHighlighted
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.orange.withOpacity(0.5),
+                                    blurRadius: 8,
+                                    spreadRadius: 2,
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: AnimatedDefaultTextStyle(
+                          duration: Duration(milliseconds: 300),
+                          style: TextStyle(
+                            fontSize: _isHighlighted
+                                ? widget.width * 0.14
+                                : widget.width * 0.11,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            '${widget.cardCount}',
+                          ),
+                        ),
+                      ),
+                    ),
+                  // 카드 선택 시 표시되는 증감 버튼
+                  if (_isShowingButtons && widget.addCard != null && widget.removeCard != null)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Stack(
+                          children: [
+                            // 닫기 버튼
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: _toggleButtons,
+                                child: Container(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.close, size: 14, color: Colors.black87),
+                                ),
+                              ),
+                            ),
+                            
+                            // 증감 버튼들
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  _buildActionButton(
+                                    onTap: () {
+                                      widget.removeCard!(widget.card);
+                                      // 카드 제거 후 버튼 상태 업데이트
+                                      if (widget.cardCount == 1) {
+                                        setState(() {
+                                          _isShowingButtons = false;
+                                        });
+                                        if (widget.onButtonsToggle != null) {
+                                          widget.onButtonsToggle!(false);
+                                        }
+                                      }
+                                    },
+                                    icon: Icons.remove,
+                                    label: "",
+                                    color: Colors.red.shade700,
+                                    size: widget.width * 0.4,
+                                  ),
+                                  _buildActionButton(
+                                    onTap: () => widget.addCard!(widget.card),
+                                    icon: Icons.add,
+                                    label: "",
+                                    color: Colors.green.shade700,
+                                    size: widget.width * 0.4,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               );
             },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required Function() onTap,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required double size,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size * 0.8,
+        height: size * 0.8,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4,
+              spreadRadius: 0.5,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Icon(
+            icon,
+            size: size * 0.4,
+            color: Colors.white,
           ),
         ),
       ),

@@ -12,6 +12,13 @@ class CardOverlayService {
   OverlayEntry? _imageOverlayEntry;
   OverlayEntry? _buttonOverlayEntry;
   bool isPanelOpen = false;
+  
+  // 현재 선택된 카드 정보 저장
+  RenderBox? _selectedCardRenderBox;
+  Function? _onMinusTap;
+  Function? _onPlusTap;
+  bool? _isTama;
+  BuildContext? _currentContext;
 
   void updatePanelStatus(bool panelOpenStatus) {
     isPanelOpen = panelOpenStatus;
@@ -55,7 +62,26 @@ class CardOverlayService {
         top: overlayTop,
         width: correctedWidth,
         height: correctedWidth / aspectRatio,
-        child: Image.network(imgUrl, fit: BoxFit.cover),
+        child: AnimatedOpacity(
+          duration: Duration(milliseconds: 200),
+          opacity: 1.0,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(imgUrl, fit: BoxFit.cover),
+            ),
+          ),
+        ),
       ),
     );
 
@@ -88,73 +114,142 @@ class CardOverlayService {
     if (isPanelOpen) {
       return;
     }
-    final offset = renderBox.localToGlobal(Offset.zero); // 카드 위치 가져오기
-    final screenHeight = MediaQuery.of(context).size.height;
-    final cardWidth = renderBox.size.width;
-    final cardHeight = renderBox.size.height;
+    
+    // 현재 선택된 카드 정보 저장
+    _selectedCardRenderBox = renderBox;
+    _onMinusTap = onMinusTap;
+    _onPlusTap = onPlusTap;
+    _isTama = isTama;
+    _currentContext = context;
+    
+    _showCardOptionsOverlay();
+  }
 
-    // 버튼 크기 및 높이 조정
-    final buttonHeight = cardHeight * 0.2;
-    double? overlayTop;
-    double? overlayBottom;
+  // 오버레이 표시 로직을 별도 메서드로 분리
+  void _showCardOptionsOverlay() {
+    if (_selectedCardRenderBox == null || _currentContext == null) return;
+    
+    final offset = _selectedCardRenderBox!.localToGlobal(Offset.zero);
+    final cardWidth = _selectedCardRenderBox!.size.width;
+    final cardHeight = _selectedCardRenderBox!.size.height;
 
-    if (!isTama) {
-      overlayTop = offset.dy + cardHeight; // 카드 하단에 버튼 표시
-    } else {
-      overlayBottom = screenHeight - offset.dy; // 카드 상단에 버튼 표시
-    }
-
+    _buttonOverlayEntry?.remove();
     _buttonOverlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         left: offset.dx,
-        top: overlayTop,
-        bottom: overlayBottom,
+        top: offset.dy,
         width: cardWidth,
-        height: buttonHeight,
+        height: cardHeight,
         child: Material(
           color: Colors.transparent,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              double buttonSize =
-                  constraints.maxWidth * 0.3; // 버튼 크기를 화면 비율에 맞게 설정
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    width: buttonSize,
-                    height: buttonSize,
-                    child: ElevatedButton(
-                      onPressed: () => onMinusTap(),
-                      style: ElevatedButton.styleFrom(
-                          shape: CircleBorder(),
-                          padding: EdgeInsets.zero,
-                          backgroundColor: Colors.red),
-                      child: Icon(Icons.remove,
-                          color: Colors.white, size: buttonSize * 0.5),
-                    ),
+          child: Stack(
+            children: [
+              // 반투명 배경
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  SizedBox(
-                    width: buttonSize,
-                    height: buttonSize,
-                    child: ElevatedButton(
-                      onPressed: () => onPlusTap(),
-                      style: ElevatedButton.styleFrom(
-                          shape: CircleBorder(),
-                          padding: EdgeInsets.zero,
-                          backgroundColor: Colors.green),
-                      child: Icon(Icons.add,
-                          color: Colors.white, size: buttonSize * 0.5),
-                    ),
+                ),
+              ),
+              // 중앙에 수량 조절 컨트롤
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                ],
-              );
-            },
+                  width: cardWidth * 0.8,
+                  height: cardHeight * 0.35,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildCountButton(
+                        onTap: _onMinusTap!,
+                        icon: Icons.remove,
+                        color: Colors.red.shade700,
+                        size: cardWidth * 0.2,
+                      ),
+                      _buildCountButton(
+                        onTap: _onPlusTap!,
+                        icon: Icons.add,
+                        color: Colors.green.shade700,
+                        size: cardWidth * 0.2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // 닫기 버튼
+              Positioned(
+                right: 5,
+                top: 5,
+                child: GestureDetector(
+                  onTap: removeAllOverlays,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.close, size: 16, color: Colors.black87),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
 
-    Overlay.of(context)?.insert(_buttonOverlayEntry!);
+    Overlay.of(_currentContext!)?.insert(_buttonOverlayEntry!);
+  }
+
+  // 스크롤 발생 시 오버레이 위치 업데이트
+  void updateCardOptionsPosition() {
+    if (_buttonOverlayEntry != null && _selectedCardRenderBox != null && _currentContext != null) {
+      _buttonOverlayEntry!.remove();
+      _showCardOptionsOverlay();
+    }
+  }
+
+  Widget _buildCountButton({
+    required Function onTap,
+    required IconData icon,
+    required Color color,
+    required double size,
+  }) {
+    return GestureDetector(
+      onTap: () => onTap(),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 5,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: size * 0.6,
+        ),
+      ),
+    );
   }
 
   // 카드 옵션 버튼 숨기기

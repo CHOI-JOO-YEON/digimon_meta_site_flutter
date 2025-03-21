@@ -35,6 +35,7 @@ class DeckScrollGridView extends StatefulWidget {
 class _DeckScrollGridViewState extends State<DeckScrollGridView>
     with WidgetsBindingObserver {
   Size _lastSize = Size.zero;
+  String? _activeCardId; // 현재 증감 모드가 활성화된 카드 ID
 
   @override
   void initState() {
@@ -42,12 +43,20 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
 
     WidgetsBinding.instance.addObserver(this); // Observer 등록
     _scrollController.addListener(() {
-      widget.cardOverlayService.removeAllOverlays();
+      // 큰 이미지 미리보기만 숨김
+      widget.cardOverlayService.hideBigImage();
     });
   }
 
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _cardKeys = {};
+
+  // 활성화된 카드 전환 메서드
+  void _setActiveCard(String? cardId) {
+    setState(() {
+      _activeCardId = cardId;
+    });
+  }
 
   @override
   void dispose() {
@@ -60,7 +69,8 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
   void didUpdateWidget(DeckScrollGridView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.rowNumber != widget.rowNumber) {
-      widget.cardOverlayService.removeAllOverlays();
+      // 큰 이미지 미리보기만 숨김
+      widget.cardOverlayService.hideBigImage();
     }
   }
 
@@ -70,7 +80,9 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
     final Size newSize = MediaQuery.of(context).size;
 
     if (newSize != _lastSize) {
-      widget.cardOverlayService.removeAllOverlays();
+      // 큰 이미지 미리보기만 숨김
+      widget.cardOverlayService.hideBigImage();
+      
       _lastSize = newSize;
     }
   }
@@ -86,6 +98,8 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.rowNumber,
             childAspectRatio: 0.715,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 12.0,
           ),
           itemCount: widget.deck.length,
           itemBuilder: (context, index) {
@@ -96,73 +110,44 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
             _cardKeys.putIfAbsent(cardId, () => GlobalKey());
             GlobalKey cardKey = _cardKeys[cardId]!;
 
-            return Stack(
-              children: [
-                CustomCard(
-                  key: cardKey,
-                  card: card,
-                  width: (constraints.maxWidth / widget.rowNumber) * 0.99,
-                  cardPressEvent: (card) {
-                    if (widget.removeCard != null) {
-                      final RenderBox renderBox = cardKey.currentContext!
-                          .findRenderObject() as RenderBox;
-                      widget.cardOverlayService.showCardOptions(
-                          context,
-                          renderBox,
-                          () => {
-                                widget.removeCard!(card),
-                                if (widget.deckCount[card] == null)
-                                  {
-                                    widget.cardOverlayService
-                                        .removeAllOverlays()
-                                  }
-                              },
-                          () => widget.addCard!(card),
-                          widget.isTama);
-                    }
-                  },
-                  onLongPress: () => CardService().showImageDialog(
-                    context,
-                    card,
-                    widget.searchNote,
-                  ),
-                  onHover: (context) {
-                    final RenderBox renderBox =
-                        cardKey.currentContext!.findRenderObject() as RenderBox;
-                    widget.cardOverlayService.showBigImage(
-                        context,
-                        card.getDisplayImgUrl()!,
-                        renderBox,
-                        widget.rowNumber,
-                        index);
-                  },
-                  onExit: widget.cardOverlayService.hideBigImage,
-                  searchNote: widget.searchNote,
+            // 이 카드가 활성화되었는지 확인
+            bool isActiveCard = _activeCardId == cardId;
+
+            return AnimatedOpacity(
+              duration: Duration(milliseconds: 250),
+              opacity: 1.0,
+              child: CustomCard(
+                key: cardKey,
+                card: card,
+                width: (constraints.maxWidth / widget.rowNumber) * 0.99,
+                onLongPress: () => CardService().showImageDialog(
+                  context,
+                  card,
+                  widget.searchNote,
                 ),
-                Positioned(
-                  left: ((constraints.maxWidth / widget.rowNumber) * 0.9) / 9,
-                  bottom:
-                      ((constraints.maxWidth / widget.rowNumber) * 0.9) / 12,
-                  child: SizedBox(
-                    width:
-                        ((constraints.maxWidth / widget.rowNumber) * 0.9) / 6,
-                    child: StrokeText(
-                      text: '$count',
-                      textStyle: TextStyle(
-                        fontSize:
-                            ((constraints.maxWidth / widget.rowNumber) * 0.9) /
-                                6,
-                        color: Colors.black,
-                        fontFamily: 'JalnanGothic',
-                      ),
-                      strokeColor: Colors.white,
-                      strokeWidth:
-                          ((constraints.maxWidth / widget.rowNumber) * 0.9) /
-                              25,
-                    ),
-                  ),
-                ),
-              ],
+                onHover: (context) {
+                  final RenderBox renderBox =
+                      cardKey.currentContext!.findRenderObject() as RenderBox;
+                  widget.cardOverlayService.showBigImage(
+                      context,
+                      card.getDisplayImgUrl()!,
+                      renderBox,
+                      widget.rowNumber,
+                      index);
+                },
+                onExit: widget.cardOverlayService.hideBigImage,
+                searchNote: widget.searchNote,
+                hoverEffect: true,
+                addCard: widget.addCard,
+                removeCard: widget.removeCard,
+                cardCount: count,
+                isButtonsActive: isActiveCard,
+                onButtonsToggle: (isActive) {
+                  // 버튼이 활성화되면 이 카드 ID를 활성화된 카드로 설정
+                  // 버튼이 비활성화되면 null로 설정
+                  _setActiveCard(isActive ? cardId : null);
+                },
+              ),
             );
           },
         );
