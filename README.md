@@ -1,6 +1,6 @@
 # digimon_meta_site_flutter
 
-A new Flutter project.
+Digimon Card Game Deck Builder
 
 ## Getting Started
 
