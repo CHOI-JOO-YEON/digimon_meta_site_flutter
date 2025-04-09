@@ -888,7 +888,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     return Row(
       children: [
         Expanded(
-            flex: 6,
+            flex: 5,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.1),
@@ -942,34 +942,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 icon: const Icon(Icons.search, size: 20),
                 padding: EdgeInsets.zero,
                 tooltip: '검색',
-              ),
-            )),
-        Expanded(
-            flex: 1,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              child: Consumer<TextSimplifyProvider>(
-                builder: (context, textSimplifyProvider, child) {
-                  return IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 20,
-                    onPressed: () {
-                      bool newValue = !textSimplifyProvider.getTextSimplify();
-                      textSimplifyProvider.updateTextSimplify(newValue);
-                      
-                      ToastOverlay.show(
-                        context,
-                        newValue ? '텍스트 간소화가 적용되었습니다.' : '텍스트 간소화가 해제되었습니다.',
-                        type: newValue ? ToastType.success : ToastType.info
-                      );
-                    },
-                    tooltip: '텍스트 간소화',
-                    icon: Icon(
-                      Icons.text_format,
-                      color: textSimplifyProvider.getTextSimplify() ? Theme.of(context).primaryColor : Colors.grey,
-                    ),
-                  );
-                },
               ),
             )),
         Expanded(

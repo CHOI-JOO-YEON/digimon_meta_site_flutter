@@ -5,9 +5,31 @@
     "version": "0.2.0",
     "configurations": [
       {
-        "name": "Flutter",
+        "name": "Flutter (Debug)",
         "request": "launch",
         "type": "dart",
+        "args": [
+          "--web-port",
+          "50000",
+          "--dart-define=SERVER_URL=http://localhost:8080"
+        ]
+      },
+      {
+        "name": "Flutter (Profile Mode)",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "profile",
+        "args": [
+          "--web-port",
+          "50000",
+          "--dart-define=SERVER_URL=http://localhost:8080"
+        ]
+      },
+      {
+        "name": "Flutter (Release Mode)",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "release",
         "args": [
           "--web-port",
           "50000",

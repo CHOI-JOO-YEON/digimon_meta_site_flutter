@@ -1,5 +1,3 @@
-
-
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -201,29 +199,6 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                           Consumer<TextSimplifyProvider>(
                                             builder: (context,
                                                 textSimplifyProvider, child) {
-                                              return Row(
-                                                children: [
-                                                  Text('텍스트 간소화',
-                                                      style: TextStyle(
-                                                          fontSize: fontSize)),
-                                                  Switch(
-                                                    value: textSimplifyProvider
-                                                        .getTextSimplify(),
-                                                    onChanged: (v) {
-                                                      textSimplifyProvider
-                                                          .updateTextSimplify(
-                                                              v);
-                                                    },
-                                                    inactiveThumbColor:
-                                                        Colors.red,
-                                                  )
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                          Consumer<TextSimplifyProvider>(
-                                            builder: (context,
-                                                textSimplifyProvider, child) {
                                               return Column(
                                                 children: [
                                                   if (localeCardData.effect !=
@@ -239,8 +214,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                                   .color1!),
                                                       fontSize,
                                                       localeCardData.locale,
-                                                      textSimplifyProvider
-                                                          .getTextSimplify(),
+                                                      true,
                                                     ),
                                                   const SizedBox(height: 5),
                                                   if (localeCardData
@@ -258,8 +232,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                                   .color1!),
                                                       fontSize,
                                                       localeCardData.locale,
-                                                      textSimplifyProvider
-                                                          .getTextSimplify(),
+                                                      true,
                                                     ),
                                                 ],
                                               );
