@@ -64,6 +64,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
         TextEditingController(text: widget.searchParameter.searchString);
   }
 
+  @override
+  void didUpdateWidget(CardSearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // searchParameter가 변경되었을 때 텍스트 필드 갱신
+    if (widget.searchParameter.searchString != oldWidget.searchParameter.searchString) {
+      _searchStringEditingController?.text = widget.searchParameter.searchString ?? '';
+    }
+  }
+
   String getCardTypeByString(String s) {
     switch (s) {
       case 'TAMER':

@@ -1,103 +1,229 @@
+import 'dart:convert';
+
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/router.dart';
+import 'package:digimon_meta_site_flutter/service/keyword_service.dart';
+import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 
 @RoutePage()
-class KeywordInfoPage extends StatelessWidget {
-  // 키워드와 설명을 담은 리스트
-  final List<Map<String, String>> keywords = [
-    {
-      'name': '보안 (Security)',
-      'description': '보안 효과는 카드가 보안에서 공개되었을 때 발동합니다. 보안 효과는 상대 디지몬의 공격으로 인해 공개된 경우에만 발동합니다.'
-    },
-    {
-      'name': '진화원 효과 (Inherited Effect)',
-      'description': '진화원에 있는 카드의 효과로, 진화한 디지몬이 그 효과를 물려받습니다. 진화원 효과는 해당 디지몬이 배틀 에리어에 있을 때만 적용됩니다.'
-    },
-    {
-      'name': '메인 (Main)',
-      'description': '자신의 메인 페이즈에 발동할 수 있는 효과입니다. 턴당 1번 사용 제한이 없다면 여러 번 사용할 수 있습니다.'
-    },
-    {
-      'name': '등장 시 (When Played)',
-      'description': '카드가 배틀 에리어에 등장했을 때 발동하는 효과입니다. 카드를 플레이하거나 진화했을 때 발동합니다.'
-    },
-    {
-      'name': '공격 선언 시 (When Attacking)',
-      'description': '디지몬이 공격을 선언했을 때 발동하는 효과입니다. 상대 플레이어나 디지몬을 공격할 때 발생합니다.'
-    },
-    {
-      'name': '상대 턴 (Opponent\'s Turn)',
-      'description': '상대의 턴 동안 발동할 수 있는 효과입니다. 특별히 타이밍이 명시되어 있지 않다면 상대 턴 중 아무 때나 사용할 수 있습니다.'
-    },
-    {
-      'name': '디지버스트 (Digibursting)',
-      'description': '자신의 디지몬 아래에 있는 카드를 트래시에 놓는 비용입니다. 디지버스트 효과를 발동하기 위해 사용됩니다.'
-    },
-    {
-      'name': '디지크로스 (DigiXros)',
-      'description': '2장 이상의 디지몬을 결합하여 새로운 디지몬을 만드는 메커니즘입니다. 디지크로스에 사용된 카드들은 그 디지몬의 진화원이 됩니다.'
-    },
-    {
-      'name': '디지조이 (Digi-Joying)',
-      'description': '타이머 테이머를 속성으로 가진 카드에 적용되며, 타이머 테이머는 배틀 에리어에 있는 디지몬에 장착하여 추가 효과를 부여할 수 있습니다.'
-    },
-    {
-      'name': '메모리 (Memory)',
-      'description': '게임 리소스로, 카드 비용을 지불하거나 특정 효과를 발동할 때 사용합니다. 메모리 게이지가 상대방 쪽으로 넘어가면 턴이 종료됩니다.'
-    },
-  ];
+class KeywordInfoPage extends StatefulWidget {
+  @override
+  State<KeywordInfoPage> createState() => _KeywordInfoPageState();
+}
+
+class _KeywordInfoPageState extends State<KeywordInfoPage> {
+  final KeywordService _keywordService = KeywordService();
+  bool _isLoading = true;
+  List<KeywordCategory> _categories = [];
+  String? _searchQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadKeywords();
+  }
+
+  Future<void> _loadKeywords() async {
+    await _keywordService.loadKeywords();
+    setState(() {
+      _categories = _keywordService.getAllCategories();
+      _isLoading = false;
+    });
+  }
+
+  // 검색어에 따라 카테고리 필터링
+  List<KeywordCategory> _getFilteredCategories() {
+    if (_searchQuery == null || _searchQuery!.isEmpty) {
+      return _categories;
+    }
+    
+    final query = _searchQuery!.toLowerCase();
+    return _categories.where((category) {
+      // 카테고리 이름에 검색어가 포함되는지 확인
+      if (category.name.toLowerCase().contains(query)) {
+        return true;
+      }
+      
+      // 카테고리 설명에 검색어가 포함되는지 확인
+      if (category.description.toLowerCase().contains(query)) {
+        return true;
+      }
+      
+      // 패턴 중에 검색어가 포함된 것이 있는지 확인
+      for (var pattern in category.patterns) {
+        if (pattern.pattern.toLowerCase().contains(query) || 
+            pattern.description.toLowerCase().contains(query)) {
+          return true;
+        }
+      }
+      
+      return false;
+    }).toList();
+  }
+
+  // 키워드로 카드 검색 화면으로 이동
+  void _searchCardsByKeyword(BuildContext context, String keyword) {
+    // 다이얼로그 표시
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('키워드로 카드 검색'),
+          content: Text('"$keyword" 키워드를 가진 카드를 검색하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
+                
+                // 검색 파라미터 생성
+                SearchParameter searchParameter = SearchParameter();
+                searchParameter.searchString = keyword;
+                
+                // 검색 파라미터를 JSON으로 변환하여 DeckBuilderRoute로 전달
+                context.navigateTo(
+                  MainRoute(
+                    children: [
+                      DeckBuilderRoute(
+                        searchParameterString: json.encode(searchParameter.toJson())
+                      )
+                    ]
+                  )
+                );
+              },
+              child: Text('검색'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '주요 키워드',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: keywords.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ExpansionTile(
-                    title: Text(
-                      keywords[index]['name']!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                // 검색 바
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: '키워드 검색...',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          keywords[index]['description']!,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
                   ),
-                );
-              },
+                ),
+                
+                // 키워드 리스트
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '키워드 목록',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _getFilteredCategories().length,
+                          itemBuilder: (context, index) {
+                            final category = _getFilteredCategories()[index];
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 타이틀과 검색 버튼을 포함하는 Row
+                                    Row(
+                                      children: [
+                                        // 타이틀
+                                        Expanded(
+                                          child: Text(
+                                            category.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Color.fromRGBO(206, 101, 1, 1), // 주황색으로 통일
+                                            ),
+                                          ),
+                                        ),
+                                        // 검색 버튼
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Color.fromRGBO(206, 101, 1, 0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Color.fromRGBO(206, 101, 1, 0.3),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.search,
+                                              color: Color.fromRGBO(206, 101, 1, 1),
+                                              size: 20,
+                                            ),
+                                            tooltip: '이 키워드로 카드 검색',
+                                            onPressed: () {
+                                              _searchCardsByKeyword(context, category.name);
+                                            },
+                                            padding: EdgeInsets.all(8),
+                                            constraints: BoxConstraints(),
+                                            splashRadius: 24,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // 설명
+                                    Text(
+                                      category.description,
+                                      style: const TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
     );
   }
 } 

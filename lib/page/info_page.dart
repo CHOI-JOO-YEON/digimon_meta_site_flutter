@@ -16,8 +16,9 @@ class InfoPage extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       routes: [
         LimitInfoRoute(),
-        // KeywordInfoRoute와 RuleInfoRoute는 미완성이므로 임시로 숨김
-        // KeywordInfoRoute(), 
+        KeywordInfoRoute(), 
+        // 룰 탭은 준비 단계이므로 주석 처리
+        // 향후 룰 페이지가 완성되면 활성화
         // RuleInfoRoute()
       ],
       builder: (context, child, controller) {
@@ -37,11 +38,11 @@ class InfoPage extends StatelessWidget {
                     icon: Icon(Icons.block),
                     text: '금지/제한',
                   ),
-                  // 미완성 페이지이므로 탭에서도 숨김
-                  // Tab(
-                  //   icon: Icon(Icons.info_outline),
-                  //   text: '키워드',
-                  // ),
+                  Tab(
+                    icon: Icon(Icons.info_outline),
+                    text: '키워드',
+                  ),
+                  // 향후 룰 탭이 추가될 예정
                   // Tab(
                   //   icon: Icon(Icons.rule),
                   //   text: '룰',
