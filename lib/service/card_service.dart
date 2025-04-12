@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:digimon_meta_site_flutter/api/card_api.dart';
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
+import 'package:digimon_meta_site_flutter/service/keyword_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
 import '../model/card.dart';
@@ -13,6 +15,18 @@ import '../provider/text_simplify_provider.dart';
 import 'color_service.dart';
 
 class CardService {
+  final KeywordService _keywordService = KeywordService();
+  bool _keywordsLoaded = false;
+
+  CardService() {
+    _loadKeywords();
+  }
+
+  Future<void> _loadKeywords() async {
+    await _keywordService.loadKeywords();
+    _keywordsLoaded = true;
+  }
+
   void showImageDialog(
       BuildContext context, DigimonCard card, Function(int)? searchNote) {
     CardOverlayService cardOverlayService = CardOverlayService();
@@ -303,29 +317,6 @@ class CardService {
                                       ],
                                     ),
                                   const SizedBox(height: 5),
-                                  // 텍스트 간소화 스위치
-                                  Consumer<TextSimplifyProvider>(
-                                    builder:
-                                        (context, textSimplifyProvider, child) {
-                                      return Row(
-                                        children: [
-                                          Text('텍스트 간소화'),
-                                          Transform.scale(
-                                              scale: SizeService.switchScale(
-                                                  context),
-                                              child: Switch(
-                                                value: textSimplifyProvider
-                                                    .getTextSimplify(),
-                                                onChanged: (v) =>
-                                                    textSimplifyProvider
-                                                        .updateTextSimplify(v),
-                                                inactiveThumbColor: Colors.red,
-                                              )),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 5),
                                   Consumer<TextSimplifyProvider>(
                                     builder:
                                         (context, textSimplifyProvider, child) {
@@ -340,9 +331,7 @@ class CardService {
                                                   card.color1!),
                                               fontSize,
                                               localeCardData.locale,
-                                              textSimplifyProvider
-                                                  .getTextSimplify(),
-                                            ),
+                                              true),
                                           const SizedBox(height: 5),
                                           if (localeCardData.sourceEffect !=
                                               null)
@@ -354,9 +343,7 @@ class CardService {
                                                   card.color1!),
                                               fontSize,
                                               localeCardData.locale,
-                                              textSimplifyProvider
-                                                  .getTextSimplify(),
-                                            ),
+                                              true),
                                         ],
                                       );
                                     },
@@ -496,13 +483,12 @@ class CardService {
               category,
               style: TextStyle(
                 color: categoryColor, fontSize: fontSize,
-                // fontFamily: locale=='JPN'?"MPLUSC":"JalnanGothic"
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: buildEffectText(text, fontSize, locale, isTextSimplify),
+            child: buildEffectText(context, text, fontSize, locale, isTextSimplify),
           )
         ],
       ),
@@ -549,7 +535,55 @@ class CardService {
     );
   }
 
-  List<InlineSpan> _getKorTextSpans(String text) {
+  List<InlineSpan> getSpansByLocale(
+      String locale, String text, bool isTextSimplify, {Function(String)? onBracketTap}) {
+    if (isTextSimplify) {
+      // 기존 코드: 모든 괄호를 제거
+      // final RegExp pattern1 = RegExp(r'（[^（）]*）');
+      // final RegExp pattern2 = RegExp(r'\([^()]*\)');
+      // text = text.replaceAll(pattern1, "");
+      // text = text.replaceAll(pattern2, "");
+      
+      // 수정된 코드: '》' 뒤에 오는 괄호만 제거
+      // 한국어: '》' 뒤에 오는 괄호
+      final RegExp korPattern1 = RegExp(r'》\s*\([^()]*\)');
+      final RegExp korPattern2 = RegExp(r'》\s*（[^（）]*）');
+      
+      // 일본어: '》' 뒤에 오는 괄호
+      final RegExp jpnPattern = RegExp(r'》\s*（[^（）]*）');
+      
+      // 영어: '>' 뒤에 오는 괄호
+      final RegExp engPattern = RegExp(r'>\s*\([^()]*\)');
+      
+      // 괄호 제거 함수: 매치된 텍스트에서 괄호 부분만 제거하고 '》'는 유지
+      String removeParentheses(String match) {
+        // '》' 또는 '>' 이후의 내용은 제거
+        if (match.contains('》')) {
+          return '》';
+        } else if (match.contains('>')) {
+          return '>';
+        }
+        return '';
+      }
+      
+      // 괄호 제거 적용
+      text = text.replaceAllMapped(korPattern1, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(korPattern2, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(jpnPattern, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(engPattern, (match) => removeParentheses(match.group(0)!));
+    }
+    
+    if (locale == "KOR") {
+      return _getKorTextSpans(text, onBracketTap);
+    } else if (locale == "ENG") {
+      return _getEngTextSpans(text, onBracketTap: onBracketTap);
+    } else if (locale == "JPN") {
+      return _getJpnTextSpans(text, onBracketTap: onBracketTap);
+    }
+    return [];
+  }
+
+  List<InlineSpan> _getKorTextSpans(String text, Function(String)? onBracketTap) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -557,22 +591,17 @@ class CardService {
       {
         'pattern': r'《[^《》]*《[^《》]*》[^《》]*》',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': true,
       },
-      // {
-      //   'pattern': r'《오버플로우 《-?\d+》》',
-      //   'color': const Color.fromRGBO(206, 101, 1, 1),
-      // },
-      // {
-      //   'pattern': r'《디코드《[^《》]+》》',
-      //   'color': const Color.fromRGBO(206, 101, 1, 1),
-      // },
       {
         'pattern': r'《[^《》]*》',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': true,
       },
       {
         'pattern': r'≪[^≪≫]*≫',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': true,
       },
       {
         'pattern': r'【[^【】]*】',
@@ -592,12 +621,8 @@ class CardService {
       {
         'pattern': r'〈[^〈〉]*〉',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': false,
       },
-      // 수정된 패턴: () 안에 《...》가 포함되지 않도록 함
-      // {
-      //   'pattern': r'\((?:(?!《[^《》]*》)[^()])*?\)',
-      //   'color': Colors.black54,
-      // },
       {
         'pattern': r'디지크로스\s*-\d+',
         'color': const Color.fromRGBO(61, 178, 86, 1),
@@ -629,10 +654,28 @@ class CardService {
           ? (styleConfig['colorEvaluator'] as Function)(matchedText)
           : styleConfig['color'] as Color;
 
-      spans.add(TextSpan(
-        text: matchedText,
-        style: TextStyle(color: backgroundColor),
-      ));
+      // Check if this style is clickable
+      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+
+      if (isClickable) {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(
+            color: backgroundColor,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              onBracketTap!(matchedText);
+            },
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(color: backgroundColor),
+        ));
+      }
+      
       lastIndex = match.end;
     }
 
@@ -646,7 +689,7 @@ class CardService {
     return spans;
   }
 
-  List<InlineSpan> _getEngTextSpans(String text) {
+  List<InlineSpan> _getEngTextSpans(String text, {Function(String)? onBracketTap}) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -686,6 +729,7 @@ class CardService {
       {
         'pattern': r'＜[^＜＞]*＞',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': true,
       },
       {
         'pattern': r'\([^()]*\)',
@@ -719,8 +763,28 @@ class CardService {
           ? (styleConfig['colorEvaluator'] as Function)(matchedText)
           : styleConfig['color'] as Color;
 
-      spans.add(TextSpan(
-          text: matchedText, style: TextStyle(color: backgroundColor)));
+      // Check if this style is clickable
+      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+
+      if (isClickable) {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(
+            color: backgroundColor,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              onBracketTap!(matchedText);
+            },
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(color: backgroundColor),
+        ));
+      }
+      
       lastIndex = match.end;
     }
 
@@ -731,7 +795,7 @@ class CardService {
     return spans;
   }
 
-  List<InlineSpan> _getJpnTextSpans(String text) {
+  List<InlineSpan> _getJpnTextSpans(String text, {Function(String)? onBracketTap}) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -755,6 +819,7 @@ class CardService {
       {
         'pattern': r'≪[^≪≫]*≫',
         'color': const Color.fromRGBO(206, 101, 1, 1),
+        'clickable': true,
       },
       {
         'pattern': r'（[^（）]*）',
@@ -788,8 +853,28 @@ class CardService {
           ? (styleConfig['colorEvaluator'] as Function)(matchedText)
           : styleConfig['color'] as Color;
 
-      spans.add(TextSpan(
-          text: matchedText, style: TextStyle(color: backgroundColor)));
+      // Check if this style is clickable
+      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+
+      if (isClickable) {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(
+            color: backgroundColor,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              onBracketTap!(matchedText);
+            },
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(color: backgroundColor),
+        ));
+      }
+      
       lastIndex = match.end;
     }
 
@@ -801,41 +886,144 @@ class CardService {
   }
 
   Widget buildEffectText(
-      String text, double fontSize, String locale, bool isTextSimplify) {
+      BuildContext context,
+      String text, 
+      double fontSize, 
+      String locale, 
+      bool isTextSimplify) {
+    // 현재 활성화된 효과 설명을 추적하기 위한 상태
+    final ValueNotifier<String?> activeDescriptionKey = ValueNotifier<String?>(null);
+    
     final List<InlineSpan> spans = [];
 
-    spans.addAll(getSpansByLocale(locale, text, isTextSimplify));
+    spans.addAll(getSpansByLocale(locale, text, isTextSimplify, 
+      onBracketTap: (String bracketText) {
+        // 괄호에서 텍스트 추출
+        String content = bracketText;
+        if (content.startsWith('《') && content.endsWith('》')) {
+          content = content.substring(1, content.length - 1);
+          
+          // 중첩된 괄호가 있는지 확인 (예: 리커버리 +1 《덱》)
+          // 여기서는 전체 내용을 그대로 유지하고 KeywordService가 패턴을 인식하도록 함
+        } else if (content.startsWith('≪') && content.endsWith('≫')) {
+          content = content.substring(1, content.length - 1);
+        } else if (content.startsWith('＜') && content.endsWith('＞')) {
+          content = content.substring(1, content.length - 1);
+        }
+        
+        // 같은 항목 클릭 시 토글
+        if (activeDescriptionKey.value == content) {
+          activeDescriptionKey.value = null;
+        } else {
+          activeDescriptionKey.value = content;
+        }
+      }
+    ));
 
-    return SelectableText.rich(
-      TextSpan(
-        children: spans,
-        style: TextStyle(
-            fontSize: fontSize,
-            color: Colors.black,
-            height: 1.4,
-            fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic"),
-      ),
-      textAlign: TextAlign.left,
-      textDirection: TextDirection.ltr,
+    return ValueListenableBuilder<String?>(
+      valueListenable: activeDescriptionKey,
+      builder: (context, activeKey, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 메인 텍스트
+            SelectableText.rich(
+              TextSpan(
+                children: spans,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: Colors.black,
+                  height: 1.4,
+                  fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic"),
+              ),
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.ltr,
+            ),
+            
+            // 활성화된 설명이 있으면 표시
+            if (activeKey != null)
+              Container(
+                margin: const EdgeInsets.only(top: 4, left: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
+                    )
+                  ]
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 헤더 (키워드 이름)
+                    Row(
+                      children: [
+                        // 키워드 이름 (주황색으로 변경, 아이콘 제거)
+                        Text(
+                          activeKey,
+                          style: TextStyle(
+                            fontSize: fontSize * 0.9,
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromRGBO(206, 101, 1, 1), // 주황색으로 변경
+                          ),
+                        ),
+                        
+                        const Spacer(),
+                        
+                        // 닫기 버튼
+                        InkWell(
+                          onTap: () {
+                            activeDescriptionKey.value = null;
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: fontSize * 0.8,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // 구분선
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Divider(
+                        color: Colors.grey.withOpacity(0.3),
+                        height: 1,
+                      ),
+                    ),
+                    
+                    // 효과 설명 텍스트
+                    Text(
+                      _getEffectDescriptionText(activeKey),
+                      style: TextStyle(
+                        fontSize: fontSize * 0.85,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        );
+      }
     );
   }
-
-  List<InlineSpan> getSpansByLocale(
-      String locale, String text, bool isTextSimplify) {
-    if (isTextSimplify) {
-      final RegExp pattern1 = RegExp(r'（[^（）]*）');
-      final RegExp pattern2 = RegExp(r'\([^()]*\)');
-      text = text.replaceAll(pattern1, "");
-      text = text.replaceAll(pattern2, "");
+  
+  // 효과 설명 텍스트를 반환하는 헬퍼 메서드
+  String _getEffectDescriptionText(String content) {
+    // 키워드 서비스에서 설명 가져오기
+    if (_keywordsLoaded) {
+      return _keywordService.getKeywordDescription(content);
     }
-    if (locale == "KOR") {
-      return _getKorTextSpans(text);
-    } else if (locale == "ENG") {
-      return _getEngTextSpans(text);
-    } else if (locale == "JPN") {
-      return _getJpnTextSpans(text);
-    }
-    return [];
+    
+    // 설명이 없을 경우 기본 반환
+    return '이 효과에 대한 자세한 설명이 없습니다.';
   }
 
   Color getColor(double ratio) {

@@ -107,6 +107,7 @@ flutter:
     - assets/images/small_img.png
     - assets/data/cards.json
     - assets/data/notes.json
+    - assets/data/keyword.json
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
