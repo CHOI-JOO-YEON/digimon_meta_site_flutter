@@ -67,6 +67,16 @@ class DigimonCard {
         return '불명';
       case 'HYBRID':
         return '하이브리드체';
+      case 'APPMON':
+        return '어플몬';
+      case 'STND':
+        return '스탠다드/어플몬';
+      case 'SUP':
+        return '슈퍼/어플몬';
+      case 'ULT':
+        return '얼티메이트/어플몬';
+      case 'GOD':
+        return '갓/어플몬';
       default:
         return '';
     }
