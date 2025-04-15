@@ -783,12 +783,20 @@
   "cardCount" : 15,
   "isDisable" : false
 }, {
-  "noteId" : 107,
-  "name" : "부스터 팩 엑시드 아포칼립스 [BT-15]",
+  "noteId" : 245,
+  "name" : "부스터 팩 익시드 아포칼립스 [BTK-15]",
   "releaseDate" : "2025-04-18",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 19,
-  "cardCount" : 102,
+  "cardOrigin" : "BOOSTER_PACK",
+  "priority" : null,
+  "cardCount" : 137,
+  "isDisable" : false
+}, {
+  "noteId" : 246,
+  "name" : "부스터 팩 익시드 아포칼립스 [BTK-15] 박스 프로모",
+  "releaseDate" : "2025-04-18",
+  "cardOrigin" : "BOOSTER_PROMO",
+  "priority" : null,
+  "cardCount" : 14,
   "isDisable" : false
 }, {
   "noteId" : 120,
@@ -979,7 +987,7 @@
   "name" : "부스터 팩 월드 컨버전스 [BT-21]",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
-  "priority" : null,
+  "priority" : 1,
   "cardCount" : 102,
   "isDisable" : false
 }, {
@@ -987,15 +995,31 @@
   "name" : "부스터 팩 월드 컨버전스 [BT-21] 박스 프로모",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
-  "priority" : null,
+  "priority" : 2,
   "cardCount" : 6,
   "isDisable" : false
 }, {
-  "noteId" : 241,
-  "name" : "리미티드 카드팩 파이널 엘리온 [LM-05]",
+  "noteId" : 243,
+  "name" : "Starter Deck PROTECTOR OF LIGHT [ST-20]",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
-  "priority" : null,
+  "priority" : 3,
+  "cardCount" : 15,
+  "isDisable" : false
+}, {
+  "noteId" : 244,
+  "name" : "Starter Deck HERO OF HOPE [ST-21]",
+  "releaseDate" : "2026-04-17",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 4,
+  "cardCount" : 15,
+  "isDisable" : false
+}, {
+  "noteId" : 241,
+  "name" : "리미티드 카드팩 파이널 엘리시온 [LM-05]",
+  "releaseDate" : "2026-04-17",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 5,
   "cardCount" : 6,
   "isDisable" : false
 }, {
@@ -1003,7 +1027,7 @@
   "name" : "테이머배틀 27",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
-  "priority" : null,
+  "priority" : 6,
   "cardCount" : 6,
   "isDisable" : false
 } ]
