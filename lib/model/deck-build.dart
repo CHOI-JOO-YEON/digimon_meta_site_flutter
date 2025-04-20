@@ -379,32 +379,93 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
       ...tamaMap.map((key, value) => MapEntry(key.cardId!, value)),
     };
 
-    // Use 'v2:' prefix for new format to maintain backward compatibility
-    // Optimize by:
-    // 1. Using base64 encoding instead of URL parameter format
-    // 2. Compressing card IDs by sorting and using relative differences
+    // 카드가 없으면 빈 문자열 반환
     if (combinedMap.isEmpty) {
       return "$url${Uri.encodeComponent("")}";
     }
 
-    // New optimized format
+    // 대량 카드 최적화된 압축 방식 (v3 형식)
+    if (combinedMap.length > 30) {
+      try {
+        // 1. ID 정렬 및 델타 인코딩
+        List<int> sortedIds = combinedMap.keys.toList()..sort();
+        List<int> data = [];
+        
+        // 첫 번째 ID와 수량 저장
+        int prevId = sortedIds[0];
+        data.add(prevId >> 8); // 상위 바이트
+        data.add(prevId & 0xFF); // 하위 바이트
+        data.add(combinedMap[prevId]!);
+        
+        // 델타 인코딩 + 가변 길이 인코딩 (웹에서 사용 가능한 최적화)
+        for (int i = 1; i < sortedIds.length; i++) {
+          int currentId = sortedIds[i];
+          int diff = currentId - prevId;
+          
+          // 작은 차이는 1바이트 인코딩
+          if (diff < 128) {
+            data.add(diff);
+          } 
+          // 중간 차이는 2바이트 인코딩
+          else if (diff < 16384) {
+            data.add(0x80 | (diff >> 8)); // 상위 바이트 + 마커
+            data.add(diff & 0xFF); // 하위 바이트
+          }
+          // 큰 차이는 3바이트 인코딩 
+          else {
+            data.add(0xC0); // 마커
+            data.add(diff >> 8); // 상위 바이트
+            data.add(diff & 0xFF); // 하위 바이트
+          }
+          
+          // 수량은 1바이트로 충분 (일반적으로 1-4장)
+          data.add(combinedMap[currentId]!);
+          
+          prevId = currentId;
+        }
+        
+        // 2. 바이트 배열로 변환
+        Uint8List bytes = Uint8List(data.length);
+        for (int i = 0; i < data.length; i++) {
+          bytes[i] = data[i];
+        }
+        
+        // 3. Base64Url 인코딩 (추가 압축 없이)
+        String v3Encoded = "v3:${base64Url.encode(bytes)}";
+        
+        // 사이즈가 원래보다 작은지 확인
+        String oldFormat = combinedMap.entries
+            .map((entry) => "${entry.key}=${entry.value}")
+            .join(",");
+        
+        // 더 작은 형식 사용
+        String finalEncoded = v3Encoded.length < oldFormat.length ? v3Encoded : oldFormat;
+        url += "deck=${Uri.encodeComponent(finalEncoded)}";
+        return url;
+      } catch (e) {
+        print('Advanced compression error: $e');
+        // 오류 시 기존 방식으로 폴백
+      }
+    }
+    
+    // 기존 방식 (적은 수의 카드) - v2 포맷
     List<int> sortedIds = combinedMap.keys.toList()..sort();
     List<int> data = [];
     
-    // First value is stored directly
+    // 첫 번째 값은 그대로 저장
     if (sortedIds.isNotEmpty) {
       data.add(sortedIds[0]);
       data.add(combinedMap[sortedIds[0]]!);
       
-      // Subsequent values are stored as differences from previous
+      // 이후 값들은 차이값으로 저장
       for (int i = 1; i < sortedIds.length; i++) {
-        // Store difference from previous ID
+        // 이전 ID와의 차이 저장
         data.add(sortedIds[i] - sortedIds[i-1]);
         data.add(combinedMap[sortedIds[i]]!);
       }
     }
     
-    // Convert to bytes and encode as base64
+    // 바이트로 변환하고 base64 인코딩
     Uint8List bytes = Uint8List(data.length * 2);
     ByteData byteData = ByteData.view(bytes.buffer);
     
@@ -414,14 +475,13 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
     
     String encoded = "v2:${base64Url.encode(bytes)}";
     
-    // Fall back to old format if new format is somehow larger
+    // 기존 형식과 비교
     String oldFormatParam = combinedMap.entries
         .map((entry) => "${entry.key}=${entry.value}")
         .join(",");
-    String oldEncoded = oldFormatParam;
     
-    // Use whichever format is smaller
-    encoded = encoded.length < oldEncoded.length ? encoded : oldEncoded;
+    // 더 작은 형식 사용
+    encoded = encoded.length < oldFormatParam.length ? encoded : oldFormatParam;
     
     url += "deck=${Uri.encodeComponent(encoded)}";
     return url;

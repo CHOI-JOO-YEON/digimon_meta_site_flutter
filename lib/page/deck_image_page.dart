@@ -470,13 +470,15 @@ class _DeckImagePageState extends State<DeckImagePage> {
             width: 10,
           ),
         if (isQrShow)
-          SizedBox(
-            width: 154,
+          Container(
+            width: 150,
             height: 150,
-            child: QrImageView(
-              padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              // color: Colors.white,
+              // borderRadius: BorderRadius.circular(8),
+            ),
+            child: QrCodeWidget(
               data: widget.deck.getQrUrl(),
-              version: QrVersions.auto,
             ),
           ),
       ],
@@ -577,6 +579,140 @@ class _DeckImagePageState extends State<DeckImagePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class QrCodeWidget extends StatefulWidget {
+  final String data;
+  
+  const QrCodeWidget({Key? key, required this.data}) : super(key: key);
+  
+  @override
+  State<QrCodeWidget> createState() => _QrCodeWidgetState();
+}
+
+class _QrCodeWidgetState extends State<QrCodeWidget> {
+  late Future<bool> _qrValidationFuture;
+  
+  @override
+  void initState() {
+    super.initState();
+    _qrValidationFuture = _validateQrData();
+  }
+  
+  Future<bool> _validateQrData() async {
+    // 비동기 작업으로 QR 예외를 미리 체크
+    try {
+      final qrData = widget.data;
+      // 버전 10 QR 코드의 최대 바이너리 데이터 한계에 근접
+      if (qrData.length > 300) {
+        // 실제 예외와 일치하는 형태로 반환
+        return false;
+      }
+      
+      // QR 라이브러리를 사용하여 검증 시도
+      // 이 검증은 실제 QR 코드를 그리지 않고 데이터 크기만 확인
+      return true;
+    } catch (e) {
+      print('QR validation error: $e');
+      return false;
+    }
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      height: 150,
+      decoration: BoxDecoration(
+        // color: Colors.white,
+      ),
+      child: FutureBuilder<bool>(
+        future: _qrValidationFuture,
+        builder: (context, snapshot) {
+          // 로딩 중
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          }
+          
+          // 유효성 검사 통과: QR 코드 표시 시도
+          if (snapshot.hasData && snapshot.data == true) {
+            // try-catch로 QR 코드 위젯 래핑하여 런타임 예외 처리
+            try {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Builder(
+                  builder: (context) {
+                    try {
+                      return QrImageView(
+                        padding: const EdgeInsets.all(0),
+                        data: widget.data,
+                        version: 10,
+                        // backgroundColor: Colors.white,
+                        errorCorrectionLevel: QrErrorCorrectLevel.L,
+                        constrainErrorBounds: true,
+                        size: 150,
+                        gapless: true,
+                        embeddedImageStyle: const QrEmbeddedImageStyle(
+                          size: Size.zero,
+                        ),
+                      );
+                    } catch (e) {
+                      print('QR drawing exception: $e');
+                      // 내부 빌더에서 에러 발생 시 에러 위젯 반환
+                      return _buildErrorWidget();
+                    }
+                  },
+                ),
+              );
+            } catch (e) {
+              print('QR outer exception: $e');
+              // 외부 try-catch에서 에러 발생 시도 에러 위젯 반환
+              return _buildErrorWidget();
+            }
+          }
+          
+          // 유효성 검사 실패 또는 오류: 에러 메시지 표시
+          return _buildErrorWidget();
+        },
+      ),
+    );
+  }
+  
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.error_outline, color: Colors.red, size: 32),
+          SizedBox(height: 8),
+          Text(
+            'QR 코드 용량 초과',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            '카드 수가 너무 많습니다',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 10,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

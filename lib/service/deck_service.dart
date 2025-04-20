@@ -1326,7 +1326,7 @@ class DeckService {
   }
 
   // Parse deck string with format "cardId1=count1,cardId2=count2,..."
-  // Or the new optimized format "v2:base64encodeddata"
+  // Or the optimized formats "v2:base64encodeddata" or "v3:base64encodeddata"
   Map<int, int> parseDeckString(String deckString) {
     Map<int, int> result = {};
 
@@ -1334,7 +1334,60 @@ class DeckService {
       return result;
     }
     
-    // Check if it's the new optimized format
+    // v3 고급 압축 포맷 (50장 이상 대용량 덱용)
+    if (deckString.startsWith('v3:')) {
+      try {
+        // Base64 데이터 추출
+        String base64Data = deckString.substring(3);
+        // Base64 디코딩
+        Uint8List bytes = base64Url.decode(base64Data);
+        
+        if (bytes.isEmpty) {
+          return result;
+        }
+        
+        // 첫 번째 카드 ID (2바이트)
+        int currentId = (bytes[0] << 8) | bytes[1];
+        int count = bytes[2];
+        result[currentId] = count;
+        
+        int i = 3;
+        // 나머지 카드 데이터 파싱
+        while (i < bytes.length) {
+          // 차이값 파싱 - 가변 길이 인코딩
+          int diff;
+          if ((bytes[i] & 0x80) == 0) {
+            // 1바이트 차이값
+            diff = bytes[i];
+            i++;
+          } else if ((bytes[i] & 0xC0) == 0x80) {
+            // 2바이트 차이값
+            diff = ((bytes[i] & 0x3F) << 8) | bytes[i + 1];
+            i += 2;
+          } else {
+            // 3바이트 차이값
+            diff = (bytes[i + 1] << 8) | bytes[i + 2];
+            i += 3;
+          }
+          
+          // 바이트 범위 체크
+          if (i >= bytes.length) break;
+          
+          // 수량 파싱
+          count = bytes[i++];
+          
+          // 새 카드 ID 계산 및 저장
+          currentId += diff;
+          result[currentId] = count;
+        }
+        
+        return result;
+      } catch (e) {
+        print('Error parsing v3 format: $e');
+      }
+    }
+    
+    // v2 압축 포맷 (기존 코드)
     if (deckString.startsWith('v2:')) {
       try {
         // Extract the base64 data (remove 'v2:' prefix)
@@ -1361,29 +1414,31 @@ class DeckService {
             result[currentId] = nextCount;
           }
         }
-        print("result: $result");
-        return result;
         
+        return result;
       } catch (e) {
         // If there's an error parsing the new format, fall back to old format
-        print('Error parsing new QR format: $e');
+        print('Error parsing v2 QR format: $e');
       }
     }
     
-    // Original format parsing (fallback)
-    List<String> pairs = deckString.split(",");
-    for (String pair in pairs) {
-      if (pair.contains("=")) {
-        List<String> parts = pair.split("=");
-        if (parts.length == 2) {
-          try {
+    // 원래 형식 파싱 (기본 폴백)
+    try {
+      List<String> pairs = deckString.split(",");
+      for (String pair in pairs) {
+        if (pair.contains("=")) {
+          List<String> parts = pair.split("=");
+          if (parts.length == 2) {
             int key = int.parse(parts[0]);
             int value = int.parse(parts[1]);
             result[key] = value;
-          } catch (e) {}
+          }
         }
       }
+    } catch (e) {
+      print('Error parsing original format: $e');
     }
+    
     return result;
   }
 
