@@ -15,7 +15,7 @@ import '../provider/user_provider.dart';
 class MainPage extends StatelessWidget {
   void openOAuthPopup() {
     String baseUrl = const String.fromEnvironment('SERVER_URL');
-    String url = '$baseUrl/oauth2/authorization/kakao?prompt=login';
+    String url = '$baseUrl/oauth2/authorization/kakao';
     String windowName = 'OAuthLogin';
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);
