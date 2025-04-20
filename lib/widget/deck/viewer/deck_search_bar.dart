@@ -392,7 +392,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       },
                     ),
                     Text(
-                      'OR',
+                      '하나라도 포함',
                       style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                     ),
                     SizedBox(width: SizeService.smallFontSize(context)),
@@ -406,7 +406,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                       },
                     ),
                     Text(
-                      'AND',
+                      '모두 포함',
                       style: TextStyle(fontSize: SizeService.smallFontSize(context)),
                     ),
                   ],

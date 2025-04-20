@@ -115,6 +115,16 @@ class _CardSearchBarState extends State<CardSearchBar> {
     CardOverlayService().removeAllOverlays();
     Set<String> _searchResults = CardDataService().searchTypes("");
     Set<String> _selectedTypes = widget.searchParameter.types;
+    
+    // Add form and attribute variables
+    Set<String> _formSearchResults = CardDataService().searchForms("");
+    Set<String> _selectedForms = widget.searchParameter.forms;
+    int formOperation = widget.searchParameter.typeOperation;
+    
+    Set<String> _attributeSearchResults = CardDataService().searchAttributes("");
+    Set<String> _selectedAttributes = widget.searchParameter.attributes;
+    int attributeOperation = widget.searchParameter.typeOperation;
+    
     NoteDto? selectedNote;
 
     if (widget.searchParameter.noteId == null) {
@@ -165,6 +175,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
     _dialogSearchStringEditingController =
         TextEditingController(text: _searchStringEditingController?.value.text);
     _trieSearchController = TextEditingController();
+    TextEditingController _formSearchController = TextEditingController();
+    TextEditingController _attributeSearchController = TextEditingController();
     int parallelOption = widget.searchParameter.parallelOption;
     bool enCardInclude = widget.searchParameter.isEnglishCardInclude;
     int typeOperation = widget.searchParameter.typeOperation;
@@ -512,120 +524,298 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       ),
                       const Divider(),
                       const Text(
-                        '유형',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        '특징',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                            Expanded(
-                              flex: 1,
-                              child: TextField(
-                                controller: _trieSearchController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _searchResults =
-                                        CardDataService().searchTypes(value);
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: '유형 검색',
-                                  labelStyle: TextStyle(
-                                    color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                  ),
-                                  hintStyle: TextStyle(
-                                    color: Theme.of(context).primaryColor.withOpacity(0.6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Radio(
-                                  value: 1,
-                                  groupValue: typeOperation,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      typeOperation =
-                                      value as int;
-                                    });
-                                  },
-                                ),
-                                const Text(
-                                  'OR',
-                                  // style: TextStyle(fontSize: fontSize),
-                                ),
-                                Radio(
-                                  value: 0,
-                                  groupValue: typeOperation,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      typeOperation =
-                                      value as int;
-                                    });
-                                  },
-                                ),
-                                const Text(
-                                  'AND',
-                                  // style: TextStyle(fontSize: fontSize),
-                                ),
-                              ],
-
-                            )),
-
+                          Radio(
+                            value: 1,
+                            groupValue: typeOperation,
+                            onChanged: (value) {
+                              setState(() {
+                                // Use the same value for all three operations
+                                typeOperation = value as int;
+                                formOperation = value as int;
+                                attributeOperation = value as int;
+                              });
+                            },
+                          ),
+                          const Text(
+                            '하나라도 포함',
+                          ),
+                          const SizedBox(width: 20),
+                          Radio(
+                            value: 0,
+                            groupValue: typeOperation,
+                            onChanged: (value) {
+                              setState(() {
+                                // Use the same value for all three operations
+                                typeOperation = value as int;
+                                formOperation = value as int;
+                                attributeOperation = value as int;
+                              });
+                            },
+                          ),
+                          const Text(
+                            '모두 포함',
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 20,),
-                      // 검색 결과 표시
-                      SizedBox(
-                        height: 200,
-                        child: Row(
+                      
+                      Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(
+                              color: Theme.of(context).primaryColor.withOpacity(0.5), 
+                              width: 2
+                            )
+                          )
+                        ),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              flex: 1,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: _searchResults.length,
-                                itemBuilder: (context, index) {
-                                  final type = _searchResults.elementAt(index);
-                                  return ListTile(
-                                    title: Text(type),
-                                    onTap: () {
-                                      _selectedTypes.add(type);
-                                      setState(() {});
-                                    },
-                                  );
-                                },
+                            Padding(
+                              padding: const EdgeInsets.only(left: 24),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextField(
+                                      controller: _formSearchController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _formSearchResults =
+                                              CardDataService().searchForms(value);
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: '형태',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                        ),
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: SingleChildScrollView(
-                                child: Wrap(
-                                  runSpacing: 4,
-                                  spacing: 8,
-                                  children: _selectedTypes
-                                      .map((type) => Chip(
-                                            label: Text(type),
-                                            deleteButtonTooltipMessage: '제거',
-                                            onDeleted: () {
-                                              setState(() {
-                                                _selectedTypes.remove(type);
-                                              });
+                            const SizedBox(height: 20,),
+                            // 검색 결과 표시
+                            SizedBox(
+                              height: 200,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 24),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: _formSearchResults.length,
+                                        itemBuilder: (context, index) {
+                                          final form = _formSearchResults.elementAt(index);
+                                          return ListTile(
+                                            title: Text(CardDataService().getDisplayFormName(form)),
+                                            onTap: () {
+                                              _selectedForms.add(form);
+                                              setState(() {});
                                             },
-                                          ))
-                                      .toList(),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          runSpacing: 4,
+                                          spacing: 8,
+                                          children: _selectedForms
+                                              .map((form) => Chip(
+                                                    label: Text(CardDataService().getDisplayFormName(form)),
+                                                    deleteButtonTooltipMessage: '제거',
+                                                    onDeleted: () {
+                                                      setState(() {
+                                                        _selectedForms.remove(form);
+                                                      });
+                                                    },
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            // 검색 결과 표시
+
+                            
+                            Padding(
+                              padding: const EdgeInsets.only(left: 24),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextField(
+                                      controller: _trieSearchController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _searchResults =
+                                              CardDataService().searchTypes(value);
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: '유형',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                        ),
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            // 검색 결과 표시
+                            SizedBox(
+                              height: 200,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 24),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: _searchResults.length,
+                                        itemBuilder: (context, index) {
+                                          final type = _searchResults.elementAt(index);
+                                          return ListTile(
+                                            title: Text(type),
+                                            onTap: () {
+                                              _selectedTypes.add(type);
+                                              setState(() {});
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          runSpacing: 4,
+                                          spacing: 8,
+                                          children: _selectedTypes
+                                              .map((type) => Chip(
+                                                    label: Text(type),
+                                                    deleteButtonTooltipMessage: '제거',
+                                                    onDeleted: () {
+                                                      setState(() {
+                                                        _selectedTypes.remove(type);
+                                                      });
+                                                    },
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 24),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: TextField(
+                                      controller: _attributeSearchController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _attributeSearchResults =
+                                              CardDataService().searchAttributes(value);
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: '속성',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                        ),
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                                                        SizedBox(
+                              height: 200,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 24),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: _attributeSearchResults.length,
+                                        itemBuilder: (context, index) {
+                                          final attribute = _attributeSearchResults.elementAt(index);
+                                          return ListTile(
+                                            title: Text(attribute),
+                                            onTap: () {
+                                              _selectedAttributes.add(attribute);
+                                              setState(() {});
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          runSpacing: 4,
+                                          spacing: 8,
+                                          children: _selectedAttributes
+                                              .map((attribute) => Chip(
+                                                    label: Text(attribute),
+                                                    deleteButtonTooltipMessage: '제거',
+                                                    onDeleted: () {
+                                                      setState(() {
+                                                        _selectedAttributes.remove(attribute);
+                                                      });
+                                                    },
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      //
                     ],
                   ),
                 ),
@@ -666,6 +856,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     enCardInclude = true;
                     _selectedTypes={};
                     typeOperation=1;
+                    _selectedForms={};
+                    formOperation=typeOperation;
+                    _selectedAttributes={};
+                    attributeOperation=typeOperation;
 
                     setState(() {});
                   },
@@ -726,6 +920,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.searchParameter.typeOperation = typeOperation;
                     widget.searchParameter.types = _selectedTypes;
+                    
+                    // Apply form and attribute values to search parameters
+                    widget.searchParameter.formOperation = typeOperation;
+                    widget.searchParameter.forms = _selectedForms;
+                    widget.searchParameter.attributeOperation = typeOperation;
+                    widget.searchParameter.attributes = _selectedAttributes;
 
 
                     Navigator.pop(context);

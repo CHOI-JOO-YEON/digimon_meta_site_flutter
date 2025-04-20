@@ -9,6 +9,12 @@ class SearchParameter{
   int typeOperation =1; //0 = and, 1 = or
 
   Set<String> types = {};
+  
+  Set<String> forms = {}; // New field for form filtering
+  int formOperation = 1; // 0 = and, 1 = or
+  
+  Set<String> attributes = {}; // New field for attribute filtering
+  int attributeOperation = 1; // 0 = and, 1 = or
 
   int? minPlayCost=0; //
   int? maxPlayCost=20;
@@ -39,6 +45,10 @@ class SearchParameter{
       ..cardTypes = json['cardTypes'] != null ? Set<String>.from(json['cardTypes']) : null
       ..typeOperation = json['typeOperation'] as int? ?? 1
       ..types = (json['types'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {}
+      ..forms = (json['forms'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {}
+      ..formOperation = json['formOperation'] as int? ?? 1
+      ..attributes = (json['attributes'] as List<dynamic>?)?.map((e) => e as String).toSet() ?? {}
+      ..attributeOperation = json['attributeOperation'] as int? ?? 1
       ..minPlayCost = json['minPlayCost'] as int?
       ..maxPlayCost = json['maxPlayCost'] as int?
       ..minDp = json['minDp'] as int?
@@ -53,7 +63,8 @@ class SearchParameter{
       ..isOrderDesc = json['isOrderDesc'] as bool? ?? false
       ..isEnglishCardInclude = json['isEnglishCardInclude'] as bool? ?? true;
   }
-  Map<String, dynamic> toJson() {
+  
+  Map<String, dynamic> toJson(){
     final Map<String, dynamic> data = {};
     if (searchString != null) data['searchString'] = searchString;
     if (noteId != null) data['noteId'] = noteId;
@@ -77,13 +88,19 @@ class SearchParameter{
     
     data['types'] = types.toList();
     data['typeOperation'] = typeOperation;
+    
+    data['forms'] = forms.toList();
+    data['formOperation'] = formOperation;
+    
+    data['attributes'] = attributes.toList();
+    data['attributeOperation'] = attributeOperation;
 
     return data;
   }
 
   @override
   String toString() {
-    return 'SearchParameter{ searchString: $searchString, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
+    return 'SearchParameter{ searchString: $searchString, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
   }
 
   void reset() {
@@ -97,6 +114,10 @@ class SearchParameter{
     typeOperation =1; 
 
     types = {};
+    forms = {};
+    formOperation = 1;
+    attributes = {};
+    attributeOperation = 1;
 
     minPlayCost=0; 
     maxPlayCost=20;

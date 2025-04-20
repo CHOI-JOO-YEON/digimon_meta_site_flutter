@@ -519,16 +519,29 @@ class CardService {
                 child: Wrap(
                     spacing: 8,
                     runSpacing: 4,
-                    children: attributes
-                        .map((attribute) => Chip(
+                    children: attributes.expand((attribute) {
+                      // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
+                      if (attribute.contains('/')) {
+                        final parts = attribute.split('/');
+                        return parts.map((part) => Chip(
                               label: Text(
-                                attribute,
+                                part.trim(),
                                 style: TextStyle(
-                                    fontSize: fontSize *
-                                        0.9), // Chip 내부 텍스트의 폰트 크기를 조정
+                                    fontSize: fontSize * 0.9),
                               ),
-                            ))
-                        .toList())),
+                            ));
+                      } else {
+                        // 기존과 같이 단일 칩으로 표시
+                        return [
+                          Chip(
+                            label: Text(
+                              attribute,
+                              style: TextStyle(fontSize: fontSize * 0.9),
+                            ),
+                          )
+                        ];
+                      }
+                    }).toList())),
           ],
         ),
       ),
