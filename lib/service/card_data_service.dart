@@ -363,7 +363,7 @@ class CardDataService {
         korForm = '아머체';
         break;
       case 'D_REAPER':
-        korForm = '디・리퍼';
+        korForm = '디·리퍼';
         break;
       case 'UNKNOWN':
         korForm = '불명';
