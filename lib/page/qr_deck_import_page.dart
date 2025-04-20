@@ -33,8 +33,15 @@ class _QrDeckImportPageState extends State<QrDeckImportPage> {
   Future<void> _processDeckParam() async {
     final param = widget.deckParam;
     if (param != null && param.isNotEmpty) {
-      deckBuild = DeckService().importDeckQr(param, context);
-      deckBuild?.deckName = 'QR';
+      try {
+        deckBuild = DeckService().importDeckQr(param, context);
+        deckBuild?.deckName = 'QR';
+      } catch (e) {
+        // Handle parsing errors gracefully
+        print('Error processing QR deck parameter: $e');
+        deckBuild = DeckBuild(context);
+        deckBuild?.deckName = 'Empty Deck';
+      }
     }
     context.navigateTo(DeckBuilderRoute(deck: deckBuild));
   }

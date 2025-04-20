@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
@@ -372,19 +373,57 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
 
   String getQrUrl() {
     String url = "$baseUrl/qr?";
-
+    
     Map<int, int> combinedMap = {
       ...deckMap.map((key, value) => MapEntry(key.cardId!, value)),
       ...tamaMap.map((key, value) => MapEntry(key.cardId!, value)),
     };
 
-    String deckParam = combinedMap.entries
+    // Use 'v2:' prefix for new format to maintain backward compatibility
+    // Optimize by:
+    // 1. Using base64 encoding instead of URL parameter format
+    // 2. Compressing card IDs by sorting and using relative differences
+    if (combinedMap.isEmpty) {
+      return "$url${Uri.encodeComponent("")}";
+    }
+
+    // New optimized format
+    List<int> sortedIds = combinedMap.keys.toList()..sort();
+    List<int> data = [];
+    
+    // First value is stored directly
+    if (sortedIds.isNotEmpty) {
+      data.add(sortedIds[0]);
+      data.add(combinedMap[sortedIds[0]]!);
+      
+      // Subsequent values are stored as differences from previous
+      for (int i = 1; i < sortedIds.length; i++) {
+        // Store difference from previous ID
+        data.add(sortedIds[i] - sortedIds[i-1]);
+        data.add(combinedMap[sortedIds[i]]!);
+      }
+    }
+    
+    // Convert to bytes and encode as base64
+    Uint8List bytes = Uint8List(data.length * 2);
+    ByteData byteData = ByteData.view(bytes.buffer);
+    
+    for (int i = 0; i < data.length; i++) {
+      byteData.setUint16(i * 2, data[i], Endian.big);
+    }
+    
+    String encoded = "v2:${base64Url.encode(bytes)}";
+    
+    // Fall back to old format if new format is somehow larger
+    String oldFormatParam = combinedMap.entries
         .map((entry) => "${entry.key}=${entry.value}")
         .join(",");
-
-    String encoded = Uri.encodeComponent(deckParam);
-
-    url += "deck=$encoded";
+    String oldEncoded = oldFormatParam;
+    
+    // Use whichever format is smaller
+    encoded = encoded.length < oldEncoded.length ? encoded : oldEncoded;
+    
+    url += "deck=${Uri.encodeComponent(encoded)}";
     return url;
   }
 

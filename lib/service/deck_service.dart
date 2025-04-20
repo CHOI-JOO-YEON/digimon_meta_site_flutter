@@ -1326,13 +1326,51 @@ class DeckService {
   }
 
   // Parse deck string with format "cardId1=count1,cardId2=count2,..."
+  // Or the new optimized format "v2:base64encodeddata"
   Map<int, int> parseDeckString(String deckString) {
     Map<int, int> result = {};
 
     if (deckString.isEmpty) {
       return result;
     }
-
+    
+    // Check if it's the new optimized format
+    if (deckString.startsWith('v2:')) {
+      try {
+        // Extract the base64 data (remove 'v2:' prefix)
+        String base64Data = deckString.substring(3);
+        // Decode base64 to binary
+        Uint8List bytes = base64Url.decode(base64Data);
+        ByteData byteData = ByteData.view(bytes.buffer);
+        
+        // Each entry consists of two integers (card ID and count)
+        int entryCount = bytes.length ~/ 4; // 2 uint16 values per entry
+        
+        if (entryCount > 0) {
+          // First value is stored directly
+          int currentId = byteData.getUint16(0, Endian.big);
+          int count = byteData.getUint16(2, Endian.big);
+          result[currentId] = count;
+          
+          // Following entries are stored as differences
+          for (int i = 1; i < entryCount; i++) {
+            int idDiff = byteData.getUint16(i * 4, Endian.big);
+            int nextCount = byteData.getUint16(i * 4 + 2, Endian.big);
+            
+            currentId += idDiff;
+            result[currentId] = nextCount;
+          }
+        }
+        print("result: $result");
+        return result;
+        
+      } catch (e) {
+        // If there's an error parsing the new format, fall back to old format
+        print('Error parsing new QR format: $e');
+      }
+    }
+    
+    // Original format parsing (fallback)
     List<String> pairs = deckString.split(",");
     for (String pair in pairs) {
       if (pair.contains("=")) {
