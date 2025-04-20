@@ -56,9 +56,23 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearKakaoAuth() {
+    // Clear cookies that might be related to Kakao auth
+    final cookies = html.document.cookie!.split(';');
+    for (var cookie in cookies) {
+      final parts = cookie.trim().split('=');
+      final name = parts[0];
+      if (name.contains('kakao') || name.contains('_kp') || name.contains('_ka')) {
+        final path = '/';
+        html.document.cookie = '$name=; path=$path; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      }
+    }
+  }
+
   Future<void> logout() async {
     bool isLogout = await UserApi().logout();
     if(isLogout){
+      clearKakaoAuth();
       _nickname = null;
       _role = null;
       html.window.localStorage.remove('nickname');
@@ -67,10 +81,10 @@ class UserProvider with ChangeNotifier {
       _isLogin=false;
       notifyListeners();
     }
-
   }
 
   Future<void> unAuth() async {
+    clearKakaoAuth();
     _nickname = null;
     _role = null;
     html.window.localStorage.remove('nickname');
