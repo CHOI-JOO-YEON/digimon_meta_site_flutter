@@ -889,7 +889,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '그룹 A:', 
+                        '그룹 A', 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: titleColor,
@@ -956,7 +956,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '그룹 B:', 
+                        '그룹 B', 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: titleColor,
