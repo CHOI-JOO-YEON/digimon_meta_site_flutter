@@ -9,9 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'package:image_downloader_web/image_downloader_web.dart';
+import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 
 @RoutePage()
 class LimitInfoPage extends StatefulWidget {
@@ -22,6 +28,12 @@ class LimitInfoPage extends StatefulWidget {
 class _LimitInfoPageState extends State<LimitInfoPage> {
   // 확장된 패널을 추적하기 위한 Set
   final Set<DateTime> _expandedPanels = {};
+  // 현재 다운로드 중인 금제 날짜를 저장
+  DateTime? _capturingDate;
+  // 이미지 생성 오버레이 컨트롤러
+  OverlayEntry? _overlayEntry;
+  // 이미지 생성 완료 콜백
+  VoidCallback? _onImageReady;
   
   // 입수처로 카드를 검색하는 함수
   void searchNote(int noteId) {
@@ -29,6 +41,169 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     searchParameter.noteId = noteId;
     context.navigateTo(DeckBuilderRoute(
         searchParameterString: json.encode(searchParameter.toJson())));
+  }
+
+  // 특정 금제 정보를 이미지로 캡처하는 함수
+  Future<void> _captureAndDownloadImage(DateTime limitDate, LimitDto limitDto, LimitComparison? comparison) async {
+    setState(() {
+      _capturingDate = limitDate;
+    });
+
+    try {
+      // 다운로드 시작 알림
+      ToastOverlay.show(context, '이미지를 저장하는 중입니다...', type: ToastType.info);
+      
+      // 고정 사이즈 이미지를 위한 오버레이 생성
+      final completer = Completer<ui.Image>();
+      final key = GlobalKey();
+      
+      _overlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+          left: -10000, // 화면 밖으로 배치
+          child: Material(
+            child: RepaintBoundary(
+              key: key,
+              child: Container(
+                width: 600, // 고정 너비
+                color: Colors.white,
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 금제 정보 헤더
+                    _buildImageHeader(limitDate),
+                    
+                    // 금제 내용
+                    _buildImageContent(context, limitDto, comparison),
+                    
+                    // 푸터
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Text(
+                          'Image created using DGCHub (dgchub.com)',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      
+      // 오버레이 추가
+      Overlay.of(context).insert(_overlayEntry!);
+      
+      // 이미지 렌더링 완료 대기 (약간의 지연 추가)
+      await Future.delayed(Duration(milliseconds: 500));
+      
+      // 이미지 캡처
+      RenderRepaintBoundary boundary = key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      
+      // 고해상도 이미지를 위한 픽셀 비율 설정
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      
+      // 오버레이 제거
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      
+      // 이미지를 파일로 변환
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData != null) {
+        // 금제 날짜를 파일명으로 사용
+        final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+        final fileName = '디지몬_금제_${dateFormat.format(limitDate)}.png';
+        
+        // 웹에서 이미지 다운로드
+        await WebImageDownloader.downloadImageFromUInt8List(
+          uInt8List: byteData.buffer.asUint8List(),
+          name: fileName,
+          imageType: ImageType.png
+        );
+        
+        // 성공 알림
+        ToastOverlay.show(context, '이미지가 성공적으로 저장되었습니다', type: ToastType.success);
+      }
+    } catch (e) {
+      ToastOverlay.show(context, '이미지 저장 중 오류가 발생했습니다: $e', type: ToastType.error);
+      
+      // 오류 발생 시 오버레이 제거
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    } finally {
+      setState(() {
+        _capturingDate = null;
+      });
+    }
+  }
+  
+  // 이미지 용 헤더 위젯
+  Widget _buildImageHeader(DateTime date) {
+    final dateFormat = DateFormat('yyyy년 MM월 dd일');
+    final formattedDate = dateFormat.format(date);
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 사이트 제목
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              '디지몬 카드 게임 금제 정보',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'JalnanGothic',
+              ),
+            ),
+          ),
+        ),
+        Divider(thickness: 2),
+        SizedBox(height: 8),
+        
+        // 날짜 (상태 표시 제거)
+        Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.blue.shade200),
+            ),
+            child: Text(
+              formattedDate,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade800,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 16),
+        Divider(),
+      ],
+    );
+  }
+  
+  // 이미지 용 컨텐츠 위젯
+  Widget _buildImageContent(BuildContext context, LimitDto limit, LimitComparison? comparison) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 기존 금제 내용 위젯 재사용
+        _buildLimitContent(context, limit, comparison),
+      ],
+    );
   }
 
   @override
@@ -39,7 +214,9 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
         limits.sort((a, b) => b.key.compareTo(a.key)); // 날짜 내림차순 정렬
 
         if (limits.isEmpty) {
-          return Center(child: CircularProgressIndicator());
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
         // 현재 적용 중인 금제 찾기
@@ -132,6 +309,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   Widget _buildCurrentLimitSection(BuildContext context, DateTime date, LimitDto limit, LimitComparison? comparison) {
     final dateFormat = DateFormat('yyyy년 MM월 dd일');
     final formattedDate = dateFormat.format(date);
+    final isCapturing = _capturingDate == date;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -167,6 +345,24 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                // 다운로드 버튼 추가
+                IconButton(
+                  icon: isCapturing 
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        ),
+                      )
+                    : Icon(Icons.download, color: Colors.blue),
+                  tooltip: '이미지로 저장',
+                  onPressed: isCapturing 
+                    ? null 
+                    : () => _captureAndDownloadImage(date, limit, comparison),
+                ),
               ],
             ),
           ),
@@ -187,56 +383,83 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     final isExpanded = _expandedPanels.contains(date);
     final currentDate = DateTime.now();
     final isFuture = date.isAfter(currentDate);
+    final isCapturing = _capturingDate == date;
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ExpansionTile(
-        initiallyExpanded: isExpanded,
-        onExpansionChanged: (expanded) {
-          setState(() {
-            if (expanded) {
-              _expandedPanels.add(date);
-            } else {
-              _expandedPanels.remove(date);
-            }
-          });
-        },
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                formattedDate,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: isFuture ? Colors.green : Colors.grey,
-                ),
-              ),
-            ),
-            if (isFuture)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  '예정',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+      child: Column(
+        children: [
+          ExpansionTile(
+            initiallyExpanded: isExpanded,
+            onExpansionChanged: (expanded) {
+              setState(() {
+                if (expanded) {
+                  _expandedPanels.add(date);
+                } else {
+                  _expandedPanels.remove(date);
+                }
+              });
+            },
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    formattedDate,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isFuture ? Colors.green : Colors.grey,
+                    ),
                   ),
                 ),
+                if (isFuture)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      '예정',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                // 다운로드 버튼 추가
+                IconButton(
+                  icon: isCapturing 
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isFuture ? Colors.green : Colors.grey,
+                          ),
+                        ),
+                      )
+                    : Icon(
+                        Icons.download, 
+                        color: isFuture ? Colors.green : Colors.grey
+                      ),
+                  tooltip: '이미지로 저장',
+                  onPressed: isCapturing 
+                    ? null 
+                    : () => _captureAndDownloadImage(date, limit, comparison),
+                ),
+              ],
+            ),
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _buildLimitContent(context, limit, comparison),
               ),
-          ],
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildLimitContent(context, limit, comparison),
+            ],
           ),
         ],
       ),
@@ -258,205 +481,284 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       children: [
         // 금지 카드 섹션
         if (limit.allowedQuantityMap.entries.where((e) => e.value == 0).isNotEmpty) ...[
-          const Text(
-            '금지',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          const SizedBox(height: 8),
           Container(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 8,
-              runSpacing: 8,
-              children: _getSortedCardChips(
-                limit.allowedQuantityMap.entries
-                  .where((e) => e.value == 0)
-                  .map((e) => e.key)
-                  .toList(),
-                Colors.red,
-                newlyAddedCards: newlyBannedCards,
-              ),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.red.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
-          ),
-          
-          // 금지 해제된 카드 섹션 (있는 경우)
-          if (removedBanCards.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.green, size: 16),
-                      const SizedBox(width: 4),
+                      Icon(Icons.block, color: Colors.red),
+                      const SizedBox(width: 8),
                       Text(
-                        '금지 해제된 카드',
+                        '금지',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          color: Colors.red,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
+                ),
+                Divider(height: 1, thickness: 1, color: Colors.red.shade100),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Wrap(
                     alignment: WrapAlignment.start,
                     spacing: 8,
                     runSpacing: 8,
                     children: _getSortedCardChips(
-                      removedBanCards,
-                      Colors.green,
-                      isRemovedCard: true,
+                      limit.allowedQuantityMap.entries
+                        .where((e) => e.value == 0)
+                        .map((e) => e.key)
+                        .toList(),
+                      Colors.red,
+                      newlyAddedCards: newlyBannedCards,
+                    ),
+                  ),
+                ),
+                
+                // 금지 해제된 카드 섹션 (있는 경우)
+                if (removedBanCards.isNotEmpty) ...[
+                  Divider(height: 1, thickness: 1, color: Colors.red.shade100),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.green, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              '금지 해제된 카드',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _getSortedCardChips(
+                            removedBanCards,
+                            Colors.green,
+                            isRemovedCard: true,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
-          ],
-          
-          const SizedBox(height: 16),
+          ),
         ],
         
         // 제한 카드 섹션
         if (limit.allowedQuantityMap.entries.where((e) => e.value == 1).isNotEmpty) ...[
-          const Text(
-            '제한',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.orange,
-            ),
-          ),
-          const SizedBox(height: 8),
           Container(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 8,
-              runSpacing: 8,
-              children: _getSortedCardChips(
-                limit.allowedQuantityMap.entries
-                  .where((e) => e.value == 1)
-                  .map((e) => e.key)
-                  .toList(),
-                Colors.orange,
-                newlyAddedCards: newlyRestrictedCards,
-              ),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
-          ),
-          
-          // 제한 해제된 카드 섹션 (있는 경우)
-          if (removedRestrictCards.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.blue, size: 16),
-                      const SizedBox(width: 4),
+                      Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                      const SizedBox(width: 8),
                       Text(
-                        '제한 해제된 카드',
+                        '제한',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: Colors.orange,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
+                ),
+                Divider(height: 1, thickness: 1, color: Colors.orange.shade100),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Wrap(
                     alignment: WrapAlignment.start,
                     spacing: 8,
                     runSpacing: 8,
                     children: _getSortedCardChips(
-                      removedRestrictCards,
-                      Colors.blue,
-                      isRemovedCard: true,
+                      limit.allowedQuantityMap.entries
+                        .where((e) => e.value == 1)
+                        .map((e) => e.key)
+                        .toList(),
+                      Colors.orange,
+                      newlyAddedCards: newlyRestrictedCards,
+                    ),
+                  ),
+                ),
+                
+                // 제한 해제된 카드 섹션 (있는 경우)
+                if (removedRestrictCards.isNotEmpty) ...[
+                  Divider(height: 1, thickness: 1, color: Colors.orange.shade100),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              '제한 해제된 카드',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _getSortedCardChips(
+                            removedRestrictCards,
+                            Colors.blue,
+                            isRemovedCard: true,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
-          ],
-          
-          const SizedBox(height: 16),
+          ),
         ],
         
         // 조합 제한 섹션
         if (limit.limitPairs.isNotEmpty) ...[
-          const Text(
-            '조합 제한',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.purple,
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.purple.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.purple.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          ...limit.limitPairs.map((pair) {
-            // 새로 추가된 페어인지 확인
-            bool isNewPair = newLimitPairs.any((newPair) => 
-              _arePairsEqual(pair, newPair));
-            return _buildLimitPairSection(context, pair, isNewPair: isNewPair);
-          }),
-          
-          // 제거된 페어 섹션 (있는 경우)
-          if (removedLimitPairs.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.teal, size: 16),
-                      const SizedBox(width: 4),
+                      Icon(Icons.compare_arrows, color: Colors.purple),
+                      const SizedBox(width: 8),
                       Text(
-                        '제거된 조합 제한',
+                        '조합 제한',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: Colors.purple,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  ...removedLimitPairs.map((pair) =>
-                    _buildLimitPairSection(context, pair, isRemovedPair: true)
+                ),
+                Divider(height: 1, thickness: 1, color: Colors.purple.shade100),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...limit.limitPairs.map((pair) {
+                        // 새로 추가된 페어인지 확인
+                        bool isNewPair = newLimitPairs.any((newPair) => 
+                          _arePairsEqual(pair, newPair));
+                        return _buildLimitPairSection(context, pair, isNewPair: isNewPair);
+                      }),
+                    ],
+                  ),
+                ),
+                
+                // 제거된 페어 섹션 (있는 경우)
+                if (removedLimitPairs.isNotEmpty) ...[
+                  Divider(height: 1, thickness: 1, color: Colors.purple.shade100),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.teal, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              '제거된 조합 제한',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ...removedLimitPairs.map((pair) =>
+                          _buildLimitPairSection(context, pair, isRemovedPair: true)
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
+              ],
             ),
-          ],
+          ),
         ],
       ],
     );
@@ -469,14 +771,23 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     bool isRemovedPair = false,
   }) {
     // 페어 컨테이너를 위한 스타일 설정
+    Color bgColor = isRemovedPair ? Colors.grey.shade50 : Colors.white;
+    Color borderColor = isNewPair 
+      ? Colors.yellow 
+      : (isRemovedPair ? Colors.grey.shade300 : Colors.purple.shade200);
+    
     BoxDecoration decoration = BoxDecoration(
-      color: isRemovedPair ? Colors.grey.shade50 : null,
+      color: bgColor,
       borderRadius: BorderRadius.circular(8),
-      border: isNewPair 
-        ? Border.all(color: Colors.yellow, width: 2)
-        : (isRemovedPair 
-            ? Border.all(color: Colors.grey.shade300, width: 1)
-            : null),
+      border: Border.all(color: borderColor, width: isNewPair ? 2 : 1),
+      boxShadow: isNewPair ? [
+        BoxShadow(
+          color: Colors.yellow.withOpacity(0.3),
+          spreadRadius: 1,
+          blurRadius: 2,
+          offset: Offset(0, 1),
+        )
+      ] : null,
     );
     
     Color textColor = isRemovedPair ? Colors.grey : Colors.black;
@@ -484,100 +795,188 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(isNewPair || isRemovedPair ? 8 : 0),
       decoration: decoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                '다음 중 하나만 선택 가능:',
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: isNewPair ? FontWeight.bold : FontWeight.normal,
-                ),
+          // 헤더 영역
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isRemovedPair 
+                ? Colors.grey.shade100
+                : Colors.purple.shade100.withOpacity(0.5),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(7),
+                topRight: Radius.circular(7),
               ),
-              if (isNewPair)
-                Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.swap_horiz, 
+                  color: isRemovedPair ? Colors.grey : Colors.purple.shade700,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '그룹 하나만 선택 가능',
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: isNewPair ? FontWeight.bold : FontWeight.normal,
                   ),
-                  child: Text(
-                    'NEW',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                ),
+                if (isNewPair)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'NEW',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                ),
-              if (isRemovedPair)
-                Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '해제',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                if (isRemovedPair)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '해제',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
+              ],
+            ),
+          ),
+          
+          // 카드 그룹들
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 그룹 A
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isRemovedPair 
+                      ? Colors.grey.shade50 
+                      : Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isRemovedPair 
+                        ? Colors.grey.shade200 
+                        : Colors.purple.shade200,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '그룹 A:', 
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _getSortedCardChips(
+                          pair.acardPairNos, 
+                          isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
+                          isRemovedCard: isRemovedPair,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // 그룹 A
-          Text(
-            '그룹 A:', 
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: titleColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 8,
-              runSpacing: 8,
-              children: _getSortedCardChips(
-                pair.acardPairNos, 
-                isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
-                isRemovedCard: isRemovedPair,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // 그룹 B
-          Text(
-            '그룹 B:', 
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: titleColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 8,
-              runSpacing: 8,
-              children: _getSortedCardChips(
-                pair.bcardPairNos, 
-                isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
-                isRemovedCard: isRemovedPair,
-              ),
+                
+                // 중앙에 OR 표시
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isRemovedPair 
+                            ? Colors.grey.shade300 
+                            : Colors.purple.shade300,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // 그룹 B
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isRemovedPair 
+                      ? Colors.grey.shade50 
+                      : Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isRemovedPair 
+                        ? Colors.grey.shade200 
+                        : Colors.purple.shade200,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '그룹 B:', 
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _getSortedCardChips(
+                          pair.bcardPairNos, 
+                          isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
+                          isRemovedCard: isRemovedPair,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -746,13 +1145,17 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       );
     }
     
+    // 이미지 저장을 위한 고정 크기 설정
+    final double cardWidth = 65; // 약간 작게 조정
+    final double cardHeight = 91; // 카드 비율 유지 (1:1.4)
+    
     if (card == null) {
       // 카드가 없는 경우 대체 UI 표시
       return Container(
         margin: const EdgeInsets.only(right: 4, bottom: 4),
         decoration: decoration,
-        width: 70,
-        height: 98, // 카드 비율 (1:1.4)
+        width: cardWidth,
+        height: cardHeight,
         child: Stack(
           children: [
             Center(
@@ -778,7 +1181,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       child: Stack(
         children: [
           CustomCard(
-            width: 70, // 이미지 크기와 비슷하게 조정
+            width: cardWidth, // 고정된 크기 사용
             card: card,
             cardPressEvent: (selectedCard) {
               // 카드 클릭 시 동작
