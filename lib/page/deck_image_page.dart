@@ -252,14 +252,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
             uInt8List: byteData!.buffer.asUint8List(),
             name: '${widget.deck.deckName}.png',
             imageType: ImageType.png);
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     double maxWidth = MediaQuery.of(context).size.width;
-
     bottomSheetScale =
         isPortrait ? (maxWidth * 2) / size : (maxWidth * 0.6) / size;
 
@@ -385,7 +383,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Container(
-                width: isHorizontal?horizontalSize: size,
+                width: isHorizontal ? horizontalSize : size,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: deckImageColorService
@@ -409,7 +407,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                             width: 10,
                           ),
                         SizedBox(
-                          width: 984,
+                          width: isHorizontal ? (horizontalSize - 636) : 984,
                           child: _deckImageCenterWidget(scaleFactor, context),
                         ),
                       ],
@@ -474,9 +472,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
             width: 150,
             height: 150,
             decoration: BoxDecoration(
-              // color: Colors.white,
-              // borderRadius: BorderRadius.circular(8),
-            ),
+                // color: Colors.white,
+                // borderRadius: BorderRadius.circular(8),
+                ),
             child: QrCodeWidget(
               data: widget.deck.getQrUrl(),
             ),
@@ -508,21 +506,23 @@ class _DeckImagePageState extends State<DeckImagePage> {
       key: gridKey,
       children: [
         const SizedBox(height: 5),
-        _buildGridView(
-            context,
-            displayTamas,
-            10,
-            deckImageColorService.selectedDeckImageColor.cardColor,
-            '디지타마 덱',
-            scaleFactor),
+        if (displayTamas.isNotEmpty)
+          _buildGridView(
+              context,
+              displayTamas,
+              10,
+              deckImageColorService.selectedDeckImageColor.cardColor,
+              '디지타마 덱',
+              scaleFactor),
         const SizedBox(height: 5),
-        _buildGridView(
-            context,
-            displayDecks,
-            10,
-            deckImageColorService.selectedDeckImageColor.cardColor,
-            '메인 덱',
-            scaleFactor),
+        if (displayDecks.isNotEmpty)
+          _buildGridView(
+              context,
+              displayDecks,
+              10,
+              deckImageColorService.selectedDeckImageColor.cardColor,
+              '메인 덱',
+              scaleFactor),
         const SizedBox(height: 5),
       ],
     );
@@ -586,22 +586,22 @@ class _DeckImagePageState extends State<DeckImagePage> {
 
 class QrCodeWidget extends StatefulWidget {
   final String data;
-  
+
   const QrCodeWidget({Key? key, required this.data}) : super(key: key);
-  
+
   @override
   State<QrCodeWidget> createState() => _QrCodeWidgetState();
 }
 
 class _QrCodeWidgetState extends State<QrCodeWidget> {
   late Future<bool> _qrValidationFuture;
-  
+
   @override
   void initState() {
     super.initState();
     _qrValidationFuture = _validateQrData();
   }
-  
+
   Future<bool> _validateQrData() async {
     // 비동기 작업으로 QR 예외를 미리 체크
     try {
@@ -611,7 +611,7 @@ class _QrCodeWidgetState extends State<QrCodeWidget> {
         // 실제 예외와 일치하는 형태로 반환
         return false;
       }
-      
+
       // QR 라이브러리를 사용하여 검증 시도
       // 이 검증은 실제 QR 코드를 그리지 않고 데이터 크기만 확인
       return true;
@@ -620,15 +620,15 @@ class _QrCodeWidgetState extends State<QrCodeWidget> {
       return false;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 150,
       height: 150,
       decoration: BoxDecoration(
-        // color: Colors.white,
-      ),
+          // color: Colors.white,
+          ),
       child: FutureBuilder<bool>(
         future: _qrValidationFuture,
         builder: (context, snapshot) {
@@ -644,7 +644,7 @@ class _QrCodeWidgetState extends State<QrCodeWidget> {
               ),
             );
           }
-          
+
           // 유효성 검사 통과: QR 코드 표시 시도
           if (snapshot.hasData && snapshot.data == true) {
             // try-catch로 QR 코드 위젯 래핑하여 런타임 예외 처리
@@ -681,14 +681,14 @@ class _QrCodeWidgetState extends State<QrCodeWidget> {
               return _buildErrorWidget();
             }
           }
-          
+
           // 유효성 검사 실패 또는 오류: 에러 메시지 표시
           return _buildErrorWidget();
         },
       ),
     );
   }
-  
+
   Widget _buildErrorWidget() {
     return Center(
       child: Column(
