@@ -166,17 +166,44 @@ class CardDataService {
       bool matches = true;
       
       if (params.searchString != null && params.searchString!.isNotEmpty) {
-        String searchLower = params.searchString!.toLowerCase();
+        String searchString = params.searchString!;
         bool textMatches = false;
+        bool isRegex = false;
+        RegExp? regex;
+        
+        // Try to parse as regex
+        try {
+          regex = RegExp(searchString, caseSensitive: false);
+          isRegex = true;
+        } catch (e) {
+          // If invalid regex, fall back to normal search
+          searchString = searchString.toLowerCase();
+        }
         
         for (LocaleCardData localeData in card.localeCardData ?? []) {
-          if (localeData.name.toLowerCase().contains(searchLower) == true || localeData.effect?.toLowerCase().contains(searchLower) == true || localeData.sourceEffect?.toLowerCase().contains(searchLower) == true) {
+          bool matches = false;
+          if (isRegex) {
+            matches = regex!.hasMatch(localeData.name) ||
+                    (localeData.effect != null && regex.hasMatch(localeData.effect!)) ||
+                    (localeData.sourceEffect != null && regex.hasMatch(localeData.sourceEffect!));
+          } else {
+            matches = localeData.name.toLowerCase().contains(searchString) ||
+                    (localeData.effect?.toLowerCase().contains(searchString) == true) ||
+                    (localeData.sourceEffect?.toLowerCase().contains(searchString) == true);
+          }
+          
+          if (matches) {
             textMatches = true;
             break;
           }
         }
         
-        bool cardNoMatches = card.cardNo?.toLowerCase().contains(searchLower) == true;
+        bool cardNoMatches = false;
+        if (isRegex) {
+          cardNoMatches = card.cardNo != null && regex!.hasMatch(card.cardNo!);
+        } else {
+          cardNoMatches = card.cardNo?.toLowerCase().contains(searchString) == true;
+        }
         
         matches = textMatches || cardNoMatches;
         if (!matches) return false;

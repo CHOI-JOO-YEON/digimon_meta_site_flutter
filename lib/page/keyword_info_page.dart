@@ -66,13 +66,26 @@ class _KeywordInfoPageState extends State<KeywordInfoPage> {
 
   // 키워드로 카드 검색 화면으로 이동
   void _searchCardsByKeyword(BuildContext context, String keyword) {
+    // 키워드 별칭 맵핑
+    Map<String, List<String>> keywordAliases = {
+      'S 어택': ['시큐리티 어택'],
+      '시큐리티 어택': ['S 어택'],
+      // 필요한 다른 별칭들을 여기에 추가
+    };
+
+    // 검색할 키워드 목록 생성
+    List<String> keywordsToSearch = [keyword];
+    if (keywordAliases.containsKey(keyword)) {
+      keywordsToSearch.addAll(keywordAliases[keyword]!);
+    }
+
     // 다이얼로그 표시
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('키워드로 카드 검색'),
-          content: Text('"$keyword" 키워드를 가진 카드를 검색하시겠습니까?'),
+          content: Text('$keyword 키워드를 가진 카드를 검색하시겠습니까?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -86,7 +99,10 @@ class _KeywordInfoPageState extends State<KeywordInfoPage> {
                 
                 // 검색 파라미터 생성
                 SearchParameter searchParameter = SearchParameter();
-                searchParameter.searchString = keyword;
+                
+                // 여러 키워드를 OR 조건으로 결합
+                String regexPattern = keywordsToSearch.map((k) => '《.*?' + k + '.*?》').join('|');
+                searchParameter.searchString = regexPattern;
                 
                 // 검색 파라미터를 JSON으로 변환하여 DeckBuilderRoute로 전달
                 context.navigateTo(

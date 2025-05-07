@@ -292,8 +292,8 @@
       "patterns": []
     },
     {
-      "name": "링크",
-      "description": "이 디지몬의 링크 매수 상한을 조절한다.",
+      "name": "링크 +",
+      "description": "이 디지몬의 링크 매수 상한 +.",
       "patterns": [
         {
           "pattern": "^링크\\s*\\+\\s*\\+?(\\d+)$",
