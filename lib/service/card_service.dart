@@ -627,7 +627,7 @@ class CardService {
       {
         'pattern': r'〔[^〔〕]*〕',
         'colorEvaluator': (String matchedText) =>
-            matchedText.contains('조그레스') || matchedText.contains('진화')
+            matchedText.contains('조그레스') || matchedText.contains('진화') || matchedText.contains('어플합체')
                 ? const Color.fromRGBO(59, 88, 101, 1.0)
                 : const Color.fromRGBO(163, 23, 99, 1),
       },
