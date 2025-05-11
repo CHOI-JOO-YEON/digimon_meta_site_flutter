@@ -69,6 +69,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     listenForOAuthToken();
+    listenForLogoutEvent();
     DioClient().onAuthError = () {
       Provider.of<UserProvider>(context, listen: false).unAuth();
     };
@@ -81,6 +82,16 @@ class _MyAppState extends State<MyApp> {
       html.MessageEvent messageEvent = event as html.MessageEvent;
       var code = messageEvent.data['code'];
       await UserService().oauthLogin(code, context);
+    });
+  }
+
+  void listenForLogoutEvent() {
+    html.window.addEventListener('message', (event) async {
+      html.MessageEvent messageEvent = event as html.MessageEvent;
+      var logoutSuccess = messageEvent.data['logout_success'];
+      if (logoutSuccess == true) {
+        Provider.of<UserProvider>(context, listen: false).unAuth();
+      }
     });
   }
 

@@ -1,5 +1,6 @@
 import 'package:digimon_meta_site_flutter/api/user_api.dart';
 import 'package:digimon_meta_site_flutter/model/account/login_response_dto.dart';
+import 'package:digimon_meta_site_flutter/service/user_service.dart';
 import 'package:flutter/material.dart';
 
 import '../model/user.dart';
@@ -32,7 +33,14 @@ class UserProvider with ChangeNotifier {
   Future<bool> loginCheck() async {
     bool isLogin = await UserApi().isLogin();
     if(!isLogin) {
-      logout();
+      clearKakaoAuth();
+      _nickname = null;
+      _role = null;
+      html.window.localStorage.remove('nickname');
+      html.window.localStorage.remove('role');
+      html.window.localStorage.remove('userNo');
+      _isLogin = false;
+      notifyListeners();
     }
     return isLogin;
   }
@@ -69,8 +77,9 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
-    bool isLogout = await UserApi().logout();
+  Future<void> logout(BuildContext context) async {
+    // 새로운 팝업 방식 로그아웃 사용
+    bool isLogout = await UserService().logoutWithPopup(context);
     if(isLogout){
       clearKakaoAuth();
       _nickname = null;

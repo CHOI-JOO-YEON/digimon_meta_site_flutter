@@ -48,12 +48,21 @@ class UserApi {
     }
     return null;
   }
-  Future<bool> logout() async {
-    final response = await dioClient.dio.post('$baseUrl/api/account/logout');
-    if(response.statusCode==200) {
-      return true;
-    }
-    return false;
-
-  }
+  // Future<bool> logout() async {
+  //   try {
+  //     final response = await dioClient.dio.post('$baseUrl/api/account/logout');
+  //     int? statusCode = response.statusCode;
+      
+  //     if(statusCode == 200) {
+  //       return true;
+  //     }
+  //     // 리다이렉트가 발생할 경우에도 성공으로 처리
+  //     if(statusCode != null && statusCode >= 300 && statusCode < 400) {
+  //       return true;
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   return false;
+  // }
 }

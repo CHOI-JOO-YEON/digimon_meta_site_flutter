@@ -82,6 +82,11 @@
             window.opener.postMessage({code: authCode}, "*");
             window.close(); // 메시지 전송 후 팝업 창 닫기
         }
+        
+        function sendLogoutSuccessToParent(success) {
+            window.opener.postMessage({logout_success: success}, "*");
+            window.close(); // 메시지 전송 후 팝업 창 닫기
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/pica@9.0.1/dist/pica.min.js"></script>
 

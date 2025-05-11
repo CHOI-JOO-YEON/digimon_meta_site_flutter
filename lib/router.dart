@@ -6,6 +6,7 @@ import 'package:digimon_meta_site_flutter/page/deck_list_page.dart';
 import 'package:digimon_meta_site_flutter/page/game_playground_page.dart';
 import 'package:digimon_meta_site_flutter/page/info_page.dart';
 import 'package:digimon_meta_site_flutter/page/kakao_login_page.dart';
+import 'package:digimon_meta_site_flutter/page/kakao_logout_page.dart';
 import 'package:digimon_meta_site_flutter/page/keyword_info_page.dart';
 import 'package:digimon_meta_site_flutter/page/limit_info_page.dart';
 import 'package:digimon_meta_site_flutter/page/main_page.dart';
@@ -28,6 +29,7 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: DeckImageRoute.page,path: "/deck-image",guards: [DeckGuard()]),
     AutoRoute(page: GamePlayGroundRoute.page,path: "/game",guards: [DeckGuard()]),
     AutoRoute(page: KakaoLoginRoute.page,path: "/login/kakao"),
+    AutoRoute(page: KakaoLogoutRoute.page,path: "/logout/kakao"),
     AutoRoute(page: QrDeckImportRoute.page,path: "/qr", meta: {'deck': 'String',},),
     AutoRoute(
       // initial: true,

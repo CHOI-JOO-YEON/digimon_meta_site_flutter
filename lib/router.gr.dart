@@ -282,6 +282,22 @@ class KakaoLoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [KakaoLogoutPage]
+class KakaoLogoutRoute extends PageRouteInfo<void> {
+  const KakaoLogoutRoute({List<PageRouteInfo>? children})
+    : super(KakaoLogoutRoute.name, initialChildren: children);
+
+  static const String name = 'KakaoLogoutRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const KakaoLogoutPage();
+    },
+  );
+}
+
+/// generated route for
 /// [KeywordInfoPage]
 class KeywordInfoRoute extends PageRouteInfo<void> {
   const KeywordInfoRoute({List<PageRouteInfo>? children})

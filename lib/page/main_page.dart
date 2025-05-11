@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
+import 'package:digimon_meta_site_flutter/service/user_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,14 @@ class MainPage extends StatelessWidget {
     String baseUrl = const String.fromEnvironment('SERVER_URL');
     String url = '$baseUrl/oauth2/authorization/kakao';
     String windowName = 'OAuthLogin';
+    String windowFeatures = 'width=800,height=600';
+    html.window.open(url, windowName, windowFeatures);
+  }
+
+    void openLogoutPopup() {
+    String baseUrl = const String.fromEnvironment('SERVER_URL');
+    String url = '$baseUrl/logout';
+    String windowName = 'Logout';
     String windowFeatures = 'width=800,height=600';
     html.window.open(url, windowName, windowFeatures);
   }
@@ -116,7 +125,7 @@ class MainPage extends StatelessWidget {
                                         ),
                                         onTap: () {
                                           userProvider.isLogin
-                                              ? userProvider.logout()
+                                              ? UserService().logoutWithPopup(context)
                                               : openOAuthPopup();
                                         },
                                       ),
@@ -250,7 +259,7 @@ class MainPage extends StatelessWidget {
                                           ),
                                           onTap: () {
                                             userProvider.isLogin
-                                                ? userProvider.logout()
+                                                ? UserService().logoutWithPopup(context)
                                                 : openOAuthPopup();
                                           },
                                         ),
