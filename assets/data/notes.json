@@ -780,7 +780,7 @@
   "releaseDate" : "2025-03-19",
   "cardOrigin" : "ENGLISH",
   "priority" : 18,
-  "cardCount" : 15,
+  "cardCount" : 1,
   "isDisable" : false
 }, {
   "noteId" : 245,
@@ -799,13 +799,21 @@
   "cardCount" : 14,
   "isDisable" : false
 }, {
-  "noteId" : 120,
-  "name" : "어드밴스 덱 더블 타이쿤 [ST-17]",
+  "noteId" : 247,
+  "name" : "어드밴스 덱 더블 타이푼 [STK-17]",
   "releaseDate" : "2025-05-16",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "STARTER_DECK",
   "priority" : null,
-  "cardCount" : 13,
-  "isDisable" : false
+  "cardCount" : 20,
+  "isDisable" : null
+}, {
+  "noteId" : 248,
+  "name" : "어드밴스 덱 더블 타이푼 [STK-17] 특전 카드",
+  "releaseDate" : "2025-05-16",
+  "cardOrigin" : "STARTER_PROMO",
+  "priority" : null,
+  "cardCount" : 27,
+  "isDisable" : null
 }, {
   "noteId" : 119,
   "name" : "부스터 팩 비기닝 옵저버 [BT-16]",
