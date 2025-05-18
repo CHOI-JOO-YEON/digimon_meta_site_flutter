@@ -51,11 +51,24 @@ class _DeckImagePageState extends State<DeckImagePage> {
   }
 
   void _showColorSetsBottomSheet() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final screenWidth = mediaQuery.size.width;
+    final isPortrait = mediaQuery.orientation == Orientation.portrait;
+    
+    // Calculate responsive values
+    final responsiveHeight = isPortrait ? screenHeight * 0.7 : screenHeight * 0.8;
+    final responsiveWidth = isPortrait ? screenWidth * 0.85 : screenWidth * 0.7;
+    
     showModalBottomSheet(
       isScrollControlled: true,
       barrierColor: Colors.transparent,
       backgroundColor: Colors.grey[100],
       context: context,
+      constraints: BoxConstraints(
+        maxWidth: responsiveWidth,
+        maxHeight: responsiveHeight,
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -64,162 +77,166 @@ class _DeckImagePageState extends State<DeckImagePage> {
             deckImageColorService.selectableColorMap.keys.toList();
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 16.0 * bottomSheetScale,
-                    vertical: 10.0 * bottomSheetScale),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '컬러 테마 선택',
-                      style: TextStyle(
-                        fontSize: 18 * bottomSheetScale,
-                        fontWeight: FontWeight.bold,
-                      ),
+            // Adaptive sizing calculations
+            final bottomSheetWidth = MediaQuery.of(context).size.width;
+            final itemSize = bottomSheetWidth * (isPortrait ? 0.08 : 0.05);
+            final fontSize = isPortrait ? 16.0 : 18.0;
+            final spacing = isPortrait ? 8.0 : 12.0;
+            
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: spacing * 2,
+                  vertical: spacing),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '컬러 테마 선택',
+                    style: TextStyle(
+                      fontSize: fontSize * 1.2,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: 10 * bottomSheetScale),
-                    Wrap(
-                        spacing: 10.0 * bottomSheetScale, // 가로 간격
-                        runSpacing: 10.0 * bottomSheetScale, // 세로 간격
-                        children: [
-                          ...List.generate(
-                            colorKeys.length,
-                            (index) {
-                              String color = colorKeys[index];
-                              Color buttonColor =
-                                  ColorService.getColorFromString(color);
-                              return GestureDetector(
-                                onTap: () {
-                                  setModalState(() {
-                                    selectColorSetKey = color;
-                                  });
-                                },
-                                child: Container(
-                                  width: 40 * bottomSheetScale,
-                                  height: 40 * bottomSheetScale,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: selectColorSetKey == color
-                                        ? buttonColor
-                                        : buttonColor.withOpacity(0.3),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setModalState(() {
-                                selectColorSetKey = 'custom';
-                              });
-                            },
-                            child: Container(
-                              width: 40 * bottomSheetScale,
-                              height: 40 * bottomSheetScale,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: selectColorSetKey == 'custom'
-                                    ? Colors.pinkAccent
-                                    : Colors.pinkAccent.withOpacity(0.3),
-                              ),
-                              child: Icon(
-                                  size: 30 * bottomSheetScale,
-                                  Icons.dashboard_customize_outlined),
-                            ),
-                          )
-                        ]),
-                    SizedBox(height: 20 * bottomSheetScale),
-                    const Divider(thickness: 2),
-                    if (selectColorSetKey != 'custom')
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: deckImageColorService
-                              .selectableColorMap[selectColorSetKey]!.length,
-                          itemBuilder: (context, index) {
-                            var deckImageColor = deckImageColorService
-                                .selectableColorMap[selectColorSetKey]![index];
-                            return InkWell(
+                  ),
+                  SizedBox(height: spacing),
+                  Wrap(
+                      spacing: spacing, // 가로 간격
+                      runSpacing: spacing, // 세로 간격
+                      children: [
+                        ...List.generate(
+                          colorKeys.length,
+                          (index) {
+                            String color = colorKeys[index];
+                            Color buttonColor =
+                                ColorService.getColorFromString(color);
+                            return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  deckImageColorService
-                                      .updateColor(deckImageColor);
+                                setModalState(() {
+                                  selectColorSetKey = color;
                                 });
                               },
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0 * bottomSheetScale),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '컬러 세트 ${index + 1}',
-                                      style: TextStyle(
-                                        fontSize: 16 * bottomSheetScale,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color:
-                                                deckImageColor.backGroundColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          width: 30 * bottomSheetScale,
-                                          height: 30 * bottomSheetScale,
-                                        ),
-                                        SizedBox(width: 8 * bottomSheetScale),
-                                        // 간격 추가
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: deckImageColor.textColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          width: 30 * bottomSheetScale,
-                                          height: 30 * bottomSheetScale,
-                                        ),
-                                        SizedBox(width: 8 * bottomSheetScale),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: deckImageColor.cardColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          width: 30 * bottomSheetScale,
-                                          height: 30 * bottomSheetScale,
-                                        ),
-                                        SizedBox(width: 8 * bottomSheetScale),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: deckImageColor.barColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          width: 30 * bottomSheetScale,
-                                          height: 30 * bottomSheetScale,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                              child: Container(
+                                width: itemSize,
+                                height: itemSize,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: selectColorSetKey == color
+                                      ? buttonColor
+                                      : buttonColor.withOpacity(0.3),
                                 ),
                               ),
                             );
                           },
                         ),
-                      ),
-                    if (selectColorSetKey == 'custom')
-                      Expanded(
-                        child: ColorPickerBottomSheet(
-                          scaleFactor: bottomSheetScale,
-                          onColorChanged: (color) {
-                            setState(() {});
+                        GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              selectColorSetKey = 'custom';
+                            });
                           },
-                        ),
-                      )
-                  ],
-                ),
+                          child: Container(
+                            width: itemSize,
+                            height: itemSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: selectColorSetKey == 'custom'
+                                  ? Colors.pinkAccent
+                                  : Colors.pinkAccent.withOpacity(0.3),
+                            ),
+                            child: Icon(
+                                size: itemSize * 0.7,
+                                Icons.dashboard_customize_outlined),
+                          ),
+                        )
+                      ]),
+                  SizedBox(height: spacing * 2),
+                  const Divider(thickness: 2),
+                  if (selectColorSetKey != 'custom')
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: deckImageColorService
+                            .selectableColorMap[selectColorSetKey]!.length,
+                        itemBuilder: (context, index) {
+                          var deckImageColor = deckImageColorService
+                              .selectableColorMap[selectColorSetKey]![index];
+                          final colorSize = itemSize * 0.8;
+                          
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                deckImageColorService
+                                    .updateColor(deckImageColor);
+                              });
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.all(spacing),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '컬러 세트 ${index + 1}',
+                                    style: TextStyle(
+                                      fontSize: fontSize,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color:
+                                              deckImageColor.backGroundColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: colorSize,
+                                        height: colorSize,
+                                      ),
+                                      SizedBox(width: spacing),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.textColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: colorSize,
+                                        height: colorSize,
+                                      ),
+                                      SizedBox(width: spacing),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.cardColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: colorSize,
+                                        height: colorSize,
+                                      ),
+                                      SizedBox(width: spacing),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: deckImageColor.barColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        width: colorSize,
+                                        height: colorSize,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  if (selectColorSetKey == 'custom')
+                    Expanded(
+                      child: ColorPickerBottomSheet(
+                        scaleFactor: isPortrait ? 1.0 : 1.2,
+                        onColorChanged: (color) {
+                          setState(() {});
+                        },
+                      ),
+                    )
+                ],
               ),
             );
           },
