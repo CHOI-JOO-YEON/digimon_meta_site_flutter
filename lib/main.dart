@@ -81,7 +81,9 @@ class _MyAppState extends State<MyApp> {
     html.window.addEventListener('message', (event) async {
       html.MessageEvent messageEvent = event as html.MessageEvent;
       var code = messageEvent.data['code'];
-      await UserService().oauthLogin(code, context);
+      if (code != null) {
+        await UserService().oauthLogin(code, context);
+      }
     });
   }
 
