@@ -13,6 +13,7 @@ import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'dart:convert';
+import 'dart:async';
 
 // 커스텀 Intent 클래스들 정의
 class MoveUpIntent extends Intent {}
@@ -78,12 +79,29 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
   final LayerLink _layerLink = LayerLink();
   int _selectedSuggestionIndex = 0;
   
+  // 무한 스크롤을 위한 변수들 제거
+  final ScrollController _scrollController = ScrollController();
+  int _pageSize = 10; // 기본값 유지
+  
   // 키보드 네비게이션 중인지 추적하는 변수
   bool _isNavigatingWithKeyboard = false;
 
   // 현재 참조된 카드들 관리
   List<DigimonCard> _referencedCards = [];
   
+  // 최근에 추가한 카드 목록 관리
+  List<DigimonCard> _recentlyAddedCards = [];
+  
+  // 키보드 반복 처리를 위한 타이머
+  Timer? _keyRepeatTimer;
+  bool _isKeyDown = false;
+  int _keyRepeatDelay = 400; // 첫 번째 반복까지의 지연 시간 (밀리초) - 더 길게 설정
+  int _keyRepeatInterval = 150; // 반복 간격 (밀리초) - 더 느리게 설정
+  LogicalKeyboardKey? _currentKey;
+
+  // 마우스 호버 항목 인덱스
+  int? _hoverIndex;
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +117,8 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
         _updateReferencedCards();
       }
     });
+    
+    // 스크롤 리스너 제거
     
     // 초기 참조 카드 로드
     _updateReferencedCards();
@@ -133,6 +153,8 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     _removeSuggestions();
     _editorController.dispose();
     _editorFocusNode.dispose();
+    _scrollController.dispose(); // 스크롤 컨트롤러 유지
+    _cancelKeyRepeat(); // 타이머 취소
     super.dispose();
   }
   
@@ -201,20 +223,27 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
   }
   
   void _showRecentCards() {
-    // 최근 카드 표시 (5개로 제한)
-    // 패럴렐 카드 제외
-    _suggestions = CardDataService().getRecentCards(10)
-        .where((card) => card.isParallel == false)
-        .take(5)
-        .toList();
+    // 최근 추가한 카드 표시
+    if (_recentlyAddedCards.isEmpty) {
+      // 최근 추가한 카드가 없는 경우 아무것도 표시하지 않음
+      _suggestions = [];
+    } else {
+      // 최근 추가한 카드를 역순으로 표시 (전체 데이터)
+      _suggestions = _recentlyAddedCards.reversed.toList();
+    }
     
     _selectedSuggestionIndex = 0;
-    _showAutocomplete();
+    
+    // 제안할 카드가 있는 경우에만 자동완성 표시
+    if (_suggestions.isNotEmpty) {
+      _showAutocomplete();
+    } else {
+      _removeSuggestions();
+    }
   }
   
   void _searchCards(String query) {
     final searchService = CardDataService();
-    List<DigimonCard> results = [];
     
     // 검색어가 비어있으면 최근 카드 표시
     if (query.isEmpty) {
@@ -222,29 +251,37 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
       return;
     }
     
-    // 카드 번호로 먼저 검색 (cardNo 기준)
-    if (query.isNotEmpty) {
-      results = searchService.searchCardsByNumber(query)
-          .where((card) => card.isParallel == false) // 패럴렐 카드 제외
-          .take(5)
-          .toList();
-      
-      if (results.isNotEmpty) {
-        _suggestions = results;
-        _selectedSuggestionIndex = 0;
-        _showAutocomplete();
-        return;
-      }
-    }
+    List<DigimonCard> results = [];
     
-    // 이름으로 카드 검색 (패럴렐 카드 제외)
-    _suggestions = searchService.searchCardsByText(query)
+    // 카드 번호로 먼저 검색 (cardNo 기준 prefix 검색)
+    // if (query.isNotEmpty) {
+    //   results = searchService.searchCardsByNumber(query)
+    //       .where((card) => 
+    //           card.cardNo != null && 
+    //           card.cardNo!.toLowerCase().startsWith(query.toLowerCase()) && 
+    //           card.isParallel == false) // 패럴렐 카드 제외, prefix 검색
+    //       .toList();
+        
+    //   if (results.isNotEmpty) {
+    //     _allSearchResults = results; // 전체 검색 결과 저장
+    //     _suggestions = results.take(_pageSize).toList(); // 첫 페이지만 표시
+    //     _hasMoreData = results.length > _pageSize;
+    //     _selectedSuggestionIndex = 0;
+    //     _showAutocomplete();
+    //     return;
+    //   }
+    // }
+    
+    // 이름으로 카드 검색 (prefix 검색, 패럴렐 카드 제외)
+    results = searchService.searchCardsByText(query)
         .where((card) => 
             card.getDisplayName() != null && 
-            card.getDisplayName()!.toLowerCase().contains(query.toLowerCase()) &&
-            card.isParallel == false) // 패럴렐 카드 제외
-        .take(5)
+            card.getDisplayName()!.toLowerCase().startsWith(query.toLowerCase()) && 
+            card.isParallel == false)
         .toList();
+    
+    // 전체 결과 표시 (무한 스크롤 대신)
+    _suggestions = results;
     
     // 항상 첫 번째 항목이 선택되도록 설정
     _selectedSuggestionIndex = 0;
@@ -295,87 +332,137 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     // 카드 참조 형식으로 생성 (간단한 [cardNo] 형식)
     final cardRef = CardReference.create(card);
     
-          // 명령어를 카드 참조로 교체
-      final newText = text.replaceRange(_commandStartIndex, _commandStartIndex + _currentCommand.length, cardRef);
-      
-      // 에디터 텍스트 업데이트
-      _editorController.value = TextEditingController.fromValue(
-        TextEditingValue(
-          text: newText,
-          selection: TextSelection.collapsed(offset: _commandStartIndex + cardRef.length),
-        ),
-      ).value;
-      
-      // 덱 설명 업데이트
-      widget.deck.description = newText;
-      widget.onEditorChanged();
-      
-      // 참조 카드 목록 업데이트
-      _updateReferencedCards();
-      
-      // 토스트 메시지 표시
-      ToastOverlay.show(
-        context, 
-        '카드 참조가 추가되었습니다: ${card.getDisplayName()}',
-        type: ToastType.success,
-      );
-      
-      _removeSuggestions();
+    // 명령어를 카드 참조로 교체
+    final newText = text.replaceRange(_commandStartIndex, _commandStartIndex + _currentCommand.length, cardRef);
+    
+    // 에디터 텍스트 업데이트
+    _editorController.value = TextEditingController.fromValue(
+      TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: _commandStartIndex + cardRef.length),
+      ),
+    ).value;
+    
+    // 덱 설명 업데이트
+    widget.deck.description = newText;
+    widget.onEditorChanged();
+    
+    // 참조 카드 목록 업데이트
+    _updateReferencedCards();
+    
+    // 최근 추가한 카드 목록에 추가 (중복 제거)
+    if (!_recentlyAddedCards.any((c) => c.cardNo == card.cardNo)) {
+      _recentlyAddedCards.add(card);
+      // 최대 20개로 제한
+      if (_recentlyAddedCards.length > 20) {
+        _recentlyAddedCards.removeAt(0);
+      }
+    } else {
+      // 이미 있는 경우, 해당 카드를 제거하고 맨 뒤에 추가 (가장 최근으로 갱신)
+      _recentlyAddedCards.removeWhere((c) => c.cardNo == card.cardNo);
+      _recentlyAddedCards.add(card);
     }
     
-    void _moveSelectionUp() {
-      if (_suggestions.isNotEmpty) {
-        // 키보드 네비게이션 중임을 표시
-        _isNavigatingWithKeyboard = true;
-        
-        int newIndex;
-        
-        if (_selectedSuggestionIndex <= 0) {
-          // 첫 항목에서는 마지막 항목으로 이동
-          newIndex = _suggestions.length - 1;
-        } else {
-          newIndex = _selectedSuggestionIndex - 1;
-        }
-        
-        setState(() {
-          _selectedSuggestionIndex = newIndex;
-        });
-        
-        _updateOverlay();
-        
-        // 짧은 딜레이 후 네비게이션 상태 해제
-        Future.delayed(Duration(milliseconds: 100), () {
-          _isNavigatingWithKeyboard = false;
-        });
-      }
-    }
+    // 토스트 메시지 표시
+    ToastOverlay.show(
+      context, 
+      '카드 참조가 추가되었습니다: ${card.getDisplayName()}',
+      type: ToastType.success,
+    );
     
-    void _moveSelectionDown() {
-      if (_suggestions.isNotEmpty) {
-        // 키보드 네비게이션 중임을 표시
-        _isNavigatingWithKeyboard = true;
-        
-        int newIndex;
-        
-        if (_selectedSuggestionIndex >= _suggestions.length - 1) {
-          // 마지막 항목에서는 첫 항목으로 이동
-          newIndex = 0;
-        } else {
-          newIndex = _selectedSuggestionIndex + 1;
-        }
-        
-        setState(() {
-          _selectedSuggestionIndex = newIndex;
-        });
-        
-        _updateOverlay();
-        
-        // 짧은 딜레이 후 네비게이션 상태 해제
-        Future.delayed(Duration(milliseconds: 100), () {
-          _isNavigatingWithKeyboard = false;
-        });
+    _removeSuggestions();
+
+    // 편집기에 포커스를 다시 맞춤
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_editorFocusNode);
       }
+    });
+  }
+  
+  void _moveSelectionUp() {
+    if (_suggestions.isNotEmpty) {
+      // 키보드 네비게이션 중임을 표시
+      _isNavigatingWithKeyboard = true;
+      
+      int newIndex;
+      
+      if (_selectedSuggestionIndex <= 0) {
+        // 첫 항목에서는 마지막 항목으로 이동
+        newIndex = _suggestions.length - 1;
+      } else {
+        newIndex = _selectedSuggestionIndex - 1;
+      }
+      
+      setState(() {
+        _selectedSuggestionIndex = newIndex;
+      });
+      
+      // 스크롤 위치 조정 - 선택된 항목이 보이도록
+      if (_scrollController.hasClients && _suggestions.length > 3) {
+        final itemHeight = 48.0; // 각 항목의 예상 높이
+        final targetPosition = itemHeight * _selectedSuggestionIndex;
+        
+        if (targetPosition < _scrollController.position.pixels ||
+            targetPosition > _scrollController.position.viewportDimension + _scrollController.position.pixels - itemHeight) {
+          _scrollController.animateTo(
+            targetPosition,
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+      
+      _updateOverlay();
+      
+      // 짧은 딜레이 후 네비게이션 상태 해제
+      Future.delayed(Duration(milliseconds: 100), () {
+        _isNavigatingWithKeyboard = false;
+      });
     }
+  }
+  
+  void _moveSelectionDown() {
+    if (_suggestions.isNotEmpty) {
+      // 키보드 네비게이션 중임을 표시
+      _isNavigatingWithKeyboard = true;
+      
+      int newIndex;
+      
+      if (_selectedSuggestionIndex >= _suggestions.length - 1) {
+        // 마지막 항목에서는 첫 항목으로 이동
+        newIndex = 0;
+      } else {
+        newIndex = _selectedSuggestionIndex + 1;
+      }
+      
+      setState(() {
+        _selectedSuggestionIndex = newIndex;
+      });
+      
+      // 스크롤 위치 조정 - 선택된 항목이 보이도록
+      if (_scrollController.hasClients && _suggestions.length > 3) {
+        final itemHeight = 48.0; // 각 항목의 예상 높이
+        final targetPosition = itemHeight * _selectedSuggestionIndex;
+        
+        if (targetPosition > _scrollController.position.viewportDimension + _scrollController.position.pixels - itemHeight * 2 ||
+            targetPosition < _scrollController.position.pixels) {
+          _scrollController.animateTo(
+            targetPosition - itemHeight,
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+      
+      _updateOverlay();
+      
+      // 짧은 딜레이 후 네비게이션 상태 해제
+      Future.delayed(Duration(milliseconds: 100), () {
+        _isNavigatingWithKeyboard = false;
+      });
+    }
+  }
   
   void _confirmSelection() {
     if (_suggestions.isNotEmpty) {
@@ -406,42 +493,52 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     }
   }
   
-  bool _handleKey(FocusNode node, RawKeyEvent event) {
-    if (!_showSuggestions) return false;
-    
-    if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-        _moveSelectionUp();
-        return true;
-      } 
-      
-      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-        _moveSelectionDown();
-        return true;
-      }
-      
-      if (event.logicalKey == LogicalKeyboardKey.enter || 
-          event.logicalKey == LogicalKeyboardKey.tab) {
-        _confirmSelection();
-        return true;
-      }
-    }
-    
-    return false;
+  // 키 반복 타이머 취소
+  void _cancelKeyRepeat() {
+    _keyRepeatTimer?.cancel();
+    _keyRepeatTimer = null;
+    _isKeyDown = false;
+    _currentKey = null;
   }
   
+  // 키 반복 시작
+  void _startKeyRepeat(LogicalKeyboardKey key) {
+    _cancelKeyRepeat();
+    _isKeyDown = true;
+    _currentKey = key;
+    
+    // 첫 번째 반복은 즉시 실행
+    _processKeyAction(key);
+    
+    // 추가 반복을 위한 타이머 설정
+    _keyRepeatTimer = Timer(Duration(milliseconds: _keyRepeatDelay), () {
+      // 첫 번째 딜레이 후, 더 빠른 간격으로 반복
+      _keyRepeatTimer = Timer.periodic(Duration(milliseconds: _keyRepeatInterval), (timer) {
+        if (_isKeyDown) {
+          _processKeyAction(key);
+        } else {
+          _cancelKeyRepeat();
+        }
+      });
+    });
+  }
+  
+  // 키 액션 처리
+  void _processKeyAction(LogicalKeyboardKey key) {
+    if (key == LogicalKeyboardKey.arrowUp) {
+      _moveSelectionUp();
+    } else if (key == LogicalKeyboardKey.arrowDown) {
+      _moveSelectionDown();
+    }
+  }
+
   OverlayEntry _createOverlayEntry() {
     // TextField의 RenderBox 가져오기
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
     
-    // 정확한 높이 계산 (더 신뢰성 있게)
-    final double headerHeight = 34.0;  // 헤더 높이
-    final double itemHeight = 48.0;    // 각 항목 높이
-    final double listPadding = 4.0;    // 리스트 패딩
-    
-    // 정확히 5개 항목에 맞는 전체 높이 계산
-    final double exactHeight = headerHeight + (itemHeight * math.min(5, _suggestions.length)) + listPadding;
+    // 고정 높이 정의
+    final double maxOverlayHeight = 300.0; // 최대 높이 제한
     
     return OverlayEntry(
       builder: (context) => Positioned(
@@ -454,8 +551,10 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
             elevation: 4.0,
             borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
             child: Container(
-              // 정확한 높이 지정
-              height: exactHeight,
+              // 최대 높이 지정
+              constraints: BoxConstraints(
+                maxHeight: maxOverlayHeight,
+              ),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 border: Border.all(color: Colors.grey.shade300),
@@ -465,31 +564,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 상단에 안내 텍스트 추가
-                  Container(
-                    height: headerHeight,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 6, 
-                      horizontal: SizeService.paddingSize(context) / 2
-                    ),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.05),
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey.shade300),
-                      ),
-                    ),
-                    child: Text(
-                      '방향키(↑↓)로 선택 후 엔터키로 확정',
-                      style: TextStyle(
-                        fontSize: SizeService.bodyFontSize(context) * 0.8,
-                        color: Colors.grey.shade700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  // 카드 목록
-                  Expanded(
+                  Flexible(
                     child: _suggestions.isEmpty 
                       ? Center(
                           child: Padding(
@@ -503,42 +578,85 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
                             ),
                           ),
                         )
-                      : ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: NeverScrollableScrollPhysics(), // 스크롤 비활성화 (고정 5개)
-                        itemCount: _suggestions.length,
-                        itemBuilder: (context, index) {
-                          final card = _suggestions[index];
-                          final isSelected = index == _selectedSuggestionIndex;
-                          
-                          return Container(
-                            height: itemHeight, // 정확한 높이 지정
-                            decoration: BoxDecoration(
-                              color: isSelected ? Theme.of(context).primaryColor.withOpacity(0.1) : null,
-                              border: isSelected 
-                                  ? Border(left: BorderSide(color: Theme.of(context).primaryColor, width: 3.0)) 
-                                  : null,
+                      : ScrollConfiguration(
+                          behavior: ScrollBehavior().copyWith(
+                            scrollbars: true,
+                            dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                              PointerDeviceKind.trackpad,
+                              PointerDeviceKind.stylus,
+                              PointerDeviceKind.unknown,
+                            },
+                            physics: ClampingScrollPhysics(), 
+                          ),
+                          child: RawScrollbar(
+                            controller: _scrollController,
+                            thumbVisibility: true,
+                            thickness: 6.0,
+                            radius: Radius.circular(10),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              controller: _scrollController,
+                              padding: EdgeInsets.zero,
+                              itemCount: _suggestions.length,
+                              itemBuilder: (context, index) {
+                                final card = _suggestions[index];
+                                final isSelected = index == _selectedSuggestionIndex;
+                                final isHovered = index == _hoverIndex;
+                                
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedSuggestionIndex = index;
+                                    });
+                                    _selectSuggestion(card);
+                                  },
+                                  behavior: HitTestBehavior.opaque,
+                                  child: MouseRegion(
+                                    onEnter: (event) {
+                                      setState(() {
+                                        _hoverIndex = index;
+                                        _selectedSuggestionIndex = index;
+                                      });
+                                      _updateOverlay();
+                                    },
+                                    onExit: (event) {
+                                      if (_hoverIndex == index) {
+                                        setState(() {
+                                          _hoverIndex = null;
+                                        });
+                                        _updateOverlay();
+                                      }
+                                    },
+                                    cursor: SystemMouseCursors.click,
+                                    child: Container(
+                                      height: 48.0,
+                                      decoration: BoxDecoration(
+                                        color: isSelected || isHovered 
+                                            ? Theme.of(context).primaryColor.withOpacity(0.1) 
+                                            : null,
+                                        border: isSelected || isHovered
+                                            ? Border(left: BorderSide(color: Theme.of(context).primaryColor, width: 3.0)) 
+                                            : null,
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                      child: Text(
+                                        "${card.cardNo} ${card.getDisplayName()}",
+                                        style: TextStyle(
+                                          fontSize: SizeService.bodyFontSize(context),
+                                          fontWeight: (isSelected || isHovered) ? FontWeight.bold : FontWeight.normal,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                            child: ListTile(
-                              dense: true,
-                              visualDensity: VisualDensity.compact, // 좀 더 조밀하게
-                              title: Text(
-                                "${card.cardNo} - ${card.getDisplayName()}",
-                                style: TextStyle(
-                                  fontSize: SizeService.bodyFontSize(context),
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                ),
-                                maxLines: 1, // 한 줄로 제한
-                                overflow: TextOverflow.ellipsis, // 길면 말줄임표 표시
-                              ),
-                              onTap: () => _selectSuggestion(card),
-                              // 기존 tileColor 대신 Container의 decoration으로 처리
-                              tileColor: null,
-                            ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
                   ),
                 ],
               ),
@@ -555,16 +673,28 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     Widget textField = Focus(
       onKeyEvent: (FocusNode node, KeyEvent event) {
         // 자동완성이 활성화된 경우에만 특정 키 이벤트를 가로챔
-        if (_showSuggestions && event is KeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-            _moveSelectionUp();
-            return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-            _moveSelectionDown();
-            return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.tab) {
-            _confirmSelection();
-            return KeyEventResult.handled;
+        if (_showSuggestions) {
+          if (event is KeyDownEvent) {
+            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              // 키 반복 시작
+              _startKeyRepeat(LogicalKeyboardKey.arrowUp);
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              // 키 반복 시작
+              _startKeyRepeat(LogicalKeyboardKey.arrowDown);
+              return KeyEventResult.handled;
+            } else if (event.logicalKey == LogicalKeyboardKey.enter || 
+                      event.logicalKey == LogicalKeyboardKey.tab) {
+              _confirmSelection();
+              return KeyEventResult.handled;
+            }
+          } else if (event is KeyUpEvent) {
+            // 키에서 손을 뗀 경우 반복 취소
+            if (event.logicalKey == LogicalKeyboardKey.arrowUp || 
+                event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              _cancelKeyRepeat();
+              return KeyEventResult.handled;
+            }
           }
         }
         else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {

@@ -496,32 +496,23 @@ class CardDataService {
     
     final result = <DigimonCard>[];
     final searchLower = searchText.toLowerCase();
-    
-    // 먼저 카드 번호로 검색
-    for (final card in _allCardsByCardNo.values) {
-      if (card.cardNo != null && 
-          card.cardNo!.toLowerCase().contains(searchLower)) {
-        result.add(card);
-        if (result.length >= 20) {
-          return result;
-        }
-      }
-    }
-    
+
     // 카드 이름으로 검색
     for (final card in _allCards.values) {
       if (card.getDisplayName() != null && 
-          card.getDisplayName()!.toLowerCase().contains(searchLower)) {
+          card.getDisplayName()!.toLowerCase().startsWith(searchLower) &&
+          card.isParallel == false
+          ) {
         // 중복 카드 방지
         if (!result.any((c) => c.cardId == card.cardId)) {
           result.add(card);
-          if (result.length >= 20) {
-            return result;
-          }
         }
       }
     }
     
+    result.sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
     return result;
   }
+
+
 } 
