@@ -439,7 +439,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
     return Row(
       children: [
         SizedBox(
-          width: ((isHorizontal ? 950 : 328) + (isQrShow ? 0 : 164)),
+          width: ((isHorizontal ? 982 : 328) + (isQrShow ? 0 : 160)),
           child: Center(
             child: Text(
               widget.deck.deckName,
@@ -473,7 +473,6 @@ class _DeckImagePageState extends State<DeckImagePage> {
             height: 150,
             decoration: BoxDecoration(
                 // color: Colors.white,
-                // borderRadius: BorderRadius.circular(8),
                 ),
             child: QrCodeWidget(
               data: widget.deck.getQrUrl(),
@@ -658,11 +657,19 @@ class _QrCodeWidgetState extends State<QrCodeWidget> {
                         padding: const EdgeInsets.all(0),
                         data: widget.data,
                         version: 10,
-                        // backgroundColor: Colors.white,
+                        backgroundColor: Colors.white,
                         errorCorrectionLevel: QrErrorCorrectLevel.L,
                         constrainErrorBounds: true,
                         size: 150,
                         gapless: true,
+                        eyeStyle: const QrEyeStyle(
+                          eyeShape: QrEyeShape.square,
+                          color: Colors.black,
+                        ),
+                        dataModuleStyle: const QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.square,
+                          color: Colors.black,
+                        ),
                         embeddedImageStyle: const QrEmbeddedImageStyle(
                           size: Size.zero,
                         ),

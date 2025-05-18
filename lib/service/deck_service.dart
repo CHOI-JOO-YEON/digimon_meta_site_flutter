@@ -288,46 +288,396 @@ class DeckService {
   }
 
   Future<String?> decodeQrCodeFromImage(Uint8List imageBytes) async {
+    // 기본 이미지 디코딩
     final rawImage = imglib.decodeImage(imageBytes);
     if (rawImage == null) {
       return null;
     }
 
-    final imageData = rawImage.data; // ImageData? 타입
-    if (imageData == null) {
-      return null;
+    // 오른쪽 상단 QR 코드 영역 추출 (항상 QR 코드가 있는 위치)
+    final qrRegion = _extractTopRightRegion(rawImage);
+    
+    // 1. 추출한 영역 그대로 스캔 시도
+    String? result = await _scanQRCode(qrRegion);
+    if (result != null) {
+      return result;
     }
+    
+    // 2. 추출한 영역에 이미지 처리 기법 적용
+    return await _enhanceAndScanQRRegion(qrRegion);
+  }
+  
+  // 추출된 이미지를 PNG로 다운로드 (디버깅용)
+  void _downloadImage(imglib.Image image, String filename) {
+    // 디버깅 코드 비활성화
+    return;
 
-    final buffer = imageData.getBytes();
-    if (buffer == null || buffer is! Uint8List) {
-      return null;
-    }
-
-    final width = rawImage.width;
-    final height = rawImage.height;
-    final pixelCount = width * height;
-    if (buffer.length < pixelCount * 4) {
-      return null;
-    }
-
-    final int32Data = Int32List(pixelCount);
-    for (int i = 0; i < pixelCount; i++) {
-      final r = buffer[i * 4 + 0];
-      final g = buffer[i * 4 + 1];
-      final b = buffer[i * 4 + 2];
-      final a = buffer[i * 4 + 3];
-      int32Data[i] = (a << 24) | (r << 16) | (g << 8) | b;
-    }
-
-    final luminanceSource = RGBLuminanceSource(width, height, int32Data);
-    final binarizer = HybridBinarizer(luminanceSource);
-    final bitmap = BinaryBitmap(binarizer);
-
-    final reader = QRCodeReader();
+    /*
     try {
-      final result = reader.decode(bitmap);
-      return result.text;
+      // 이미지를 PNG로 인코딩
+      List<int> pngBytes = imglib.encodePng(image);
+      
+      // Blob 생성
+      final blob = html.Blob([Uint8List.fromList(pngBytes)], 'image/png');
+      
+      // 다운로드 URL 생성
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      
+      // 다운로드 링크 생성 및 클릭
+      final anchor = html.document.createElement('a') as html.AnchorElement
+        ..href = url
+        ..style.display = 'none'
+        ..download = filename;
+      
+      html.document.body?.children.add(anchor);
+      anchor.click();
+      
+      // 클린업
+      html.document.body?.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
     } catch (e) {
+      print('Error downloading image: $e');
+    }
+    */
+  }
+  
+  // 오른쪽 상단 QR 코드 영역 추출
+  imglib.Image _extractTopRightRegion(imglib.Image image) {
+    // QR 코드 영역 크기 계산 - 최소 150x150 보장
+    int qrSize = 150;
+    
+    // 이미지가 작은 경우 전체 이미지 반환
+    if (image.width < qrSize * 2 || image.height < qrSize * 2) {
+      return image;
+    }
+    
+    // 오른쪽 상단 영역 추출 - 여유있게 QR 코드 영역을 포함하도록 함
+    int extractWidth = min(image.width ~/ 3, 300);
+    extractWidth = max(extractWidth, qrSize);
+    
+    int extractHeight = min(image.height ~/ 3, 300);
+    extractHeight = max(extractHeight, qrSize);
+    
+    // 오른쪽 상단 위치 계산
+    int x = max(0, image.width - extractWidth);
+    int y = 0;
+    
+    return imglib.copyCrop(
+      image,
+      x: x,
+      y: y,
+      width: extractWidth,
+      height: extractHeight,
+    );
+  }
+  
+  // QR 영역에 집중 처리 기법 적용
+  Future<String?> _enhanceAndScanQRRegion(imglib.Image qrRegion) async {
+    // 원본 이미지 업스케일링 (저해상도 이미지 개선을 위해)
+    final upscaled = imglib.copyResize(
+      qrRegion,
+      width: qrRegion.width * 2,
+      height: qrRegion.height * 2,
+      interpolation: imglib.Interpolation.cubic
+    );
+    String? result = await _scanQRCode(upscaled);
+    if (result != null) return result;
+    
+    // 1. 그레이스케일 변환
+    final grayscale = imglib.grayscale(upscaled);
+    result = await _scanQRCode(grayscale);
+    if (result != null) return result;
+    
+    // 2. 노이즈 감소 처리
+    final denoised = _applyMedianFilter(grayscale, 3);
+    result = await _scanQRCode(denoised);
+    if (result != null) return result;
+    
+    // 3. 선명도 향상
+    final sharpened = _sharpenImage(denoised);
+    result = await _scanQRCode(sharpened);
+    if (result != null) return result;
+    
+    // 4. 적응형 이진화 처리 
+    final adaptiveThresholded = _applyAdaptiveThreshold(sharpened);
+    result = await _scanQRCode(adaptiveThresholded);
+    if (result != null) return result;
+    
+    // 5. 대비 향상 단계별 적용
+    final contrastLevels = [1.5, 2.0, 2.5, 3.0];
+    for (var contrast in contrastLevels) {
+      final enhanced = imglib.adjustColor(
+        grayscale, 
+        contrast: contrast,
+        brightness: 0.0,
+      );
+      result = await _scanQRCode(enhanced);
+      if (result != null) return result;
+      
+      // 대비 향상 + 이진화 조합 시도
+      for (int threshold in [100, 128, 150, 180]) {
+        final binarized = _applySimpleThreshold(enhanced, threshold);
+        result = await _scanQRCode(binarized);
+        if (result != null) return result;
+      }
+    }
+    
+    // 6. 여러 크기로 조정 시도
+    final scales = [1.5, 2.0, 2.5, 0.8, 0.6];
+    for (var scale in scales) {
+      final resized = imglib.copyResize(
+        grayscale,
+        width: (grayscale.width * scale).round(),
+        height: (grayscale.height * scale).round(),
+        interpolation: imglib.Interpolation.cubic
+      );
+      
+      result = await _scanQRCode(resized);
+      if (result != null) return result;
+      
+      // 크기 조정 + 선명화 + 대비 향상
+      final enhancedResized = _sharpenImage(imglib.adjustColor(
+        resized,
+        contrast: 2.2,
+        brightness: 0.0,
+      ));
+      result = await _scanQRCode(enhancedResized);
+      if (result != null) return result;
+      
+      // 크기 조정 + 이진화
+      final binarizedResized = _applySimpleThreshold(resized, 128);
+      result = await _scanQRCode(binarizedResized);
+      if (result != null) return result;
+    }
+    
+    // 7. 외곽선 강화 처리
+    final edgeEnhanced = _enhanceEdges(grayscale);
+    result = await _scanQRCode(edgeEnhanced);
+    if (result != null) return result;
+    
+    // 8. 각도 보정 (QR 코드가 회전된 경우)
+    final angles = [90.0, 180.0, 270.0, 45.0, -45.0];
+    for (var angle in angles) {
+      final rotated = imglib.copyRotate(grayscale, angle: angle);
+      result = await _scanQRCode(rotated);
+      if (result != null) return result;
+    }
+    
+    return null;
+  }
+  
+  // 중앙값 필터를 사용한 노이즈 감소 (가장 좋은 노이즈 감소 기법 중 하나)
+  imglib.Image _applyMedianFilter(imglib.Image image, int radius) {
+    final result = imglib.Image.from(image);
+    
+    for (int y = radius; y < image.height - radius; y++) {
+      for (int x = radius; x < image.width - radius; x++) {
+        List<int> neighborValues = [];
+        
+        // 주변 픽셀 수집
+        for (int dy = -radius; dy <= radius; dy++) {
+          for (int dx = -radius; dx <= radius; dx++) {
+            imglib.Pixel pixel = image.getPixel(x + dx, y + dy);
+            neighborValues.add(pixel.r.toInt());
+          }
+        }
+        
+        // 중앙값 계산
+        neighborValues.sort();
+        int medianValue = neighborValues[neighborValues.length ~/ 2];
+        
+        // 중앙값으로 픽셀 설정
+        result.setPixel(x, y, imglib.ColorRgb8(medianValue, medianValue, medianValue));
+      }
+    }
+    
+    return result;
+  }
+  
+  // 이미지 선명화 (언샤프 마스킹)
+  imglib.Image _sharpenImage(imglib.Image image) {
+    final result = imglib.Image.from(image);
+    final blurred = imglib.gaussianBlur(image, radius: 1);
+    
+    for (int y = 1; y < image.height - 1; y++) {
+      for (int x = 1; x < image.width - 1; x++) {
+        final originalPixel = image.getPixel(x, y);
+        final blurredPixel = blurred.getPixel(x, y);
+        
+        // 언샤프 마스킹 적용
+        int sharpValue = (2 * originalPixel.r.toInt() - blurredPixel.r.toInt()).clamp(0, 255);
+        result.setPixel(x, y, imglib.ColorRgb8(sharpValue, sharpValue, sharpValue));
+      }
+    }
+    
+    return result;
+  }
+  
+  // 적응형 이진화 (저해상도 이미지에 효과적)
+  imglib.Image _applyAdaptiveThreshold(imglib.Image image) {
+    final result = imglib.Image.from(image);
+    final radius = 7; // 적응형 영역 크기
+    final diff = 7;   // 임계값 차이
+    
+    for (int y = radius; y < image.height - radius; y++) {
+      for (int x = radius; x < image.width - radius; x++) {
+        // 주변 영역 평균 계산
+        int sum = 0;
+        int count = 0;
+        
+        for (int dy = -radius; dy <= radius; dy++) {
+          for (int dx = -radius; dx <= radius; dx++) {
+            if (y + dy >= 0 && y + dy < image.height && 
+                x + dx >= 0 && x + dx < image.width) {
+              imglib.Pixel pixel = image.getPixel(x + dx, y + dy);
+              sum += pixel.r.toInt();
+              count++;
+            }
+          }
+        }
+        
+        int average = sum ~/ count;
+        int threshold = average - diff;
+        
+        // 중앙 픽셀 이진화
+        imglib.Pixel centerPixel = image.getPixel(x, y);
+        if (centerPixel.r.toInt() > threshold) {
+          result.setPixel(x, y, imglib.ColorRgb8(255, 255, 255));
+        } else {
+          result.setPixel(x, y, imglib.ColorRgb8(0, 0, 0));
+        }
+      }
+    }
+    
+    // 경계 픽셀 처리
+    for (int y = 0; y < image.height; y++) {
+      for (int x = 0; x < image.width; x++) {
+        if (y < radius || y >= image.height - radius || 
+            x < radius || x >= image.width - radius) {
+          imglib.Pixel pixel = image.getPixel(x, y);
+          if (pixel.r.toInt() > 128) {
+            result.setPixel(x, y, imglib.ColorRgb8(255, 255, 255));
+          } else {
+            result.setPixel(x, y, imglib.ColorRgb8(0, 0, 0));
+          }
+        }
+      }
+    }
+    
+    return result;
+  }
+  
+  // 단순 임계값 이진화
+  imglib.Image _applySimpleThreshold(imglib.Image image, int threshold) {
+    final binary = imglib.Image.from(image);
+    
+    for (int y = 0; y < binary.height; y++) {
+      for (int x = 0; x < binary.width; x++) {
+        imglib.Pixel pixel = binary.getPixel(x, y);
+        
+        // 임계값 적용
+        if (pixel.r.toInt() > threshold) {
+          binary.setPixel(x, y, imglib.ColorRgb8(255, 255, 255));
+        } else {
+          binary.setPixel(x, y, imglib.ColorRgb8(0, 0, 0));
+        }
+      }
+    }
+    
+    return binary;
+  }
+  
+  // 외곽선 강화
+  imglib.Image _enhanceEdges(imglib.Image image) {
+    final result = imglib.Image.from(image);
+    
+    // 소벨 에지 검출 커널
+    final sobelX = [
+      [-1, 0, 1],
+      [-2, 0, 2],
+      [-1, 0, 1]
+    ];
+    
+    final sobelY = [
+      [-1, -2, -1],
+      [0, 0, 0],
+      [1, 2, 1]
+    ];
+    
+    for (int y = 1; y < image.height - 1; y++) {
+      for (int x = 1; x < image.width - 1; x++) {
+        int gx = 0;
+        int gy = 0;
+        
+        // 소벨 커널 적용
+        for (int ky = -1; ky <= 1; ky++) {
+          for (int kx = -1; kx <= 1; kx++) {
+            imglib.Pixel pixel = image.getPixel(x + kx, y + ky);
+            int val = pixel.r.toInt();
+            
+            gx += val * sobelX[ky + 1][kx + 1];
+            gy += val * sobelY[ky + 1][kx + 1];
+          }
+        }
+        
+        // 그래디언트 크기 계산
+        int magnitude = sqrt(gx * gx + gy * gy).toInt().clamp(0, 255);
+        
+        // 원본 이미지와 엣지를 합성
+        imglib.Pixel originalPixel = image.getPixel(x, y);
+        int originalValue = originalPixel.r.toInt();
+        int enhancedValue = (originalValue * 0.7 + magnitude * 0.3).toInt().clamp(0, 255);
+        
+        result.setPixel(x, y, imglib.ColorRgb8(enhancedValue, enhancedValue, enhancedValue));
+      }
+    }
+    
+    return result;
+  }
+  
+  // ZXing 라이브러리를 사용한 QR 코드 스캔
+  Future<String?> _scanQRCode(imglib.Image image) async {
+    try {
+      final imageData = image.data;
+      if (imageData == null) return null;
+      
+      final buffer = imageData.getBytes();
+      if (buffer == null || buffer is! Uint8List) return null;
+      
+      final width = image.width;
+      final height = image.height;
+      final pixelCount = width * height;
+      
+      if (buffer.length < pixelCount * 4) return null;
+      
+      // ZXing 라이브러리가 요구하는 포맷으로 변환
+      final int32Data = Int32List(pixelCount);
+      for (int i = 0; i < pixelCount; i++) {
+        final r = buffer[i * 4 + 0];
+        final g = buffer[i * 4 + 1];
+        final b = buffer[i * 4 + 2];
+        final a = buffer[i * 4 + 3];
+        int32Data[i] = (a << 24) | (r << 16) | (g << 8) | b;
+      }
+      
+      final luminanceSource = RGBLuminanceSource(width, height, int32Data);
+      final binarizer = HybridBinarizer(luminanceSource);
+      final bitmap = BinaryBitmap(binarizer);
+      
+      // QR 코드 리더 객체 생성
+      final reader = QRCodeReader();
+      
+      // 기본 디코딩 시도
+      try {
+        final result = reader.decode(bitmap);
+        return result.text;
+      } catch (e) {
+        // 첫 번째 시도 실패, 다른 방식 시도 (ZXing 라이브러리 제약으로 힌트를 사용할 수 없음)
+        // 이 라이브러리 버전은 별도의 힌트 파라미터를 지원하지 않음
+        return null;
+      }
+    } catch (e) {
+      // QR 코드 인식 실패는 정상적인 경우
       return null;
     }
   }
@@ -1474,7 +1824,7 @@ class DeckService {
             TextButton(
               child: const Text('확인'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
               },
             ),
           ],

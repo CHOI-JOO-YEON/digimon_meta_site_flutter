@@ -64,6 +64,9 @@ dependencies:
   zxing2: ^0.2.3
   responsive_framework: ^1.5.1
   collection: ^1.14.13
+  image_picker: ^1.1.2
+  image_picker_for_web: ^3.0.6
+  qr_code_scanner: ^0.4.0
 
 #  oauth2: ^2.0.2
 #  kakao_flutter_sdk_user: ^1.8.0
