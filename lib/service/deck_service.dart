@@ -277,13 +277,36 @@ class DeckService {
       String jsonString, BuildContext context) async {
     Map<String, dynamic> map = jsonDecode(jsonString);
     String deckName = map['deckName'];
-    bool isStrict = map['isStrict'];
+    bool isStrict = map['isStrict'] ?? true;
+    String? description = map['description'];
     Map<String, int> cardIdAndCntMap =
         Map<String, int>.from(map['deckMap']);
+    
+    Map<String, int> tamaCardIdAndCntMap = {};
+    if (map.containsKey('tamaMap')) {
+      tamaCardIdAndCntMap = Map<String, int>.from(map['tamaMap']);
+    }
 
     DeckBuild deck = importDeckThisSite(cardIdAndCntMap, context);
+    
+    // 타마 카드 추가
+    if (tamaCardIdAndCntMap.isNotEmpty) {
+      CardDataService cardDataService = CardDataService();
+      for (final entry in tamaCardIdAndCntMap.entries) {
+        final cardId = entry.key;
+        final count = entry.value;
+        final card = await cardDataService.getCardById(int.parse(cardId));
+        if (card != null) {
+          for (int i = 0; i < count; i++) {
+            deck.addSingleCard(card);
+          }
+        }
+      }
+    }
+    
     deck.deckName = deckName;
     deck.isStrict = isStrict;
+    deck.description = description;
     return deck;
   }
 
@@ -737,7 +760,8 @@ class DeckService {
             TextButton(
               child: Text('예'),
               onPressed: () {
-                DeckBuild newDeck = DeckBuild.deckBuild(deck, context);
+                deck.newCopy();
+                
                 Navigator.of(context).pop();
                 
                 // 토스트 메시지 표시
@@ -747,7 +771,8 @@ class DeckService {
                   type: ToastType.success
                 );
 
-                context.navigateTo(DeckBuilderRoute(deck: newDeck));
+                // 새 덱 복사본을 생성하지 않고, 현재 덱의 상태를 업데이트한 후 리디렉션
+                context.navigateTo(DeckBuilderRoute(deck: deck));
               },
             ),
           ],

@@ -106,9 +106,11 @@ class _DeckListViewerState extends State<DeckListViewer> {
                       style: TextStyle(
                           fontSize: SizeService.bodyFontSize(context))),
                   subtitle: Text(
-                      '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
-                      style: TextStyle(
-                          fontSize: SizeService.smallFontSize(context))),
+                    '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
+                    style: TextStyle(
+                      fontSize: SizeService.smallFontSize(context)
+                    )
+                  ),
                   onTap: () {
                     _selectedIndex = index;
                     widget.deckUpdate(decks[index]);

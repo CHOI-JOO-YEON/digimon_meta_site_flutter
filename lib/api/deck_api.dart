@@ -18,8 +18,10 @@ class DeckApi {
 
   Future<DeckView?> postDeck(DeckBuild deck) async {
     try {
+      final requestData = DeckRequestDto(deck).toJson();
+
       var response = await dioClient.dio
-          .post('$baseUrl/api/deck', data: DeckRequestDto(deck).toJson());
+          .post('$baseUrl/api/deck', data: requestData);
       if (response.statusCode == 200) {
         return DeckView.fromJson(response.data);
       } else if (response.statusCode == 401) {
@@ -71,7 +73,6 @@ class DeckApi {
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
     return null;
@@ -137,7 +138,6 @@ class DeckApi {
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
   }
@@ -151,7 +151,6 @@ class DeckApi {
         return DeckView.fromJsonList(response.data);
       }
     } catch (e) {
-      print(e);
       return null;
     }
     return null;
@@ -185,7 +184,6 @@ class DeckApi {
         return null;
       }
     } catch (e) {
-      print(e);
       return null;
     }
   }

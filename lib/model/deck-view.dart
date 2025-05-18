@@ -12,6 +12,7 @@ class DeckView {
   List<String>? colors = [];
   int? formatId;
   bool? isPublic;
+  String? description;
 
   DeckView(
       {this.authorId,
@@ -21,7 +22,8 @@ class DeckView {
       this.cardIdAndCntMap,
       this.colors,
       this.formatId,
-      this.isPublic}) {
+      this.isPublic,
+      this.description}) {
     if (colors != null) {
       colors = _sortColorsByOrder(colors!);
     }
@@ -78,6 +80,7 @@ class DeckView {
         colors: colors,
         cardIdAndCntMap: cardMap,
         formatId: json['formatId'],
+        description: json['description'],
         isPublic: json['isPublic']);
   }
 
@@ -113,6 +116,6 @@ class DeckView {
 
   @override
   String toString() {
-    return 'DeckView{authorId: $authorId, authorName: $authorName, deckId: $deckId, deckName: $deckName, cardIdAndCntMap: $cardIdAndCntMap, colors: $colors, formatId: $formatId, isPublic: $isPublic}';
+    return 'DeckView{authorId: $authorId, authorName: $authorName, deckId: $deckId, deckName: $deckName, cardIdAndCntMap: $cardIdAndCntMap, colors: $colors, formatId: $formatId, isPublic: $isPublic, description: $description}';
   }
 }

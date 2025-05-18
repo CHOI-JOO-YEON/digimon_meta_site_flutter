@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_buttons.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_description_view.dart';
 
 import '../../../model/deck-build.dart';
 import '../../../provider/deck_sort_provider.dart';
@@ -156,6 +157,11 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             isTama: true,
             cardOverlayService: cardOverlayService,
           ),
+        ),
+        SizedBox(height: SizeService.paddingSize(context)),
+        DeckDescriptionView(
+          deck: widget.deck,
+          searchNote: widget.searchNote,
         ),
       ],
     );

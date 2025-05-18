@@ -22,6 +22,7 @@ class DeckBuild {
   int tamaCount = 0;
   String deckName = 'My Deck';
   Set<String> colors = {};
+  String? description;
 
   String? author;
   int? authorId;
@@ -55,6 +56,7 @@ class DeckBuild {
     formatId = null;
     isPublic = true;
     colors = {};
+    description = null;
     html.window.localStorage.remove('deck');
   }
 
@@ -63,6 +65,7 @@ class DeckBuild {
     deckName = "$deckName Copy";
     isPublic = true;
     isSave = false;
+    description = null;
   }
 
   void updateIsStrict(bool v) {
@@ -79,6 +82,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   authorId = deckView.authorId;
   formatId = deckView.formatId;
   isPublic = deckView.isPublic ?? false;
+  description = deckView.description;
 
   // Get cards using the helper method
   Map<DigimonCard, int>? cardAndCntMap = deckView.getCardAndCntMap();
@@ -102,6 +106,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
     deckSortProvider!.addListener(deckSort);
     deckName = '${deck.deckName} Copy';
     formatId = deck.formatId;
+    description = null;
 
     for (var tamaEntry in deck.tamaMap.entries) {
       DigimonCard card = tamaEntry.key;
@@ -355,17 +360,21 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   void saveMapToLocalStorage() {
     Map<String, int> encodableMap = {
       ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
+    };
+
+    Map<String, int> encodableTamaMap = {
       ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
     };
-    if (encodableMap.isEmpty) {
-      html.window.localStorage.remove('deck');
-      return;
-    }
-
+    
     Map<String, dynamic> map = {
       'deckName': deckName,
       'deckMap': encodableMap,
-      'isStrict': isStrict
+      'tamaMap': encodableTamaMap,
+      'authorId': authorId,
+      'isPublic': isPublic,
+      'isStrict': isStrict,
+      'formatId': formatId,
+      'description': description
     };
     String jsonString = jsonEncode(map);
     html.window.localStorage['deck'] = jsonString;

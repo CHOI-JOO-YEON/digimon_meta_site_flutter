@@ -6,6 +6,7 @@ class DeckRequestDto{
   List<String>? colors;
   int? formatId;
   bool? isPublic;
+  String? description;
   Map<int,int> cardAndCntMap ={};
 
   DeckRequestDto(DeckBuild deck){
@@ -14,6 +15,7 @@ class DeckRequestDto{
     colors= deck.colors.toList();
     formatId=deck.formatId;
     isPublic = deck.isPublic;
+    description = deck.description;
 
     for (var deckEntry in deck.deckMap.entries) {
         cardAndCntMap[deckEntry.key.cardId!]=deckEntry.value;
@@ -30,7 +32,8 @@ class DeckRequestDto{
       'deckName': deckName,
       'colors': colors,
       'isPublic': isPublic,
-      'formatId':formatId,
+      'formatId': formatId,
+      'description': description,
     };
 
     final Map<String, int> convertedCardAndCntMap = {};

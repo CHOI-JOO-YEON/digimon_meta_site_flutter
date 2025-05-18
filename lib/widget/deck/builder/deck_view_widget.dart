@@ -3,6 +3,7 @@ import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_editor_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,13 @@ import 'package:flutter/widgets.dart';
 
 import '../../../model/card.dart';
 import '../../../model/deck-build.dart';
+
+// 덱 설명 변경 알림용 클래스
+class DeckDescriptionChangedNotification extends Notification {
+  final DeckBuild deck;
+  
+  DeckDescriptionChangedNotification(this.deck);
+}
 
 class DeckBuilderView extends StatefulWidget {
   final DeckBuild deck;
@@ -37,6 +45,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   TextEditingController textEditingController = TextEditingController();
   bool isInit = true;
   int _rowNumber = 9;
+  bool _isEditorExpanded = false;
 
   void updateRowNumber(int n) {
     _rowNumber = n;
@@ -51,13 +60,16 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   initDeck() {
     widget.deck.init();
     textEditingController.text = 'My Deck';
+    // 덱 설명이 초기화되었음을 알림
+    DeckDescriptionChangedNotification(widget.deck).dispatch(context);
     setState(() {});
   }
 
   newCopy() {
     widget.deck.newCopy();
-
     textEditingController.text = widget.deck.deckName;
+    // 덱 설명이 초기화되었음을 알림
+    DeckDescriptionChangedNotification(widget.deck).dispatch(context);
     setState(() {});
   }
 
@@ -81,6 +93,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
       textEditingController.dispose();
     }
     super.dispose();
+  }
+
+  void toggleEditorExpanded(bool expanded) {
+    setState(() {
+      _isEditorExpanded = expanded;
+    });
   }
 
   @override
@@ -140,6 +158,22 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
         SizedBox(
           height: SizeService.bodyFontSize(context) * 1.5,
           child: Center(child: Text('메인', style: TextStyle(fontSize: SizeService.bodyFontSize(context)))),
+        ),
+        NotificationListener<DeckDescriptionChangedNotification>(
+          onNotification: (notification) {
+            // 알림을 처리하고 상위 위젯으로 전파하지 않음
+            return true; 
+          },
+          child: DeckEditorWidget(
+            deck: widget.deck,
+            onEditorChanged: () {
+              setState(() {});
+              widget.deck.saveMapToLocalStorage();
+            },
+            searchNote: widget.searchNote,
+            isExpanded: _isEditorExpanded,
+            toggleExpanded: toggleEditorExpanded,
+          ),
         ),
         Container(
           decoration: BoxDecoration(

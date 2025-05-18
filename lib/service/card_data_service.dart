@@ -65,6 +65,21 @@ class CardDataService {
     }
   }
 
+  void _initializeSync() {
+    // 비동기 초기화가 완료되지 않은 경우, 동기적으로 초기화 진행
+    if (!_isInitialized) {
+      _isInitialized = true;
+      // 비어있는 상태로 초기화하고 나중에 비동기로 로드될 것임
+      _allCards = {};
+      _allCardsByCardNo = {};
+      _types = {};
+      _forms = {};
+      _attributes = {};
+      // 비동기 초기화 시작
+      initialize();
+    }
+  }
+
   Set<String> searchTypes(String word) {
     Set<String> result = {};
     
@@ -350,9 +365,16 @@ class CardDataService {
 
   // ID로 카드를 얻기 위한 유틸리티 메서드
   DigimonCard? getCardById(int cardId) {
+    if (!_isInitialized) {
+      initialize();
+    }
+    
     return _allCards[cardId];
   }
   DigimonCard? getCardByCardNo(String cardNo) {
+    if (!_isInitialized) {
+      _initializeSync();
+    }
     return _allCardsByCardNo[cardNo];
   }
   
@@ -430,5 +452,76 @@ class CardDataService {
     }
     
     return korForm;
+  }
+
+  List<DigimonCard> getRecentCards(int limit) {
+    if (!_isInitialized) {
+      _initializeSync();
+    }
+    
+    // 등록일 기준으로 최신 카드 반환
+    final cards = _allCards.values.toList();
+    cards.sort((a, b) => (b.releaseDate ?? DateTime(1970))
+        .compareTo(a.releaseDate ?? DateTime(1970)));
+    
+    return cards.take(limit).toList();
+  }
+  
+  List<DigimonCard> searchCardsByNumber(String cardNoPrefix) {
+    if (!_isInitialized) {
+      _initializeSync();
+    }
+    
+    final result = <DigimonCard>[];
+    
+    // 카드 번호로 검색
+    for (final card in _allCardsByCardNo.values) {
+      if (card.cardNo != null && 
+          card.cardNo!.toLowerCase().contains(cardNoPrefix.toLowerCase())) {
+        result.add(card);
+      }
+    }
+    
+    return result;
+  }
+  
+  List<DigimonCard> searchCardsByText(String searchText) {
+    if (!_isInitialized) {
+      _initializeSync();
+    }
+    
+    if (searchText.isEmpty) {
+      return getRecentCards(10);
+    }
+    
+    final result = <DigimonCard>[];
+    final searchLower = searchText.toLowerCase();
+    
+    // 먼저 카드 번호로 검색
+    for (final card in _allCardsByCardNo.values) {
+      if (card.cardNo != null && 
+          card.cardNo!.toLowerCase().contains(searchLower)) {
+        result.add(card);
+        if (result.length >= 20) {
+          return result;
+        }
+      }
+    }
+    
+    // 카드 이름으로 검색
+    for (final card in _allCards.values) {
+      if (card.getDisplayName() != null && 
+          card.getDisplayName()!.toLowerCase().contains(searchLower)) {
+        // 중복 카드 방지
+        if (!result.any((c) => c.cardId == card.cardId)) {
+          result.add(card);
+          if (result.length >= 20) {
+            return result;
+          }
+        }
+      }
+    }
+    
+    return result;
   }
 } 

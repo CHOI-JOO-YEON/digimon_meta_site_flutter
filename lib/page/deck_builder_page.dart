@@ -163,6 +163,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             });
 
                             Navigator.of(context).pop(true);
+                            
+                            // 덱 로드 후 상태 업데이트하여 에디터에 설명이 표시되도록 함
+                            setState(() {});
                           },
                         ),
                     ],
