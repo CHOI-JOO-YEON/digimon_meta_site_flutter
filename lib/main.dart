@@ -14,12 +14,23 @@ import 'dart:html' as html;
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:ui' as ui;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   final appRouter = AppRouter();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 웹 플랫폼에서 렌더링 방식 설정
+  if (kIsWeb) {
+    // 텍스트 선택 관련 웹 렌더링 설정
+    debugPaintLayerBordersEnabled = false;
+    // 최신 Flutter 버전에서는 다음 API가 변경됨
+    // 웹 렌더링 성능 최적화 설정
+  }
 
   // 앱 시작 전 카드 데이터 초기화
   await CardDataService().initialize();

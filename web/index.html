@@ -29,6 +29,28 @@
         font-family: 'JalnanGothic';
         src: url('assets/fonts/JalnanGothic.otf') format('truetype');
     }
+
+    /* 텍스트 선택 핸들 위치 조정을 위한 CSS */
+    .flutter-text-selection-handle {
+        transform: translateY(-50%) !important;
+    }
+    
+    /* TextField의 텍스트 선택 스타일 수정 */
+    flt-glass-pane * {
+        box-sizing: border-box;
+    }
+    
+    /* 모바일 텍스트 선택 UI 수정 */
+    @media (max-width: 600px) {
+        flt-text-editing-host {
+            position: relative !important;
+        }
+        
+        .text-selection-overlay {
+            position: absolute !important;
+            z-index: 999 !important;
+        }
+    }
 </style>
 <html>
 <head>
