@@ -33,6 +33,8 @@ class CardScrollListView extends StatefulWidget {
 class _CardScrollListViewState extends State<CardScrollListView> {
   final ScrollController _scrollController = ScrollController();
   bool isLoading = false;
+  // cardNo 대신 cardId를 사용하여 효과 관리
+  final Map<int, bool> _cardAddingEffects = {};
 
   @override
   void initState() {
@@ -62,6 +64,30 @@ class _CardScrollListViewState extends State<CardScrollListView> {
     setState(() => isLoading = false);
   }
 
+  // Play addition animation for a card
+  void _playAdditionEffect(DigimonCard card) {
+    if (card.cardId == null) return; // cardId가 없는 경우 효과 적용 안함
+    
+    setState(() {
+      _cardAddingEffects[card.cardId!] = true;
+    });
+
+    // Reset effect after animation completes
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _cardAddingEffects.remove(card.cardId);
+        });
+      }
+    });
+  }
+
+  // Handle card addition with visual effect
+  void _handleCardAddition(DigimonCard card) {
+    _playAdditionEffect(card);
+    widget.cardPressEvent(card);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -73,15 +99,35 @@ class _CardScrollListViewState extends State<CardScrollListView> {
             itemBuilder: (context, index) {
               if (index < widget.cards.length) {
                 final card = widget.cards[index];
-                return Padding(
+                // cardId를 사용하여 애니메이션 효과 확인
+                final bool isAddingCard = card.cardId != null && (_cardAddingEffects[card.cardId!] ?? false);
+                
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutQuart,
+                  transform: isAddingCard 
+                      ? (Matrix4.identity()..scale(1.01))
+                      : Matrix4.identity(),
                   padding: EdgeInsets.all(SizeService.paddingSize(context)),
                   child: GestureDetector(
-                    onTap: () => widget.cardPressEvent(card),
+                    onTap: () => _handleCardAddition(card),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                             SizeService.roundRadius(context)),
-                        color: Theme.of(context).cardColor,
+                        color: isAddingCard 
+                            ? Color.lerp(Theme.of(context).cardColor, Colors.white, 0.15)
+                            : Theme.of(context).cardColor,
+                        boxShadow: isAddingCard
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 1),
+                                )
+                              ]
+                            : null,
                       ),
                       child: Container(
                         padding: EdgeInsets.all(SizeService.paddingSize(context)),
@@ -96,6 +142,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                     card,
                                     widget.searchNote,
                                   ),
+                                  // Make sure this inner GestureDetector doesn't interfere with the parent
+                                  behavior: HitTestBehavior.opaque,
                                   child: Image.network(
                                     card.getDisplaySmallImgUrl()!,
                                     errorBuilder: (context, error, stackTrace) {
@@ -106,64 +154,70 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                             Expanded(flex: 1, child: Container(),),
                             Expanded(
                                 flex: 32,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${card.cardNo} ${card.getDisplayName()}',
-                                      style: TextStyle(
-                                        fontFamily:
-                                            card.getDisplayLocale() == 'JPN'
-                                                ? "MPLUSC"
-                                                : "JalnanGothic",
-                                        fontSize: SizeService.bodyFontSize(context),
-                                        fontWeight: FontWeight.bold
+                                child: GestureDetector(
+                                  onTap: () => _handleCardAddition(card), // Make the text area clickable
+                                  behavior: HitTestBehavior.opaque, // Important - ensures the gesture is detected across the whole area
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${card.cardNo} ${card.getDisplayName()}',
+                                        style: TextStyle(
+                                          fontFamily:
+                                              card.getDisplayLocale() == 'JPN'
+                                                  ? "MPLUSC"
+                                                  : "JalnanGothic",
+                                          fontSize: SizeService.bodyFontSize(context),
+                                          fontWeight: FontWeight.bold
+                                        ),
                                       ),
-                                    ),
-                                    if (card.getDisplayEffect() != null)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              margin: EdgeInsets.only(top: 4),
-                                              padding: EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context).highlightColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
-                                              child: EffectText(
-                                                text: card.getDisplayEffect()!,
-                                                prefix: '상단 텍스트',
-                                                locale: card.getDisplayLocale()!,
+                                      if (card.getDisplayEffect() != null)
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                margin: EdgeInsets.only(top: 4),
+                                                padding: EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context).highlightColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: EffectTextClickable(
+                                                  text: card.getDisplayEffect()!,
+                                                  prefix: '상단 텍스트',
+                                                  locale: card.getDisplayLocale()!,
+                                                  onTap: () => _handleCardAddition(card),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    if (card.getDisplaySourceEffect() != null)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              margin: EdgeInsets.only(top: 4),
-                                              padding: EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context).highlightColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
-                                              child: EffectText(
-                                                text: card
-                                                    .getDisplaySourceEffect()!,
-                                                prefix: '하단 텍스트',
-                                                locale: card.getDisplayLocale()!,
+                                          ],
+                                        ),
+                                      if (card.getDisplaySourceEffect() != null)
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                margin: EdgeInsets.only(top: 4),
+                                                padding: EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context).highlightColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: EffectTextClickable(
+                                                  text: card
+                                                      .getDisplaySourceEffect()!,
+                                                  prefix: '하단 텍스트',
+                                                  locale: card.getDisplayLocale()!,
+                                                  onTap: () => _handleCardAddition(card),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
+                                          ],
+                                        ),
+                                    ],
+                                  ),
                                 ))
                           ],
                         ),
@@ -182,23 +236,26 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   }
 }
 
-class EffectText extends StatefulWidget {
+// 새로운 클릭 가능한 텍스트 위젯
+class EffectTextClickable extends StatefulWidget {
   final String text;
   final String prefix;
   final String locale;
+  final VoidCallback onTap;
 
-  const EffectText({
+  const EffectTextClickable({
     Key? key,
     required this.text,
     required this.prefix,
     required this.locale,
+    required this.onTap,
   }) : super(key: key);
 
   @override
-  State<EffectText> createState() => _EffectTextState();
+  State<EffectTextClickable> createState() => _EffectTextClickableState();
 }
 
-class _EffectTextState extends State<EffectText> {
+class _EffectTextClickableState extends State<EffectTextClickable> {
   // 현재 활성화된 설명의 키 (없으면 null)
   String? activeDescriptionKey;
   final KeywordService _keywordService = KeywordService();
@@ -241,9 +298,6 @@ class _EffectTextState extends State<EffectText> {
         String content = bracketText;
         if (content.startsWith('《') && content.endsWith('》')) {
           content = content.substring(1, content.length - 1);
-          
-          // 중첩된 괄호가 있는지 확인 (예: 리커버리 +1 《덱》)
-          // 여기서는 전체 내용을 그대로 유지하고 KeywordService가 패턴을 인식하도록 함
         } else if (content.startsWith('≪') && content.endsWith('≫')) {
           content = content.substring(1, content.length - 1);
         } else if (content.startsWith('＜') && content.endsWith('＞')) {
@@ -261,94 +315,107 @@ class _EffectTextState extends State<EffectText> {
       }
     ));
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 메인 텍스트
-        SelectableText.rich(
-          TextSpan(
-            children: spans,
-            style: TextStyle(
-              fontSize: SizeService.bodyFontSize(context),
-              color: Colors.black,
-              height: 1.4,
-              fontFamily: widget.locale == 'JPN' ? "MPLUSC" : "JalnanGothic",
+    return GestureDetector(
+      onTap: widget.onTap,
+      behavior: HitTestBehavior.opaque, // 중요: 모든 영역에서 탭 이벤트가 감지되도록 설정
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 메인 텍스트
+          Text.rich(
+            TextSpan(
+              children: spans,
+              style: TextStyle(
+                fontSize: SizeService.bodyFontSize(context),
+                color: Colors.black,
+                height: 1.4,
+                fontFamily: widget.locale == 'JPN' ? "MPLUSC" : "JalnanGothic",
+              ),
             ),
           ),
-        ),
-        
-        // 활성화된 설명이 있으면 표시
-        if (activeDescriptionKey != null)
-          Container(
-            margin: const EdgeInsets.only(top: 4, left: 8),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
-                )
-              ]
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 헤더 (키워드 이름)
-                Row(
+          
+          // 활성화된 설명이 있으면 표시
+          if (activeDescriptionKey != null)
+            GestureDetector(
+              // 설명 영역은 이벤트 전파 방지 (클릭 시 설명만 닫히도록)
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() {
+                  activeDescriptionKey = null;
+                });
+              },
+              child: Container(
+                margin: const EdgeInsets.only(top: 4, left: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
+                    )
+                  ]
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 키워드 이름 (주황색으로 변경, 아이콘 제거)
-                    Text(
-                      activeDescriptionKey!,
-                      style: TextStyle(
-                        fontSize: SizeService.bodyFontSize(context) * 0.9,
-                        fontWeight: FontWeight.bold,
-                        color: const Color.fromRGBO(206, 101, 1, 1), // 주황색으로 변경
+                    // 헤더 (키워드 이름)
+                    Row(
+                      children: [
+                        // 키워드 이름 (주황색으로 변경, 아이콘 제거)
+                        Text(
+                          activeDescriptionKey!,
+                          style: TextStyle(
+                            fontSize: SizeService.bodyFontSize(context) * 0.9,
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromRGBO(206, 101, 1, 1), // 주황색으로 변경
+                          ),
+                        ),
+                        
+                        const Spacer(),
+                        
+                        // 닫기 버튼
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              activeDescriptionKey = null;
+                            });
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: SizeService.bodyFontSize(context) * 0.8,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // 구분선
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Divider(
+                        color: Colors.grey.withOpacity(0.3),
+                        height: 1,
                       ),
                     ),
                     
-                    const Spacer(),
-                    
-                    // 닫기 버튼
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          activeDescriptionKey = null;
-                        });
-                      },
-                      child: Icon(
-                        Icons.close,
-                        size: SizeService.bodyFontSize(context) * 0.8,
-                        color: Colors.grey[600],
+                    // 효과 설명 텍스트
+                    Text(
+                      _getEffectDescriptionText(activeDescriptionKey!),
+                      style: TextStyle(
+                        fontSize: SizeService.bodyFontSize(context) * 0.85,
+                        color: Colors.black87,
                       ),
                     ),
                   ],
                 ),
-                
-                // 구분선
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Divider(
-                    color: Colors.grey.withOpacity(0.3),
-                    height: 1,
-                  ),
-                ),
-                
-                // 효과 설명 텍스트
-                Text(
-                  _getEffectDescriptionText(activeDescriptionKey!),
-                  style: TextStyle(
-                    fontSize: SizeService.bodyFontSize(context) * 0.85,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
   

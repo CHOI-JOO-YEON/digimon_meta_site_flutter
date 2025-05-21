@@ -34,6 +34,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
   final ScrollController _scrollController = ScrollController();
   bool isLoading = false;
   final CardOverlayService _cardOverlayService = CardOverlayService();
+  final Map<int, bool> _cardAddingEffects = {};
 
   @override
   void initState() {
@@ -63,6 +64,27 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
     setState(() => isLoading = false);
   }
 
+  void _playAdditionEffect(DigimonCard card) {
+    if (card.cardId == null) return;
+    
+    setState(() {
+      _cardAddingEffects[card.cardId!] = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _cardAddingEffects.remove(card.cardId);
+        });
+      }
+    });
+  }
+
+  void _handleCardAddition(DigimonCard card) {
+    _playAdditionEffect(card);
+    widget.cardPressEvent(card);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -78,17 +100,38 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
         itemCount: widget.cards.length + (isLoading ? 1 : 0),
         itemBuilder: (context, index) {
           if (index < widget.cards.length) {
-            return Padding(
+            final card = widget.cards[index];
+            final bool isAddingCard = card.cardId != null && (_cardAddingEffects[card.cardId!] ?? false);
+            
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutQuart,
+              transform: isAddingCard 
+                  ? (Matrix4.identity()..scale(1.02))
+                  : Matrix4.identity(),
               padding: const EdgeInsets.all(0),
+              decoration: isAddingCard
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 5,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    )
+                  : null,
               child: CustomCard(
-                card: widget.cards[index],
+                card: card,
                 width: (constraints.maxWidth / widget.rowNumber) * 0.99,
-                cardPressEvent: widget.cardPressEvent,
+                cardPressEvent: (card) => _handleCardAddition(card),
                 onHover: (ctx) {
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
                   _cardOverlayService.showBigImage(
                     ctx, 
-                    widget.cards[index].getDisplayImgUrl()!, 
+                    card.getDisplayImgUrl()!, 
                     renderBox, 
                     widget.rowNumber, 
                     index
@@ -97,7 +140,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 onExit: () => _cardOverlayService.hideBigImage(),
                 searchNote: widget.searchNote,
                 onLongPress: () => CardService().showImageDialog(
-                    context, widget.cards[index], widget.searchNote),
+                    context, card, widget.searchNote),
               ),
             );
           } else {
