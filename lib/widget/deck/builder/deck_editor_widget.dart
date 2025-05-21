@@ -780,10 +780,24 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         focusNode: _editorFocusNode,
         maxLines: 10,
         minLines: 5,
+        maxLength: 1000,
+        buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
+          return Text(
+            '$currentLength/$maxLength',
+            style: TextStyle(
+              fontSize: SizeService.bodyFontSize(context) * 0.8,
+              color: currentLength >= maxLength! ? Colors.red : Colors.grey.shade600,
+            ),
+          );
+        },
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(1000),
+        ],
         decoration: InputDecoration(
-          hintText: '덱 설명을 입력하세요',
+          hintText: '덱 설명을 입력하세요 (최대 1000자)',
           contentPadding: EdgeInsets.all(SizeService.paddingSize(context)),
           border: InputBorder.none,
+          counterText: null, // buildCounter를 사용하므로 기본 카운터 텍스트 숨김
         ),
         keyboardType: TextInputType.multiline,
         textInputAction: TextInputAction.newline,
@@ -801,34 +815,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
       ),
     );
 
-    // 모바일 웹을 위한 카드 검색 버튼
-    Widget cardSearchButton = ElevatedButton.icon(
-      icon: Icon(Icons.search),
-      label: Text("카드 검색"),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        padding: EdgeInsets.symmetric(
-          horizontal: SizeService.paddingSize(context),
-          vertical: SizeService.paddingSize(context) / 2,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
-        ),
-      ),
-      onPressed: () {
-        // 키보드와 상관없이 명령어 검색 UI 표시
-        _commandStartIndex = _editorController.selection.baseOffset;
-        _currentCommand = "/";
-        _showRecentCards();
-        
-        // 상태 저장 - 명령어 상태 유지를 위한 플래그
-        setState(() {
-          _isManualSearch = true;
-        });
-      },
-    );
+    // 카드 검색 버튼 제거
 
     return Container(
       decoration: BoxDecoration(
@@ -879,22 +866,15 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
                     ),
                   ),
                   SizedBox(height: SizeService.paddingSize(context)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
-                          style: TextStyle(
-                            fontSize: SizeService.bodyFontSize(context) * 0.8,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
+                      style: TextStyle(
+                        fontSize: SizeService.bodyFontSize(context) * 0.8,
+                        color: Colors.grey.shade600,
                       ),
-                      
-                      // 모바일 디바이스에서만 버튼 표시
-                      if (isMobile)
-                        cardSearchButton,
-                    ],
+                    ),
                   ),
                   
                   // 참조된 카드 표시 영역
