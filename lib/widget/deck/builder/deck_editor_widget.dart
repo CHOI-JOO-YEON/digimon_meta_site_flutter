@@ -63,7 +63,7 @@ class DeckEditorWidget extends StatefulWidget {
   State<DeckEditorWidget> createState() => _DeckEditorWidgetState();
 }
 
-class _DeckEditorWidgetState extends State<DeckEditorWidget> {
+class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBindingObserver {
   final TextEditingController _editorController = TextEditingController();
   final FocusNode _editorFocusNode = FocusNode();
   bool _isEditorExpanded = false;
@@ -102,6 +102,18 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
   // 마우스 호버 항목 인덱스
   int? _hoverIndex;
 
+  // 오버레이 상태 추적을 위한 변수 추가
+  bool _isOverlayAttached = false;
+  
+  // 키보드 닫힘 상태 추적
+  bool _isKeyboardClosing = false;
+
+  // 키보드 높이 추적
+  double _previousKeyboardHeight = 0;
+
+  // 메뉴얼 검색 상태 추적
+  bool _isManualSearch = false;
+
   @override
   void initState() {
     super.initState();
@@ -112,13 +124,14 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     
     // 포커스 변경 리스너
     _editorFocusNode.addListener(() {
-      if (!_editorFocusNode.hasFocus) {
-        _removeSuggestions();
+      // 포커스가 없어져도 자동완성 유지 - 다이얼로그를 통해서만 닫힘
+      if (!_editorFocusNode.hasFocus && !_showSuggestions) {
         _updateReferencedCards();
       }
     });
     
-    // 스크롤 리스너 제거
+    // WidgetsBinding 옵저버 등록
+    WidgetsBinding.instance.addObserver(this);
     
     // 초기 참조 카드 로드
     _updateReferencedCards();
@@ -150,12 +163,42 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
   
   @override
   void dispose() {
+    // WidgetsBinding 옵저버 제거
+    WidgetsBinding.instance.removeObserver(this);
+    
     _removeSuggestions();
     _editorController.dispose();
     _editorFocusNode.dispose();
-    _scrollController.dispose(); // 스크롤 컨트롤러 유지
+    _scrollController.dispose();
     _cancelKeyRepeat(); // 타이머 취소
     super.dispose();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 의존성 변경 시(다이얼로그 표시 등) 자동완성 닫기
+    if (_isOverlayAttached) {
+      _hideOnInteraction();
+    }
+  }
+  
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    // 키보드 높이 변화 감지
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      
+      // 키보드가 내려갔으나 (높이가 0이 됨) 자동완성이 표시 중인 경우
+      if (_previousKeyboardHeight > 0 && keyboardHeight == 0 && _showSuggestions) {
+        // 자동완성은 유지 (아무것도 하지 않음)
+      }
+      
+      _previousKeyboardHeight = keyboardHeight;
+    });
   }
   
   // 텍스트에서 참조된 카드 목록 업데이트
@@ -200,8 +243,6 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
         _commandStartIndex = match.start;
         _currentCommand = match.group(0)!;
         
-        print('명령어 감지: $_currentCommand');
-        
         // "/"만 입력했거나 접두어로 시작하는 경우
         if (_currentCommand.length > 1) {
           _searchCards(_currentCommand.substring(1)); // 슬래시 제거
@@ -212,7 +253,10 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
       }
     }
     
-    _removeSuggestions();
+    // 포커스 손실로 인한 불필요한 제안 제거 방지
+    if (_editorFocusNode.hasFocus) {
+      _removeSuggestions();
+    }
     
     // 일반 텍스트 변경
     widget.deck.description = text;
@@ -313,12 +357,22 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     // 오버레이 생성 및 표시
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
+    _isOverlayAttached = true;
+    
+    // 외부 클릭 감지를 위한 리스너 추가
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 다이얼로그가 열리는 것을 감지
+      if (ModalRoute.of(context)?.isCurrent == false) {
+        _hideOnInteraction();
+      }
+    });
   }
   
   void _removeSuggestions() {
     if (_overlayEntry != null) {
       _overlayEntry!.remove();
       _overlayEntry = null;
+      _isOverlayAttached = false;
     }
     
     setState(() {
@@ -371,6 +425,11 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     );
     
     _removeSuggestions();
+    
+    // 수동 검색 모드 해제
+    setState(() {
+      _isManualSearch = false;
+    });
 
     // 편집기에 포커스를 다시 맞춤
     Future.delayed(Duration(milliseconds: 100), () {
@@ -667,9 +726,23 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
     );
   }
 
+  bool _isMobileWeb() {
+    // 모바일 웹 브라우저 감지
+    final navigatorPlatform = WidgetsBinding.instance.window.platformDispatcher.defaultRouteName;
+    return navigatorPlatform.contains('android') || 
+           navigatorPlatform.contains('ios') || 
+           navigatorPlatform.contains('mobile');
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 텍스트 필드 위젯
+    // 현재 키보드 높이 저장
+    _previousKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    
+    // 모바일 환경인지 확인
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+    
+    // 텍스트 필드 위젯 - 키보드 이벤트 처리 로직 복원
     Widget textField = Focus(
       onKeyEvent: (FocusNode node, KeyEvent event) {
         // 자동완성이 활성화된 경우에만 특정 키 이벤트를 가로챔
@@ -696,8 +769,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
               return KeyEventResult.handled;
             }
           }
-        }
-        else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
+        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.tab) {
           return KeyEventResult.handled;
         }
         // 다른 모든 키 이벤트는 전달됨
@@ -716,7 +788,46 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
         keyboardType: TextInputType.multiline,
         textInputAction: TextInputAction.newline,
         enableInteractiveSelection: true,
+        // 화면 바깥 터치 시 키보드 닫기만 처리
+        onTapOutside: (event) {
+          // 화면 바깥을 터치했을 때 키보드는 닫히지만 자동완성은 유지
+          if (!_showSuggestions) {
+            _editorFocusNode.unfocus();
+          }
+        },
+        // 모바일 웹에서의 동작 개선
+        autocorrect: false, // 자동 수정 비활성화
+        enableSuggestions: false, // 제안 기능 비활성화
       ),
+    );
+
+    // 모바일 웹을 위한 카드 검색 버튼
+    Widget cardSearchButton = ElevatedButton.icon(
+      icon: Icon(Icons.search),
+      label: Text("카드 검색"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 2,
+        padding: EdgeInsets.symmetric(
+          horizontal: SizeService.paddingSize(context),
+          vertical: SizeService.paddingSize(context) / 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
+        ),
+      ),
+      onPressed: () {
+        // 키보드와 상관없이 명령어 검색 UI 표시
+        _commandStartIndex = _editorController.selection.baseOffset;
+        _currentCommand = "/";
+        _showRecentCards();
+        
+        // 상태 저장 - 명령어 상태 유지를 위한 플래그
+        setState(() {
+          _isManualSearch = true;
+        });
+      },
     );
 
     return Container(
@@ -768,12 +879,22 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
                     ),
                   ),
                   SizedBox(height: SizeService.paddingSize(context)),
-                  Text(
-                    '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
-                    style: TextStyle(
-                      fontSize: SizeService.bodyFontSize(context) * 0.8,
-                      color: Colors.grey.shade600,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
+                          style: TextStyle(
+                            fontSize: SizeService.bodyFontSize(context) * 0.8,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ),
+                      
+                      // 모바일 디바이스에서만 버튼 표시
+                      if (isMobile)
+                        cardSearchButton,
+                    ],
                   ),
                   
                   // 참조된 카드 표시 영역
@@ -838,6 +959,24 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> {
         ),
       ],
     );
+  }
+
+  // 다른 위젯과의 상호작용 시 자동완성 닫기
+  void _hideOnInteraction() {
+    if (_showSuggestions) {
+      _removeSuggestions();
+    }
+  }
+
+  // 자동완성 UI에서 MouseRegion 위젯에 추가할 onTap 핸들러 
+  void _onItemHover(int index) {
+    if (index != _selectedSuggestionIndex && index >= 0 && index < _suggestions.length) {
+      setState(() {
+        _selectedSuggestionIndex = index;
+        _hoverIndex = index;
+      });
+      _updateOverlay();
+    }
   }
 }
 
