@@ -12,6 +12,163 @@ import '../../../service/card_overlay_service.dart';
 import '../../../service/size_service.dart';
 import '../../common/toast_overlay.dart';
 
+// 마퀴 효과를 위한 ScrollingText 위젯 추가
+class ScrollingText extends StatefulWidget {
+  final String text;
+  final TextStyle? style;
+  final double width;
+
+  const ScrollingText({
+    Key? key,
+    required this.text,
+    this.style,
+    required this.width,
+  }) : super(key: key);
+
+  @override
+  State<ScrollingText> createState() => _ScrollingTextState();
+}
+
+class _ScrollingTextState extends State<ScrollingText> with SingleTickerProviderStateMixin {
+  late ScrollController _scrollController;
+  bool _needsScroll = false;
+  double _textWidth = 0;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback(_checkIfNeedsScroll);
+  }
+
+  void _checkIfNeedsScroll(_) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final textPainter = TextPainter(
+      text: TextSpan(text: widget.text, style: widget.style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: double.infinity);
+
+    _textWidth = textPainter.width;
+    
+    if (_textWidth > widget.width - 40) { // 40은 대략적인 패딩과 삭제 버튼 공간
+      setState(() {
+        _needsScroll = true;
+      });
+      
+      _animation = Tween<double>(
+        begin: 0.0,
+        end: _textWidth - widget.width + 40,
+      ).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Curves.easeInOut,
+        ),
+      );
+      
+      _animationController.addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+              _animationController.reverse();
+            }
+          });
+        } else if (status == AnimationStatus.dismissed) {
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+              _animationController.forward();
+            }
+          });
+        }
+      });
+      
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_needsScroll) {
+      return Text(
+        widget.text,
+        style: widget.style,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: _scrollController,
+          physics: const NeverScrollableScrollPhysics(),
+          child: Container(
+            margin: EdgeInsets.only(left: -_animation.value),
+            child: Text(
+              widget.text,
+              style: widget.style,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// MarqueeChip 위젯 추가
+class MarqueeChip extends StatelessWidget {
+  final String label;
+  final VoidCallback? onDeleted;
+  final String? deleteButtonTooltipMessage;
+  final EdgeInsetsGeometry? labelPadding;
+  final TextStyle? labelStyle;
+
+  const MarqueeChip({
+    Key? key,
+    required this.label,
+    this.onDeleted,
+    this.deleteButtonTooltipMessage,
+    this.labelPadding,
+    this.labelStyle,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: LayoutBuilder(
+        builder: (context, constraints) {
+          return SizedBox(
+            width: constraints.maxWidth,
+            child: ScrollingText(
+              text: label,
+              style: labelStyle,
+              width: constraints.maxWidth,
+            ),
+          );
+        }
+      ),
+      deleteButtonTooltipMessage: deleteButtonTooltipMessage,
+      onDeleted: onDeleted,
+      labelPadding: labelPadding,
+    );
+  }
+}
+
 class CardSearchBar extends StatefulWidget {
   final SearchParameter searchParameter;
   final List<NoteDto> notes;
@@ -56,6 +213,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
   final List<String> rarities = ['C', 'U', 'R', 'SR', 'SEC', 'P'];
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
   NoteDto all = NoteDto(noteId: null, name: '모든 카드');
+  bool _isFeaturesSectionExpanded = false;
 
   @override
   void initState() {
@@ -523,297 +681,556 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         },
                       ),
                       const Divider(),
-                      const Text(
-                        '특징',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Radio(
-                            value: 1,
-                            groupValue: typeOperation,
-                            onChanged: (value) {
-                              setState(() {
-                                // Use the same value for all three operations
-                                typeOperation = value as int;
-                                formOperation = value as int;
-                                attributeOperation = value as int;
-                              });
-                            },
+                      // Replace the static Text with a clickable row
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            // Toggle the expanded state for the features section
+                            _isFeaturesSectionExpanded = !_isFeaturesSectionExpanded;
+                          });
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isFeaturesSectionExpanded 
+                                  ? Icons.keyboard_arrow_up 
+                                  : Icons.keyboard_arrow_down,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                '특징',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                _isFeaturesSectionExpanded 
+                                  ? Icons.keyboard_arrow_up 
+                                  : Icons.keyboard_arrow_down,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ],
                           ),
-                          const Text(
-                            '하나라도 포함',
-                          ),
-                          const SizedBox(width: 20),
-                          Radio(
-                            value: 0,
-                            groupValue: typeOperation,
-                            onChanged: (value) {
-                              setState(() {
-                                // Use the same value for all three operations
-                                typeOperation = value as int;
-                                formOperation = value as int;
-                                attributeOperation = value as int;
-                              });
-                            },
-                          ),
-                          const Text(
-                            '모두 포함',
-                          ),
-                        ],
-                      ),
-                      
-                      Container(
-                        margin: const EdgeInsets.only(left: 16),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            left: BorderSide(
-                              color: Theme.of(context).primaryColor.withOpacity(0.5), 
-                              width: 2
-                            )
-                          )
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 24),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: TextField(
-                                      controller: _formSearchController,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _formSearchResults =
-                                              CardDataService().searchForms(value);
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: '형태',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                        ),
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      ),
+                      // Show/hide the features content based on expanded state
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        height: _isFeaturesSectionExpanded ? null : 0,
+                        curve: Curves.easeInOut,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: _isFeaturesSectionExpanded ? 1.0 : 0.0,
+                          child: Column(
+                            children: [
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final isNarrow = constraints.maxWidth < 300;
+                                  
+                                  return isNarrow
+                                    ? Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Radio(
+                                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                value: 1,
+                                                groupValue: typeOperation,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    // Use the same value for all three operations
+                                                    typeOperation = value as int;
+                                                    formOperation = value as int;
+                                                    attributeOperation = value as int;
+                                                  });
+                                                },
+                                              ),
+                                              const Text(
+                                                '하나라도 포함',
+                                                style: TextStyle(fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Radio(
+                                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                value: 0,
+                                                groupValue: typeOperation,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    // Use the same value for all three operations
+                                                    typeOperation = value as int;
+                                                    formOperation = value as int;
+                                                    attributeOperation = value as int;
+                                                  });
+                                                },
+                                              ),
+                                              const Text(
+                                                '모두 포함',
+                                                style: TextStyle(fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Radio(
+                                            value: 1,
+                                            groupValue: typeOperation,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                // Use the same value for all three operations
+                                                typeOperation = value as int;
+                                                formOperation = value as int;
+                                                attributeOperation = value as int;
+                                              });
+                                            },
+                                          ),
+                                          const Text(
+                                            '하나라도 포함',
+                                          ),
+                                          const SizedBox(width: 20),
+                                          Radio(
+                                            value: 0,
+                                            groupValue: typeOperation,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                // Use the same value for all three operations
+                                                typeOperation = value as int;
+                                                formOperation = value as int;
+                                                attributeOperation = value as int;
+                                              });
+                                            },
+                                          ),
+                                          const Text(
+                                            '모두 포함',
+                                          ),
+                                        ],
+                                      );
+                                }
                               ),
-                            ),
-                            const SizedBox(height: 20,),
-                            // 검색 결과 표시
-                            SizedBox(
-                              height: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 24),
-                                child: Row(
+                              
+                              Container(
+                                margin: const EdgeInsets.only(left: 16),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: Theme.of(context).primaryColor.withOpacity(0.5), 
+                                      width: 2
+                                    )
+                                  )
+                                ),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: _formSearchResults.length,
-                                        itemBuilder: (context, index) {
-                                          final form = _formSearchResults.elementAt(index);
-                                          return ListTile(
-                                            title: Text(CardDataService().getDisplayFormName(form)),
-                                            onTap: () {
-                                              _selectedForms.add(form);
-                                              setState(() {});
-                                            },
-                                          );
-                                        },
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 24),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller: _formSearchController,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _formSearchResults =
+                                                      CardDataService().searchForms(value);
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText: '형태',
+                                                labelStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                                ),
+                                                hintStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          runSpacing: 4,
-                                          spacing: 8,
-                                          children: _selectedForms
-                                              .map((form) => Chip(
-                                                    label: Text(CardDataService().getDisplayFormName(form)),
-                                                    deleteButtonTooltipMessage: '제거',
-                                                    onDeleted: () {
-                                                      setState(() {
-                                                        _selectedForms.remove(form);
-                                                      });
-                                                    },
-                                                  ))
-                                              .toList(),
+                                    const SizedBox(height: 20,),
+                                    // 검색 결과 표시
+                                    SizedBox(
+                                      height: 200,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 24),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            final isNarrow = constraints.maxWidth < 400;
+                                            
+                                            return isNarrow
+                                              ? Column(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _formSearchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final form = _formSearchResults.elementAt(index);
+                                                          return ListTile(
+                                                            dense: true,
+                                                            title: Text(
+                                                              CardDataService().getDisplayFormName(form),
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                            onTap: () {
+                                                              _selectedForms.add(form);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedForms
+                                                              .map((form) => MarqueeChip(
+                                                                    label: CardDataService().getDisplayFormName(form),
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedForms.remove(form);
+                                                                      });
+                                                                    },
+                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _formSearchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final form = _formSearchResults.elementAt(index);
+                                                          return ListTile(
+                                                            title: Text(CardDataService().getDisplayFormName(form)),
+                                                            onTap: () {
+                                                              _selectedForms.add(form);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedForms
+                                                              .map((form) => MarqueeChip(
+                                                                    label: CardDataService().getDisplayFormName(form),
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedForms.remove(form);
+                                                                      });
+                                                                    },
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                          }
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20,),
-                            // 검색 결과 표시
+                                    const SizedBox(height: 20,),
+                                    // 검색 결과 표시
 
-                            
-                            Padding(
-                              padding: const EdgeInsets.only(left: 24),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: TextField(
-                                      controller: _trieSearchController,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _searchResults =
-                                              CardDataService().searchTypes(value);
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: '유형',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                        ),
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                    
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 24),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller: _trieSearchController,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _searchResults =
+                                                      CardDataService().searchTypes(value);
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText: '유형',
+                                                labelStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                                ),
+                                                hintStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20,),
+                                    // 검색 결과 표시
+                                    SizedBox(
+                                      height: 200,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 24),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            final isNarrow = constraints.maxWidth < 400;
+                                            
+                                            return isNarrow
+                                              ? Column(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _searchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final type = _searchResults.elementAt(index);
+                                                          return ListTile(
+                                                            dense: true,
+                                                            title: Text(
+                                                              type,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                            onTap: () {
+                                                              _selectedTypes.add(type);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedTypes
+                                                              .map((type) => MarqueeChip(
+                                                                    label: type,
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedTypes.remove(type);
+                                                                      });
+                                                                    },
+                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _searchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final type = _searchResults.elementAt(index);
+                                                          return ListTile(
+                                                            title: Text(type),
+                                                            onTap: () {
+                                                              _selectedTypes.add(type);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedTypes
+                                                              .map((type) => MarqueeChip(
+                                                                    label: type,
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedTypes.remove(type);
+                                                                      });
+                                                                    },
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                          }
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20,),
-                            // 검색 결과 표시
-                            SizedBox(
-                              height: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 24),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: _searchResults.length,
-                                        itemBuilder: (context, index) {
-                                          final type = _searchResults.elementAt(index);
-                                          return ListTile(
-                                            title: Text(type),
-                                            onTap: () {
-                                              _selectedTypes.add(type);
-                                              setState(() {});
-                                            },
-                                          );
-                                        },
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 24),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: TextField(
+                                              controller: _attributeSearchController,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _attributeSearchResults =
+                                                      CardDataService().searchAttributes(value);
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText: '속성',
+                                                labelStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                                ),
+                                                hintStyle: TextStyle(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          runSpacing: 4,
-                                          spacing: 8,
-                                          children: _selectedTypes
-                                              .map((type) => Chip(
-                                                    label: Text(type),
-                                                    deleteButtonTooltipMessage: '제거',
-                                                    onDeleted: () {
-                                                      setState(() {
-                                                        _selectedTypes.remove(type);
-                                                      });
-                                                    },
-                                                  ))
-                                              .toList(),
+                                    SizedBox(
+                                      height: 200,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 24),
+                                        child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            final isNarrow = constraints.maxWidth < 400;
+                                            
+                                            return isNarrow
+                                              ? Column(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _attributeSearchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final attribute = _attributeSearchResults.elementAt(index);
+                                                          return ListTile(
+                                                            dense: true,
+                                                            title: Text(
+                                                              attribute,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                            onTap: () {
+                                                              _selectedAttributes.add(attribute);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedAttributes
+                                                              .map((attribute) => MarqueeChip(
+                                                                    label: attribute,
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedAttributes.remove(attribute);
+                                                                      });
+                                                                    },
+                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: ListView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount: _attributeSearchResults.length,
+                                                        itemBuilder: (context, index) {
+                                                          final attribute = _attributeSearchResults.elementAt(index);
+                                                          return ListTile(
+                                                            title: Text(attribute),
+                                                            onTap: () {
+                                                              _selectedAttributes.add(attribute);
+                                                              setState(() {});
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: SingleChildScrollView(
+                                                        child: Wrap(
+                                                          runSpacing: 4,
+                                                          spacing: 8,
+                                                          children: _selectedAttributes
+                                                              .map((attribute) => MarqueeChip(
+                                                                    label: attribute,
+                                                                    labelStyle: const TextStyle(fontSize: 12),
+                                                                    deleteButtonTooltipMessage: '제거',
+                                                                    onDeleted: () {
+                                                                      setState(() {
+                                                                        _selectedAttributes.remove(attribute);
+                                                                      });
+                                                                    },
+                                                                  ))
+                                                              .toList(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                          }
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 24),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: TextField(
-                                      controller: _attributeSearchController,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _attributeSearchResults =
-                                              CardDataService().searchAttributes(value);
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: '속성',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                        ),
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.6),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                                                        SizedBox(
-                              height: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 24),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: _attributeSearchResults.length,
-                                        itemBuilder: (context, index) {
-                                          final attribute = _attributeSearchResults.elementAt(index);
-                                          return ListTile(
-                                            title: Text(attribute),
-                                            onTap: () {
-                                              _selectedAttributes.add(attribute);
-                                              setState(() {});
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          runSpacing: 4,
-                                          spacing: 8,
-                                          children: _selectedAttributes
-                                              .map((attribute) => Chip(
-                                                    label: Text(attribute),
-                                                    deleteButtonTooltipMessage: '제거',
-                                                    onDeleted: () {
-                                                      setState(() {
-                                                        _selectedAttributes.remove(attribute);
-                                                      });
-                                                    },
-                                                  ))
-                                              .toList(),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
