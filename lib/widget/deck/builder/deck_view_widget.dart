@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
@@ -25,7 +26,7 @@ class DeckBuilderView extends StatefulWidget {
   final Function(DigimonCard)? mouseEnterEvent;
   final Function(DigimonCard) cardPressEvent;
   final Function(DeckBuild) import;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
   final CardOverlayService cardOverlayService;
 
   const DeckBuilderView(
@@ -34,7 +35,7 @@ class DeckBuilderView extends StatefulWidget {
       this.mouseEnterEvent,
       required this.cardPressEvent,
       required this.import,
-      this.searchNote,
+      this.searchWithParameter,
       required this.cardOverlayService});
 
   @override
@@ -164,15 +165,18 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             // 알림을 처리하고 상위 위젯으로 전파하지 않음
             return true; 
           },
-          child: DeckEditorWidget(
-            deck: widget.deck,
-            onEditorChanged: () {
-              setState(() {});
-              widget.deck.saveMapToLocalStorage();
-            },
-            searchNote: widget.searchNote,
-            isExpanded: _isEditorExpanded,
-            toggleExpanded: toggleEditorExpanded,
+          child: Expanded(
+            flex: _isEditorExpanded ? 4 : 1,
+            child: DeckEditorWidget(
+              deck: widget.deck,
+              onEditorChanged: () {
+                setState(() {});
+                widget.deck.saveMapToLocalStorage();
+              },
+              searchWithParameter: widget.searchWithParameter,
+              isExpanded: _isEditorExpanded,
+              toggleExpanded: toggleEditorExpanded,
+            ),
           ),
         ),
         Container(
@@ -183,7 +187,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             deckCount: widget.deck.deckMap,
             deck: widget.deck.deckCards,
             rowNumber: _rowNumber,
-            searchNote: widget.searchNote,
+            searchWithParameter: widget.searchWithParameter,
             addCard: addCard,
             removeCard: removeCard,
             isTama: false,
@@ -203,7 +207,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             deckCount: widget.deck.tamaMap,
             deck: widget.deck.tamaCards,
             rowNumber: _rowNumber,
-            searchNote: widget.searchNote,
+            searchWithParameter: widget.searchWithParameter,
             addCard: addCard,
             removeCard: removeCard,
             isTama: true,

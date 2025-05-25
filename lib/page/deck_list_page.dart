@@ -96,12 +96,11 @@ class _DeckListPageState extends State<DeckListPage> {
     super.dispose();
   }
 
-  void searchNote(int noteId) {
-    SearchParameter searchParameter = SearchParameter();
-    searchParameter.noteId = noteId;
+  void searchWithParameter(SearchParameter parameter) {
     context.navigateTo(DeckBuilderRoute(
-        searchParameterString: json.encode(searchParameter.toJson())));
+        searchParameterString: json.encode(parameter.toJson())));
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -282,7 +281,7 @@ class _DeckListPageState extends State<DeckListPage> {
                             children: [
                               DeckViewerView(
                                 deck: _selectedDeck!,
-                                searchNote: searchNote,
+                                searchWithParameter: searchWithParameter,
                               ),
                               SizedBox(
                                 height:
@@ -309,7 +308,7 @@ class _DeckListPageState extends State<DeckListPage> {
                           ? Container()
                           : DeckViewerView(
                               deck: _selectedDeck!,
-                              searchNote: searchNote,
+                              searchWithParameter: searchWithParameter,
                             ),
                     ),
                   ),

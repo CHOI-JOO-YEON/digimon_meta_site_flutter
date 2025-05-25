@@ -46,7 +46,7 @@ class CardReference {
 class DeckEditorWidget extends StatefulWidget {
   final DeckBuild deck;
   final Function() onEditorChanged;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
   final bool isExpanded;
   final Function(bool) toggleExpanded;
 
@@ -54,7 +54,7 @@ class DeckEditorWidget extends StatefulWidget {
     Key? key,
     required this.deck,
     required this.onEditorChanged,
-    this.searchNote,
+    this.searchWithParameter,
     this.isExpanded = false,
     required this.toggleExpanded,
   }) : super(key: key);
@@ -893,7 +893,11 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     final card = CardDataService().getCardByCardNo(cardNo);
     if (card != null) {
       // CardService를 사용하여 카드 이미지 다이얼로그 표시
-      CardService().showImageDialog(context, card, widget.searchNote);
+      CardService().showImageDialog(
+        context, 
+        card, 
+        searchWithParameter: widget.searchWithParameter
+      );
     }
   }
 

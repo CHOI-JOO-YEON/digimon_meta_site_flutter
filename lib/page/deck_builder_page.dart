@@ -213,15 +213,12 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
   }
 
-  void searchNote(int noteId) {
-    searchParameter = SearchParameter();
-    searchParameter.noteId = noteId;
+  void searchWithParameter(SearchParameter parameter) {
     context.navigateTo(DeckBuilderRoute(
-        searchParameterString: json.encode(searchParameter.toJson()),
+        searchParameterString: json.encode(parameter.toJson()),
         deck: widget.deck));
-
-    initSearch();
   }
+
 
   Future<void> initSearch() async {
     setState(() {
@@ -472,7 +469,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             cardPressEvent: addCardByDeck,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
-                                            searchNote: searchNote,
+                                            searchWithParameter: searchWithParameter,
                                           )
                                         : CardScrollListView(
                                             cards: cards,
@@ -480,7 +477,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             cardPressEvent: addCardByDeck,
                                             totalPages: totalPages,
                                             currentPage: currentPage,
-                                            searchNote: searchNote,
+                                            searchWithParameter: searchWithParameter,
                                           ))
                                     : Padding(
                                         padding: const EdgeInsets.all(16.0),
@@ -547,7 +544,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     deck: deck,
                     cardPressEvent: removeCardByDeck,
                     import: deckUpdate,
-                    searchNote: searchNote,
+                    searchWithParameter: searchWithParameter,
                     cardOverlayService: _cardOverlayService,
                   ),
                   SizedBox(
@@ -577,7 +574,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     deck: deck,
                     cardPressEvent: removeCardByDeck,
                     import: deckUpdate,
-                    searchNote: searchNote,
+                    searchWithParameter: searchWithParameter,
                     cardOverlayService: _cardOverlayService,
                   ),
                 ),
@@ -619,7 +616,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
                                       currentPage: currentPage,
-                                      searchNote: searchNote,
+                                      searchWithParameter: searchWithParameter,
                                     )
                                   : CardScrollListView(
                                       cards: cards,
@@ -627,7 +624,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
                                       currentPage: currentPage,
-                                      searchNote: searchNote,
+                                      searchWithParameter: searchWithParameter,
                                     ))
                               : Padding(
                                   padding: const EdgeInsets.all(16.0),

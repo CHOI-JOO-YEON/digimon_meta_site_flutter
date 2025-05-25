@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
@@ -20,5 +21,15 @@ class CardApi {
     } catch (e) {
       throw Exception('Error occurred while fetching cards');
     }
+  }
+  
+  // Search cards using the CardDataService
+  Future<List<DigimonCard>> searchCards({String? cardNo, String? searchText}) async {
+    if (cardNo != null && cardNo.isNotEmpty) {
+      return cardDataService.searchCardsByNumber(cardNo);
+    } else if (searchText != null && searchText.isNotEmpty) {
+      return cardDataService.searchCardsByText(searchText);
+    }
+    return [];
   }
 }

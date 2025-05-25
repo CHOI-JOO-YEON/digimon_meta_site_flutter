@@ -1,3 +1,4 @@
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Make sure to import the provider package
@@ -15,12 +16,12 @@ import '../../../provider/deck_sort_provider.dart';
 
 class DeckViewerView extends StatefulWidget {
   final DeckBuild deck;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
 
   const DeckViewerView({
     super.key,
     required this.deck,
-    this.searchNote, 
+    this.searchWithParameter, 
   });
 
   @override
@@ -132,9 +133,9 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             deckCount: widget.deck.deckMap,
             deck: widget.deck.deckCards,
             rowNumber: _rowNumber,
-            searchNote: widget.searchNote,
             isTama: false,
             cardOverlayService: cardOverlayService,
+            searchWithParameter: widget.searchWithParameter,
           ),
         ),
         SizedBox(
@@ -153,7 +154,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             deckCount: widget.deck.tamaMap,
             deck: widget.deck.tamaCards,
             rowNumber: _rowNumber,
-            searchNote: widget.searchNote,
+            searchWithParameter: widget.searchWithParameter,
             isTama: true,
             cardOverlayService: cardOverlayService,
           ),
@@ -161,7 +162,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
         SizedBox(height: SizeService.paddingSize(context)),
         DeckDescriptionView(
           deck: widget.deck,
-          searchNote: widget.searchNote,
+          searchWithParameter: widget.searchWithParameter,
         ),
       ],
     );

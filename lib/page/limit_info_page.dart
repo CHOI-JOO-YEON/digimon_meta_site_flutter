@@ -36,11 +36,9 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   VoidCallback? _onImageReady;
   
   // 입수처로 카드를 검색하는 함수
-  void searchNote(int noteId) {
-    SearchParameter searchParameter = SearchParameter();
-    searchParameter.noteId = noteId;
+  void searchWithParameter(SearchParameter parameter) {
     context.navigateTo(DeckBuilderRoute(
-        searchParameterString: json.encode(searchParameter.toJson())));
+        searchParameterString: json.encode(parameter.toJson())));
   }
 
   // 특정 금제 정보를 이미지로 캡처하는 함수
@@ -1185,11 +1183,11 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
             card: card,
             cardPressEvent: (selectedCard) {
               // 카드 클릭 시 동작
-              CardService().showImageDialog(context, selectedCard, searchNote);
+              CardService().showImageDialog(context, selectedCard, searchWithParameter: searchWithParameter);
             },
             onLongPress: () {
               // 길게 누르면 카드 상세 정보 표시
-              CardService().showImageDialog(context, card, searchNote);
+              CardService().showImageDialog(context, card, searchWithParameter: searchWithParameter);
             },
             // 항상 컬러로 표시 (흑백 처리 제거)
             isActive: true,

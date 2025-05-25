@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +24,7 @@ class CustomCard extends StatefulWidget {
   final Function? onExit;
   final Function? onLongPress;
   final Function? onDoubleTab;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
 
   final bool hideLimitBadges;
   final bool hoverEffect;
@@ -47,7 +48,7 @@ class CustomCard extends StatefulWidget {
     this.onLongPress,
     this.isActive,
     this.zoomActive,
-    this.searchNote,
+    this.searchWithParameter,
     this.onDoubleTab,
     this.hideLimitBadges = false,
     this.hoverEffect = false,
@@ -455,7 +456,8 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                             ),
                             onPressed: () {
                               CardService().showImageDialog(
-                                  context, widget.card, widget.searchNote);
+                                 context, widget.card, 
+                                 searchWithParameter: widget.searchWithParameter);
                             },
                           ),
                         ),

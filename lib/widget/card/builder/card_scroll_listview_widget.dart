@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/service/keyword_service.dart';
 import 'package:flutter/material.dart';
@@ -8,22 +9,22 @@ import '../../../service/size_service.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
-  final Future<void> Function() loadMoreCards;
-  final Function(DigimonCard) cardPressEvent;
+  final VoidCallback? loadMoreCards;
+  final Function(DigimonCard)? cardPressEvent;
   final int totalPages;
   final int currentPage;
-  final Function(DigimonCard)? mouseEnterEvent;
-  final Function(int)? searchNote;
+  final Function? mouseEnterEvent;
+  final Function(SearchParameter)? searchWithParameter;
 
   const CardScrollListView({
     super.key,
     required this.cards,
-    required this.loadMoreCards,
-    required this.cardPressEvent,
+    this.loadMoreCards,
+    this.cardPressEvent,
     this.mouseEnterEvent,
     required this.totalPages,
     required this.currentPage,
-    this.searchNote,
+    this.searchWithParameter,
   });
 
   @override
@@ -60,7 +61,9 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
   Future<void> loadMoreItems() async {
     setState(() => isLoading = true);
-    await widget.loadMoreCards();
+    if (widget.loadMoreCards != null) {
+      widget.loadMoreCards!();
+    }
     setState(() => isLoading = false);
   }
 
@@ -85,7 +88,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   // Handle card addition with visual effect
   void _handleCardAddition(DigimonCard card) {
     _playAdditionEffect(card);
-    widget.cardPressEvent(card);
+    widget.cardPressEvent!(card);
   }
 
   @override
@@ -140,7 +143,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                   onTap: () => CardService().showImageDialog(
                                     context,
                                     card,
-                                    widget.searchNote,
+                                    searchWithParameter: widget.searchWithParameter,
                                   ),
                                   // Make sure this inner GestureDetector doesn't interfere with the parent
                                   behavior: HitTestBehavior.opaque,

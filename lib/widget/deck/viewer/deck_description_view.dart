@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
@@ -42,12 +43,12 @@ class CardReference {
 
 class DeckDescriptionView extends StatelessWidget {
   final DeckBuild deck;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
 
   const DeckDescriptionView({
     Key? key,
     required this.deck,
-    this.searchNote,
+    this.searchWithParameter,
   }) : super(key: key);
 
   @override
@@ -252,7 +253,11 @@ class DeckDescriptionView extends StatelessWidget {
     final card = CardDataService().getCardByCardNo(cardNo);
     if (card != null) {
       // CardService를 사용하여 카드 이미지 다이얼로그 표시
-      CardService().showImageDialog(context, card, searchNote);
+      CardService().showImageDialog(
+        context, 
+        card, 
+        searchWithParameter: searchWithParameter,
+      );
     }
   }
 } 

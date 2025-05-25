@@ -1,4 +1,5 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
+import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:flutter/material.dart';
 
 import '../../../service/card_overlay_service.dart';
@@ -8,23 +9,22 @@ import '../card_widget.dart';
 class CardScrollGridView extends StatefulWidget {
   final List<DigimonCard> cards;
   final int rowNumber;
-  final Future<void> Function() loadMoreCards;
-  final Function(DigimonCard) cardPressEvent;
+  final VoidCallback? loadMoreCards;
+  final Function(DigimonCard)? cardPressEvent;
   final int totalPages;
   final int currentPage;
-  final Function(DigimonCard)? mouseEnterEvent;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
 
-  const CardScrollGridView(
-      {super.key,
-      required this.cards,
-      required this.rowNumber,
-      required this.loadMoreCards,
-      required this.cardPressEvent,
-      this.mouseEnterEvent,
-      required this.totalPages,
-      required this.currentPage,
-      this.searchNote,});
+  const CardScrollGridView({
+    super.key,
+    required this.cards,
+    required this.rowNumber,
+    this.loadMoreCards,
+    this.cardPressEvent,
+    required this.totalPages,
+    required this.currentPage,
+    this.searchWithParameter,
+  });
 
   @override
   State<CardScrollGridView> createState() => _CardScrollGridViewState();
@@ -60,7 +60,9 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
 
   Future<void> loadMoreItems() async {
     setState(() => isLoading = true);
-    await widget.loadMoreCards();
+    if (widget.loadMoreCards != null) {
+      widget.loadMoreCards!();
+    }
     setState(() => isLoading = false);
   }
 
@@ -82,7 +84,9 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
 
   void _handleCardAddition(DigimonCard card) {
     _playAdditionEffect(card);
-    widget.cardPressEvent(card);
+    if (widget.cardPressEvent != null) {
+      widget.cardPressEvent!(card);
+    }
   }
 
   @override
@@ -138,9 +142,8 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                   );
                 },
                 onExit: () => _cardOverlayService.hideBigImage(),
-                searchNote: widget.searchNote,
                 onLongPress: () => CardService().showImageDialog(
-                    context, card, widget.searchNote),
+                    context, card, searchWithParameter: widget.searchWithParameter),
               ),
             );
           } else {

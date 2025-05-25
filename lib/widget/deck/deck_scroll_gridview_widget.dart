@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../model/card.dart';
+import '../../model/search_parameter.dart';
 import '../../service/card_overlay_service.dart';
 import '../../service/card_service.dart';
 import '../card/card_widget.dart';
@@ -10,7 +11,7 @@ class DeckScrollGridView extends StatefulWidget {
   final Map<DigimonCard, int> deckCount;
   final List<DigimonCard> deck;
   final int rowNumber;
-  final Function(int)? searchNote;
+  final Function(SearchParameter)? searchWithParameter;
   final Function(DigimonCard)? addCard;
   final Function(DigimonCard)? removeCard;
   final CardOverlayService cardOverlayService;
@@ -21,7 +22,7 @@ class DeckScrollGridView extends StatefulWidget {
     required this.deckCount,
     required this.rowNumber,
     required this.deck,
-    this.searchNote,
+    this.searchWithParameter,
     this.addCard,
     this.removeCard,
     required this.cardOverlayService,
@@ -123,20 +124,20 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                 onLongPress: () => CardService().showImageDialog(
                   context,
                   card,
-                  widget.searchNote,
+                  searchWithParameter: widget.searchWithParameter
                 ),
-                onHover: (context) {
-                  final RenderBox renderBox =
-                      cardKey.currentContext!.findRenderObject() as RenderBox;
+                onHover: (ctx) {
+                  final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
                   widget.cardOverlayService.showBigImage(
-                      context,
-                      card.getDisplayImgUrl()!,
-                      renderBox,
-                      widget.rowNumber,
-                      index);
+                    ctx, 
+                    card.getDisplayImgUrl()!, 
+                    renderBox, 
+                    widget.rowNumber, 
+                    index
+                  );
                 },
-                onExit: widget.cardOverlayService.hideBigImage,
-                searchNote: widget.searchNote,
+                onExit: () => widget.cardOverlayService.hideBigImage(),
+                searchWithParameter: widget.searchWithParameter,
                 hoverEffect: true,
                 addCard: widget.addCard,
                 removeCard: widget.removeCard,
