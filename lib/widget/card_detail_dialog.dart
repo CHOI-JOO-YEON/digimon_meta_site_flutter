@@ -362,6 +362,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '형태',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
+                    compact: true,
                   ),
                 if (widget.card.attribute != null)
                   _attributeWidget(
@@ -370,6 +371,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '속성',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
+                    compact: true,
                   ),
                 if (widget.card.types != null && widget.card.types!.isNotEmpty)
                   _attributeWidget(
@@ -378,6 +380,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '유형',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
+                    compact: true,
                   ),
               ],
             ),
@@ -388,6 +391,9 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
 
   Widget _buildAttributesRow(BuildContext context, double fontSize) {
     return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.start,
       children: [
         if (widget.card.form != null)
           _attributeWidget(
@@ -396,6 +402,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             '형태',
             ColorService.getColorFromString(widget.card.color1!),
             fontSize,
+            compact: true,
           ),
         if (widget.card.attribute != null)
           _attributeWidget(
@@ -404,6 +411,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             '속성',
             ColorService.getColorFromString(widget.card.color1!),
             fontSize,
+            compact: true,
           ),
         if (widget.card.types != null && widget.card.types!.isNotEmpty)
           _attributeWidget(
@@ -412,6 +420,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             '유형',
             ColorService.getColorFromString(widget.card.color1!),
             fontSize,
+            compact: true,
           ),
       ],
     );
@@ -626,56 +635,62 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     String category,
     Color categoryColor,
     double fontSize,
+    {bool compact = false}
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Theme.of(context).splashColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                category,
-                style: TextStyle(color: categoryColor, fontSize: fontSize),
-              ),
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: compact ? 200 : double.infinity,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).splashColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0, bottom: 4.0),
+            child: Text(
+              category,
+              style: TextStyle(color: categoryColor, fontSize: fontSize),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: attributes.expand((attribute) {
-                  // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
-                  if (attribute.contains('/')) {
-                    final parts = attribute.split('/');
-                    return parts.map((part) => Chip(
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: attributes.expand((attribute) {
+                // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
+                if (attribute.contains('/')) {
+                  final parts = attribute.split('/');
+                  return parts.map((part) => Chip(
+                    label: Text(
+                      part.trim(),
+                      style: TextStyle(fontSize: fontSize * 0.9),
+                    ),
+                    padding: EdgeInsets.zero,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                  ));
+                } else {
+                  // 기존과 같이 단일 칩으로 표시
+                  return [
+                    Chip(
                       label: Text(
-                        part.trim(),
+                        attribute,
                         style: TextStyle(fontSize: fontSize * 0.9),
                       ),
-                    ));
-                  } else {
-                    // 기존과 같이 단일 칩으로 표시
-                    return [
-                      Chip(
-                        label: Text(
-                          attribute,
-                          style: TextStyle(fontSize: fontSize * 0.9),
-                        ),
-                      )
-                    ];
-                  }
-                }).toList(),
-              ),
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                    )
+                  ];
+                }
+              }).toList(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
