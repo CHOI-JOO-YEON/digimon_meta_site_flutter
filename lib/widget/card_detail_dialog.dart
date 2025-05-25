@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/api/card_api.dart';
@@ -362,7 +363,6 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '형태',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
-                    compact: true,
                   ),
                 if (widget.card.attribute != null)
                   _attributeWidget(
@@ -371,7 +371,6 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '속성',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
-                    compact: true,
                   ),
                 if (widget.card.types != null && widget.card.types!.isNotEmpty)
                   _attributeWidget(
@@ -380,7 +379,6 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     '유형',
                     ColorService.getColorFromString(widget.card.color1!),
                     fontSize,
-                    compact: true,
                   ),
               ],
             ),
@@ -390,39 +388,163 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
   }
 
   Widget _buildAttributesRow(BuildContext context, double fontSize) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.start,
-      children: [
-        if (widget.card.form != null)
-          _attributeWidget(
-            context,
-            [widget.card.getKorForm()],
-            '형태',
-            ColorService.getColorFromString(widget.card.color1!),
-            fontSize,
-            compact: true,
+    return AutoScrollingWidget(
+      duration: Duration(milliseconds: 
+      ((widget.card.form?.contains('/') ?? false) ? 2 : 1) + 
+      1 + 
+      ((widget.card.types?.length ?? 0) )
+      *2000),
+      pauseDuration: 1,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (widget.card.form != null)
+            _attributeCompactWidget(
+              context,
+              [widget.card.getKorForm()],
+              '형태',
+              ColorService.getColorFromString(widget.card.color1!),
+              fontSize,
+            ),
+          SizedBox(width: 8),
+          if (widget.card.attribute != null)
+            _attributeCompactWidget(
+              context,
+              [widget.card.attribute!],
+              '속성',
+              ColorService.getColorFromString(widget.card.color1!),
+              fontSize,
+            ),
+          SizedBox(width: 8),
+          if (widget.card.types != null && widget.card.types!.isNotEmpty)
+            _attributeCompactWidget(
+              context,
+              widget.card.types!,
+              '유형',
+              ColorService.getColorFromString(widget.card.color1!),
+              fontSize,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _attributeCompactWidget(
+    BuildContext context,
+    List<String> attributes,
+    String category,
+    Color categoryColor,
+    double fontSize,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).splashColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$category: ',
+            style: TextStyle(
+              color: categoryColor, 
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        if (widget.card.attribute != null)
-          _attributeWidget(
-            context,
-            [widget.card.attribute!],
-            '속성',
-            ColorService.getColorFromString(widget.card.color1!),
-            fontSize,
-            compact: true,
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: attributes.expand((attribute) {
+              // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
+              if (attribute.contains('/')) {
+                final parts = attribute.split('/');
+                return parts.map((part) => Chip(
+                  label: Text(
+                    part.trim(),
+                    style: TextStyle(fontSize: fontSize * 0.9),
+                  ),
+                  padding: EdgeInsets.zero,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                ));
+              } else {
+                // 기존과 같이 단일 칩으로 표시
+                return [
+                  Chip(
+                    label: Text(
+                      attribute,
+                      style: TextStyle(fontSize: fontSize * 0.9),
+                    ),
+                    padding: EdgeInsets.zero,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                  )
+                ];
+              }
+            }).toList(),
           ),
-        if (widget.card.types != null && widget.card.types!.isNotEmpty)
-          _attributeWidget(
-            context,
-            widget.card.types!,
-            '유형',
-            ColorService.getColorFromString(widget.card.color1!),
-            fontSize,
-            compact: true,
+        ],
+      ),
+    );
+  }
+
+  Widget _attributeWidget(
+    BuildContext context,
+    List<String> attributes,
+    String category,
+    Color categoryColor,
+    double fontSize,
+  ) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Theme.of(context).splashColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              category,
+              style: TextStyle(color: categoryColor, fontSize: fontSize),
+            ),
           ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: attributes.expand((attribute) {
+                // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
+                if (attribute.contains('/')) {
+                  final parts = attribute.split('/');
+                  return parts.map((part) => Chip(
+                    label: Text(
+                      part.trim(),
+                      style: TextStyle(fontSize: fontSize * 0.9),
+                    ),
+                  ));
+                } else {
+                  // 기존과 같이 단일 칩으로 표시
+                  return [
+                    Chip(
+                      label: Text(
+                        attribute,
+                        style: TextStyle(fontSize: fontSize * 0.9),
+                      ),
+                    )
+                  ];
+                }
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -626,72 +748,6 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           ),
         );
       },
-    );
-  }
-
-  Widget _attributeWidget(
-    BuildContext context,
-    List<String> attributes,
-    String category,
-    Color categoryColor,
-    double fontSize,
-    {bool compact = false}
-  ) {
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: compact ? 200 : double.infinity,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).splashColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0, bottom: 4.0),
-            child: Text(
-              category,
-              style: TextStyle(color: categoryColor, fontSize: fontSize),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: attributes.expand((attribute) {
-                // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
-                if (attribute.contains('/')) {
-                  final parts = attribute.split('/');
-                  return parts.map((part) => Chip(
-                    label: Text(
-                      part.trim(),
-                      style: TextStyle(fontSize: fontSize * 0.9),
-                    ),
-                    padding: EdgeInsets.zero,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
-                  ));
-                } else {
-                  // 기존과 같이 단일 칩으로 표시
-                  return [
-                    Chip(
-                      label: Text(
-                        attribute,
-                        style: TextStyle(fontSize: fontSize * 0.9),
-                      ),
-                      padding: EdgeInsets.zero,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
-                    )
-                  ];
-                }
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1229,5 +1285,126 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     }
 
     return Colors.black;
+  }
+}
+
+class AutoScrollingWidget extends StatefulWidget {
+  final Widget child;
+  final Duration duration;
+  final double pauseDuration;
+  final Curve curve;
+
+  const AutoScrollingWidget({
+    Key? key,
+    required this.child,
+    this.duration = const Duration(seconds: 10),
+    this.pauseDuration = 2.0,
+    this.curve = Curves.linear,
+  }) : super(key: key);
+
+  @override
+  State<AutoScrollingWidget> createState() => _AutoScrollingWidgetState();
+}
+
+class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTickerProviderStateMixin {
+  late ScrollController _scrollController;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  double _contentWidth = 0;
+  double _viewportWidth = 0;
+  bool _hasOverflow = false;
+  Timer? _pauseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    );
+
+    _animation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: widget.curve,
+      ),
+    );
+
+    _animation.addListener(_updateScroll);
+    
+    // Start animation after layout is complete and we know content size
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForOverflow();
+      if (_hasOverflow) {
+        _startScrolling();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollController.dispose();
+    _pauseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkForOverflow() {
+    if (!_scrollController.hasClients) return;
+    
+    _contentWidth = _scrollController.position.maxScrollExtent + _scrollController.position.viewportDimension;
+    _viewportWidth = _scrollController.position.viewportDimension;
+    
+    _hasOverflow = _contentWidth > _viewportWidth;
+    
+    if (_hasOverflow && !_animationController.isAnimating) {
+      _startScrolling();
+    }
+  }
+
+  void _updateScroll() {
+    if (!_scrollController.hasClients) return;
+    
+    double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    if (maxScrollExtent <= 0) return;
+    
+    double scrollPosition = maxScrollExtent * _animation.value;
+    _scrollController.jumpTo(scrollPosition);
+  }
+
+  void _startScrolling() {
+    _animationController.forward().then((_) {
+      // Pause at the end
+      _pauseTimer = Timer(Duration(seconds: widget.pauseDuration.toInt()), () {
+        if (mounted) {
+          // Reset to beginning
+          _scrollController.jumpTo(0);
+          _animationController.reset();
+          // Start again
+          _startScrolling();
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<SizeChangedLayoutNotification>(
+      onNotification: (_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _checkForOverflow();
+        });
+        return true;
+      },
+      child: SizeChangedLayoutNotifier(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: _scrollController,
+          physics: NeverScrollableScrollPhysics(), // Disable manual scrolling
+          child: widget.child,
+        ),
+      ),
+    );
   }
 } 
