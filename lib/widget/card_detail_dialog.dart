@@ -388,44 +388,49 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
   }
 
   Widget _buildAttributesRow(BuildContext context, double fontSize) {
-    return AutoScrollingWidget(
-      duration: Duration(milliseconds: 
-      ((widget.card.form?.contains('/') ?? false) ? 2 : 1) + 
-      1 + 
-      ((widget.card.types?.length ?? 0) )
-      *2000),
-      pauseDuration: 1,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          if (widget.card.form != null)
-            _attributeCompactWidget(
-              context,
-              [widget.card.getKorForm()],
-              '형태',
-              ColorService.getColorFromString(widget.card.color1!),
-              fontSize,
-            ),
-          SizedBox(width: 8),
-          if (widget.card.attribute != null)
-            _attributeCompactWidget(
-              context,
-              [widget.card.attribute!],
-              '속성',
-              ColorService.getColorFromString(widget.card.color1!),
-              fontSize,
-            ),
-          SizedBox(width: 8),
-          if (widget.card.types != null && widget.card.types!.isNotEmpty)
-            _attributeCompactWidget(
-              context,
-              widget.card.types!,
-              '유형',
-              ColorService.getColorFromString(widget.card.color1!),
-              fontSize,
-            ),
-        ],
-      ),
+    return Column(
+      children: [
+        SizedBox(height: 5),
+        AutoScrollingWidget(
+          duration: Duration(milliseconds: 
+          ((widget.card.form?.contains('/') ?? false) ? 2 : 1) + 
+          1 + 
+          ((widget.card.types?.length ?? 0) )
+          *2000),
+          pauseDuration: 1,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              if (widget.card.form != null)
+                _attributeCompactWidget(
+                  context,
+                  [widget.card.getKorForm()],
+                  '형태',
+                  ColorService.getColorFromString(widget.card.color1!),
+                  fontSize,
+                ),
+              SizedBox(width: 8),
+              if (widget.card.attribute != null)
+                _attributeCompactWidget(
+                  context,
+                  [widget.card.attribute!],
+                  '속성',
+                  ColorService.getColorFromString(widget.card.color1!),
+                  fontSize,
+                ),
+              SizedBox(width: 8),
+              if (widget.card.types != null && widget.card.types!.isNotEmpty)
+                _attributeCompactWidget(
+                  context,
+                  widget.card.types!,
+                  '유형',
+                  ColorService.getColorFromString(widget.card.color1!),
+                  fontSize,
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
