@@ -33,7 +33,7 @@ class UserProvider with ChangeNotifier {
   Future<bool> loginCheck() async {
     bool isLogin = await UserApi().isLogin();
     if(!isLogin) {
-      clearKakaoAuth();
+      await UserApi().logout();
       _nickname = null;
       _role = null;
       html.window.localStorage.remove('nickname');
@@ -63,37 +63,13 @@ class UserProvider with ChangeNotifier {
     _isLogin=true;
     notifyListeners();
   }
-
-  void clearKakaoAuth() {
-    // Clear cookies that might be related to Kakao auth
-    final cookies = html.document.cookie!.split(';');
-    for (var cookie in cookies) {
-      final parts = cookie.trim().split('=');
-      final name = parts[0];
-      if (name.contains('kakao') || name.contains('_kp') || name.contains('_ka')) {
-        final path = '/';
-        html.document.cookie = '$name=; path=$path; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      }
-    }
-  }
-
   Future<void> logout(BuildContext context) async {
     // 새로운 팝업 방식 로그아웃 사용
-    bool isLogout = await UserService().logoutWithPopup(context);
-    if(isLogout){
-      clearKakaoAuth();
-      _nickname = null;
-      _role = null;
-      html.window.localStorage.remove('nickname');
-      html.window.localStorage.remove('role');
-      html.window.localStorage.remove('userNo');
-      _isLogin=false;
-      notifyListeners();
-    }
+    await UserService().logoutWithPopup(context);
   }
 
   Future<void> unAuth() async {
-    clearKakaoAuth();
+    await UserApi().logout();
     _nickname = null;
     _role = null;
     html.window.localStorage.remove('nickname');
