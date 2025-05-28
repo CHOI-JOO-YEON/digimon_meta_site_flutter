@@ -221,19 +221,6 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   tooltip: '대회 제출용 레시피',
                 ),
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => DeckService().showDeckSettingDialog(
-                      context, widget.deck, widget.reload),
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.settings),
-                  tooltip: '덱 설정',
-                ),
-              ),
               if (hasManagerRole)
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(

@@ -26,8 +26,11 @@ import 'package:auto_route/auto_route.dart';
 
 import '../model/format.dart';
 import '../model/limit_dto.dart';
+import '../model/user_setting_dto.dart';
 import '../provider/deck_sort_provider.dart';
 import '../provider/limit_provider.dart';
+import '../provider/user_provider.dart';
+import '../service/user_setting_service.dart';
 import 'package:image/image.dart' as imglib;
 
 import '../router.dart';
@@ -35,6 +38,7 @@ import 'card_overlay_service.dart';
 import 'color_service.dart';
 import 'lang_service.dart';
 import 'card_data_service.dart';
+import '../model/sort_criterion_dto.dart';
 
 class DeckService {
   DeckApi deckApi = DeckApi();
@@ -928,9 +932,25 @@ class DeckService {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Consumer2<LimitProvider, DeckSortProvider>(
-          builder: (context, limitProvider, deckSortProvider, child) {
+        return Consumer3<LimitProvider, DeckSortProvider, UserProvider>(
+          builder: (context, limitProvider, deckSortProvider, userProvider, child) {
+            // selectedLimit 초기화 - 저장된 설정을 확인하여 초기화
             LimitDto? selectedLimit = limitProvider.selectedLimit;
+            
+            // 로컬 스토리지에서 defaultLimitId 직접 확인
+            final defaultLimitIdStr = html.window.localStorage['defaultLimitId'];
+            final defaultLimitId = defaultLimitIdStr != null ? int.tryParse(defaultLimitIdStr) : null;
+            
+            if (defaultLimitId == 0) {
+              // defaultLimitId가 0이면 "항상 최신 금제로 설정" 옵션으로 설정
+              selectedLimit = LimitDto(
+                id: 0,
+                restrictionBeginDate: DateTime.now(),
+                allowedQuantityMap: {},
+                limitPairs: [],
+              );
+            }
+            
             bool isStrict = deck.isStrict;
             List<SortCriterion> sortPriority = List.from(
               deckSortProvider.sortPriority.map(
@@ -961,8 +981,9 @@ class DeckService {
                           child: const Text('취소'),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (!deck.isStrict && isStrict) {
+                              // 엄격한 덱 작성 모드 활성화 시 먼저 확인
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -974,28 +995,65 @@ class DeckService {
                                       TextButton(
                                         child: Text('취소'),
                                         onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close warning dialog
+                                          Navigator.of(context).pop(); // Close warning dialog
                                         },
                                       ),
                                       TextButton(
                                         child: Text('확인'),
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          // 확인 후 설정 저장
+                                          UserSettingDto setting = UserSettingDto(
+                                            defaultLimitId: selectedLimit?.id == 0 ? 0 : selectedLimit?.id,
+                                            strictDeck: isStrict,
+                                            sortPriority: sortPriority.map((criterion) => 
+                                              SortCriterionDto(
+                                                field: criterion.field,
+                                                ascending: criterion.ascending,
+                                                orderMap: criterion.orderMap,
+                                              )
+                                            ).toList(),
+                                          );
+
+                                          // 설정을 즉시 적용
+                                          await UserSettingService().applyUserSetting(context, setting);
+
+                                          // 서버에 설정 저장 (로그인된 경우)
+                                          if (userProvider.isLogin) {
+                                            bool saveSuccess = await UserSettingService().saveUserSetting(context, setting);
+                                            if (saveSuccess) {
+                                              ToastOverlay.show(
+                                                context,
+                                                '설정이 서버에 저장되었습니다.',
+                                                type: ToastType.success
+                                              );
+                                            } else {
+                                              ToastOverlay.show(
+                                                context,
+                                                '서버 저장에 실패했습니다. 로컬에만 저장됩니다.',
+                                                type: ToastType.warning
+                                              );
+                                            }
+                                          } else {
+                                            // 로컬에만 저장
+                                            await UserSettingService().saveUserSetting(context, setting);
+                                            ToastOverlay.show(
+                                              context,
+                                              '설정이 로컬에 저장되었습니다.',
+                                              type: ToastType.info
+                                            );
+                                          }
+
                                           // Apply changes after confirmation
                                           if (selectedLimit != null) {
                                             limitProvider.updateSelectLimit(
-                                                selectedLimit!
-                                                    .restrictionBeginDate);
+                                                selectedLimit!.restrictionBeginDate);
                                           }
                                           deck.clear();
                                           deck.updateIsStrict(isStrict);
-                                          deckSortProvider
-                                              .setSortPriority(sortPriority);
+                                          deckSortProvider.setSortPriority(sortPriority);
                                           reload();
-                                          Navigator.of(context)
-                                              .pop(); // Close warning dialog
-                                          Navigator.of(context)
-                                              .pop(); // Close settings dialog
+                                          Navigator.of(context).pop(); // Close warning dialog
+                                          Navigator.of(context).pop(); // Close settings dialog
                                         },
                                       ),
                                     ],
@@ -1003,6 +1061,48 @@ class DeckService {
                                 },
                               );
                             } else {
+                              // 일반적인 경우 설정 저장
+                              UserSettingDto setting = UserSettingDto(
+                                defaultLimitId: selectedLimit?.id == 0 ? 0 : selectedLimit?.id,
+                                strictDeck: isStrict,
+                                sortPriority: sortPriority.map((criterion) => 
+                                  SortCriterionDto(
+                                    field: criterion.field,
+                                    ascending: criterion.ascending,
+                                    orderMap: criterion.orderMap,
+                                  )
+                                ).toList(),
+                              );
+
+                              // 설정을 즉시 적용
+                              await UserSettingService().applyUserSetting(context, setting);
+
+                              // 서버에 설정 저장 (로그인된 경우)
+                              if (userProvider.isLogin) {
+                                bool saveSuccess = await UserSettingService().saveUserSetting(context, setting);
+                                if (saveSuccess) {
+                                  ToastOverlay.show(
+                                    context,
+                                    '설정이 서버에 저장되었습니다.',
+                                    type: ToastType.success
+                                  );
+                                } else {
+                                  ToastOverlay.show(
+                                    context,
+                                    '서버 저장에 실패했습니다. 로컬에만 저장됩니다.',
+                                    type: ToastType.warning
+                                  );
+                                }
+                              } else {
+                                // 로컬에만 저장
+                                await UserSettingService().saveUserSetting(context, setting);
+                                ToastOverlay.show(
+                                  context,
+                                  '설정이 로컬에 저장되었습니다.',
+                                  type: ToastType.info
+                                );
+                              }
+
                               // Proceed without warning
                               if (selectedLimit != null) {
                                 limitProvider.updateSelectLimit(
@@ -1034,25 +1134,68 @@ class DeckService {
                           ),
                           Expanded(
                             child: DropdownButtonFormField<LimitDto>(
-                              value: selectedLimit,
+                              value: selectedLimit?.id == 0 ? null : selectedLimit,
+                              hint: selectedLimit?.id == 0 
+                                  ? Text(
+                                      '항상 최신 금제로 설정',
+                                      style: TextStyle(
+                                        fontSize: SizeService.bodyFontSize(context),
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    )
+                                  : Text(
+                                      '금지/제한 선택',
+                                      style: TextStyle(
+                                        fontSize: SizeService.bodyFontSize(context),
+                                      ),
+                                    ),
                               onChanged: (newValue) {
                                 setState(() {
                                   selectedLimit = newValue;
+                                  // "항상 최신 금제로 설정" 옵션을 선택한 경우
+                                  if (newValue != null && newValue.id == 0) {
+                                    selectedLimit = LimitDto(
+                                      id: 0,
+                                      restrictionBeginDate: DateTime.now(),
+                                      allowedQuantityMap: {},
+                                      limitPairs: [],
+                                    );
+                                  }
                                 });
                               },
-                              items:
-                                  limitProvider.limits.values.map((limitDto) {
-                                return DropdownMenuItem<LimitDto>(
-                                  value: limitDto,
+                              items: [
+                                // 최신 금제 옵션 추가 - 가장 최근 금제 날짜 표시
+                                DropdownMenuItem<LimitDto>(
+                                  value: LimitDto(
+                                    id: 0,
+                                    restrictionBeginDate: DateTime.now(),
+                                    allowedQuantityMap: {},
+                                    limitPairs: [],
+                                  ),
                                   child: Text(
-                                    '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                    '항상 최신 금제로 설정${limitProvider.limits.isNotEmpty ? ' (현재: ${DateFormat('yyyy-MM-dd').format(limitProvider.limits.values.reduce((a, b) => a.restrictionBeginDate.isAfter(b.restrictionBeginDate) ? a : b).restrictionBeginDate)})' : ''}',
                                     style: TextStyle(
-                                      fontSize:
-                                          SizeService.bodyFontSize(context),
+                                      fontSize: SizeService.bodyFontSize(context),
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
                                     ),
                                   ),
-                                );
-                              }).toList(),
+                                ),
+                                // 기존 금제 목록들의 선택 시 표시될 텍스트
+                                ...limitProvider.limits.values.map((limitDto) {
+                                  return DropdownMenuItem<LimitDto>(
+                                    value: limitDto,
+                                    child: Text(
+                                      '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
+                                      style: TextStyle(
+                                        fontSize:
+                                            SizeService.bodyFontSize(context),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
                             ),
                           ),
                         ],
@@ -1092,19 +1235,9 @@ class DeckService {
                           IconButton(
                               onPressed: () {
                                 setState(() {
-                                  sortPriority = List.from(
-                                      deckSortProvider.sortPriority.map(
-                                    (criterion) => SortCriterion(
-                                      criterion.field,
-                                      ascending: criterion.ascending,
-                                      orderMap: criterion.orderMap != null
-                                          ? Map<String, int>.from(
-                                              criterion.orderMap!)
-                                          : null,
-                                    ),
-                                  ));
+                                  // 정렬 우선순위만 초기화
+                                  sortPriority = deckSortProvider.getOriginalSortPriority();
                                 });
-                                deckSortProvider.reset();
                               },
                               icon: Icon(Icons.refresh))
                         ],

@@ -180,4 +180,8 @@ class DeckSortProvider with ChangeNotifier {
     sortPriority = List.from(_originalSortPriority);
     notifyListeners();
   }
+
+  List<SortCriterion> getOriginalSortPriority() {
+    return List.from(_originalSortPriority);
+  }
 }

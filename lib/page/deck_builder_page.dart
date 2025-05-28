@@ -7,6 +7,8 @@ import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
@@ -62,6 +64,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
   Timer? _debounce;
+  
+  DeckSortProvider? _deckSortProvider;
 
   void updateSearchParameter() {
     context.navigateTo(DeckBuilderRoute(
@@ -79,9 +83,23 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (mounted) {
       _scrollController.dispose();
       _debounce?.cancel();
+      // DeckProvider 클리어
+      final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+      deckProvider.clearCurrentDeck();
+      
+      // DeckSortProvider 리스너 제거
+      _deckSortProvider?.removeListener(_onDeckSortChanged);
     }
 
     super.dispose();
+  }
+
+  void _onDeckSortChanged() {
+    // 덱 정렬이 변경되면 덱을 다시 정렬하고 화면을 업데이트
+    if (mounted) {
+      deck.deckSort();
+      setState(() {});
+    }
   }
 
   @override
@@ -90,6 +108,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
     Future.delayed(const Duration(seconds: 0), () async {
       UserProvider().loginCheck();
+      
+      // DeckSortProvider 리스너 설정
+      _deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
+      _deckSortProvider?.addListener(_onDeckSortChanged);
       
       final noteProvider = Provider.of<NoteProvider>(context, listen: false);
       if (!noteProvider.isInitialized) {
@@ -105,11 +127,17 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       if (widget.deckView != null) {
         deck = DeckBuild.deckView(widget.deckView!, context);
         deck.saveMapToLocalStorage();
+        final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+        deckProvider.setCurrentDeck(deck);
       } else if (widget.deck != null) {
         deck = widget.deck!;
         deck.saveMapToLocalStorage();
+        final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+        deckProvider.setCurrentDeck(deck);
       } else {
         deck = DeckBuild(context);
+        final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+        deckProvider.setCurrentDeck(deck);
         String? deckJsonString = html.window.localStorage['deck'];
 
         if (deckJsonString != null) {
@@ -156,6 +184,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                     deckJsonString, context);
                             if (savedDeck != null) {
                               deck = savedDeck;
+                              final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+                              deckProvider.setCurrentDeck(deck);
                             }
 
                             setState(() {
@@ -203,6 +233,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (widget.deck != oldWidget.deck) {
       setState(() {
         deck = widget.deck ?? DeckBuild(context);
+        final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+        deckProvider.setCurrentDeck(deck);
       });
     }
     if (widget.searchParameterString != null &&

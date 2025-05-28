@@ -4,8 +4,10 @@ import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.da
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/text_simplify_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/user_service.dart';
+import 'package:digimon_meta_site_flutter/service/user_setting_service.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +34,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => TextSimplifyProvider()),
       ChangeNotifierProvider(create: (_) => FormatDeckCountProvider()),
       ChangeNotifierProvider(create: (_) => NoteProvider()),
+      ChangeNotifierProvider(create: (_) => DeckProvider()),
       ChangeNotifierProxyProvider<UserProvider, CollectProvider>(
         create: (_) => CollectProvider(),
         update: (_, userProvider, collectProvider) {
@@ -75,6 +78,7 @@ class _MyAppState extends State<MyApp> {
     };
     _initializeLimitProvider();
     _initializeCollectProvider();
+    _loadUserSettings();
   }
 
   void listenForOAuthToken() {
@@ -106,6 +110,18 @@ class _MyAppState extends State<MyApp> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final collectProvider =
         Provider.of<CollectProvider>(context, listen: false);
+  }
+
+  Future<void> _loadUserSettings() async {
+    try {
+      // LimitProvider가 초기화될 때까지 기다림
+      await Future.delayed(Duration(milliseconds: 100));
+      
+      final userSetting = await UserSettingService().loadUserSetting(context);
+      await UserSettingService().applyUserSetting(context, userSetting);
+    } catch (e) {
+      print('Failed to load user settings on app start: $e');
+    }
   }
 
   @override

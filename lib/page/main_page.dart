@@ -5,15 +5,23 @@ import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/card_overlay_service.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/service/user_service.dart';
+import 'package:digimon_meta_site_flutter/service/deck_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'dart:html' as html;
 import '../provider/user_provider.dart';
+import '../provider/deck_provider.dart';
+import '../model/deck-build.dart';
 
 @RoutePage()
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
   void openOAuthPopup() {
     String baseUrl = const String.fromEnvironment('SERVER_URL');
     String url = '$baseUrl/oauth2/authorization/kakao';
@@ -47,6 +55,9 @@ class MainPage extends StatelessWidget {
           }
         });
 
+        // 현재 탭이 덱 빌더인지 확인
+        bool isDeckBuilderTab = controller.index == 0;
+
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Column(
@@ -63,8 +74,8 @@ class MainPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Consumer<UserProvider>(
-                  builder: (context, userProvider, child) {
+                child: Consumer2<UserProvider, DeckProvider>(
+                  builder: (context, userProvider, deckProvider, child) {
                     return Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: SizeService.paddingSize(context) * 2,
@@ -73,7 +84,7 @@ class MainPage extends StatelessWidget {
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // 세로모드에서 로그인 정보
+                                // 세로모드에서 로그인 정보와 설정 버튼
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 4),
                                   child: Row(
@@ -100,34 +111,60 @@ class MainPage extends StatelessWidget {
                                             ),
                                           ],
                                         ),
-                                      GestureDetector(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: userProvider.isLogin
-                                                ? Colors.red.withOpacity(0.1)
-                                                : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          child: Text(
-                                            userProvider.isLogin ? '로그아웃' : '로그인',
-                                            style: TextStyle(
-                                              fontSize: fontSize,
-                                              color: userProvider.isLogin
-                                                  ? Colors.red
-                                                  : Theme.of(context).primaryColor,
-                                              fontWeight: FontWeight.w500,
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            GestureDetector(
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 6,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: userProvider.isLogin
+                                                      ? Colors.red.withOpacity(0.1)
+                                                      : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(16),
+                                                ),
+                                                child: Text(
+                                                  userProvider.isLogin ? '로그아웃' : '로그인',
+                                                  style: TextStyle(
+                                                    fontSize: fontSize,
+                                                    color: userProvider.isLogin
+                                                        ? Colors.red
+                                                        : Theme.of(context).primaryColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                userProvider.isLogin
+                                                    ? UserService().logoutWithPopup(context)
+                                                    : openOAuthPopup();
+                                              },
                                             ),
-                                          ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 8.0),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero,
+                                                onPressed: () {
+                                                  DeckBuild? deck = deckProvider.currentDeck;
+                                                  if (deck == null) {
+                                                    deck = DeckBuild(context);
+                                                  }
+                                                  DeckService().showDeckSettingDialog(
+                                                      context, deck, () {
+                                                    setState(() {});
+                                                  });
+                                                },
+                                                iconSize: SizeService.largeIconSize(context),
+                                                icon: const Icon(Icons.settings),
+                                                tooltip: '덱 설정',
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        onTap: () {
-                                          userProvider.isLogin
-                                              ? UserService().logoutWithPopup(context)
-                                              : openOAuthPopup();
-                                        },
                                       ),
                                     ],
                                   ),
@@ -318,11 +355,28 @@ class MainPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const Expanded(
+                                Expanded(
                                     flex: 1,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [],
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () {
+                                            DeckBuild? deck = deckProvider.currentDeck;
+                                            if (deck == null) {
+                                              deck = DeckBuild(context);
+                                            }
+                                            DeckService().showDeckSettingDialog(
+                                                context, deck, () {
+                                              setState(() {});
+                                            });
+                                          },
+                                          iconSize: SizeService.largeIconSize(context),
+                                          icon: const Icon(Icons.settings),
+                                          tooltip: '덱 설정',
+                                        ),
+                                      ],
                                     )),
                               ],
                             ),

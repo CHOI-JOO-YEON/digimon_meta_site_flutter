@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../api/user_api.dart';
 import '../model/account/login_response_dto.dart';
+import '../service/user_setting_service.dart';
 
 class UserService{
 
@@ -20,6 +21,15 @@ class UserService{
         return false;
       }
       Provider.of<UserProvider>(context, listen: false).setUser(loginResponseDto);
+      
+      // 로그인 성공 시 사용자 설정 로드
+      try {
+        final userSetting = await UserSettingService().loadUserSetting(context);
+        await UserSettingService().applyUserSetting(context, userSetting);
+      } catch (e) {
+        print('Failed to load user settings: $e');
+        // 설정 로드 실패해도 로그인은 성공으로 처리
+      }
     }catch(e){
       return false;
     }
@@ -57,6 +67,10 @@ class UserService{
         if (success == true) {
           // 로그아웃 성공 처리
           Provider.of<UserProvider>(context, listen: false).unAuth();
+          
+          // 사용자 설정 초기화 (서버 설정만 제거, 로컬 설정은 유지)
+          // 필요시 UserSettingService().clearSettings(); 호출 가능
+          
           completer.complete(true);
         } else {
           completer.complete(false);
