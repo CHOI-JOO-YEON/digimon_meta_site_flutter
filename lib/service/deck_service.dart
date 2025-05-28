@@ -1029,7 +1029,7 @@ class DeckService {
                                             } else {
                                               ToastOverlay.show(
                                                 context,
-                                                '서버 저장에 실패했습니다. 로컬에만 저장됩니다.',
+                                                '서버 저장에 실패했습니다. 브라우저에만 저장됩니다.',
                                                 type: ToastType.warning
                                               );
                                             }
@@ -1038,7 +1038,7 @@ class DeckService {
                                             await UserSettingService().saveUserSetting(context, setting);
                                             ToastOverlay.show(
                                               context,
-                                              '설정이 로컬에 저장되었습니다.',
+                                              '설정이 브라우저에 저장되었습니다.',
                                               type: ToastType.info
                                             );
                                           }
