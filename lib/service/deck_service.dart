@@ -189,7 +189,24 @@ class DeckService {
 
     var font =
         pw.Font.ttf(await rootBundle.load('assets/fonts/JalnanGothicTTF.ttf'));
-    final tableStyle = pw.TextStyle(font: font, fontSize: 7);
+    
+    // Helper function to determine font size based on text length
+    double getFontSize(String text, double maxWidth, double baseFontSize) {
+      // Estimate character width (approximate) - more conservative estimate
+      double estimatedCharWidth = baseFontSize * 0.7; // Increased from 0.6 to be more conservative
+      double estimatedTextWidth = text.length * estimatedCharWidth;
+      
+      if (estimatedTextWidth <= maxWidth) {
+        return baseFontSize;
+      } else {
+        // Calculate reduced font size to fit within maxWidth with some padding
+        double scaleFactor = (maxWidth * 0.95) / estimatedTextWidth; // Use 95% of available width for safety
+        double newFontSize = baseFontSize * scaleFactor;
+        // Set minimum font size to maintain readability
+        return newFontSize < 4.0 ? 4.0 : newFontSize; // Reduced minimum from 5.0 to 4.0
+      }
+    }
+    
     pdf.addPage(
       pw.Page(
         margin: pw.EdgeInsets.all(5),
@@ -204,7 +221,7 @@ class DeckService {
                       height: pageSizeHeight - 10, fit: pw.BoxFit.fitHeight)),
               pw.Positioned(
                 left: 96,
-                top: 206.5,
+                top: 205,
                 child: pw.Table(
                   columnWidths: {
                     0: pw.FixedColumnWidth(40),
@@ -215,12 +232,27 @@ class DeckService {
                   },
                   children: mainDeckData.map((row) {
                     return pw.TableRow(
-                      children: row.map((cell) {
+                      children: row.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String cell = entry.value.toString();
+                        
+                        // Apply dynamic font sizing for card name (index 2) and card type (index 3)
+                        double fontSize = 7.0;
+                        if (index == 2) {
+                          // Card name column - width 141
+                          fontSize = getFontSize(cell, 135.0, 7.0);
+                        } else if (index == 3) {
+                          // Card type column - width 130
+                          fontSize = getFontSize(cell, 124.0, 7.0);
+                        }
+                        
                         return pw.Container(
                           height: 15.4,
-                          child: pw.Text(cell!,
-                              style: tableStyle,
-                              textAlign: pw.TextAlign.center),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(cell,
+                              style: pw.TextStyle(font: font, fontSize: fontSize),
+                              textAlign: pw.TextAlign.center,
+                              overflow: pw.TextOverflow.visible),
                           padding: const pw.EdgeInsets.all(2),
                         );
                       }).toList(),
@@ -230,7 +262,7 @@ class DeckService {
               ),
               pw.Positioned(
                 left: 96,
-                top: 731.5,
+                top: 730,
                 child: pw.Table(
                   columnWidths: {
                     0: pw.FixedColumnWidth(40),
@@ -241,12 +273,27 @@ class DeckService {
                   },
                   children: digitamaDeckData.map((row) {
                     return pw.TableRow(
-                      children: row.map((cell) {
+                      children: row.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        String cell = entry.value.toString();
+                        
+                        // Apply dynamic font sizing for card name (index 2) and card type (index 3)
+                        double fontSize = 7.0;
+                        if (index == 2) {
+                          // Card name column - width 141
+                          fontSize = getFontSize(cell, 135.0, 7.0);
+                        } else if (index == 3) {
+                          // Card type column - width 130
+                          fontSize = getFontSize(cell, 124.0, 7.0);
+                        }
+                        
                         return pw.Container(
                           height: 15.4,
-                          child: pw.Text(cell!,
-                              style: tableStyle,
-                              textAlign: pw.TextAlign.center),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(cell,
+                              style: pw.TextStyle(font: font, fontSize: fontSize),
+                              textAlign: pw.TextAlign.center,
+                              overflow: pw.TextOverflow.visible),
                           padding: const pw.EdgeInsets.all(2),
                         );
                       }).toList(),
@@ -719,7 +766,7 @@ class DeckService {
           content: const SizedBox(
             width: 300,
             child: Text(
-              '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 넘는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
+              '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 초과하는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
               softWrap: true,
             ),
           ),
