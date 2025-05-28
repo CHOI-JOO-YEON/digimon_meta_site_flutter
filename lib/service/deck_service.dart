@@ -941,8 +941,8 @@ class DeckService {
             final defaultLimitIdStr = html.window.localStorage['defaultLimitId'];
             final defaultLimitId = defaultLimitIdStr != null ? int.tryParse(defaultLimitIdStr) : null;
             
-            if (defaultLimitId == 0) {
-              // defaultLimitId가 0이면 "항상 최신 금제로 설정" 옵션으로 설정
+            if (defaultLimitId == null || defaultLimitId == 0) {
+              // defaultLimitId가 null이거나 0이면 "항상 최신 금제로 설정" 옵션으로 설정
               selectedLimit = LimitDto(
                 id: 0,
                 restrictionBeginDate: DateTime.now(),
