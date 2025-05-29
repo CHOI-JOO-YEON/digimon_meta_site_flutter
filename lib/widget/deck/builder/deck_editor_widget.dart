@@ -77,6 +77,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
   int _commandStartIndex = 0;
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
+  final GlobalKey _textFieldKey = GlobalKey();
   int _selectedSuggestionIndex = 0;
   
   // 무한 스크롤을 위한 변수들 제거
@@ -264,6 +265,11 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     
     // 참조된 카드 목록 업데이트
     _updateReferencedCards();
+
+    // 텍스트 입력으로 높이가 변할 수 있으므로 오버레이 위치 업데이트
+    if (_showSuggestions) {
+      _updateOverlay();
+    }
   }
   
   void _showRecentCards() {
@@ -358,7 +364,12 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     _overlayEntry = _createOverlayEntry();
     Overlay.of(context).insert(_overlayEntry!);
     _isOverlayAttached = true;
-    
+
+    // 오버레이가 생성된 후 위치 업데이트
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateOverlay();
+    });
+
     // 외부 클릭 감지를 위한 리스너 추가
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // 다이얼로그가 열리는 것을 감지
@@ -592,9 +603,9 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
   }
 
   OverlayEntry _createOverlayEntry() {
-    // TextField의 RenderBox 가져오기
-    final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
+    // TextField의 RenderBox 가져오기 (정확한 위치 계산을 위해 GlobalKey 사용)
+    final renderBox = _textFieldKey.currentContext?.findRenderObject() as RenderBox?;
+    final size = renderBox?.size ?? Size.zero;
     
     // 고정 높이 정의
     final double maxOverlayHeight = 300.0; // 최대 높이 제한
@@ -605,7 +616,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, 80), // 텍스트 필드 아래에 위치
+          offset: Offset(0, size.height), // 텍스트 필드 아래에 위치하도록 조절
           child: Material(
             elevation: 4.0,
             borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
@@ -799,6 +810,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
           border: InputBorder.none,
           counterText: null, // buildCounter를 사용하므로 기본 카운터 텍스트 숨김
         ),
+        scrollPadding: EdgeInsets.zero,
         keyboardType: TextInputType.multiline,
         textInputAction: TextInputAction.newline,
         enableInteractiveSelection: true,
@@ -858,6 +870,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
                   CompositedTransformTarget(
                     link: _layerLink,
                     child: Container(
+                      key: _textFieldKey,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
