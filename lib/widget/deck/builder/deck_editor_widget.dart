@@ -78,6 +78,9 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
   final GlobalKey _textFieldKey = GlobalKey();
+  final GlobalKey<EditableTextState> _editableTextKey =
+      GlobalKey<EditableTextState>();
+  Offset _overlayOffset = Offset.zero;
   int _selectedSuggestionIndex = 0;
   
   // 무한 스크롤을 위한 변수들 제거
@@ -243,7 +246,11 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         final match = _slashCommandRegex.firstMatch(textBeforeCursor)!;
         _commandStartIndex = match.start;
         _currentCommand = match.group(0)!;
-        
+
+        // 텍스트를 덱 설명에 임시 저장하여 포커스 변경 시에도 유지
+        widget.deck.description = text;
+        widget.onEditorChanged();
+
         // "/"만 입력했거나 접두어로 시작하는 경우
         if (_currentCommand.length > 1) {
           _searchCards(_currentCommand.substring(1)); // 슬래시 제거
@@ -557,7 +564,10 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
       if (_selectedSuggestionIndex < 0 || _selectedSuggestionIndex >= _suggestions.length) {
         _selectedSuggestionIndex = 0;
       }
-      
+
+      // 커서 위치 기반으로 오버레이 위치 계산
+      _overlayOffset = _calculateCaretOffset();
+
       // 오버레이 강제 업데이트 - 이 방식이 더 안정적
       _overlayEntry!.markNeedsBuild();
     }
@@ -602,10 +612,33 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     }
   }
 
+  // 현재 커서 위치를 기준으로 오버레이 위치 계산
+  Offset _calculateCaretOffset() {
+    final EditableTextState? editable = _editableTextKey.currentState;
+    final RenderBox? containerBox =
+        _textFieldKey.currentContext?.findRenderObject() as RenderBox?;
+
+    if (editable != null && containerBox != null) {
+      final RenderEditable renderEditable = editable.renderEditable;
+      final TextPosition position = _editorController.selection.extent;
+      final caretRect = renderEditable.getLocalRectForCaret(position);
+      final caretGlobal = renderEditable.localToGlobal(caretRect.bottomLeft);
+      final containerGlobal = containerBox.localToGlobal(Offset.zero);
+      return caretGlobal - containerGlobal + const Offset(0, 5);
+    }
+
+    // 기본적으로 텍스트 필드 아래에 위치
+    final size = containerBox?.size ?? Size.zero;
+    return Offset(0, size.height);
+  }
+
   OverlayEntry _createOverlayEntry() {
     // TextField의 RenderBox 가져오기 (정확한 위치 계산을 위해 GlobalKey 사용)
     final renderBox = _textFieldKey.currentContext?.findRenderObject() as RenderBox?;
     final size = renderBox?.size ?? Size.zero;
+
+    // 최초 생성 시 오버레이 위치 계산
+    _overlayOffset = _calculateCaretOffset();
     
     // 고정 높이 정의
     final double maxOverlayHeight = 300.0; // 최대 높이 제한
@@ -616,7 +649,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, size.height), // 텍스트 필드 아래에 위치하도록 조절
+          offset: _overlayOffset,
           child: Material(
             elevation: 4.0,
             borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
@@ -787,6 +820,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         return KeyEventResult.ignored;
       },
       child: TextField(
+        key: _editableTextKey,
         controller: _editorController,
         focusNode: _editorFocusNode,
         maxLines: 10,
