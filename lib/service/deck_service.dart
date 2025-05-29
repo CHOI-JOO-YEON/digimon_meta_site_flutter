@@ -31,6 +31,7 @@ import '../provider/deck_sort_provider.dart';
 import '../provider/limit_provider.dart';
 import '../provider/user_provider.dart';
 import '../service/user_setting_service.dart';
+import 'orientation_service.dart';
 import 'package:image/image.dart' as imglib;
 
 import '../router.dart';
@@ -999,6 +1000,7 @@ class DeckService {
             }
             
             bool isStrict = deck.isStrict;
+            bool autoRotate = OrientationService.loadAutoRotate();
             List<SortCriterion> sortPriority = List.from(
               deckSortProvider.sortPriority.map(
                 (criterion) => SortCriterion(
@@ -1270,6 +1272,33 @@ class DeckService {
                           ),
                         ],
                       ),
+                      if (OrientationService.isWebApp()) ...[
+                        Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              '화면 자동 회전',
+                              style: TextStyle(
+                                  fontSize: SizeService.bodyFontSize(context)),
+                            ),
+                            Transform.scale(
+                              scale: SizeService.switchScale(context),
+                              child: Switch(
+                                inactiveThumbColor: Colors.red,
+                                value: autoRotate,
+                                onChanged: (bool v) {
+                                  setState(() {
+                                    autoRotate = v;
+                                  });
+                                  OrientationService.saveAutoRotate(v);
+                                  OrientationService.applyAutoRotate(v);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       Divider(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

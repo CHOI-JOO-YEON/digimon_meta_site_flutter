@@ -16,12 +16,17 @@ import 'dart:html' as html;
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
+import 'package:digimon_meta_site_flutter/service/orientation_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   final appRouter = AppRouter();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 화면 자동 회전 설정 적용
+  await OrientationService.applyAutoRotate(
+      OrientationService.loadAutoRotate());
 
   // 앱 시작 전 카드 데이터 초기화
   await CardDataService().initialize();
