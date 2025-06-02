@@ -60,7 +60,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   int totalPages = 0;
   int currentPage = 0;
 
-  DeckBuild deck = DeckBuild.empty();
+  DeckBuild? deck;
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
   Timer? _debounce;
@@ -96,9 +96,14 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   void _onDeckSortChanged() {
     // 덱 정렬이 변경되면 덱을 다시 정렬하고 화면을 업데이트
-    if (mounted) {
-      deck.deckSort();
-      setState(() {});
+    try {
+      if (mounted) {
+        deck?.deckSort();
+        setState(() {});
+      }
+    } catch (e) {
+      // deck이 초기화되지 않았거나 다른 오류가 발생한 경우 무시
+      print('Deck sort error: $e');
     }
   }
 
@@ -126,18 +131,18 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
       if (widget.deckView != null) {
         deck = DeckBuild.deckView(widget.deckView!, context);
-        deck.saveMapToLocalStorage();
+        deck?.saveMapToLocalStorage();
         final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-        deckProvider.setCurrentDeck(deck);
+        if (deck != null) deckProvider.setCurrentDeck(deck!);
       } else if (widget.deck != null) {
         deck = widget.deck!;
-        deck.saveMapToLocalStorage();
+        deck?.saveMapToLocalStorage();
         final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-        deckProvider.setCurrentDeck(deck);
+        if (deck != null) deckProvider.setCurrentDeck(deck!);
       } else {
         deck = DeckBuild(context);
         final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-        deckProvider.setCurrentDeck(deck);
+        if (deck != null) deckProvider.setCurrentDeck(deck!);
         String? deckJsonString = html.window.localStorage['deck'];
 
         if (deckJsonString != null) {
@@ -185,7 +190,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             if (savedDeck != null) {
                               deck = savedDeck;
                               final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-                              deckProvider.setCurrentDeck(deck);
+                              if (deck != null) deckProvider.setCurrentDeck(deck!);
                             }
 
                             setState(() {
@@ -234,7 +239,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       setState(() {
         deck = widget.deck ?? DeckBuild(context);
         final deckProvider = Provider.of<DeckProvider>(context, listen: false);
-        deckProvider.setCurrentDeck(deck);
+        if (deck != null) deckProvider.setCurrentDeck(deck!);
       });
     }
     if (widget.searchParameterString != null &&
@@ -291,7 +296,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   addCardByDeck(DigimonCard card) {
-    String? result = deck.addSingleCard(card);
+    String? result = deck?.addSingleCard(card);
     if (result != null) {
       if (result.contains("추가")) {
         ToastOverlay.show(context, result, type: ToastType.success);
@@ -303,7 +308,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   removeCardByDeck(DigimonCard card) {
-    deck.removeSingleCard(card);
+    deck?.removeSingleCard(card);
     ToastOverlay.show(context, "카드가 제거되었습니다.", type: ToastType.info);
     setState(() {});
   }
@@ -572,8 +577,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               controller: _scrollController,
               child: Column(
                 children: [
-                  DeckBuilderView(
-                    deck: deck,
+                  if (deck != null) DeckBuilderView(
+                    deck: deck!,
                     cardPressEvent: removeCardByDeck,
                     import: deckUpdate,
                     searchWithParameter: searchWithParameter,
@@ -602,13 +607,13 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                         BorderRadius.circular(SizeService.roundRadius(context)),
                     color: Theme.of(context).highlightColor),
                 child: SingleChildScrollView(
-                  child: DeckBuilderView(
-                    deck: deck,
+                  child: deck != null ? DeckBuilderView(
+                    deck: deck!,
                     cardPressEvent: removeCardByDeck,
                     import: deckUpdate,
                     searchWithParameter: searchWithParameter,
                     cardOverlayService: _cardOverlayService,
-                  ),
+                  ) : Container(),
                 ),
               ),
             ),

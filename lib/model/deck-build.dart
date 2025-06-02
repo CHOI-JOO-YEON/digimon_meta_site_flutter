@@ -75,7 +75,7 @@ class DeckBuild {
 
 DeckBuild.deckView(DeckView deckView, BuildContext context) {
   deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
-  deckSortProvider!.addListener(deckSort);
+  deckSortProvider?.addListener(deckSort);
   deckId = deckView.deckId;
   deckName = deckView.deckName??'';
   author = deckView.authorName;
@@ -103,7 +103,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
 
   DeckBuild.deckBuild(DeckBuild deck, BuildContext context) {
     deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
-    deckSortProvider!.addListener(deckSort);
+    deckSortProvider?.addListener(deckSort);
     deckName = '${deck.deckName} Copy';
     formatId = deck.formatId;
     description = null;
@@ -139,7 +139,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
 
   DeckBuild(BuildContext context) {
     deckSortProvider = Provider.of<DeckSortProvider>(context, listen: false);
-    deckSortProvider!.addListener(deckSort);
+    deckSortProvider?.addListener(deckSort);
   }
 
   DeckBuild.empty();
@@ -208,12 +208,16 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
       CardOverlayService().removeAllOverlays();
       map[card] = 1;
       cards.add(card);
-      cards.sort(deckSortProvider!.digimonCardComparator);
+      if (deckSortProvider != null) {
+        cards.sort(deckSortProvider!.digimonCardComparator);
+      }
     } else {
       map[card] = map[card]! + 1;
     }
 
-    _incrementCount(card.cardType!);
+    if (card.cardType != null) {
+      _incrementCount(card.cardType!);
+    }
     _incrementCardNoCount(card);
   }
 
@@ -226,6 +230,8 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   }
 
   void _incrementCardNoCount(DigimonCard card) {
+    if (card.cardNo == null) return;
+    
     if (cardNoCntMap.containsKey(card.cardNo)) {
       cardNoCntMap[card.cardNo!] = cardNoCntMap[card.cardNo]! + 1;
     } else {
@@ -240,7 +246,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
     if (cnt >= limit && isStrict) {
       return '넣을 수 있는 매수를 초과했습니다';
     }
-    if (isStrict && !LimitService().isAllowedByLimitPair(card.cardNo!, cardNoCntMap.keys.toSet())) {
+    if (isStrict && card.cardNo != null && !LimitService().isAllowedByLimitPair(card.cardNo!, cardNoCntMap.keys.toSet())) {
       return 'A/B 제한에 해당하는 카드입니다.';
     }
     
@@ -258,7 +264,9 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   }
 
   void _addCard(DigimonCard card) {
-    card = cardMap.putIfAbsent(card.cardId!, () => card);
+    if (card.cardId != null) {
+      card = cardMap.putIfAbsent(card.cardId!, () => card);
+    }
     card.cardType == 'DIGITAMA'
         ? _add(card, tamaMap, tamaCards)
         : _add(card, deckMap, deckCards);
@@ -274,12 +282,16 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
     if (map[card] == 1) {
       map.remove(card);
       cards.remove(card);
-      cards.sort(deckSortProvider!.digimonCardComparator);
+      if (deckSortProvider != null) {
+        cards.sort(deckSortProvider!.digimonCardComparator);
+      }
       cardMap.remove(card.cardId);
     } else {
       map[card] = map[card]! - 1;
     }
-    _decrementCount(card.cardType!);
+    if (card.cardType != null) {
+      _decrementCount(card.cardType!);
+    }
     _decrementCardNoCount(card);
   }
 
@@ -292,7 +304,7 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   }
 
   void _decrementCardNoCount(DigimonCard card) {
-    if (!cardNoCntMap.containsKey(card.cardNo)) {
+    if (card.cardNo == null || !cardNoCntMap.containsKey(card.cardNo)) {
       return;
     }
 
@@ -353,18 +365,26 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   }
 
   void deckSort() {
-    deckCards.sort(deckSortProvider!.digimonCardComparator);
-    tamaCards.sort(deckSortProvider!.digimonCardComparator);
+    if (deckSortProvider != null) {
+      deckCards.sort(deckSortProvider!.digimonCardComparator);
+      tamaCards.sort(deckSortProvider!.digimonCardComparator);
+    }
   }
 
   void saveMapToLocalStorage() {
-    Map<String, int> encodableMap = {
-      ...deckMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
-    };
+    Map<String, int> encodableMap = {};
+    for (var entry in deckMap.entries) {
+      if (entry.key.cardId != null) {
+        encodableMap[entry.key.cardId.toString()] = entry.value;
+      }
+    }
 
-    Map<String, int> encodableTamaMap = {
-      ...tamaMap.map((key, value) => MapEntry(key.cardId.toString(), value)),
-    };
+    Map<String, int> encodableTamaMap = {};
+    for (var entry in tamaMap.entries) {
+      if (entry.key.cardId != null) {
+        encodableTamaMap[entry.key.cardId.toString()] = entry.value;
+      }
+    }
     
     Map<String, dynamic> map = {
       'deckName': deckName,
@@ -383,10 +403,21 @@ DeckBuild.deckView(DeckView deckView, BuildContext context) {
   String getQrUrl() {
     String url = "$baseUrl/qr?";
     
-    Map<int, int> combinedMap = {
-      ...deckMap.map((key, value) => MapEntry(key.cardId!, value)),
-      ...tamaMap.map((key, value) => MapEntry(key.cardId!, value)),
-    };
+    Map<int, int> combinedMap = {};
+    
+    // deckMap에서 cardId가 null이 아닌 카드만 추가
+    for (var entry in deckMap.entries) {
+      if (entry.key.cardId != null) {
+        combinedMap[entry.key.cardId!] = entry.value;
+      }
+    }
+    
+    // tamaMap에서 cardId가 null이 아닌 카드만 추가
+    for (var entry in tamaMap.entries) {
+      if (entry.key.cardId != null) {
+        combinedMap[entry.key.cardId!] = entry.value;
+      }
+    }
 
     // 카드가 없으면 빈 문자열 반환
     if (combinedMap.isEmpty) {

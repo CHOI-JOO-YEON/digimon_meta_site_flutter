@@ -145,19 +145,21 @@ class DeckService {
     final mainDeckMap = <String, List<dynamic>>{};
 
     for (var card in deck.deckCards) {
-      String cardNo = card.cardNo!;
-      int count = deck.deckMap[card]!;
-      if (mainDeckMap.containsKey(cardNo)) {
-        mainDeckMap[cardNo]![4] =
-            (int.parse(mainDeckMap[cardNo]![4]) + count).toString();
-      } else {
-        mainDeckMap[cardNo] = [
-          cardNo,
-          card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
-          card.getDisplayName(),
-          card.getKorCardType(),
-          count.toString()
-        ];
+      if (card.cardNo != null) {
+        String cardNo = card.cardNo!;
+        int count = deck.deckMap[card]!;
+        if (mainDeckMap.containsKey(cardNo)) {
+          mainDeckMap[cardNo]![4] =
+              (int.parse(mainDeckMap[cardNo]![4]) + count).toString();
+        } else {
+          mainDeckMap[cardNo] = [
+            cardNo,
+            card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
+            card.getDisplayName(),
+            card.getKorCardType(),
+            count.toString()
+          ];
+        }
       }
     }
 
@@ -168,19 +170,21 @@ class DeckService {
     final digitamaDeckMap = <String, List<dynamic>>{};
 
     deck.tamaCards.forEach((card) {
-      String cardNo = card.cardNo!;
-      int count = deck.tamaMap[card]!;
-      if (digitamaDeckMap.containsKey(cardNo)) {
-        digitamaDeckMap[cardNo]![4] =
-            (int.parse(digitamaDeckMap[cardNo]![4]) + count).toString();
-      } else {
-        digitamaDeckMap[cardNo!] = [
-          cardNo,
-          card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
-          card.getDisplayName(),
-          '디지타마',
-          count.toString()
-        ];
+      if (card.cardNo != null) {
+        String cardNo = card.cardNo!;
+        int count = deck.tamaMap[card]!;
+        if (digitamaDeckMap.containsKey(cardNo)) {
+          digitamaDeckMap[cardNo]![4] =
+              (int.parse(digitamaDeckMap[cardNo]![4]) + count).toString();
+        } else {
+          digitamaDeckMap[cardNo] = [
+            cardNo,
+            card.lv == null || card.lv == 0 ? '-' : card.lv.toString(),
+            card.getDisplayName(),
+            '디지타마',
+            count.toString()
+          ];
+        }
       }
     });
     final digitamaDeckData = digitamaDeckMap.values
@@ -860,11 +864,13 @@ class DeckService {
                               value: siteName,
                               groupValue: selectedButton,
                               onChanged: (SiteName? value) {
-                                setState(() {
-                                  selectedButton = value!;
-                                  textEditingController.text =
-                                      selectedButton.ExportToSiteDeckCode(deck);
-                                });
+                                if (value != null) {
+                                  setState(() {
+                                    selectedButton = value;
+                                    textEditingController.text =
+                                        selectedButton.ExportToSiteDeckCode(deck);
+                                  });
+                                }
                               },
                             ),
                           ),
@@ -1385,9 +1391,11 @@ class DeckService {
                               value: siteName,
                               groupValue: selectedButton,
                               onChanged: (SiteName? value) {
-                                setState(() {
-                                  selectedButton = value!;
-                                });
+                                if (value != null) {
+                                  setState(() {
+                                    selectedButton = value;
+                                  });
+                                }
                               },
                             ),
                           ),
@@ -1451,27 +1459,36 @@ class DeckService {
                               },
                             );
                             
-                            Uint8List fileBytes = result.files.first.bytes!;
-                            String? qrData = await decodeQrCodeFromImage(fileBytes);
-                            
-                            // 로딩 다이얼로그 닫기
-                            Navigator.pop(context);
-                            
-                            if (qrData != null) {
-                              DeckBuild deck = importDeckQr(qrData, context);
-                              Navigator.pop(context); // Import 다이얼로그 닫기
-                              importAction(deck);
+                            if (result.files.isNotEmpty && result.files.first.bytes != null) {
+                              Uint8List fileBytes = result.files.first.bytes!;
+                              String? qrData = await decodeQrCodeFromImage(fileBytes);
                               
-                              // 토스트 메시지 표시
-                              ToastOverlay.show(
-                                context,
-                                'QR코드에서 덱을 가져왔습니다.',
-                                type: ToastType.success
-                              );
+                              // 로딩 다이얼로그 닫기
+                              Navigator.pop(context);
+                              
+                              if (qrData != null) {
+                                DeckBuild deck = importDeckQr(qrData, context);
+                                Navigator.pop(context); // Import 다이얼로그 닫기
+                                importAction(deck);
+                                
+                                // 토스트 메시지 표시
+                                ToastOverlay.show(
+                                  context,
+                                  'QR코드에서 덱을 가져왔습니다.',
+                                  type: ToastType.success
+                                );
+                              } else {
+                                ToastOverlay.show(
+                                  context,
+                                  'QR코드를 인식할 수 없습니다.',
+                                  type: ToastType.error
+                                );
+                              }
                             } else {
+                              Navigator.pop(context);
                               ToastOverlay.show(
                                 context,
-                                'QR코드를 인식할 수 없습니다.',
+                                '파일을 읽을 수 없습니다.',
                                 type: ToastType.error
                               );
                             }
@@ -1760,15 +1777,19 @@ class DeckService {
                         }),
                       ],
                       onChanged: (int? newValue) {
-                        setState(() {
-                          deck.formatId = newValue!;
-                        });
+                        if (newValue != null) {
+                          setState(() {
+                            deck.formatId = newValue;
+                          });
+                        }
                       },
                     ),
                     const Divider(),
                     const Text('선택된 금지/제한', style: TextStyle(fontSize: 25)),
                     Text(
-                        '${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}',
+                        limitProvider.selectedLimit != null 
+                          ? '${DateFormat('yyyy-MM-dd').format(limitProvider.selectedLimit!.restrictionBeginDate)}'
+                          : '제한 없음',
                         style: const TextStyle(fontSize: 20))
                   ],
                 ),
