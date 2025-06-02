@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/user_service.dart';
 import 'package:digimon_meta_site_flutter/service/user_setting_service.dart';
+import 'package:digimon_meta_site_flutter/service/orientation_service.dart';
 import 'package:digimon_meta_site_flutter/util/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -79,6 +80,7 @@ class _MyAppState extends State<MyApp> {
     _initializeLimitProvider();
     _initializeCollectProvider();
     _loadUserSettings();
+    _initializeOrientation();
   }
 
   void listenForOAuthToken() {
@@ -121,6 +123,18 @@ class _MyAppState extends State<MyApp> {
       await UserSettingService().applyUserSetting(context, userSetting);
     } catch (e) {
       print('Failed to load user settings on app start: $e');
+    }
+  }
+
+  Future<void> _initializeOrientation() async {
+    try {
+      // 기기 자동회전 설정을 따르도록 초기화
+      await OrientationService.applyAutoRotateBasedOnDevice();
+      
+      // 기기 설정 변경 감지 리스너 시작
+      OrientationService.startDeviceOrientationListener();
+    } catch (e) {
+      print('Failed to initialize orientation settings: $e');
     }
   }
 
