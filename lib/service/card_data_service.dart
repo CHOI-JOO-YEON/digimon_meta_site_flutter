@@ -180,18 +180,24 @@ class CardDataService {
     return cards.where((card) {
       bool matches = true;
       
+      // Handle general search string (existing functionality for backward compatibility)
       if (params.searchString != null && params.searchString!.isNotEmpty) {
         String searchString = params.searchString!;
         bool textMatches = false;
         bool isRegex = false;
         RegExp? regex;
         
-        // Try to parse as regex
-        try {
-          regex = RegExp(searchString, caseSensitive: false);
-          isRegex = true;
-        } catch (e) {
-          // If invalid regex, fall back to normal search
+        // Check if search string starts with @ for regex
+        if (searchString.startsWith('@')) {
+          searchString = searchString.substring(1); // Remove @ prefix
+          try {
+            regex = RegExp(searchString, caseSensitive: false);
+            isRegex = true;
+          } catch (e) {
+            // If invalid regex, fall back to normal search
+            searchString = searchString.toLowerCase();
+          }
+        } else {
           searchString = searchString.toLowerCase();
         }
         
@@ -222,6 +228,141 @@ class CardDataService {
         
         matches = textMatches || cardNoMatches;
         if (!matches) return false;
+      }
+      
+      // Handle detailed search conditions (new functionality)
+      List<bool Function()> detailedSearchConditions = [];
+      
+      // Card name search
+      if (params.cardNameSearch != null && params.cardNameSearch!.isNotEmpty) {
+        detailedSearchConditions.add(() {
+          String searchString = params.cardNameSearch!;
+          bool isRegex = false;
+          RegExp? regex;
+          
+          // Check if search string starts with @ for regex
+          if (searchString.startsWith('@')) {
+            searchString = searchString.substring(1); // Remove @ prefix
+            try {
+              regex = RegExp(searchString, caseSensitive: false);
+              isRegex = true;
+            } catch (e) {
+              searchString = searchString.toLowerCase();
+              isRegex = false;
+            }
+          } else {
+            searchString = searchString.toLowerCase();
+          }
+          
+          for (LocaleCardData localeData in card.localeCardData ?? []) {
+            if (isRegex) {
+              if (regex!.hasMatch(localeData.name)) return true;
+            } else {
+              if (localeData.name.toLowerCase().contains(searchString)) return true;
+            }
+          }
+          return false;
+        });
+      }
+      
+      // Card number search
+      if (params.cardNoSearch != null && params.cardNoSearch!.isNotEmpty) {
+        detailedSearchConditions.add(() {
+          String searchString = params.cardNoSearch!;
+          bool isRegex = false;
+          
+          // Check if search string starts with @ for regex
+          if (searchString.startsWith('@')) {
+            searchString = searchString.substring(1); // Remove @ prefix
+            try {
+              RegExp regex = RegExp(searchString, caseSensitive: false);
+              return card.cardNo != null && regex.hasMatch(card.cardNo!);
+            } catch (e) {
+              searchString = searchString.toLowerCase();
+              return card.cardNo?.toLowerCase().contains(searchString) == true;
+            }
+          } else {
+            searchString = searchString.toLowerCase();
+            return card.cardNo?.toLowerCase().contains(searchString) == true;
+          }
+        });
+      }
+      
+      // Effect search
+      if (params.effectSearch != null && params.effectSearch!.isNotEmpty) {
+        detailedSearchConditions.add(() {
+          String searchString = params.effectSearch!;
+          bool isRegex = false;
+          RegExp? regex;
+          
+          // Check if search string starts with @ for regex
+          if (searchString.startsWith('@')) {
+            searchString = searchString.substring(1); // Remove @ prefix
+            try {
+              regex = RegExp(searchString, caseSensitive: false);
+              isRegex = true;
+            } catch (e) {
+              searchString = searchString.toLowerCase();
+              isRegex = false;
+            }
+          } else {
+            searchString = searchString.toLowerCase();
+          }
+          
+          for (LocaleCardData localeData in card.localeCardData ?? []) {
+            if (localeData.effect != null) {
+              if (isRegex) {
+                if (regex!.hasMatch(localeData.effect!)) return true;
+              } else {
+                if (localeData.effect!.toLowerCase().contains(searchString)) return true;
+              }
+            }
+          }
+          return false;
+        });
+      }
+      
+      // Source effect search
+      if (params.sourceEffectSearch != null && params.sourceEffectSearch!.isNotEmpty) {
+        detailedSearchConditions.add(() {
+          String searchString = params.sourceEffectSearch!;
+          bool isRegex = false;
+          RegExp? regex;
+          
+          // Check if search string starts with @ for regex
+          if (searchString.startsWith('@')) {
+            searchString = searchString.substring(1); // Remove @ prefix
+            try {
+              regex = RegExp(searchString, caseSensitive: false);
+              isRegex = true;
+            } catch (e) {
+              searchString = searchString.toLowerCase();
+              isRegex = false;
+            }
+          } else {
+            searchString = searchString.toLowerCase();
+          }
+          
+          for (LocaleCardData localeData in card.localeCardData ?? []) {
+            if (localeData.sourceEffect != null) {
+              if (isRegex) {
+                if (regex!.hasMatch(localeData.sourceEffect!)) return true;
+              } else {
+                if (localeData.sourceEffect!.toLowerCase().contains(searchString)) return true;
+              }
+            }
+          }
+          return false;
+        });
+      }
+      
+      // Apply detailed search conditions with AND operation
+      if (detailedSearchConditions.isNotEmpty) {
+        for (var condition in detailedSearchConditions) {
+          if (!condition()) {
+            return false;
+          }
+        }
       }
       
       if (params.noteId != null) {

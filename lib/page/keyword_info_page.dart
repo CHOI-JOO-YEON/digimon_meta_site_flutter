@@ -108,7 +108,7 @@ class _KeywordInfoPageState extends State<KeywordInfoPage> {
                 
                 // 여러 키워드를 OR 조건으로 결합
                 String regexPattern = keywordsToSearch.map((k) => '《.*?' + k + '.*?》').join('|');
-                searchParameter.searchString = regexPattern;
+                searchParameter.searchString = '@${regexPattern}';
                 
                 // 검색 파라미터를 JSON으로 변환하여 DeckBuilderRoute로 전달
                 // 현재 덱 정보도 함께 전달

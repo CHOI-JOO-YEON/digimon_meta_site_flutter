@@ -214,6 +214,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
   NoteDto all = NoteDto(noteId: null, name: '모든 카드');
   bool _isFeaturesSectionExpanded = false;
+  bool _isDetailedSearchSectionExpanded = false;
 
   @override
   void initState() {
@@ -282,6 +283,20 @@ class _CardSearchBarState extends State<CardSearchBar> {
     Set<String> _attributeSearchResults = CardDataService().searchAttributes("");
     Set<String> _selectedAttributes = widget.searchParameter.attributes;
     int attributeOperation = widget.searchParameter.typeOperation;
+    
+    // Add detailed search controllers
+    TextEditingController _cardNameSearchController = TextEditingController(
+      text: widget.searchParameter.cardNameSearch ?? ''
+    );
+    TextEditingController _cardNoSearchController = TextEditingController(
+      text: widget.searchParameter.cardNoSearch ?? ''
+    );
+    TextEditingController _effectSearchController = TextEditingController(
+      text: widget.searchParameter.effectSearch ?? ''
+    );
+    TextEditingController _sourceEffectSearchController = TextEditingController(
+      text: widget.searchParameter.sourceEffectSearch ?? ''
+    );
     
     NoteDto? selectedNote;
 
@@ -376,11 +391,11 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       TextField(
                         controller: _dialogSearchStringEditingController,
                         decoration: InputDecoration(
-                          labelText: '검색어',
+                          labelText: '통합 검색어',
                           labelStyle: TextStyle(
                             color: Theme.of(context).primaryColor.withOpacity(0.7),
                           ),
-                          hintText: '카드명/효과',
+                          hintText: '이름/효과/번호',
                           hintStyle: TextStyle(
                             color: Theme.of(context).primaryColor.withOpacity(0.6),
                           ),
@@ -399,6 +414,152 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           ),
                           contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                           isDense: true,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Detailed search section
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _isDetailedSearchSectionExpanded = !_isDetailedSearchSectionExpanded;
+                          });
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isDetailedSearchSectionExpanded 
+                                  ? Icons.keyboard_arrow_up 
+                                  : Icons.keyboard_arrow_down,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                '상세 검색',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                _isDetailedSearchSectionExpanded 
+                                  ? Icons.keyboard_arrow_up 
+                                  : Icons.keyboard_arrow_down,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        height: _isDetailedSearchSectionExpanded ? null : 0,
+                        curve: Curves.easeInOut,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 300),
+                          opacity: _isDetailedSearchSectionExpanded ? 1.0 : 0.0,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey.shade50,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: _cardNameSearchController,
+                                      decoration: InputDecoration(
+                                        labelText: '카드명',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        hintText: '@ 접두사로 정규표현식 사용',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                          fontSize: 12,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                        isDense: true,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextField(
+                                      controller: _cardNoSearchController,
+                                      decoration: InputDecoration(
+                                        labelText: '카드 번호',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        hintText: '@ 접두사로 정규표현식 사용',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                          fontSize: 12,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                        isDense: true,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextField(
+                                      controller: _effectSearchController,
+                                      decoration: InputDecoration(
+                                        labelText: '상단 텍스트',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        hintText: '@ 접두사로 정규표현식 사용',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                          fontSize: 12,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                        isDense: true,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextField(
+                                      controller: _sourceEffectSearchController,
+                                      decoration: InputDecoration(
+                                        labelText: '하단 텍스트',
+                                        labelStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                        hintText: '@ 접두사로 정규표현식 사용',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                          fontSize: 12,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                        isDense: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -1270,6 +1431,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     parallelOption = 0;
                     _dialogSearchStringEditingController =
                         TextEditingController(text: '');
+                    
+                    // Reset detailed search fields
+                    _cardNameSearchController.clear();
+                    _cardNoSearchController.clear();
+                    _effectSearchController.clear();
+                    _sourceEffectSearchController.clear();
+                    
                     enCardInclude = true;
                     _selectedTypes={};
                     typeOperation=1;
@@ -1333,6 +1501,17 @@ class _CardSearchBarState extends State<CardSearchBar> {
                         _dialogSearchStringEditingController?.value.text;
                     _searchStringEditingController?.text =
                         _dialogSearchStringEditingController!.value.text;
+                    
+                    // Apply detailed search parameters
+                    widget.searchParameter.cardNameSearch =
+                        _cardNameSearchController.text.isEmpty ? null : _cardNameSearchController.text;
+                    widget.searchParameter.cardNoSearch =
+                        _cardNoSearchController.text.isEmpty ? null : _cardNoSearchController.text;
+                    widget.searchParameter.effectSearch =
+                        _effectSearchController.text.isEmpty ? null : _effectSearchController.text;
+                    widget.searchParameter.sourceEffectSearch =
+                        _sourceEffectSearchController.text.isEmpty ? null : _sourceEffectSearchController.text;
+                    
                     widget.searchParameter.parallelOption = parallelOption;
                     widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.searchParameter.typeOperation = typeOperation;
@@ -1531,7 +1710,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   widget.updateSearchParameter();
                 },
                 decoration: InputDecoration(
-                  hintText: '카드명/효과',
+                  hintText: '카드명/효과/번호',
                   hintStyle: TextStyle(
                     color: Theme.of(context).primaryColor.withOpacity(0.6),
                   ),

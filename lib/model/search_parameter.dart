@@ -1,5 +1,12 @@
 class SearchParameter{
   String? searchString;
+  
+  // New detailed search fields
+  String? cardNameSearch;
+  String? cardNoSearch;
+  String? effectSearch;
+  String? sourceEffectSearch;
+  
   int? noteId;
   Set<String>? colors ={};
   int? colorOperation;
@@ -38,6 +45,10 @@ class SearchParameter{
   factory SearchParameter.fromJson(Map<String, dynamic> json) {
     return SearchParameter()
       ..searchString = json['searchString'] as String?
+      ..cardNameSearch = json['cardNameSearch'] as String?
+      ..cardNoSearch = json['cardNoSearch'] as String?
+      ..effectSearch = json['effectSearch'] as String?
+      ..sourceEffectSearch = json['sourceEffectSearch'] as String?
       ..noteId = json['noteId'] as int?
       ..colors = json['colors'] != null ? Set<String>.from(json['colors']) : null
       ..colorOperation = json['colorOperation'] as int?
@@ -67,6 +78,10 @@ class SearchParameter{
   Map<String, dynamic> toJson(){
     final Map<String, dynamic> data = {};
     if (searchString != null) data['searchString'] = searchString;
+    if (cardNameSearch != null) data['cardNameSearch'] = cardNameSearch;
+    if (cardNoSearch != null) data['cardNoSearch'] = cardNoSearch;
+    if (effectSearch != null) data['effectSearch'] = effectSearch;
+    if (sourceEffectSearch != null) data['sourceEffectSearch'] = sourceEffectSearch;
     if (noteId != null) data['noteId'] = noteId;
     if (colors != null) data['colors'] = colors!.toList();
     if (colorOperation != null) data['colorOperation'] = colorOperation;
@@ -100,11 +115,15 @@ class SearchParameter{
 
   @override
   String toString() {
-    return 'SearchParameter{ searchString: $searchString, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
+    return 'SearchParameter{ searchString: $searchString, cardNameSearch: $cardNameSearch, cardNoSearch: $cardNoSearch, effectSearch: $effectSearch, sourceEffectSearch: $sourceEffectSearch, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
   }
 
   void reset() {
     searchString = null;
+    cardNameSearch = null;
+    cardNoSearch = null;
+    effectSearch = null;
+    sourceEffectSearch = null;
     noteId = null;
     colors ={};
     colorOperation = null;
