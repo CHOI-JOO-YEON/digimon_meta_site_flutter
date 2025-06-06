@@ -21,21 +21,28 @@ class DeckBuilderMenuBar extends StatefulWidget {
 
 class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   final GlobalKey<State<Tooltip>> tooltipKey = GlobalKey<State<Tooltip>>();
+  String? _lastDeckName;
 
   @override
   void didUpdateWidget(covariant DeckBuilderMenuBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.deck != oldWidget.deck) {
-      setState(() {
-        widget.textEditingController.text = widget.deck.deckName ?? 'My Deck';
-      });
+    if (widget.deck != oldWidget.deck || widget.deck.deckName != _lastDeckName) {
+      _updateTextController();
     }
   }
 
   @override
   void initState() {
     super.initState();
-    widget.textEditingController.text = widget.deck.deckName;
+    _updateTextController();
+  }
+
+  void _updateTextController() {
+    final newDeckName = widget.deck.deckName ?? 'My Deck';
+    if (widget.textEditingController.text != newDeckName) {
+      widget.textEditingController.text = newDeckName;
+    }
+    _lastDeckName = widget.deck.deckName;
   }
 
   @override
@@ -45,6 +52,12 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.deck.deckName != _lastDeckName) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateTextController();
+      });
+    }
+    
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return Column(

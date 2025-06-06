@@ -109,6 +109,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   onPressed: () => DeckService().showDeckCopyDialog(
                       context,
                       widget.deck,
+                      onCopy: widget.newCopy,
                   ),
                   iconSize: SizeService.largeIconSize(context),
                   icon: const Icon(Icons.copy),

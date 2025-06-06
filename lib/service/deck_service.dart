@@ -798,7 +798,7 @@ class DeckService {
     );
   }
 
-  void showDeckCopyDialog(BuildContext context, DeckBuild deck) {
+  void showDeckCopyDialog(BuildContext context, DeckBuild deck, {Function()? onCopy}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -815,9 +815,15 @@ class DeckService {
             TextButton(
               child: Text('예'),
               onPressed: () {
+                // 덱 카피 실행
                 deck.newCopy();
                 
                 Navigator.of(context).pop();
+                
+                // onCopy 콜백 호출 (UI 업데이트용)
+                if (onCopy != null) {
+                  onCopy();
+                }
                 
                 // 토스트 메시지 표시
                 ToastOverlay.show(
@@ -827,7 +833,10 @@ class DeckService {
                 );
 
                 // 새 덱 복사본을 생성하지 않고, 현재 덱의 상태를 업데이트한 후 리디렉션
-                context.navigateTo(DeckBuilderRoute(deck: deck));
+                // 텍스트 필드 업데이트를 위해 약간의 지연을 추가
+                Future.delayed(Duration(milliseconds: 100), () {
+                  context.navigateTo(DeckBuilderRoute(deck: deck));
+                });
               },
             ),
           ],

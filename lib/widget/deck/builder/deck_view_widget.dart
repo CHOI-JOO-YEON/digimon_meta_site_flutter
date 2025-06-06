@@ -67,7 +67,6 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   }
 
   newCopy() {
-    widget.deck.newCopy();
     textEditingController.text = widget.deck.deckName;
     // 덱 설명이 초기화되었음을 알림
     DeckDescriptionChangedNotification(widget.deck).dispatch(context);
