@@ -59,7 +59,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   List<NoteDto> notes = [];
   int totalPages = 0;
   int currentPage = 0;
-
+  int totalElements = 0;
   DeckBuild? deck;
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
@@ -269,6 +269,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         await CardDataService().searchCards(searchParameter);
     cards = cardResponseDto.cards!;
     totalPages = cardResponseDto.totalPages!;
+    totalElements = cardResponseDto.totalElements!;
     currentPage = 1;
     searchParameter.page = 2;
     
@@ -282,7 +283,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     } else if (searchParameter.searchString != null && searchParameter.searchString!.isNotEmpty) {
       ToastOverlay.show(
         context, 
-        '${cards.length}개의 카드를 찾았습니다.',
+        '${totalElements}개의 카드를 찾았습니다.',
         type: ToastType.success,
       );
     }
