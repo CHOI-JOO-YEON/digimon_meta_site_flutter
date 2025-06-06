@@ -7,6 +7,8 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/keyword_service.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
+import 'package:provider/provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
 
 @RoutePage()
 class KeywordInfoPage extends StatefulWidget {
@@ -97,6 +99,10 @@ class _KeywordInfoPageState extends State<KeywordInfoPage> {
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // 다이얼로그 닫기
                 
+                // 현재 덱 정보 가져오기
+                final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+                final currentDeck = deckProvider.currentDeck;
+                
                 // 검색 파라미터 생성
                 SearchParameter searchParameter = SearchParameter();
                 
@@ -105,10 +111,12 @@ class _KeywordInfoPageState extends State<KeywordInfoPage> {
                 searchParameter.searchString = regexPattern;
                 
                 // 검색 파라미터를 JSON으로 변환하여 DeckBuilderRoute로 전달
+                // 현재 덱 정보도 함께 전달
                 context.navigateTo(
                   MainRoute(
                     children: [
                       DeckBuilderRoute(
+                        deck: currentDeck,
                         searchParameterString: json.encode(searchParameter.toJson())
                       )
                     ]

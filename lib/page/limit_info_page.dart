@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:digimon_meta_site_flutter/model/limit_dto.dart';
 import 'package:digimon_meta_site_flutter/model/limit_comparison.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/widget/card/card_widget.dart';
@@ -37,7 +38,12 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   
   // 입수처로 카드를 검색하는 함수
   void searchWithParameter(SearchParameter parameter) {
+    // 현재 덱 정보 가져오기
+    final deckProvider = Provider.of<DeckProvider>(context, listen: false);
+    final currentDeck = deckProvider.currentDeck;
+    
     context.navigateTo(DeckBuilderRoute(
+        deck: currentDeck,
         searchParameterString: json.encode(parameter.toJson())));
   }
 
