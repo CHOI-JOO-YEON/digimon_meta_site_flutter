@@ -711,6 +711,62 @@
   "cardCount" : 16,
   "isDisable" : false
 }, {
+  "noteId" : 256,
+  "name" : "초! 테이머 배틀 1on1 참가상",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 250,
+  "name" : "Grand Korea Open 구매 특전",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 251,
+  "name" : "초! 테이머 배틀 1on1 TOP 2",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 252,
+  "name" : "초! 테이머 배틀 1on1 TOP 4",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 253,
+  "name" : "초! 테이머 배틀 1on1 TOP 8",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 254,
+  "name" : "초! 테이머 배틀 1on1 TOP 16",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 255,
+  "name" : "초! 테이머 배틀 1on1 TOP 32",
+  "releaseDate" : "2025-01-19",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false
+}, {
   "noteId" : 217,
   "name" : "스페셜 프로모션 팩 2024 Ver.Royal",
   "releaseDate" : "2025-01-19",
@@ -759,6 +815,14 @@
   "cardCount" : 12,
   "isDisable" : false
 }, {
+  "noteId" : 249,
+  "name" : "테이머 배틀팩 2025 Vol.1",
+  "releaseDate" : "2025-03-01",
+  "cardOrigin" : "EVENT",
+  "priority" : null,
+  "cardCount" : 16,
+  "isDisable" : false
+}, {
   "noteId" : 235,
   "name" : "테마 부스터 애니멀 콜로세움 [EXK-05]",
   "releaseDate" : "2025-03-19",
@@ -773,14 +837,6 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 19,
-  "isDisable" : false
-}, {
-  "noteId" : 88,
-  "name" : "테이머파티 - 더 비기닝",
-  "releaseDate" : "2025-03-19",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 18,
-  "cardCount" : 1,
   "isDisable" : false
 }, {
   "noteId" : 245,
@@ -805,7 +861,7 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : null,
   "cardCount" : 20,
-  "isDisable" : null
+  "isDisable" : false
 }, {
   "noteId" : 248,
   "name" : "어드밴스 덱 더블 타이푼 [STK-17] 특전 카드",
@@ -813,7 +869,7 @@
   "cardOrigin" : "STARTER_PROMO",
   "priority" : null,
   "cardCount" : 27,
-  "isDisable" : null
+  "isDisable" : false
 }, {
   "noteId" : 119,
   "name" : "부스터 팩 비기닝 옵저버 [BT-16]",
