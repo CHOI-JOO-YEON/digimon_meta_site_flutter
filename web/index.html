@@ -124,6 +124,13 @@
     // 초기 로딩 텍스트 설정
     updateLoadingText();
 
+    // Attempt to lock the orientation to portrait on supported browsers / installed PWAs.
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("portrait").catch(function (_) {
+            // It is expected to fail on some browsers or contexts (e.g. normal tabs).
+        });
+    }
+
     // 2초마다 로딩 텍스트 변경
     setInterval(updateLoadingText, 2000);
 

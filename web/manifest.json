@@ -6,6 +6,7 @@
   "background_color": "#0175C2",
   "theme_color": "#0175C2",
   "description": "for digimon tcg",
+  "orientation": "portrait",
   "prefer_related_applications": false,
   "icons": [
     {
