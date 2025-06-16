@@ -1094,4 +1094,20 @@
   "priority" : 6,
   "cardCount" : 6,
   "isDisable" : false
+}, {
+  "noteId" : 257,
+  "name" : "EXTRA BOOSTER VERSUS MONSTERS [EX-09]",
+  "releaseDate" : "2026-05-22",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 74,
+  "isDisable" : false
+}, {
+  "noteId" : 258,
+  "name" : "Store Tournament 2025 Vol. 3",
+  "releaseDate" : "2026-05-22",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 6,
+  "isDisable" : false
 } ]
