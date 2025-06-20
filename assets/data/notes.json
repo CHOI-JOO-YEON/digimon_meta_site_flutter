@@ -871,13 +871,21 @@
   "cardCount" : 27,
   "isDisable" : false
 }, {
-  "noteId" : 119,
-  "name" : "부스터 팩 비기닝 옵저버 [BT-16]",
+  "noteId" : 259,
+  "name" : "부스터 팩 BEGINNING OBSERVER [BTK-16]",
   "releaseDate" : "2025-06-20",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
-  "cardCount" : 102,
+  "cardCount" : 129,
   "isDisable" : false
+}, {
+  "noteId" : 260,
+  "name" : "부스터 팩 BEGINNING OBSERVER [BTK-16] 박스 프로모",
+  "releaseDate" : "2025-06-20",
+  "cardOrigin" : "BOOSTER_PROMO",
+  "priority" : null,
+  "cardCount" : 6,
+  "isDisable" : null
 }, {
   "noteId" : 80,
   "name" : "디지몬 서바이브 프로모 팩",
