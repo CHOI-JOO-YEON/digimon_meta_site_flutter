@@ -884,16 +884,8 @@
   "releaseDate" : "2025-06-20",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
-  "cardCount" : 6,
+  "cardCount" : 22,
   "isDisable" : null
-}, {
-  "noteId" : 80,
-  "name" : "디지몬 서바이브 프로모 팩",
-  "releaseDate" : "2025-06-20",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 15,
-  "cardCount" : 5,
-  "isDisable" : false
 }, {
   "noteId" : 121,
   "name" : "테마 부스터 인페르날 어센션 [EX-06]",
