@@ -56,7 +56,7 @@ class _MemoryGaugeState extends State<MemoryGauge> {
                 value.abs().toString(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: gameState.titleWidth(widget.cardWidth), fontWeight: FontWeight.bold),
+                    fontSize: gameState.titleWidth(widget.cardWidth), fontWeight: FontWeight.bold, color: value < 0 ? Colors.black : Colors.white),
               ),
             ),
           ),
