@@ -1,4 +1,12 @@
 [ {
+  "noteId" : 265,
+  "name" : "BOOSTER CYBER EDEN [BT-22]",
+  "releaseDate" : null,
+  "cardOrigin" : null,
+  "priority" : null,
+  "cardCount" : 102,
+  "isDisable" : null
+}, {
   "noteId" : 32,
   "name" : "프로모션 팩 Ver0.0",
   "releaseDate" : "2023-02-24",
