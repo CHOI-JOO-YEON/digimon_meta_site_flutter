@@ -26,25 +26,30 @@ class RaisingZoneWidget extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(
-                  flex: 1,
-                  child: GestureDetector(
-                    onTap: () => raisingZone.hatchEgg(gameState),
-                    child: CardBackWidget(
-                      width: cardWidth,
-                      text: '디지타마',
-                      count: gameState.digitamaDeck.length
-                    ),
-                  )),
-              Expanded(
-                  child: Padding(
-                padding: EdgeInsets.all(cardWidth * 0.025),
-                child: FieldZoneWidget(
-                  fieldZone: raisingZone.fieldZone,
-                  cardWidth: cardWidth * 0.85,
-                  isRaising: true,
+              // 디지타마 덱 (고정 크기)
+              SizedBox(
+                width: cardWidth,
+                child: GestureDetector(
+                  onTap: () => raisingZone.hatchEgg(gameState),
+                  child: CardBackWidget(
+                    width: cardWidth,
+                    text: '디지타마',
+                    count: gameState.digitamaDeck.length
+                  ),
                 ),
-              )),
+              ),
+              SizedBox(width: cardWidth * 0.1), // 간격
+              // 레이징 존 (나머지 공간)
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(cardWidth * 0.025),
+                  child: FieldZoneWidget(
+                    fieldZone: raisingZone.fieldZone,
+                    cardWidth: cardWidth * 0.85,
+                    isRaising: true,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -97,55 +97,72 @@ class ResponsiveFieldArea extends StatelessWidget {
         final firstRowCount = fieldColumns.clamp(1, totalFields);
         final secondRowCount = (totalFields - firstRowCount).clamp(0, fieldColumns);
         
+        // 필드 영역의 실제 너비 계산 (카드 크기에 맞춤)
+        double fieldWidth = (resizingWidth + (resizingWidth * 0.05)) * fieldColumns;
+        
         return Column(
           children: [
             Text('필드',
                 style: TextStyle(fontSize: gameState.textWidth(cardWidth))),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // 첫 번째 행
-                    if (firstRowCount > 0)
-                      GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: firstRowCount,
-                            childAspectRatio: 0.35,
-                            crossAxisSpacing: resizingWidth * 0.05),
-                        itemCount: firstRowCount,
-                        itemBuilder: (context, index) {
-                          return FieldZoneWidget(
-                            key: ValueKey('field_zone_$index'),
-                            fieldZone: gameState.fieldZones["field$index"]!,
-                            cardWidth: resizingWidth,
-                            isRaising: false,
-                          );
-                        },
-                      ),
-                    if (firstRowCount > 0 && secondRowCount > 0)
-                      SizedBox(
-                        height: resizingWidth * 0.05,
-                      ),
-                    // 두 번째 행
-                    if (secondRowCount > 0)
-                      GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: secondRowCount,
-                            childAspectRatio: 0.712,
-                            crossAxisSpacing: resizingWidth * 0.05),
-                        itemCount: secondRowCount,
-                        itemBuilder: (context, index) {
-                          return FieldZoneWidget(
-                            key: ValueKey('field_zone_${index + firstRowCount}'),
-                            fieldZone: gameState.fieldZones["field${index + firstRowCount}"]!,
-                            cardWidth: resizingWidth,
-                            isRaising: false,
-                          );
-                        },
-                      ),
-                  ],
+              child: Center( // 중앙 정렬
+                child: SizedBox(
+                  width: fieldWidth, // 필드 영역 너비 제한
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // 첫 번째 행
+                        if (firstRowCount > 0)
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: firstRowCount,
+                                childAspectRatio: 0.35,
+                                crossAxisSpacing: resizingWidth * 0.05),
+                            itemCount: firstRowCount,
+                            itemBuilder: (context, index) {
+                              return FieldZoneWidget(
+                                key: ValueKey('field_zone_$index'),
+                                fieldZone: gameState.fieldZones["field$index"]!,
+                                cardWidth: resizingWidth,
+                                isRaising: false,
+                              );
+                            },
+                          ),
+                        if (firstRowCount > 0 && secondRowCount > 0)
+                          SizedBox(
+                            height: resizingWidth * 0.05,
+                          ),
+                        // 두 번째 행 (현재 컬럼 수에 맞춰서만 표시)
+                        if (secondRowCount > 0)
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: fieldColumns, // 동일한 컬럼 수 사용
+                                childAspectRatio: 0.712,
+                                crossAxisSpacing: resizingWidth * 0.05),
+                            itemCount: fieldColumns, // 컬럼 수만큼만 표시
+                            itemBuilder: (context, index) {
+                              int fieldIndex = index + firstRowCount;
+                              // 해당 인덱스의 필드가 존재하는지 확인
+                              if (fieldIndex < totalFields) {
+                                return FieldZoneWidget(
+                                  key: ValueKey('field_zone_$fieldIndex'),
+                                  fieldZone: gameState.fieldZones["field$fieldIndex"]!,
+                                  cardWidth: resizingWidth,
+                                  isRaising: false,
+                                );
+                              } else {
+                                // 빈 공간
+                                return Container();
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

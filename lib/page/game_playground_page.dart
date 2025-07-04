@@ -121,18 +121,18 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     // 최소/최대 카드 크기 제한 (더 큰 범위로 조정)
     cardWidth = cardWidth.clamp(50.0, 120.0);
     
-    // 폰트 크기 계산 (반응형) - 카드 크기 증가에 맞춰 조정
+    // 폰트 크기 계산 (반응형) - 적절한 크기로 조정
     double fontSize;
     if (isSmallScreen) {
-      fontSize = screenWidth * 0.018; // 1.5배 증가
+      fontSize = screenWidth * 0.014; // 크기 줄임
     } else if (isMediumScreen) {
-      fontSize = screenWidth * 0.015; // 1.5배 증가
+      fontSize = screenWidth * 0.012; // 크기 줄임
     } else {
-      fontSize = screenWidth * 0.013; // 1.4배 증가
+      fontSize = screenWidth * 0.010; // 크기 줄임
     }
     
-    // 최소/최대 폰트 크기 제한 (더 큰 범위로 조정)
-    fontSize = fontSize.clamp(12.0, 24.0);
+    // 최소/최대 폰트 크기 제한 (적절한 범위로 조정)
+    fontSize = fontSize.clamp(10.0, 18.0);
     
     // 필드와 핸드 영역의 세로 비율 계산
     Map<String, int> centerAreaVerticalRatios;
@@ -261,7 +261,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                     children: [
                       // 좌측 패널 (카드 정보)
                       Expanded(
-                        flex: dimensions['isSmallScreen'] ? 3 : (dimensions['isMediumScreen'] ? 2 : 1),
+                        flex: dimensions['isSmallScreen'] ? 4 : (dimensions['isMediumScreen'] ? 3 : 2),
                         child: Padding(
                           padding: EdgeInsets.all(dimensions['padding']!),
                           child: Column(
@@ -317,7 +317,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                               child: Text(
                                                 localeCardData?.name ?? '데이터 없음',
                                                 style: TextStyle(
-                                                  fontSize: dimensions['fontSize']! * 1.5,
+                                                  fontSize: dimensions['fontSize']! * 1.2,
                                                   fontFamily: localeCardData?.locale == 'JPN'
                                                       ? "MPLUSC"
                                                       : "JalnanGothic",
@@ -398,21 +398,20 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                       ),
                       // 우측 게임 보드
                       Expanded(
-                        flex: dimensions['isSmallScreen'] ? 7 : (dimensions['isMediumScreen'] ? 8 : 9),
+                        flex: dimensions['isSmallScreen'] ? 6 : (dimensions['isMediumScreen'] ? 7 : 8),
                         child: Padding(
                           padding: EdgeInsets.all(dimensions['padding']!),
                           child: Stack(
                             children: [
                               Column(
                                 children: [
+                                                    // 메모리 게이지 - 반응형 높이
+                  MemoryGauge(
+                    cardWidth: dimensions['cardWidth']!,
+                  ),
+                                  SizedBox(height: dimensions['padding']!), // 간격
+                                  // 나머지 게임 영역
                                   Expanded(
-                                    flex: dimensions['gameAreaFlexRatios']['memory']!,
-                                    child: MemoryGauge(
-                                      cardWidth: dimensions['cardWidth']!,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: dimensions['gameAreaFlexRatios']['main']!,
                                     child: _buildResponsiveGameArea(dimensions, gameState),
                                   ),
                                 ],
