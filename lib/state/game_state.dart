@@ -64,7 +64,7 @@ class GameState extends ChangeNotifier {
     redoStack.clear();
 
     dragStatusMap = {};
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 20; i++) {
       String key = "field$i";
       fieldZones[key] = FieldZone(key: key);
     }

@@ -95,7 +95,20 @@ class ResponsiveFieldArea extends StatelessWidget {
         // 전체 필드 존 수 계산
         final totalFields = gameState.fieldZones.length;
         final firstRowCount = fieldColumns.clamp(1, totalFields);
-        final secondRowCount = (totalFields - firstRowCount).clamp(0, fieldColumns);
+        
+        // 작은 필드 줄 수 계산 (컬럼 수에 따라 조정)
+        int smallFieldRows;
+        if (fieldColumns == 8) {
+          smallFieldRows = 1; // 8개 컬럼일 때: 1줄
+        } else if (fieldColumns == 6) {
+          smallFieldRows = 2; // 6개 컬럼일 때: 2줄
+        } else { // fieldColumns == 4
+          smallFieldRows = 4; // 4개 컬럼일 때: 4줄
+        }
+        
+        // 총 작은 필드 개수 계산
+        final totalSmallFields = fieldColumns * smallFieldRows;
+        final actualSmallFields = (totalFields - firstRowCount).clamp(0, totalSmallFields);
         
         // 필드 영역의 실제 너비 계산 (카드 크기에 맞춤)
         double fieldWidth = (resizingWidth + (resizingWidth * 0.05)) * fieldColumns;
@@ -111,7 +124,7 @@ class ResponsiveFieldArea extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        // 첫 번째 행
+                        // 첫 번째 행 (긴 필드)
                         if (firstRowCount > 0)
                           GridView.builder(
                             shrinkWrap: true,
@@ -130,36 +143,48 @@ class ResponsiveFieldArea extends StatelessWidget {
                               );
                             },
                           ),
-                        if (firstRowCount > 0 && secondRowCount > 0)
+                        if (firstRowCount > 0 && actualSmallFields > 0)
                           SizedBox(
                             height: resizingWidth * 0.05,
                           ),
-                        // 두 번째 행 (현재 컬럼 수에 맞춰서만 표시)
-                        if (secondRowCount > 0)
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: fieldColumns, // 동일한 컬럼 수 사용
-                                childAspectRatio: 0.712,
-                                crossAxisSpacing: resizingWidth * 0.05),
-                            itemCount: fieldColumns, // 컬럼 수만큼만 표시
-                            itemBuilder: (context, index) {
-                              int fieldIndex = index + firstRowCount;
-                              // 해당 인덱스의 필드가 존재하는지 확인
-                              if (fieldIndex < totalFields) {
-                                return FieldZoneWidget(
-                                  key: ValueKey('field_zone_$fieldIndex'),
-                                  fieldZone: gameState.fieldZones["field$fieldIndex"]!,
-                                  cardWidth: resizingWidth,
-                                  isRaising: false,
-                                );
-                              } else {
-                                // 빈 공간
-                                return Container();
-                              }
-                            },
-                          ),
+                        // 작은 필드들 (여러 줄)
+                        ...List.generate(smallFieldRows, (rowIndex) {
+                          final startIndex = firstRowCount + (rowIndex * fieldColumns);
+                          final endIndex = (startIndex + fieldColumns).clamp(0, totalFields);
+                          final rowItemCount = endIndex - startIndex;
+                          
+                          if (rowItemCount <= 0) return Container();
+                          
+                          return Column(
+                            children: [
+                              if (rowIndex > 0) SizedBox(height: resizingWidth * 0.05),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: fieldColumns,
+                                    childAspectRatio: 0.712,
+                                    crossAxisSpacing: resizingWidth * 0.05),
+                                itemCount: fieldColumns,
+                                itemBuilder: (context, index) {
+                                  int fieldIndex = startIndex + index;
+                                  // 해당 인덱스의 필드가 존재하는지 확인
+                                  if (fieldIndex < totalFields) {
+                                    return FieldZoneWidget(
+                                      key: ValueKey('field_zone_$fieldIndex'),
+                                      fieldZone: gameState.fieldZones["field$fieldIndex"]!,
+                                      cardWidth: resizingWidth,
+                                      isRaising: false,
+                                    );
+                                  } else {
+                                    // 빈 공간
+                                    return Container();
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        }),
                       ],
                     ),
                   ),
