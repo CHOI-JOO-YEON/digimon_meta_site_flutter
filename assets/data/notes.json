@@ -1,12 +1,4 @@
 [ {
-  "noteId" : 265,
-  "name" : "BOOSTER CYBER EDEN [BT-22]",
-  "releaseDate" : null,
-  "cardOrigin" : null,
-  "priority" : null,
-  "cardCount" : 102,
-  "isDisable" : null
-}, {
   "noteId" : 32,
   "name" : "프로모션 팩 Ver0.0",
   "releaseDate" : "2023-02-24",
@@ -893,7 +885,7 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 22,
-  "isDisable" : null
+  "isDisable" : false
 }, {
   "noteId" : 121,
   "name" : "테마 부스터 인페르날 어센션 [EX-06]",
@@ -1117,5 +1109,13 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 6,
+  "isDisable" : false
+}, {
+  "noteId" : 265,
+  "name" : "부스터 팩 사이버 에덴 [BT-22]",
+  "releaseDate" : "2026-07-17",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 102,
   "isDisable" : false
 } ]
