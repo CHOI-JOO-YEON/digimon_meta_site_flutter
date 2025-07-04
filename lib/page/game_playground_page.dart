@@ -29,6 +29,40 @@ class GamePlayGroundPage extends StatefulWidget {
 }
 
 class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
+  void _showResetConfirmDialog(BuildContext context, GameState gameState) {
+    // 게임이 진행되지 않은 상태(undo가 불가능한 상태)라면 바로 초기화
+    if (gameState.undoStack.isEmpty && gameState.redoStack.isEmpty) {
+      gameState.init(widget.deckBuild);
+      return;
+    }
+    
+    // 게임이 진행된 상태라면 컨펌 창 띄우기
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('초기화 확인'),
+          content: const Text('정말로 게임을 초기화하시겠습니까?\n모든 진행 상황이 삭제됩니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                gameState.init(widget.deckBuild);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -104,8 +138,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                       width: gameState.iconWidth(cardWidth),
                                       height: gameState.iconWidth(cardWidth)),
                                   child: IconButton(
-                                    onPressed: () =>
-                                        gameState.init(widget.deckBuild),
+                                    onPressed: () => _showResetConfirmDialog(context, gameState),
                                     padding: EdgeInsets.zero,
                                     icon: Icon(
                                       Icons.refresh,
