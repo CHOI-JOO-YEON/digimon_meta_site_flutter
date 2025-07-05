@@ -37,7 +37,16 @@ class DeckArea extends StatelessWidget {
                 size: gameState.iconWidth(cardWidth),
               ),
               tooltip: '오픈',
-            )
+            ),
+            IconButton(
+              onPressed: () => gameState.toggleShowDialog(),
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.visibility,
+                size: gameState.iconWidth(cardWidth),
+              ),
+              tooltip: '오픈 창 보기',
+            ),
           ],
         ),
       ],

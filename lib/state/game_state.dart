@@ -27,6 +27,7 @@ class GameState extends ChangeNotifier {
   int memory = 0;
   DigimonCard? selectedCard;
   bool isShowTrash = false;
+  bool isShowDialogOpen = false;
 
   GameState(DeckBuild deckBuild) {
     init(deckBuild);
@@ -59,6 +60,7 @@ class GameState extends ChangeNotifier {
     raisingZone = RaisingZone();
     fieldZones.clear();
     memory = 0;
+    isShowDialogOpen = false;
 
     undoStack.clear();
     redoStack.clear();
@@ -174,6 +176,10 @@ class GameState extends ChangeNotifier {
               fromStartIndex: fromIndex,
               fromEndIndex: fromIndex)
           .reverse());
+      // 카드를 공개할 때 창이 닫혀있으면 자동으로 열기
+      if (!isShowDialogOpen) {
+        isShowDialogOpen = true;
+      }
       notifyListeners();
     }
   }
@@ -202,7 +208,18 @@ class GameState extends ChangeNotifier {
   }
 
   bool isShowDialog() {
-    return shows.isNotEmpty;
+    return isShowDialogOpen;
+  }
+
+  void closeShowDialog() {
+    isShowDialogOpen = false;
+    shows.clear();
+    notifyListeners();
+  }
+
+  void toggleShowDialog() {
+    isShowDialogOpen = !isShowDialogOpen;
+    notifyListeners();
   }
 
   List<DigimonCard> getCardsBySourceId(

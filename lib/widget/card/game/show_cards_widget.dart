@@ -21,7 +21,6 @@ class ShowCards extends StatefulWidget {
 
 class _ShowCardsState extends State<ShowCards> {
   final String id = 'show';
-  bool _isShow = true;
 
   final List<int> _selectedIndices = [];
 
@@ -118,28 +117,8 @@ class _ShowCardsState extends State<ShowCards> {
           child: gameState.isShowDialog()
               ? Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ConstrainedBox(
-                          constraints: BoxConstraints.tightFor(
-                              width: gameState.iconWidth(widget.cardWidth),
-                              height: gameState.iconWidth(widget.cardWidth)),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            iconSize: gameState.iconWidth(widget.cardWidth),
-                            onPressed: () {
-                              setState(() {
-                                _isShow = !_isShow;
-                              });
-                            },
-                            icon: const Icon(Icons.remove_red_eye_outlined),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_isShow)
-                      Container(
+
+                                          Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                           borderRadius:
