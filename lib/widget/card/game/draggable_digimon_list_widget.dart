@@ -158,11 +158,24 @@ class _DraggableDigimonListWidgetState
                         });
                       },
                       itemBuilder: (context, pageIndex) {
+                        // 현재 페이지의 카드들을 가져옴
+                        List<Widget> currentPageCards = pages[pageIndex];
+                        
+                        // 최대 카드 수만큼 위젯 리스트 생성 (빈 공간은 Spacer로 채움)
+                        List<Widget> paddedCards = [];
+                        for (int i = 0; i < cardsPerPage; i++) {
+                          if (i < currentPageCards.length) {
+                            paddedCards.add(currentPageCards[i]);
+                          } else {
+                            paddedCards.add(SizedBox(width: widget.cardWidth)); // 빈 공간
+                          }
+                        }
+                        
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 35), // 버튼 공간 확보
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: pages[pageIndex],
+                            children: paddedCards,
                           ),
                         );
                       },

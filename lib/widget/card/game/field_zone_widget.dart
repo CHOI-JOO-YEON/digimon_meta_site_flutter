@@ -33,6 +33,10 @@ class FieldZoneWidget extends StatelessWidget {
       child: Consumer<FieldZone>(
         builder: (context, fieldZone, child) {
           return Container(
+            constraints: BoxConstraints(
+              minWidth: cardWidth * 1.1, // 최소 너비를 카드 너비의 1.1배로 설정
+              minHeight: cardHeight * 0.8, // 최소 높이 설정
+            ),
             padding: EdgeInsets.all(cardWidth * 0.05),
             decoration: BoxDecoration(
                 color: Colors.grey[100],
@@ -41,6 +45,7 @@ class FieldZoneWidget extends StatelessWidget {
               digimonStack: cards,
               id: id,
               cardHeight: cardHeight,
+              // cardWidth: cardWidth,
               spacing: cardSpacing,
               children: [
                 ...cards.asMap().entries.map((entry) {

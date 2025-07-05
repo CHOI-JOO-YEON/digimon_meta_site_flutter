@@ -30,21 +30,31 @@ class HandArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final double resizingCardWidth = cardWidth * 0.85;
     final gameState = Provider.of<GameState>(context);
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(cardWidth * 0.1)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('패 (${gameState.hand.length})',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: gameState.textWidth(cardWidth))),
-          DraggableDigimonListWidget(
-            id: id,
-            cardWidth: resizingCardWidth,
-            height: resizingCardWidth * 1.404,
-            children: gameState.hand.asMap().entries.map((entry) {
+    
+    // 카드 실제 높이 계산
+    final double cardHeight = resizingCardWidth * 1.404;
+    final double textHeight = gameState.textWidth(cardWidth) * 2; // 텍스트 높이 추정
+    final double padding = cardWidth * 0.2; // 상하 패딩
+    final double totalHeight = cardHeight + textHeight + padding;
+    
+    return SizedBox(
+      height: totalHeight, // 카드 높이 기준으로 제한
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(cardWidth * 0.1)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('패 (${gameState.hand.length})',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: gameState.textWidth(cardWidth))),
+            Expanded(
+              child: DraggableDigimonListWidget(
+                id: id,
+                cardWidth: resizingCardWidth,
+                height: cardHeight,
+                children: gameState.hand.asMap().entries.map((entry) {
               int index = entry.key;
               DigimonCard card = entry.value;
 
@@ -80,8 +90,10 @@ class HandArea extends StatelessWidget {
                 ),
               );
             }).toList(),
-          )
-        ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

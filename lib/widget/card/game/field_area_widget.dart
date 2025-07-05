@@ -26,10 +26,10 @@ class FieldArea extends StatelessWidget {
                     GridView.builder(
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 8,
+                          crossAxisCount: 9,
                           childAspectRatio: 0.35,
-                          crossAxisSpacing: resizingWidth * 0.05),
-                      itemCount: 8,
+                          crossAxisSpacing: resizingWidth * 0.06),
+                      itemCount: 9,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
                           key: ValueKey('field_zone_$index'),
@@ -40,19 +40,19 @@ class FieldArea extends StatelessWidget {
                       },
                     ),
                     SizedBox(
-                      height: resizingWidth * 0.05,
+                      height: resizingWidth * 0.06,
                     ),
                     GridView.builder(
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 8,
+                          crossAxisCount: 9,
                           childAspectRatio: 0.712,
-                          crossAxisSpacing: resizingWidth * 0.05),
-                      itemCount: gameState.fieldZones.length - 8,
+                          crossAxisSpacing: resizingWidth * 0.06),
+                      itemCount: gameState.fieldZones.length - 9,
                       itemBuilder: (context, index) {
                         return FieldZoneWidget(
-                          key: ValueKey('field_zone_${index + 8}'),
-                          fieldZone: gameState.fieldZones["field${index + 8}"]!,
+                          key: ValueKey('field_zone_${index + 9}'),
+                          fieldZone: gameState.fieldZones["field${index + 9}"]!,
                           cardWidth: resizingWidth,
                           isRaising: false,
                         );
@@ -98,12 +98,12 @@ class ResponsiveFieldArea extends StatelessWidget {
         
         // 작은 필드 줄 수 계산 (컬럼 수에 따라 조정)
         int smallFieldRows;
-        if (fieldColumns == 8) {
-          smallFieldRows = 1; // 8개 컬럼일 때: 1줄
-        } else if (fieldColumns == 6) {
-          smallFieldRows = 2; // 6개 컬럼일 때: 2줄
-        } else { // fieldColumns == 4
-          smallFieldRows = 4; // 4개 컬럼일 때: 4줄
+        if (fieldColumns == 9) {
+          smallFieldRows = 1; // 9개 컬럼일 때: 1줄
+        } else if (fieldColumns == 7) {
+          smallFieldRows = 2; // 7개 컬럼일 때: 2줄
+        } else { // fieldColumns == 5
+          smallFieldRows = 3; // 5개 컬럼일 때: 3줄
         }
         
         // 총 작은 필드 개수 계산
@@ -111,7 +111,7 @@ class ResponsiveFieldArea extends StatelessWidget {
         final actualSmallFields = (totalFields - firstRowCount).clamp(0, totalSmallFields);
         
         // 필드 영역의 실제 너비 계산 (카드 크기에 맞춤)
-        double fieldWidth = (resizingWidth + (resizingWidth * 0.05)) * fieldColumns;
+        double fieldWidth = (resizingWidth * 1.1 + (resizingWidth * 0.06)) * fieldColumns;
         
         return Column(
           children: [
@@ -132,7 +132,7 @@ class ResponsiveFieldArea extends StatelessWidget {
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: firstRowCount,
                                 childAspectRatio: 0.35,
-                                crossAxisSpacing: resizingWidth * 0.05),
+                                crossAxisSpacing: resizingWidth * 0.06),
                             itemCount: firstRowCount,
                             itemBuilder: (context, index) {
                               return FieldZoneWidget(
@@ -145,7 +145,7 @@ class ResponsiveFieldArea extends StatelessWidget {
                           ),
                         if (firstRowCount > 0 && actualSmallFields > 0)
                           SizedBox(
-                            height: resizingWidth * 0.05,
+                            height: resizingWidth * 0.06,
                           ),
                         // 작은 필드들 (여러 줄)
                         ...List.generate(smallFieldRows, (rowIndex) {
@@ -164,7 +164,7 @@ class ResponsiveFieldArea extends StatelessWidget {
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: fieldColumns,
                                     childAspectRatio: 0.712,
-                                    crossAxisSpacing: resizingWidth * 0.05),
+                                    crossAxisSpacing: resizingWidth * 0.06),
                                 itemCount: fieldColumns,
                                 itemBuilder: (context, index) {
                                   int fieldIndex = startIndex + index;

@@ -91,11 +91,15 @@ class _DraggableDigimonStackWidgetState
             return SingleChildScrollView(
               controller: _scrollController,
               child: SizedBox(
+                // width: widget.cardWidth * 1.05,
                 height: height,
                 child: Opacity(
                   opacity: gameState.getDragStatus(widget.id) ? 0.5 : 1.0,
-                  child:
-                      Stack(clipBehavior: Clip.none, children: widget.children),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: widget.children,
+                  ),
                 ),
               ),
             );

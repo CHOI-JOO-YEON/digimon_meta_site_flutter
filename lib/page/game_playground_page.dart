@@ -77,11 +77,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
         'main': 8,
       };
       gameAreaRowFlexRatios = {
-        'left': 3,    // Security + Razing 영역 늘림
-        'center': 6,  // Field + Hand 영역 축소
-        'right': 3,   // Deck + Trash 영역 늘림
+        'left': 2,    // Security + Razing 영역
+        'center': 4,  // Field + Hand 영역 
+        'right': 1,   // Deck + Trash 영역 축소 (기존 1:2:1에서 2:4:1로)
       };
-      fieldColumns = 4; // 필드 컬럼 수 줄임
+      fieldColumns = 5; // 필드 컬럼 수 증가
     } else if (isMediumScreen) {
       // 중간 화면: 균형잡힌 레이아웃
       gameAreaFlexRatios = {
@@ -90,10 +90,10 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       };
       gameAreaRowFlexRatios = {
         'left': 2,
-        'center': 8,
-        'right': 2,
+        'center': 6,
+        'right': 1,
       };
-      fieldColumns = 6; // 필드 컬럼 수 중간
+      fieldColumns = 7; // 필드 컬럼 수 중간
     } else {
       // 큰 화면: 원래 레이아웃
       gameAreaFlexRatios = {
@@ -103,9 +103,9 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       gameAreaRowFlexRatios = {
         'left': 2,
         'center': 8,
-        'right': 2,
+        'right': 1,
       };
-      fieldColumns = 8; // 필드 컬럼 수 최대
+      fieldColumns = 9; // 필드 컬럼 수 최대
     }
     
     // 카드 크기 계산 (화면 크기 기반)
@@ -134,24 +134,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     // 최소/최대 폰트 크기 제한 (적절한 범위로 조정)
     fontSize = fontSize.clamp(10.0, 18.0);
     
-    // 필드와 핸드 영역의 세로 비율 계산
-    Map<String, int> centerAreaVerticalRatios;
-    if (isSmallScreen) {
-      centerAreaVerticalRatios = {
-        'field': 5,  // 필드 영역 비율
-        'hand': 2,   // 핸드 영역 비율 증가
-      };
-    } else if (isMediumScreen) {
-      centerAreaVerticalRatios = {
-        'field': 6,  // 필드 영역 비율
-        'hand': 2,   // 핸드 영역 비율 약간 증가
-      };
-    } else {
-      centerAreaVerticalRatios = {
-        'field': 3,  // 필드 영역 비율 (원래)
-        'hand': 1,   // 핸드 영역 비율 (원래)
-      };
-    }
+    // 핸드 영역은 고정 높이를 사용하므로 세로 비율 계산 불필요
 
     return {
       'cardWidth': cardWidth,
@@ -159,7 +142,6 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       'padding': padding,
       'gameAreaFlexRatios': gameAreaFlexRatios,
       'gameAreaRowFlexRatios': gameAreaRowFlexRatios,
-      'centerAreaVerticalRatios': centerAreaVerticalRatios,
       'fieldColumns': fieldColumns,
       'isSmallScreen': isSmallScreen,
       'isMediumScreen': isMediumScreen,
@@ -261,7 +243,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                     children: [
                       // 좌측 패널 (카드 정보)
                       Expanded(
-                        flex: dimensions['isSmallScreen'] ? 4 : (dimensions['isMediumScreen'] ? 3 : 2),
+                        flex: dimensions['isSmallScreen'] ? 2 : (dimensions['isMediumScreen'] ? 2 : 2),
                         child: Padding(
                           padding: EdgeInsets.all(dimensions['padding']!),
                           child: Column(
@@ -472,17 +454,13 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
           child: Column(
             children: [
               Expanded(
-                flex: dimensions['centerAreaVerticalRatios']['field']!,
                 child: ResponsiveFieldArea(
                   cardWidth: cardWidth,
                   fieldColumns: dimensions['fieldColumns']!,
                 ),
               ),
-              Expanded(
-                flex: dimensions['centerAreaVerticalRatios']['hand']!,
-                child: HandArea(
-                  cardWidth: cardWidth,
-                ),
+              HandArea(
+                cardWidth: cardWidth,
               ),
             ],
           ),

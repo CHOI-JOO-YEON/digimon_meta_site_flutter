@@ -93,7 +93,7 @@ class SecurityStackArea extends StatelessWidget {
           child: DraggableDigimonStackWidget(
             digimonStack: cards,
             id: id,
-            cardHeight: cardHeight,
+            cardHeight: cardWidth,
             spacing: cardSpacing,
             children: [
               ...cards.asMap().entries.map((entry) {
