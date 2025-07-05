@@ -22,38 +22,49 @@ class ShowCards extends StatefulWidget {
 class _ShowCardsState extends State<ShowCards> {
   final String id = 'show';
 
-  final List<int> _selectedIndices = [];
+  final List<DigimonCard> _selectedCards = [];
 
-  void _toggleSelection(int index) {
+  void _toggleSelection(DigimonCard card) {
     setState(() {
-      if (_selectedIndices.contains(index)) {
-        _selectedIndices.remove(index);
+      if (_selectedCards.contains(card)) {
+        _selectedCards.remove(card);
       } else {
-        _selectedIndices.add(index);
+        _selectedCards.add(card);
       }
     });
   }
 
-  int _getSelectionOrder(int index) {
-    final order = _selectedIndices.indexOf(index);
+  int _getSelectionOrder(DigimonCard card, List<DigimonCard> currentShows) {
+    if (!currentShows.contains(card)) return -1;
+    final order = _selectedCards.indexOf(card);
     return (order == -1) ? -1 : (order + 1);
   }
 
-  void _selectAll(int length) {
+  void _selectAll(List<DigimonCard> cards) {
     setState(() {
-      _selectedIndices.clear();
-      _selectedIndices.addAll(List.generate(length, (i) => i));
+      _selectedCards.clear();
+      _selectedCards.addAll(cards);
     });
   }
 
   void _clearSelection() {
     setState(() {
-      _selectedIndices.clear();
+      _selectedCards.clear();
     });
   }
 
   void _sendSelectedToDeckTop(GameState gameState) {
-    if (_selectedIndices.isEmpty) return;
+    if (_selectedCards.isEmpty) return;
+
+    List<int> selectedIndices = [];
+    for (DigimonCard selectedCard in _selectedCards) {
+      int index = gameState.shows.indexWhere((card) => identical(card, selectedCard));
+      if (index != -1) {
+        selectedIndices.add(index);
+      }
+    }
+
+    if (selectedIndices.isEmpty) return;
 
     MoveCard move = MoveCard(
       fromId: 'show',
@@ -63,7 +74,7 @@ class _ShowCardsState extends State<ShowCards> {
     );
     move.toId = 'deck';
     int toIndex = gameState.mainDeck.length;
-    for (var i in _selectedIndices.reversed) {
+    for (var i in selectedIndices.reversed) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -71,7 +82,17 @@ class _ShowCardsState extends State<ShowCards> {
   }
 
   void _sendSelectedToDeckBottom(GameState gameState) {
-    if (_selectedIndices.isEmpty) return;
+    if (_selectedCards.isEmpty) return;
+
+    List<int> selectedIndices = [];
+    for (DigimonCard selectedCard in _selectedCards) {
+      int index = gameState.shows.indexWhere((card) => identical(card, selectedCard));
+      if (index != -1) {
+        selectedIndices.add(index);
+      }
+    }
+
+    if (selectedIndices.isEmpty) return;
 
     MoveCard move = MoveCard(
       fromId: 'show',
@@ -81,7 +102,7 @@ class _ShowCardsState extends State<ShowCards> {
     );
     move.toId = 'deck';
     int toIndex = 0;
-    for (var i in _selectedIndices.reversed) {
+    for (var i in selectedIndices.reversed) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -89,7 +110,17 @@ class _ShowCardsState extends State<ShowCards> {
   }
 
   void _sendSelectedToTrash(GameState gameState) {
-    if (_selectedIndices.isEmpty) return;
+    if (_selectedCards.isEmpty) return;
+
+    List<int> selectedIndices = [];
+    for (DigimonCard selectedCard in _selectedCards) {
+      int index = gameState.shows.indexWhere((card) => identical(card, selectedCard));
+      if (index != -1) {
+        selectedIndices.add(index);
+      }
+    }
+
+    if (selectedIndices.isEmpty) return;
 
     MoveCard move = MoveCard(
       fromId: 'show',
@@ -99,7 +130,7 @@ class _ShowCardsState extends State<ShowCards> {
     );
     move.toId = 'trash';
     int toIndex = 0;
-    for (var i in _selectedIndices) {
+    for (var i in selectedIndices) {
       move.moveSet.add(MoveIndex(toIndex++, i));
     }
     _clearSelection();
@@ -109,6 +140,10 @@ class _ShowCardsState extends State<ShowCards> {
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
+    
+    // 더 이상 존재하지 않는 카드들을 선택 목록에서 제거
+    _selectedCards.removeWhere((card) => !gameState.shows.contains(card));
+    
     double resizingCardWidth = widget.cardWidth * 0.85;
     return Column(
       children: [
@@ -161,7 +196,7 @@ class _ShowCardsState extends State<ShowCards> {
                                 const Spacer(),
                                 TextButton(
                                   onPressed: () =>
-                                      _selectAll(gameState.shows.length),
+                                      _selectAll(gameState.shows),
                                   child: Text(
                                     '모두 선택',
                                     style: TextStyle(
@@ -189,9 +224,9 @@ class _ShowCardsState extends State<ShowCards> {
                                 int index = entry.key;
                                 DigimonCard card = entry.value;
                                 final isSelected =
-                                    _selectedIndices.contains(index);
+                                    _selectedCards.contains(card) && gameState.shows.contains(card);
                                 final selectionOrder =
-                                    _getSelectionOrder(index);
+                                    _getSelectionOrder(card, gameState.shows);
 
                                 return Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -242,7 +277,7 @@ class _ShowCardsState extends State<ShowCards> {
                                             ),
                                             child: GestureDetector(
                                               onTap: () {
-                                                _toggleSelection(index);
+                                                _toggleSelection(card);
                                               },
                                               child: Padding(
                                                 padding: EdgeInsets.all(
