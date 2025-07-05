@@ -176,7 +176,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('초기화 확인'),
+          title: const Text('초기화'),
           content: const Text('정말로 게임을 초기화하시겠습니까?\n모든 진행 상황이 삭제됩니다.'),
           actions: [
             TextButton(
@@ -210,7 +210,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('나가기 확인'),
+          title: const Text('나가기'),
           content: const Text('정말로 나가시겠습니까?\n게임 진행 상황이 저장되지 않습니다.'),
           actions: [
             TextButton(
@@ -304,23 +304,23 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                   runSpacing: 4, // 줄 간 세로 간격
                                   children: [
                                     _buildControlButton(
-                                      icon: Icons.arrow_back,
+                                      icon: Icons.exit_to_app,
                                       onPressed: () => _showExitConfirmDialog(context, gameState),
-                                      tooltip: '뒤로가기',
+                                      tooltip: '페이지 나가기',
                                       isEnabled: true,
                                       iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.undo,
                                       onPressed: () => gameState.undo(),
-                                      tooltip: 'Undo',
+                                      tooltip: '뒤로',
                                       isEnabled: gameState.undoStack.isNotEmpty,
                                       iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.redo,
                                       onPressed: () => gameState.redo(),
-                                      tooltip: 'Redo',
+                                      tooltip: '앞으로',
                                       isEnabled: gameState.redoStack.isNotEmpty,
                                       iconSize: dimensions['buttonSize']!,
                                     ),
