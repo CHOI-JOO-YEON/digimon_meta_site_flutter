@@ -59,9 +59,9 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     
     // 화면 가로 세로 비율에 따른 breakpoint 설정
     double aspectRatio = screenWidth / screenHeight;
-    bool isSmallScreen = aspectRatio < 1.6;  // 16:10 (1.6) 미만
-    bool isMediumScreen = aspectRatio >= 1.6 && aspectRatio < 2.0;  // 16:10 ~ 20:10 (2.0) 미만
-    bool isLargeScreen = aspectRatio >= 2.0;  // 20:10 (2.0) 이상
+    bool isNarrowScreen = aspectRatio < 1.6;  // 16:10 (1.6) 미만 - 상대적으로 좁은 화면
+    bool isMediumScreen = aspectRatio >= 1.6 && aspectRatio < 2.0;  // 16:10 ~ 20:10 (2.0) 미만 - 중간 비율
+    bool isWideScreen = aspectRatio >= 2.0;  // 20:10 (2.0) 이상 - 와이드 화면
     
     // 패딩 계산
     double padding = screenWidth * 0.01;
@@ -71,8 +71,8 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     Map<String, int> gameAreaRowFlexRatios;
     int fieldColumns;
     
-    if (isSmallScreen) {
-      // 작은 화면: 컴팩트한 레이아웃
+    if (isNarrowScreen) {
+      // 좁은 화면: 컴팩트한 레이아웃
       gameAreaFlexRatios = {
         'memory': 1,
         'main': 8,
@@ -96,7 +96,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
       };
       fieldColumns = 7; // 필드 컬럼 수 중간
     } else {
-      // 큰 화면: 원래 레이아웃
+      // 와이드 화면: 원래 레이아웃
       gameAreaFlexRatios = {
         'memory': 1,
         'main': 8,
@@ -111,20 +111,33 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     
     // 카드 크기 계산 (화면 크기 기반)
     double cardWidth;
-    if (isSmallScreen) {
-      cardWidth = screenWidth * 0.08; // 화면 너비의 8% (거의 2배 증가)
+    if (isNarrowScreen) {
+      cardWidth = screenWidth * 0.08; // 화면 너비의 8%
     } else if (isMediumScreen) {
-      cardWidth = screenWidth * 0.07; // 화면 너비의 7% (거의 2배 증가)
+      cardWidth = screenWidth * 0.07; // 화면 너비의 7%
     } else {
-      cardWidth = screenWidth * 0.06; // 화면 너비의 6% (거의 2배 증가)
+      cardWidth = screenWidth * 0.06; // 화면 너비의 6%
     }
     
     // 최소/최대 카드 크기 제한 (더 큰 범위로 조정)
     cardWidth = cardWidth.clamp(50.0, 120.0);
     
+    // 버튼 크기 계산 (모바일에서 터치하기 쉽도록 최소 크기 보장)
+    double buttonSize;
+    if (isNarrowScreen) {
+      buttonSize = screenWidth * 0.03; // 좁은 화면에서 더 큰 버튼
+    } else if (isMediumScreen) {
+      buttonSize = screenWidth * 0.02; 
+    } else {
+      buttonSize = screenWidth * 0.01; 
+    }
+    
+    // 최소/최대 버튼 크기 제한 (터치하기 쉽도록 최소 30dp 보장)
+    buttonSize = buttonSize.clamp(40, 50);
+    
     // 폰트 크기 계산 (반응형) - 적절한 크기로 조정
     double fontSize;
-    if (isSmallScreen) {
+    if (isNarrowScreen) {
       fontSize = screenWidth * 0.014; // 크기 줄임
     } else if (isMediumScreen) {
       fontSize = screenWidth * 0.012; // 크기 줄임
@@ -139,14 +152,15 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
 
     return {
       'cardWidth': cardWidth,
+      'buttonSize': buttonSize,
       'fontSize': fontSize,
       'padding': padding,
       'gameAreaFlexRatios': gameAreaFlexRatios,
       'gameAreaRowFlexRatios': gameAreaRowFlexRatios,
       'fieldColumns': fieldColumns,
-      'isSmallScreen': isSmallScreen,
+      'isNarrowScreen': isNarrowScreen,
       'isMediumScreen': isMediumScreen,
-      'isLargeScreen': isLargeScreen,
+      'isWideScreen': isWideScreen,
     };
   }
 
@@ -244,7 +258,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                     children: [
                       // 좌측 패널 (카드 정보)
                       Expanded(
-                        flex: dimensions['isSmallScreen'] ? 2 : (dimensions['isMediumScreen'] ? 2 : 2),
+                        flex: dimensions['isNarrowScreen'] ? 2 : (dimensions['isMediumScreen'] ? 2 : 2),
                         child: Padding(
                           padding: EdgeInsets.all(dimensions['padding']!),
                           child: Column(
@@ -259,28 +273,28 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                       onPressed: () => gameState.undo(),
                                       tooltip: '뒤로',
                                       isEnabled: gameState.undoStack.isNotEmpty,
-                                      iconSize: gameState.iconWidth(dimensions['cardWidth']!),
+                                      iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.redo,
                                       onPressed: () => gameState.redo(),
                                       tooltip: '앞으로',
                                       isEnabled: gameState.redoStack.isNotEmpty,
-                                      iconSize: gameState.iconWidth(dimensions['cardWidth']!),
+                                      iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.refresh,
                                       onPressed: () => _showResetConfirmDialog(context, gameState),
                                       tooltip: '초기화',
                                       isEnabled: true,
-                                      iconSize: gameState.iconWidth(dimensions['cardWidth']!),
+                                      iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.token,
                                       onPressed: () => gameState.addTokenToHand(),
                                       tooltip: '토큰 추가',
                                       isEnabled: true,
-                                      iconSize: gameState.iconWidth(dimensions['cardWidth']!),
+                                      iconSize: dimensions['buttonSize']!,
                                     ),
                                   ],
                                 ),
@@ -381,7 +395,7 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                       ),
                       // 우측 게임 보드
                       Expanded(
-                        flex: dimensions['isSmallScreen'] ? 6 : (dimensions['isMediumScreen'] ? 7 : 8),
+                        flex: dimensions['isNarrowScreen'] ? 6 : (dimensions['isMediumScreen'] ? 7 : 8),
                         child: Padding(
                           padding: EdgeInsets.all(dimensions['padding']!),
                           child: Stack(
