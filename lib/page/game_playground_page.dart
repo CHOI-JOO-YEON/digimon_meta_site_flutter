@@ -198,14 +198,45 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     );
   }
 
+  void _showExitConfirmDialog(BuildContext context, GameState gameState) {
+    // 게임이 진행되지 않은 상태(undo가 불가능한 상태)라면 바로 나가기
+    if (gameState.undoStack.isEmpty && gameState.redoStack.isEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+    
+    // 게임이 진행된 상태라면 컨펌 창 띄우기
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('나가기 확인'),
+          content: const Text('정말로 나가시겠습니까?\n게임 진행 상황이 저장되지 않습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // 게임 페이지에서 나가기
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => GameState(widget.deckBuild),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('플레이그라운드'),
-        ),
         body: OrientationBuilder(
           builder: (context, orientation) {
             // 세로모드일 때 경고 메시지 표시
@@ -266,19 +297,30 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                               // 컨트롤 버튼들
                               Container(
                                 decoration: const BoxDecoration(),
-                                child: Row(
+                                alignment: Alignment.centerLeft, // 컨테이너 내에서 좌측 정렬
+                                child: Wrap(
+                                  alignment: WrapAlignment.start, // 좌측 정렬
+                                  spacing: 4, // 버튼 간 가로 간격
+                                  runSpacing: 4, // 줄 간 세로 간격
                                   children: [
+                                    _buildControlButton(
+                                      icon: Icons.arrow_back,
+                                      onPressed: () => _showExitConfirmDialog(context, gameState),
+                                      tooltip: '뒤로가기',
+                                      isEnabled: true,
+                                      iconSize: dimensions['buttonSize']!,
+                                    ),
                                     _buildControlButton(
                                       icon: Icons.undo,
                                       onPressed: () => gameState.undo(),
-                                      tooltip: '뒤로',
+                                      tooltip: 'Undo',
                                       isEnabled: gameState.undoStack.isNotEmpty,
                                       iconSize: dimensions['buttonSize']!,
                                     ),
                                     _buildControlButton(
                                       icon: Icons.redo,
                                       onPressed: () => gameState.redo(),
-                                      tooltip: '앞으로',
+                                      tooltip: 'Redo',
                                       isEnabled: gameState.redoStack.isNotEmpty,
                                       iconSize: dimensions['buttonSize']!,
                                     ),
