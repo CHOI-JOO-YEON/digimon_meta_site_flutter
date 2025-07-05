@@ -39,17 +39,19 @@ class RaisingZoneWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(width: cardWidth * 0.1), // 간격
-              // 레이징 존 (카드 크기 참조)
-              Container(
-                constraints: BoxConstraints(
-                  minWidth: cardWidth * 1.1, // 최소 너비를 카드 너비의 1.1배로 설정
-                  minHeight: cardWidth * 1.404 * 0.8, // 최소 높이 설정 (카드 높이 기준)
-                ),
-                padding: EdgeInsets.all(cardWidth * 0.025),
-                child: FieldZoneWidget(
-                  fieldZone: raisingZone.fieldZone,
-                  cardWidth: cardWidth * 0.9, // 카드 크기를 더 크게 설정
-                  isRaising: true,
+              // 레이징 존 (유연한 크기)
+              Flexible(
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: cardWidth * 1.1, // 최소 너비를 카드 너비의 1.1배로 설정
+                    minHeight: cardWidth * 1.404 * 0.8, // 최소 높이 설정 (카드 높이 기준)
+                  ),
+                  padding: EdgeInsets.all(cardWidth * 0.025),
+                  child: FieldZoneWidget(
+                    fieldZone: raisingZone.fieldZone,
+                    cardWidth: cardWidth * 0.9, // 카드 크기를 더 크게 설정
+                    isRaising: true,
+                  ),
                 ),
               ),
             ],

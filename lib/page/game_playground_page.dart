@@ -57,10 +57,11 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
     
-    // 화면 크기에 따른 breakpoint 설정
-    bool isSmallScreen = screenWidth < 1200;
-    bool isMediumScreen = screenWidth >= 1200 && screenWidth < 1600;
-    bool isLargeScreen = screenWidth >= 1600;
+    // 화면 가로 세로 비율에 따른 breakpoint 설정
+    double aspectRatio = screenWidth / screenHeight;
+    bool isSmallScreen = aspectRatio < 1.6;  // 16:10 (1.6) 미만
+    bool isMediumScreen = aspectRatio >= 1.6 && aspectRatio < 2.0;  // 16:10 ~ 20:10 (2.0) 미만
+    bool isLargeScreen = aspectRatio >= 2.0;  // 20:10 (2.0) 이상
     
     // 패딩 계산
     double padding = screenWidth * 0.01;

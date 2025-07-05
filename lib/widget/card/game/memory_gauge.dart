@@ -25,20 +25,43 @@ class _MemoryGaugeState extends State<MemoryGauge> {
         
         // 화면 크기에 따른 반응형 계산
         double screenWidth = MediaQuery.of(context).size.width;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double aspectRatio = screenWidth / screenHeight;
         
-        // 버튼 크기 계산 (화면 크기에 따라 반응형)
+        // 버튼 크기 계산 (완전 반응형)
         double buttonSize;
-        if (screenWidth < 1200) {
-          // 중간 화면
-          buttonSize = (screenWidth * 0.035).clamp(25.0, 45.0);
+        
+        // 화면 비율이 작은 경우 (모바일 가로화면) 자동으로 2줄 표시
+        bool forceTwoRows = aspectRatio < 1.6;
+        
+        // 반응형 최소/최대 크기 계산 (cardWidth 기준)
+        double minButtonSize = widget.cardWidth * 0.3; // 카드 너비의 30%
+        double maxButtonSize;
+        
+        if (forceTwoRows) {
+          // 2줄로 표시할 때 버튼 크기 계산 (첫 번째 줄 11개 기준)
+          // 반응형 마진을 고려한 계산 (초기 추정값 사용)
+          double estimatedMargin = minButtonSize * 0.04 * 2; // 양쪽 마진
+          maxButtonSize = (availableWidth - (estimatedMargin * 11)) / 11;
+          
+          // 화면 크기에 따른 기본 버튼 크기 계산
+          double baseButtonSize = availableWidth * 0.08; // 사용 가능한 너비의 8%
+          buttonSize = baseButtonSize.clamp(minButtonSize, maxButtonSize);
         } else {
-          // 큰 화면
-          buttonSize = (screenWidth * 0.03).clamp(30.0, 50.0);
+          // 1줄로 표시할 때 버튼 크기 계산
+          // 반응형 마진을 고려한 계산 (초기 추정값 사용)
+          double estimatedMargin = minButtonSize * 0.04 * 2; // 양쪽 마진
+          maxButtonSize = (availableWidth - (estimatedMargin * 21)) / 21;
+          
+          // 화면 크기에 따른 기본 버튼 크기 계산
+          double baseButtonSize = availableWidth * 0.04; // 사용 가능한 너비의 4%
+          buttonSize = baseButtonSize.clamp(minButtonSize, maxButtonSize);
         }
         
-        // 한 줄에 21개 버튼이 들어갈 수 있는지 계산
-        double totalButtonWidth = (buttonSize + 2) * 21; // 버튼 크기 + 마진
-        bool useTwoRows = totalButtonWidth > availableWidth;
+        // 한 줄에 21개 버튼이 들어갈 수 있는지 계산 (실제 마진 사용)
+        double buttonMargin = buttonSize * 0.04 * 2; // 양쪽 마진
+        double totalButtonWidth = (buttonSize + buttonMargin) * 21;
+        bool useTwoRows = forceTwoRows || totalButtonWidth > availableWidth;
         
         Widget createMemoryButton(int value) {
           bool isSelected = value == gameState.memory;
@@ -53,7 +76,7 @@ class _MemoryGaugeState extends State<MemoryGauge> {
           }
           
           return Container(
-            margin: EdgeInsets.all(1.0),
+            margin: EdgeInsets.all(buttonSize * 0.04), // 버튼 크기의 4%
             child: GestureDetector(
               onTap: () {
                 gameState.updateMemory(value, true);
@@ -74,7 +97,10 @@ class _MemoryGaugeState extends State<MemoryGauge> {
                     value.abs().toString(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: (buttonSize * 0.3).clamp(10.0, gameState.titleWidth(widget.cardWidth)), 
+                        fontSize: (buttonSize * 0.35).clamp(
+                          widget.cardWidth * 0.15, // 최소 크기: 카드 너비의 15%
+                          gameState.titleWidth(widget.cardWidth)
+                        ), 
                         fontWeight: FontWeight.bold, 
                         color: value < 0 ? Colors.black : Colors.white), // 원래 색상
                   ),
@@ -84,10 +110,12 @@ class _MemoryGaugeState extends State<MemoryGauge> {
           );
         }
         
-        // 메모리 게이지 높이 계산
+        // 메모리 게이지 높이 계산 (반응형)
+        double buttonMarginVertical = buttonSize * 0.04 * 2; // 상하 마진
+        double rowGap = useTwoRows ? buttonSize * 0.1 : 0; // 줄 간격
         double gaugeHeight = useTwoRows ? 
-          (buttonSize * 2) + 12 : // 두 줄 + 간격 + 마진
-          buttonSize + 8; // 한 줄 + 마진
+          (buttonSize * 2) + rowGap + (buttonMarginVertical * 2) : // 두 줄 + 간격 + 마진
+          buttonSize + buttonMarginVertical; // 한 줄 + 마진
         
         return SizedBox(
           height: gaugeHeight,
@@ -104,7 +132,7 @@ class _MemoryGaugeState extends State<MemoryGauge> {
                     return createMemoryButton(value);
                   }),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: buttonSize * 0.1), // 버튼 크기의 10%
                 // 두 번째 줄: 1부터 +10까지 (10개)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
