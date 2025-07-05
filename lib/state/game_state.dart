@@ -64,7 +64,7 @@ class GameState extends ChangeNotifier {
     redoStack.clear();
 
     dragStatusMap = {};
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 20; i++) {
       String key = "field$i";
       fieldZones[key] = FieldZone(key: key);
     }
@@ -99,15 +99,15 @@ class GameState extends ChangeNotifier {
   }
 
   double iconWidth(double cardWidth) {
-    return cardWidth * 0.3;
+    return cardWidth * 0.4; // 0.3 → 0.4로 증가
   }
 
   double titleWidth(double cardWidth) {
-    return cardWidth * 0.15;
+    return cardWidth * 0.2; // 0.15 → 0.2로 증가
   }
 
   double textWidth(double cardWidth) {
-    return cardWidth * 0.1;
+    return cardWidth * 0.15; // 0.1 → 0.15로 증가
   }
 
   void updateDragStatus(String key, bool status) {

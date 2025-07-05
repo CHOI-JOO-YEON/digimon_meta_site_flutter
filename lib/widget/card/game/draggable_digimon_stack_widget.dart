@@ -42,6 +42,28 @@ class _DraggableDigimonStackWidgetState
     super.dispose();
   }
 
+  void _scrollUp() {
+    if (_scrollController.hasClients) {
+      final double scrollAmount = widget.spacing * 2; // 2카드 간격만큼 스크롤
+      _scrollController.animateTo(
+        (_scrollController.offset - scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _scrollDown() {
+    if (_scrollController.hasClients) {
+      final double scrollAmount = widget.spacing * 2; // 2카드 간격만큼 스크롤
+      _scrollController.animateTo(
+        (_scrollController.offset + scrollAmount).clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
@@ -79,29 +101,91 @@ class _DraggableDigimonStackWidgetState
         move.toStartIndex = calculateToIndex(
             cardInsertHeight, widget.spacing, widget.digimonStack.length);
 
-        gameState.moveCards(move, cards,true);
+        gameState.moveCards(move, cards, true);
       },
       builder: (context, candidateData, rejectedData) {
         return LayoutBuilder(
           builder: (context, constraints) {
-            double stackHeight = widget.cardHeight +
+                        double stackHeight = widget.cardHeight +
                 (widget.spacing * (widget.digimonStack.length - 1));
             height = stackHeight.clamp(constraints.maxHeight, double.infinity);
+            
+            // 스크롤이 필요한지 확인
+            bool needsScroll = stackHeight > constraints.maxHeight;
 
-            return SingleChildScrollView(
-              controller: _scrollController,
-              child: SizedBox(
-                height: height,
-                child: Opacity(
-                  opacity: gameState.getDragStatus(widget.id) ? 0.5 : 1.0,
-                  child:
-                      Stack(clipBehavior: Clip.none, children: widget.children),
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  child: SizedBox(
+                    height: height,
+                    child: Opacity(
+                      opacity: gameState.getDragStatus(widget.id) ? 0.5 : 1.0,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: widget.children,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                // 스크롤 버튼들 (스크롤이 필요할 때만 표시)
+                if (needsScroll)
+                  Positioned.fill(
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildScrollButton(
+                              icon: Icons.keyboard_arrow_up,
+                              onPressed: _scrollUp,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 4,
+                              color: Colors.grey.withOpacity(0.4),
+                            ),
+                            _buildScrollButton(
+                              icon: Icons.keyboard_arrow_down,
+                              onPressed: _scrollDown,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildScrollButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
     );
   }
 }

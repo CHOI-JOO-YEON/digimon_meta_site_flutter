@@ -26,25 +26,34 @@ class RaisingZoneWidget extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(
-                  flex: 1,
-                  child: GestureDetector(
-                    onTap: () => raisingZone.hatchEgg(gameState),
-                    child: CardBackWidget(
-                      width: cardWidth,
-                      text: '디지타마',
-                      count: gameState.digitamaDeck.length
-                    ),
-                  )),
-              Expanded(
-                  child: Padding(
-                padding: EdgeInsets.all(cardWidth * 0.025),
-                child: FieldZoneWidget(
-                  fieldZone: raisingZone.fieldZone,
-                  cardWidth: cardWidth * 0.85,
-                  isRaising: true,
+              // 디지타마 덱 (고정 크기)
+              SizedBox(
+                width: cardWidth,
+                child: GestureDetector(
+                  onTap: () => raisingZone.hatchEgg(gameState),
+                  child: CardBackWidget(
+                    width: cardWidth,
+                    text: '디지타마',
+                    count: gameState.digitamaDeck.length
+                  ),
                 ),
-              )),
+              ),
+              SizedBox(width: cardWidth * 0.1), // 간격
+              // 레이징 존 (유연한 크기)
+              Flexible(
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: cardWidth * 1.1, // 최소 너비를 카드 너비의 1.1배로 설정
+                    minHeight: cardWidth * 1.404 * 0.8, // 최소 높이 설정 (카드 높이 기준)
+                  ),
+                  padding: EdgeInsets.all(cardWidth * 0.025),
+                  child: FieldZoneWidget(
+                    fieldZone: raisingZone.fieldZone,
+                    cardWidth: cardWidth * 0.9, // 카드 크기를 더 크게 설정
+                    isRaising: true,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -30,20 +30,21 @@ class CardBackWidget extends StatelessWidget {
               width: width / 3,
               child: Image.asset('assets/images/small_img.png')),
           if (text != null)
-            Text(
-              createText(text, count),
-              style: TextStyle(fontSize: gameState.textWidth(width)),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  text ?? '',
+                  style: TextStyle(fontSize: gameState.textWidth(width)),
+                ),
+                if (count != null)
+                  Text(
+                    '($count)',
+                    style: TextStyle(fontSize: gameState.textWidth(width))),
+              ],
             ),
         ],
       ),
     );
-  }
-
-  String createText(String? text, int? count) {
-    String result = text ?? '';
-    if (count != null) {
-      result += ' ($count)';
-    }
-    return result;
   }
 }
