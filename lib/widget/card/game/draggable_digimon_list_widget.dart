@@ -189,16 +189,6 @@ class _DraggableDigimonListWidgetState
                       bottom: 0,
                       child: Container(
                         width: 35,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.grey[100]!,
-                              Colors.grey[100]!.withOpacity(0.0),
-                            ],
-                          ),
-                        ),
                         child: Center(
                           child: Container(
                             decoration: BoxDecoration(
@@ -233,16 +223,6 @@ class _DraggableDigimonListWidgetState
                       bottom: 0,
                       child: Container(
                         width: 35,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                            colors: [
-                              Colors.grey[100]!,
-                              Colors.grey[100]!.withOpacity(0.0),
-                            ],
-                          ),
-                        ),
                         child: Center(
                           child: Container(
                             decoration: BoxDecoration(
