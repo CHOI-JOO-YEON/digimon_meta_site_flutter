@@ -82,7 +82,7 @@ class SearchParameter{
       ..isOrderDesc = json['isOrderDesc'] as bool? ?? false
       ..isEnglishCardInclude = json['isEnglishCardInclude'] as bool? ?? true
       ..minReleaseDate = json['minReleaseDate'] != null ? DateTime.parse(json['minReleaseDate']) : null
-      ..maxReleaseDate = json['maxReleaseDate'] != null ? DateTime.parse(json['maxReleaseDate']) : DateTime.now()
+      ..maxReleaseDate = json['maxReleaseDate'] != null ? DateTime.parse(json['maxReleaseDate']) : null
       ..isLatestReleaseFirst = json['isLatestReleaseFirst'] as bool? ?? true;
   }
   
@@ -174,9 +174,9 @@ class SearchParameter{
     setLatestReleasedCardsFirst();
   }
   
-  // 편의 메서드: 발매일이 오늘보다 이전이면서 최신 우선 정렬
+  // 편의 메서드: 발매일이 오늘보다 이전이면서 최신 우선 정렬 (모든 카드 포함)
   void setLatestReleasedCardsFirst() {
-    maxReleaseDate = DateTime.now();
+    // maxReleaseDate는 설정하지 않아서 모든 카드가 보이도록 함
     isLatestReleaseFirst = true;
   }
   
