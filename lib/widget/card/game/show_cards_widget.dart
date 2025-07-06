@@ -74,6 +74,11 @@ class _ShowCardsState extends State<ShowCards> {
     }
     _clearSelection();
     gameState.moveOrderedCards(move, true);
+    
+    // 카드를 이동한 후 show가 비었으면 창 닫기
+    if (gameState.shows.isEmpty) {
+      gameState.closeShowDialog();
+    }
   }
 
   void _sendSelectedToDeckBottom(GameState gameState) {
@@ -95,6 +100,11 @@ class _ShowCardsState extends State<ShowCards> {
     }
     _clearSelection();
     gameState.moveOrderedCards(move, true);
+    
+    // 카드를 이동한 후 show가 비었으면 창 닫기
+    if (gameState.shows.isEmpty) {
+      gameState.closeShowDialog();
+    }
   }
 
   void _sendSelectedToTrash(GameState gameState) {
@@ -116,6 +126,11 @@ class _ShowCardsState extends State<ShowCards> {
     }
     _clearSelection();
     gameState.moveOrderedCards(move, true);
+    
+    // 카드를 이동한 후 show가 비었으면 창 닫기
+    if (gameState.shows.isEmpty) {
+      gameState.closeShowDialog();
+    }
   }
 
   @override
