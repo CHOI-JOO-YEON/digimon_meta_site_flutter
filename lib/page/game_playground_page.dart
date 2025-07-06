@@ -59,9 +59,9 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
     
     // 화면 가로 세로 비율에 따른 breakpoint 설정
     double aspectRatio = screenWidth / screenHeight;
-    bool isNarrowScreen = aspectRatio < 1.6;  // 16:10 (1.6) 미만 - 상대적으로 좁은 화면
-    bool isMediumScreen = aspectRatio >= 1.6 && aspectRatio < 2.0;  // 16:10 ~ 20:10 (2.0) 미만 - 중간 비율
-    bool isWideScreen = aspectRatio >= 2.0;  // 20:10 (2.0) 이상 - 와이드 화면
+    bool isNarrowScreen = aspectRatio < 1.4;  // 4:3 (1.33) 정도까지 - 정말 좁은 화면
+    bool isMediumScreen = aspectRatio >= 1.4 && aspectRatio < 1.6;  // 중간 비율
+    bool isWideScreen = aspectRatio >= 1.6;  // 16:10 (1.6) 이상 - 와이드 화면
     
     // 패딩 계산
     double padding = screenWidth * 0.01;
