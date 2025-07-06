@@ -39,8 +39,16 @@ class SearchParameter{
   String orderOption = "sortString";
   bool isOrderDesc = false;
   bool isEnglishCardInclude = true;
+  
+  // 발매일 관련 필드 추가
+  DateTime? minReleaseDate;
+  DateTime? maxReleaseDate;
+  bool isLatestReleaseFirst = false; // 최신 발매일 우선 정렬
 
-  SearchParameter();
+  SearchParameter() {
+    // 기본적으로 발매일이 오늘보다 이전이면서 최신 우선 정렬 적용
+    setLatestReleasedCardsFirst();
+  }
 
   factory SearchParameter.fromJson(Map<String, dynamic> json) {
     return SearchParameter()
@@ -72,7 +80,10 @@ class SearchParameter{
       ..parallelOption = json['parallelOption'] as int? ?? 0
       ..orderOption = json['orderOption'] as String? ?? 'sortString'
       ..isOrderDesc = json['isOrderDesc'] as bool? ?? false
-      ..isEnglishCardInclude = json['isEnglishCardInclude'] as bool? ?? true;
+      ..isEnglishCardInclude = json['isEnglishCardInclude'] as bool? ?? true
+      ..minReleaseDate = json['minReleaseDate'] != null ? DateTime.parse(json['minReleaseDate']) : null
+      ..maxReleaseDate = json['maxReleaseDate'] != null ? DateTime.parse(json['maxReleaseDate']) : DateTime.now()
+      ..isLatestReleaseFirst = json['isLatestReleaseFirst'] as bool? ?? true;
   }
   
   Map<String, dynamic> toJson(){
@@ -109,13 +120,17 @@ class SearchParameter{
     
     data['attributes'] = attributes.toList();
     data['attributeOperation'] = attributeOperation;
+    
+    if (minReleaseDate != null) data['minReleaseDate'] = minReleaseDate!.toIso8601String();
+    if (maxReleaseDate != null) data['maxReleaseDate'] = maxReleaseDate!.toIso8601String();
+    data['isLatestReleaseFirst'] = isLatestReleaseFirst;
 
     return data;
   }
 
   @override
   String toString() {
-    return 'SearchParameter{ searchString: $searchString, cardNameSearch: $cardNameSearch, cardNoSearch: $cardNoSearch, effectSearch: $effectSearch, sourceEffectSearch: $sourceEffectSearch, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc}';
+    return 'SearchParameter{ searchString: $searchString, cardNameSearch: $cardNameSearch, cardNoSearch: $cardNoSearch, effectSearch: $effectSearch, sourceEffectSearch: $sourceEffectSearch, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc, minReleaseDate: $minReleaseDate, maxReleaseDate: $maxReleaseDate, isLatestReleaseFirst: $isLatestReleaseFirst}';
   }
 
   void reset() {
@@ -154,5 +169,30 @@ class SearchParameter{
     orderOption = "sortString";
     isOrderDesc = false;
     isEnglishCardInclude = true;
+    
+    // 기본적으로 최신 발매일 우선 정렬 적용
+    setLatestReleasedCardsFirst();
+  }
+  
+  // 편의 메서드: 발매일이 오늘보다 이전이면서 최신 우선 정렬
+  void setLatestReleasedCardsFirst() {
+    maxReleaseDate = DateTime.now();
+    isLatestReleaseFirst = true;
+  }
+  
+  // 편의 메서드: 특정 기간 내 발매된 카드 검색
+  void setReleaseDateRange(DateTime? minDate, DateTime? maxDate) {
+    minReleaseDate = minDate;
+    maxReleaseDate = maxDate;
+  }
+  
+  // 편의 메서드: 특정 날짜 이후 발매된 카드 검색
+  void setReleasedAfter(DateTime date) {
+    minReleaseDate = date;
+  }
+  
+  // 편의 메서드: 특정 날짜 이전 발매된 카드 검색
+  void setReleasedBefore(DateTime date) {
+    maxReleaseDate = date;
   }
 }

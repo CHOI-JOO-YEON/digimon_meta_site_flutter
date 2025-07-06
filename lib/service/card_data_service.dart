@@ -492,16 +492,45 @@ class CardDataService {
       if (!params.isEnglishCardInclude && card.isEn == true) {
         return false;
       }
+      
+      // 발매일 필터링 추가
+      if (params.minReleaseDate != null && card.releaseDate != null) {
+        if (card.releaseDate!.isBefore(params.minReleaseDate!)) {
+          return false;
+        }
+      }
+      
+      if (params.maxReleaseDate != null && card.releaseDate != null) {
+        if (card.releaseDate!.isAfter(params.maxReleaseDate!)) {
+          return false;
+        }
+      }
           
       return matches;
     }).toList();
   }
 
   void _applySorting(List<DigimonCard> cards, SearchParameter params) {
-    // 기본적으로 cardNo로 정렬
-    cards.sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
-    
-    // params.sortBy에 기반한 추가 정렬 로직 추가 가능
+    if (params.isLatestReleaseFirst) {
+      // 1차 정렬: 발매일 기준 (최신 우선)
+      // 2차 정렬: sortString 기준
+      cards.sort((a, b) {
+        // 발매일 비교 (최신 우선)
+        DateTime aReleaseDate = a.releaseDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime bReleaseDate = b.releaseDate ?? DateTime.fromMillisecondsSinceEpoch(0);
+        
+        int releaseDateComparison = bReleaseDate.compareTo(aReleaseDate);
+        if (releaseDateComparison != 0) {
+          return releaseDateComparison;
+        }
+        
+        // 발매일이 같으면 sortString으로 정렬
+        return (a.sortString ?? '').compareTo(b.sortString ?? '');
+      });
+    } else {
+      // 기본적으로 sortString으로 정렬
+      cards.sort((a, b) => (a.sortString ?? '').compareTo(b.sortString ?? ''));
+    }
   }
 
   // ID로 카드를 얻기 위한 유틸리티 메서드
