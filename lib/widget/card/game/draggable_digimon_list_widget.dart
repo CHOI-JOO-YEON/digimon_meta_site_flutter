@@ -48,9 +48,42 @@ class _DraggableDigimonListWidgetState
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(DraggableDigimonListWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // children이 변경되었을 때 currentPageIndex 범위 검증
+    if (oldWidget.children != widget.children) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final maxPageIndex = totalPages - 1;
+          if (currentPageIndex > maxPageIndex) {
+            setState(() {
+              currentPageIndex = maxPageIndex.clamp(0, maxPageIndex);
+            });
+            // PageController도 유효한 페이지로 이동
+            if (pageController.hasClients && totalPages > 0) {
+              pageController.animateToPage(
+                currentPageIndex,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
+          }
+        }
+      });
+    }
+  }
+
   final PageController pageController = PageController();
   double _availableWidth = 0;
   int currentPageIndex = 0;
+
+  // 안전한 currentPageIndex getter (범위 검증)
+  int get safeCurrentPageIndex {
+    if (totalPages <= 0) return 0;
+    return currentPageIndex.clamp(0, totalPages - 1);
+  }
 
   // 한 페이지에 들어갈 카드 수 계산
   int get cardsPerPage {
@@ -64,7 +97,7 @@ class _DraggableDigimonListWidgetState
 
   // 총 페이지 수 계산
   int get totalPages {
-    if (widget.children.isEmpty || cardsPerPage <= 0) return 1;
+    if (widget.children.isEmpty || cardsPerPage <= 0) return 0;
     return ((widget.children.length - 1) / cardsPerPage).floor() + 1;
   }
 
@@ -82,7 +115,7 @@ class _DraggableDigimonListWidgetState
 
   // 이전 페이지로 이동
   void _goToPreviousPage() {
-    if (currentPageIndex > 0) {
+    if (safeCurrentPageIndex > 0) {
       pageController.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -92,7 +125,7 @@ class _DraggableDigimonListWidgetState
 
   // 다음 페이지로 이동
   void _goToNextPage() {
-    if (currentPageIndex < totalPages - 1) {
+    if (safeCurrentPageIndex < totalPages - 1) {
       pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -121,8 +154,9 @@ class _DraggableDigimonListWidgetState
         final double localX = box.globalToLocal(details.offset).dx;
         
         // 현재 페이지의 카드들 중에서 위치 계산
-        int cardsInCurrentPage = pageCards.isNotEmpty && currentPageIndex < pageCards.length 
-            ? pageCards[currentPageIndex].length 
+        int safePage = safeCurrentPageIndex;
+        int cardsInCurrentPage = pageCards.isNotEmpty && safePage < pageCards.length 
+            ? pageCards[safePage].length 
             : 0;
         
         // 페이지 내에서의 인덱스 계산
@@ -130,7 +164,7 @@ class _DraggableDigimonListWidgetState
         indexInPage = indexInPage.clamp(0, cardsInCurrentPage);
         
         // 전체 리스트에서의 실제 인덱스 계산
-        int globalIndex = (currentPageIndex * cardsPerPage) + indexInPage;
+        int globalIndex = (safePage * cardsPerPage) + indexInPage;
         move.toStartIndex = globalIndex.clamp(0, widget.children.length);
 
         gameState.moveCards(move, cards, true);
@@ -149,37 +183,39 @@ class _DraggableDigimonListWidgetState
                 children: [
                   // 페이지 뷰
                   Positioned.fill(
-                    child: PageView.builder(
-                      controller: pageController,
-                      itemCount: pages.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentPageIndex = index;
-                        });
-                      },
-                      itemBuilder: (context, pageIndex) {
-                        // 현재 페이지의 카드들을 가져옴
-                        List<Widget> currentPageCards = pages[pageIndex];
-                        
-                        // 최대 카드 수만큼 위젯 리스트 생성 (빈 공간은 Spacer로 채움)
-                        List<Widget> paddedCards = [];
-                        for (int i = 0; i < cardsPerPage; i++) {
-                          if (i < currentPageCards.length) {
-                            paddedCards.add(currentPageCards[i]);
-                          } else {
-                            paddedCards.add(SizedBox(width: widget.cardWidth)); // 빈 공간
-                          }
-                        }
-                        
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 35), // 버튼 공간 확보
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: paddedCards,
-                          ),
-                        );
-                      },
-                    ),
+                    child: pages.isNotEmpty 
+                        ? PageView.builder(
+                            controller: pageController,
+                            itemCount: pages.length,
+                            onPageChanged: (index) {
+                              setState(() {
+                                currentPageIndex = index.clamp(0, totalPages - 1);
+                              });
+                            },
+                            itemBuilder: (context, pageIndex) {
+                              // 현재 페이지의 카드들을 가져옴
+                              List<Widget> currentPageCards = pages[pageIndex];
+                              
+                              // 최대 카드 수만큼 위젯 리스트 생성 (빈 공간은 Spacer로 채움)
+                              List<Widget> paddedCards = [];
+                              for (int i = 0; i < cardsPerPage; i++) {
+                                if (i < currentPageCards.length) {
+                                  paddedCards.add(currentPageCards[i]);
+                                } else {
+                                  paddedCards.add(SizedBox(width: widget.cardWidth)); // 빈 공간
+                                }
+                              }
+                              
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 35), // 버튼 공간 확보
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: paddedCards,
+                                ),
+                              );
+                            },
+                          )
+                        : const SizedBox.shrink(), // 빈 상태일 때
                   ),
                   // 좌측 스크롤 버튼 (이전 페이지)
                   if (pages.isNotEmpty && totalPages > 1)
@@ -192,7 +228,7 @@ class _DraggableDigimonListWidgetState
                         child: Center(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: currentPageIndex > 0 ? Colors.white : Colors.grey[300],
+                              color: safeCurrentPageIndex > 0 ? Colors.white : Colors.grey[300],
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
@@ -205,10 +241,10 @@ class _DraggableDigimonListWidgetState
                             child: IconButton(
                               icon: Icon(
                                 Icons.chevron_left,
-                                color: currentPageIndex > 0 ? Colors.grey[700] : Colors.grey[500],
+                                color: safeCurrentPageIndex > 0 ? Colors.grey[700] : Colors.grey[500],
                                 size: 24,
                               ),
-                              onPressed: currentPageIndex > 0 ? _goToPreviousPage : null,
+                              onPressed: safeCurrentPageIndex > 0 ? _goToPreviousPage : null,
                               padding: EdgeInsets.zero,
                             ),
                           ),
@@ -226,7 +262,7 @@ class _DraggableDigimonListWidgetState
                         child: Center(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: currentPageIndex < totalPages - 1 ? Colors.white : Colors.grey[300],
+                              color: safeCurrentPageIndex < totalPages - 1 ? Colors.white : Colors.grey[300],
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
@@ -239,10 +275,10 @@ class _DraggableDigimonListWidgetState
                             child: IconButton(
                               icon: Icon(
                                 Icons.chevron_right,
-                                color: currentPageIndex < totalPages - 1 ? Colors.grey[700] : Colors.grey[500],
+                                color: safeCurrentPageIndex < totalPages - 1 ? Colors.grey[700] : Colors.grey[500],
                                 size: 24,
                               ),
-                              onPressed: currentPageIndex < totalPages - 1 ? _goToNextPage : null,
+                              onPressed: safeCurrentPageIndex < totalPages - 1 ? _goToNextPage : null,
                               padding: EdgeInsets.zero,
                             ),
                           ),
@@ -263,7 +299,7 @@ class _DraggableDigimonListWidgetState
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            '${currentPageIndex + 1} / $totalPages',
+                            '${safeCurrentPageIndex + 1} / $totalPages',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
