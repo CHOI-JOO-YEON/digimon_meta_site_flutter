@@ -901,14 +901,6 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : null
-}, {
-  "noteId" : 122,
-  "name" : "테이머배틀 21&22",
-  "releaseDate" : "2025-07-18",
-  "cardOrigin" : "ENGLISH",
-  "priority" : null,
-  "cardCount" : 8,
   "isDisable" : false
 }, {
   "noteId" : 147,
@@ -933,6 +925,14 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 1,
+  "isDisable" : false
+}, {
+  "noteId" : 122,
+  "name" : "테이머배틀 21&22",
+  "releaseDate" : "2025-09-19",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 8,
   "isDisable" : false
 }, {
   "noteId" : 170,
