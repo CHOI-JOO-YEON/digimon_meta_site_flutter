@@ -887,13 +887,21 @@
   "cardCount" : 22,
   "isDisable" : false
 }, {
-  "noteId" : 121,
-  "name" : "테마 부스터 인페르날 어센션 [EX-06]",
+  "noteId" : 266,
+  "name" : "테마 부스터 인퍼널 어센션 [EXK-06]",
   "releaseDate" : "2025-07-18",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
-  "cardCount" : 74,
+  "cardCount" : 100,
   "isDisable" : false
+}, {
+  "noteId" : 267,
+  "name" : "테마 부스터 인퍼널 어센션 [EXK-06] 부스터 프로모",
+  "releaseDate" : "2025-07-18",
+  "cardOrigin" : "BOOSTER_PROMO",
+  "priority" : null,
+  "cardCount" : 6,
+  "isDisable" : null
 }, {
   "noteId" : 122,
   "name" : "테이머배틀 21&22",
