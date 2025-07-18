@@ -512,17 +512,17 @@ class CardDataService {
 
   void _applySorting(List<DigimonCard> cards, SearchParameter params) {
     if (params.isLatestReleaseFirst) {
-      // 1차: 발매일이 오늘보다 이전인 카드들을 최신 우선으로
-      // 2차: sortString으로 정렬
+          // 1차: 발매일이 오늘 이전이거나 오늘인 카드들을 최신 우선으로
+    // 2차: sortString으로 정렬
       cards.sort((a, b) {
         DateTime today = DateTime.now();
         DateTime todayOnly = DateTime(today.year, today.month, today.day);
         
-        // 발매일이 오늘 이전인지 확인
-        bool aIsReleasedBefore = a.releaseDate != null && a.releaseDate!.isBefore(todayOnly);
-        bool bIsReleasedBefore = b.releaseDate != null && b.releaseDate!.isBefore(todayOnly);
+              // 발매일이 오늘 이전이거나 오늘인지 확인
+      bool aIsReleasedBefore = a.releaseDate != null && !a.releaseDate!.isAfter(todayOnly);
+      bool bIsReleasedBefore = b.releaseDate != null && !b.releaseDate!.isAfter(todayOnly);
         
-        // 둘 다 오늘 이전 발매된 카드라면 최신 발매일 우선
+        // 둘 다 오늘 이전이거나 오늘 발매된 카드라면 최신 발매일 우선
         if (aIsReleasedBefore && bIsReleasedBefore) {
           int releaseDateComparison = b.releaseDate!.compareTo(a.releaseDate!);
           if (releaseDateComparison != 0) {
@@ -530,16 +530,16 @@ class CardDataService {
           }
         }
         
-        // 둘 다 오늘 이전 발매가 아닌 카드라면 sortString으로
+        // 둘 다 오늘 이후 발매 예정 카드라면 sortString으로
         if (!aIsReleasedBefore && !bIsReleasedBefore) {
           return (a.sortString ?? '').compareTo(b.sortString ?? '');
         }
         
-        // 하나는 오늘 이전, 하나는 아니라면 오늘 이전 카드가 먼저
+        // 하나는 오늘 이전/오늘, 하나는 아니라면 오늘 이전/오늘 카드가 먼저
         if (aIsReleasedBefore && !bIsReleasedBefore) {
-          return -1; // a(오늘 이전 카드)가 먼저
+          return -1; // a(오늘 이전/오늘 카드)가 먼저
         } else if (!aIsReleasedBefore && bIsReleasedBefore) {
-          return 1; // b(오늘 이전 카드)가 먼저
+          return 1; // b(오늘 이전/오늘 카드)가 먼저
         }
         
         // 최종적으로 sortString으로 정렬
