@@ -35,12 +35,33 @@ class DeckStat extends StatelessWidget {
       return Container(
         height: constraints.maxHeight,
         decoration: BoxDecoration(
-            borderRadius:
-                BorderRadius.circular(radius??SizeService.roundRadius(context)),
-            color: backGroundColor ?? Theme.of(context).cardColor),
+          gradient: backGroundColor != null 
+            ? null 
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  const Color(0xFFF8FAFC),
+                ],
+              ),
+          color: backGroundColor,
+          borderRadius: BorderRadius.circular(radius ?? 16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(constraints.maxHeight * 0.05),
+            padding: EdgeInsets.all(constraints.maxHeight * 0.08),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: indicators,

@@ -212,17 +212,25 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   Container(
                     width: widget.width,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(_isHovered ? 0.25 : 0.15),
-                          blurRadius: _isHovered ? 8 : 5,
-                          offset: Offset(0, _isHovered ? 4 : 2),
+                          color: Colors.black.withOpacity(_isHovered ? 0.2 : 0.1),
+                          blurRadius: _isHovered ? 20 : 12,
+                          offset: Offset(0, _isHovered ? 8 : 4),
+                          spreadRadius: _isHovered ? 2 : 0,
                         ),
+                        if (_isHovered)
+                          BoxShadow(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 16,
+                            offset: const Offset(0, 0),
+                            spreadRadius: 0,
+                          ),
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
                       child: ColorFiltered(
                         colorFilter: widget.isActive ?? true
                             ? ColorFilter.mode(
@@ -275,35 +283,62 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                             
                             return Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(widget.width * 0.05),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    const Color(0xFF6B7280),
+                                    const Color(0xFF4B5563),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1,
+                                ),
                               ),
                               child: Center(
                                 child: Padding(
-                                  padding: EdgeInsets.all(widget.width * 0.05),
+                                  padding: EdgeInsets.all(widget.width * 0.08),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      Icon(
+                                        Icons.image_not_supported_outlined,
+                                        size: widget.width * 0.2,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                      SizedBox(height: widget.width * 0.04),
                                       Text(
                                         cardNo,
                                         style: TextStyle(
-                                          fontSize: widget.width * 0.15,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: widget.width * 0.14,
+                                          fontWeight: FontWeight.w700,
                                           color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: const Offset(0, 1),
+                                              blurRadius: 2,
+                                              color: Colors.black.withOpacity(0.5),
+                                            ),
+                                          ],
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      if (cardName.isNotEmpty) 
+                                      if (cardName.isNotEmpty) ...[
+                                        SizedBox(height: widget.width * 0.02),
                                         Text(
                                           cardName,
                                           style: TextStyle(
-                                            fontSize: widget.width * 0.12,
-                                            color: Colors.white,
+                                            fontSize: widget.width * 0.1,
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontWeight: FontWeight.w500,
                                           ),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -466,39 +501,60 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   // 카드 수량 표시
                   if (widget.cardCount != null)
                     Positioned(
-                      left: 0,
-                      bottom: 0,
+                      left: 8,
+                      bottom: 8,
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 300),
+                        curve: Curves.easeOutQuart,
                         padding: EdgeInsets.symmetric(
-                          horizontal: widget.width * 0.07,
-                          vertical: widget.width * 0.04,
+                          horizontal: widget.width * 0.08,
+                          vertical: widget.width * 0.05,
                         ),
                         decoration: BoxDecoration(
-                          color: _isHighlighted 
-                              ? Colors.orange.withOpacity(0.9)
-                              : Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(8),
+                          gradient: _isHighlighted 
+                              ? LinearGradient(
+                                  colors: [
+                                    const Color(0xFFFF6B35),
+                                    const Color(0xFFFF8E53),
+                                  ],
+                                )
+                              : LinearGradient(
+                                  colors: [
+                                    const Color(0xFF1F2937),
+                                    const Color(0xFF374151),
+                                  ],
+                                ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _isHighlighted
+                                  ? const Color(0xFFFF6B35).withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.3),
+                              blurRadius: _isHighlighted ? 12 : 8,
+                              offset: const Offset(0, 4),
+                              spreadRadius: _isHighlighted ? 1 : 0,
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1,
                           ),
-                          boxShadow: _isHighlighted
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.orange.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  )
-                                ]
-                              : null,
                         ),
                         child: AnimatedDefaultTextStyle(
                           duration: Duration(milliseconds: 300),
                           style: TextStyle(
                             fontSize: _isHighlighted
                                 ? widget.width * 0.14
-                                : widget.width * 0.11,
+                                : widget.width * 0.12,
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(0, 1),
+                                blurRadius: 2,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                            ],
                           ),
                           child: Text(
                             '${widget.cardCount}',
@@ -509,26 +565,50 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   // 카드 선택 시 표시되는 증감 버튼
                   if (_isShowingButtons && widget.addCard != null && widget.removeCard != null)
                     Positioned.fill(
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(8),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.7),
+                              Colors.black.withOpacity(0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Stack(
                           children: [
                             // 닫기 버튼
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: 12,
+                              right: 12,
                               child: GestureDetector(
                                 onTap: _toggleButtons,
                                 child: Container(
-                                  padding: EdgeInsets.all(4),
+                                  padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.9),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white,
+                                        Colors.grey.shade100,
+                                      ],
+                                    ),
                                     shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                  child: Icon(Icons.close, size: 14, color: Colors.black87),
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 16,
+                                    color: Colors.grey.shade700,
+                                  ),
                                 ),
                               ),
                             ),
@@ -553,14 +633,14 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     },
                                     icon: Icons.remove,
                                     label: "",
-                                    color: Colors.red.shade700,
+                                    color: const Color(0xFFEF4444),
                                     size: widget.width * 0.4,
                                   ),
                                   _buildActionButton(
                                     onTap: () => widget.addCard!(widget.card),
                                     icon: Icons.add,
                                     label: "",
-                                    color: Colors.green.shade700,
+                                    color: const Color(0xFF10B981),
                                     size: widget.width * 0.4,
                                   ),
                                 ],
@@ -586,27 +666,56 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
     required Color color,
     required double size,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size * 0.8,
-        height: size * 0.8,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 4,
-              spreadRadius: 0.5,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(size * 0.4),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: size * 0.8,
+          height: size * 0.8,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                color,
+                Color.lerp(color, Colors.black, 0.2)!,
+              ],
             ),
-          ],
-        ),
-        child: Center(
-          child: Icon(
-            icon,
-            size: size * 0.4,
-            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 12,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              size: size * 0.4,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  offset: const Offset(0, 1),
+                  blurRadius: 2,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ],
+            ),
           ),
         ),
       ),

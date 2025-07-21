@@ -609,17 +609,38 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(SizeService.roundRadius(context)),
-                    color: Theme.of(context).highlightColor),
-                child: SingleChildScrollView(
-                  child: deck != null ? DeckBuilderView(
-                    deck: deck!,
-                    cardPressEvent: removeCardByDeck,
-                    import: deckUpdate,
-                    searchWithParameter: searchWithParameter,
-                    cardOverlayService: _cardOverlayService,
-                  ) : Container(),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: SingleChildScrollView(
+                    child: deck != null ? DeckBuilderView(
+                      deck: deck!,
+                      cardPressEvent: removeCardByDeck,
+                      import: deckUpdate,
+                      searchWithParameter: searchWithParameter,
+                      cardOverlayService: _cardOverlayService,
+                    ) : Container(),
+                  ),
                 ),
               ),
             ),
@@ -630,9 +651,26 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               flex: 2,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor,
-                  borderRadius:
-                      BorderRadius.circular(SizeService.roundRadius(context)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(SizeService.paddingSize(context)),

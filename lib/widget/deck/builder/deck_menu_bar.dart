@@ -72,22 +72,64 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                 children: [
                   Expanded(
                       flex: 12,
-                      child: TextField(
-                        style: TextStyle(
-                          fontSize: isSmallHeight 
-                            ? SizeService.bodyFontSize(context) * 0.8 
-                            : SizeService.bodyFontSize(context),
-                        ),
-                        controller: widget.textEditingController,
-                        onChanged: (v) {
-                          widget.deck.deckName = v;
-                        },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: isSmallHeight ? 4 : 8,
-                            horizontal: isSmallHeight ? 4 : 8,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white,
+                              const Color(0xFFFAFBFC),
+                            ],
                           ),
-                          isDense: isSmallHeight, // 작은 화면에서 compact 모드
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.15),
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          style: TextStyle(
+                            fontSize: isSmallHeight 
+                              ? SizeService.bodyFontSize(context) * 0.85 
+                              : SizeService.bodyFontSize(context) * 0.95,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1F2937),
+                          ),
+                          controller: widget.textEditingController,
+                          onChanged: (v) {
+                            widget.deck.deckName = v;
+                          },
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: isSmallHeight ? 8 : 12,
+                              horizontal: isSmallHeight ? 12 : 16,
+                            ),
+                            border: InputBorder.none,
+                            hintText: '덱 이름을 입력하세요',
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            prefixIcon: Container(
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2563EB).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.edit_outlined,
+                                size: 16,
+                                color: const Color(0xFF2563EB),
+                              ),
+                            ),
+                          ),
                         ),
                       )),
                   Expanded(
@@ -106,12 +148,14 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
               )),
           Expanded(
               flex: 2,
-              child: SizedBox(
-                width: constraints.maxWidth,
+              child: Container(
+                padding: const EdgeInsets.only(top: 8),
+                alignment: Alignment.topLeft,
                 child: DeckCount(
                   deck: widget.deck,
                 ),
-              ))
+              ),
+            )
         ],
       );
     });

@@ -76,14 +76,27 @@ class _MainPageState extends State<MainPage> {
                       ? SizeService.headerHeight(context) 
                       : (isSmallHeight ? 40 : 50), // 최소한의 공간 유지
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white,
+                          const Color(0xFFF8FAFC),
+                        ],
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 4,
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 4),
+                          blurRadius: 12,
                         ),
                       ],
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
                     ),
                     child: ClipRect(
                       child: headerProvider.isHeaderVisible 
@@ -129,67 +142,83 @@ class _MainPageState extends State<MainPage> {
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
-                                                      GestureDetector(
-                                                        child: Container(
-                                                          padding: EdgeInsets.symmetric(
-                                                            horizontal: 12,
-                                                            vertical: 6,
-                                                          ),
-                                                          decoration: BoxDecoration(
-                                                            color: userProvider.isLogin
-                                                                ? Colors.red.withOpacity(0.1)
-                                                                : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                                            borderRadius: BorderRadius.circular(16),
-                                                          ),
-                                                          child: Text(
-                                                            userProvider.isLogin ? '로그아웃' : '로그인',
-                                                            style: TextStyle(
-                                                              fontSize: fontSize,
-                                                              color: userProvider.isLogin
-                                                                  ? Colors.red
-                                                                  : Theme.of(context).primaryColor,
-                                                              fontWeight: FontWeight.w500,
+                                                      AnimatedContainer(
+                                                        duration: const Duration(milliseconds: 200),
+                                                        child: Material(
+                                                          color: Colors.transparent,
+                                                          child: InkWell(
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            onTap: () {
+                                                              userProvider.isLogin
+                                                                  ? UserService().logoutWithPopup(context)
+                                                                  : openOAuthPopup();
+                                                            },
+                                                            child: Container(
+                                                              padding: const EdgeInsets.symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 8,
+                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                gradient: userProvider.isLogin
+                                                                    ? LinearGradient(
+                                                                        colors: [
+                                                                          const Color(0xFFEF4444),
+                                                                          const Color(0xFFDC2626),
+                                                                        ],
+                                                                      )
+                                                                    : LinearGradient(
+                                                                        colors: [
+                                                                          Theme.of(context).colorScheme.primary,
+                                                                          const Color(0xFF1D4ED8),
+                                                                        ],
+                                                                      ),
+                                                                borderRadius: BorderRadius.circular(20),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: (userProvider.isLogin 
+                                                                        ? const Color(0xFFEF4444) 
+                                                                        : Theme.of(context).colorScheme.primary)
+                                                                        .withOpacity(0.3),
+                                                                    offset: const Offset(0, 4),
+                                                                    blurRadius: 8,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child: Text(
+                                                                userProvider.isLogin ? '로그아웃' : '로그인',
+                                                                style: TextStyle(
+                                                                  fontSize: fontSize * 0.9,
+                                                                  color: Colors.white,
+                                                                  fontWeight: FontWeight.w600,
+                                                                ),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                        onTap: () {
-                                                          userProvider.isLogin
-                                                              ? UserService().logoutWithPopup(context)
-                                                              : openOAuthPopup();
-                                                        },
                                                       ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 8.0),
-                                                        child: IconButton(
-                                                          padding: EdgeInsets.zero,
-                                                          onPressed: () {
-                                                            DeckBuild? deck = deckProvider.currentDeck;
-                                                            if (deck == null) {
-                                                              deck = DeckBuild(context);
-                                                            }
-                                                            DeckService().showDeckSettingDialog(
-                                                                context, deck, () {
-                                                              setState(() {});
-                                                            });
-                                                          },
-                                                          iconSize: SizeService.largeIconSize(context),
-                                                          icon: const Icon(Icons.settings),
-                                                          tooltip: '덱 설정',
-                                                        ),
+                                                      const SizedBox(width: 12),
+                                                      _buildIconButton(
+                                                        onPressed: () {
+                                                          DeckBuild? deck = deckProvider.currentDeck;
+                                                          if (deck == null) {
+                                                            deck = DeckBuild(context);
+                                                          }
+                                                          DeckService().showDeckSettingDialog(
+                                                              context, deck, () {
+                                                            setState(() {});
+                                                          });
+                                                        },
+                                                        icon: Icons.settings,
+                                                        tooltip: '덱 설정',
+                                                        context: context,
                                                       ),
                                                       
-                                                      // 헤더 토글 버튼 - 가장 오른쪽
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 8.0),
-                                                        child: IconButton(
-                                                          onPressed: () => headerProvider.hideHeader(),
-                                                          icon: Icon(
-                                                            Icons.keyboard_arrow_up,
-                                                            size: SizeService.largeIconSize(context),
-                                                          ),
-                                                          tooltip: '메뉴 접기',
-                                                          padding: EdgeInsets.zero,
-                                                        ),
+                                                      const SizedBox(width: 8),
+                                                      _buildIconButton(
+                                                        onPressed: () => headerProvider.hideHeader(),
+                                                        icon: Icons.keyboard_arrow_up,
+                                                        tooltip: '메뉴 접기',
+                                                        context: context,
                                                       ),
                                                     ],
                                                   ),
@@ -199,50 +228,73 @@ class _MainPageState extends State<MainPage> {
                                           ),
                                           // 세로모드에서 탭바
                                           Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                            padding: const EdgeInsets.all(4),
                                             decoration: BoxDecoration(
-                                              color: Colors.grey.shade50,
-                                              borderRadius: BorderRadius.circular(12),
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Colors.white,
+                                                  const Color(0xFFF8FAFC),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ),
+                                              borderRadius: BorderRadius.circular(16),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withOpacity(0.05),
-                                                  blurRadius: 4,
-                                                  offset: const Offset(0, 2),
+                                                  color: Colors.black.withOpacity(0.08),
+                                                  blurRadius: 12,
+                                                  offset: const Offset(0, 4),
                                                 ),
                                               ],
+                                              border: Border.all(
+                                                color: Colors.grey.withOpacity(0.1),
+                                                width: 1,
+                                              ),
                                             ),
                                             child: TabBar(
                                               controller: controller,
                                               labelStyle: TextStyle(
-                                                fontWeight: FontWeight.w600,
+                                                fontWeight: FontWeight.w700,
                                                 fontSize: fontSize * 0.85,
                                               ),
                                               unselectedLabelStyle: TextStyle(
-                                                fontWeight: FontWeight.normal,
+                                                fontWeight: FontWeight.w500,
                                                 fontSize: fontSize * 0.85,
                                               ),
-                                              indicator: const UnderlineTabIndicator(
-                                                borderSide: BorderSide.none,
+                                              indicator: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Theme.of(context).colorScheme.primary,
+                                                    const Color(0xFF1D4ED8),
+                                                  ],
+                                                ),
+                                                borderRadius: BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
                                               ),
-                                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                              padding: EdgeInsets.zero,
                                               labelPadding: EdgeInsets.zero,
-                                              indicatorPadding: const EdgeInsets.all(4),
-                                              labelColor: Theme.of(context).primaryColor,
+                                              indicatorPadding: EdgeInsets.zero,
+                                              labelColor: Colors.white,
                                               unselectedLabelColor: Colors.grey.shade600,
                                               dividerColor: Colors.transparent,
                                               splashFactory: NoSplash.splashFactory,
                                               overlayColor: MaterialStateProperty.resolveWith<Color?>(
                                                 (Set<MaterialState> states) {
-                                                  return states.contains(MaterialState.focused)
-                                                      ? null
-                                                      : Colors.transparent;
+                                                  return Colors.transparent;
                                                 },
                                               ),
                                               tabs: [
-                                                _buildTabItem(context, Icons.build, 'Builder', isPortrait),
-                                                _buildTabItem(context, Icons.list, 'List', isPortrait),
-                                                _buildTabItem(context, Icons.collections_bookmark_rounded, 'Collect', isPortrait),
-                                                _buildTabItem(context, Icons.info_outline, 'Info', isPortrait),
+                                                _buildModernTabItem(context, Icons.build_outlined, Icons.build, 'Builder', isPortrait, controller.index == 0),
+                                                _buildModernTabItem(context, Icons.list_outlined, Icons.list, 'List', isPortrait, controller.index == 1),
+                                                _buildModernTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', isPortrait, controller.index == 2),
+                                                _buildModernTabItem(context, Icons.info_outline, Icons.info, 'Info', isPortrait, controller.index == 3),
                                               ],
                                             ),
                                           ),
@@ -299,34 +351,59 @@ class _MainPageState extends State<MainPage> {
                                                   ),
                                                 ),
                                                 ResponsiveRowColumnItem(
-                                                  child: GestureDetector(
-                                                    child: Container(
-                                                      padding: EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: userProvider.isLogin
-                                                            ? Colors.red.withOpacity(0.1)
-                                                            : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                                        borderRadius: BorderRadius.circular(16),
-                                                      ),
-                                                      child: Text(
-                                                        userProvider.isLogin ? '로그아웃' : '로그인',
-                                                        style: TextStyle(
-                                                          fontSize: fontSize,
-                                                          color: userProvider.isLogin
-                                                              ? Colors.red
-                                                              : Theme.of(context).primaryColor,
-                                                          fontWeight: FontWeight.w500,
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 200),
+                                                    child: Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        onTap: () {
+                                                          userProvider.isLogin
+                                                              ? UserService().logoutWithPopup(context)
+                                                              : openOAuthPopup();
+                                                        },
+                                                        child: Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8,
+                                                          ),
+                                                          decoration: BoxDecoration(
+                                                            gradient: userProvider.isLogin
+                                                                ? LinearGradient(
+                                                                    colors: [
+                                                                      const Color(0xFFEF4444),
+                                                                      const Color(0xFFDC2626),
+                                                                    ],
+                                                                  )
+                                                                : LinearGradient(
+                                                                    colors: [
+                                                                      Theme.of(context).colorScheme.primary,
+                                                                      const Color(0xFF1D4ED8),
+                                                                    ],
+                                                                  ),
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: (userProvider.isLogin 
+                                                                    ? const Color(0xFFEF4444) 
+                                                                    : Theme.of(context).colorScheme.primary)
+                                                                    .withOpacity(0.3),
+                                                                offset: const Offset(0, 4),
+                                                                blurRadius: 8,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Text(
+                                                            userProvider.isLogin ? '로그아웃' : '로그인',
+                                                            style: TextStyle(
+                                                              fontSize: fontSize * 0.9,
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                    onTap: () {
-                                                      userProvider.isLogin
-                                                          ? UserService().logoutWithPopup(context)
-                                                          : openOAuthPopup();
-                                                    },
                                                   ),
                                                 ),
                                               ],
@@ -336,88 +413,106 @@ class _MainPageState extends State<MainPage> {
                                             flex: 1,
                                             child: Container(
                                               margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                              padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
-                                                color: Colors.grey.shade50,
-                                                borderRadius: BorderRadius.circular(12),
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.white,
+                                                    const Color(0xFFF8FAFC),
+                                                  ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                borderRadius: BorderRadius.circular(16),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black.withOpacity(0.05),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
+                                                    color: Colors.black.withOpacity(0.08),
+                                                    blurRadius: 12,
+                                                    offset: const Offset(0, 4),
                                                   ),
                                                 ],
+                                                border: Border.all(
+                                                  color: Colors.grey.withOpacity(0.1),
+                                                  width: 1,
+                                                ),
                                               ),
                                               child: TabBar(
                                                 controller: controller,
                                                 labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w600,
+                                                  fontWeight: FontWeight.w700,
                                                   fontSize: fontSize * 0.85,
                                                 ),
                                                 unselectedLabelStyle: TextStyle(
-                                                  fontWeight: FontWeight.normal,
+                                                  fontWeight: FontWeight.w500,
                                                   fontSize: fontSize * 0.85,
                                                 ),
-                                                indicator: const UnderlineTabIndicator(
-                                                  borderSide: BorderSide.none,
+                                                indicator: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Theme.of(context).colorScheme.primary,
+                                                      const Color(0xFF1D4ED8),
+                                                    ],
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(0, 2),
+                                                    ),
+                                                  ],
                                                 ),
-                                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                                padding: EdgeInsets.zero,
                                                 labelPadding: EdgeInsets.zero,
-                                                indicatorPadding: const EdgeInsets.all(4),
-                                                labelColor: Theme.of(context).primaryColor,
+                                                indicatorPadding: EdgeInsets.zero,
+                                                labelColor: Colors.white,
                                                 unselectedLabelColor: Colors.grey.shade600,
                                                 dividerColor: Colors.transparent,
                                                 splashFactory: NoSplash.splashFactory,
                                                 overlayColor: MaterialStateProperty.resolveWith<Color?>(
                                                   (Set<MaterialState> states) {
-                                                    return states.contains(MaterialState.focused)
-                                                        ? null
-                                                        : Colors.transparent;
+                                                    return Colors.transparent;
                                                   },
                                                 ),
                                                 tabs: [
-                                                  _buildTabItem(context, Icons.build, 'Builder', isPortrait),
-                                                  _buildTabItem(context, Icons.list, 'List', isPortrait),
-                                                  _buildTabItem(context, Icons.collections_bookmark_rounded, 'Collect', isPortrait),
-                                                  _buildTabItem(context, Icons.info_outline, 'Info', isPortrait),
+                                                  _buildModernTabItem(context, Icons.build_outlined, Icons.build, 'Builder', isPortrait, controller.index == 0),
+                                                  _buildModernTabItem(context, Icons.list_outlined, Icons.list, 'List', isPortrait, controller.index == 1),
+                                                  _buildModernTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', isPortrait, controller.index == 2),
+                                                  _buildModernTabItem(context, Icons.info_outline, Icons.info, 'Info', isPortrait, controller.index == 3),
                                                 ],
                                               ),
                                             ),
                                           ),
-                                          Expanded(
-                                              flex: 1,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    onPressed: () {
-                                                      DeckBuild? deck = deckProvider.currentDeck;
-                                                      if (deck == null) {
-                                                        deck = DeckBuild(context);
-                                                      }
-                                                      DeckService().showDeckSettingDialog(
-                                                          context, deck, () {
-                                                        setState(() {});
-                                                      });
-                                                    },
-                                                    iconSize: SizeService.largeIconSize(context),
-                                                    icon: const Icon(Icons.settings),
-                                                    tooltip: '덱 설정',
-                                                  ),
-                                                  
-                                                  // 헤더 토글 버튼 (가로 모드) - 가장 오른쪽
-                                                  SizedBox(width: 8),
-                                                  IconButton(
-                                                    onPressed: () => headerProvider.hideHeader(),
-                                                    icon: Icon(
-                                                      Icons.keyboard_arrow_up,
-                                                      size: SizeService.largeIconSize(context),
-                                                    ),
-                                                    tooltip: '메뉴 접기',
-                                                    padding: EdgeInsets.zero,
-                                                  ),
-                                                ],
-                                              )),
+                                                                                        Expanded(
+                                                  flex: 1,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      _buildIconButton(
+                                                        onPressed: () {
+                                                          DeckBuild? deck = deckProvider.currentDeck;
+                                                          if (deck == null) {
+                                                            deck = DeckBuild(context);
+                                                          }
+                                                          DeckService().showDeckSettingDialog(
+                                                              context, deck, () {
+                                                            setState(() {});
+                                                          });
+                                                        },
+                                                        icon: Icons.settings,
+                                                        tooltip: '덱 설정',
+                                                        context: context,
+                                                      ),
+                                                      
+                                                      const SizedBox(width: 12),
+                                                      _buildIconButton(
+                                                        onPressed: () => headerProvider.hideHeader(),
+                                                        icon: Icons.keyboard_arrow_up,
+                                                        tooltip: '메뉴 접기',
+                                                        context: context,
+                                                      ),
+                                                    ],
+                                                  )),
                                         ],
                                       ),
                               );
@@ -431,15 +526,53 @@ class _MainPageState extends State<MainPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                IconButton(
-                                  onPressed: () => headerProvider.showHeader(),
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: SizeService.largeIconSize(context),
-                                    color: Theme.of(context).primaryColor,
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () => headerProvider.showHeader(),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.primary,
+                                              const Color(0xFF1D4ED8),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 8,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              size: 20,
+                                              color: Colors.white,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '메뉴',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  tooltip: '메뉴 펼치기',
-                                  padding: EdgeInsets.zero,
                                 ),
                               ],
                             ),
@@ -482,6 +615,75 @@ class _MainPageState extends State<MainPage> {
               overflow: TextOverflow.ellipsis,
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildIconButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String tooltip,
+    required BuildContext context,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            offset: const Offset(0, 2),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: Icon(
+              icon,
+              size: SizeService.largeIconSize(context),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isPortrait, bool isSelected) {
+    return Tab(
+      height: isPortrait ? 52 : 56,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                isSelected ? filledIcon : outlinedIcon,
+                key: ValueKey(isSelected),
+                size: isPortrait ? 24 : 22,
+              ),
+            ),
+            if (!isPortrait) const SizedBox(height: 4),
+            if (!isPortrait)
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
       ),
     );
   }

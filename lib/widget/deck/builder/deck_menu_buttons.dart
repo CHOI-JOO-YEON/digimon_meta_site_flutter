@@ -46,6 +46,56 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
     );
   }
 
+  Widget _buildModernIconButton({
+    required BuildContext context,
+    required IconData icon,
+    required IconData filledIcon,
+    required String tooltip,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onPressed,
+        child: Container(
+          width: SizeService.largeIconSize(context) + 8,
+          height: SizeService.largeIconSize(context) + 8,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                const Color(0xFFF8FAFC),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+            border: Border.all(
+              color: Colors.grey.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              size: SizeService.largeIconSize(context) * 0.7,
+              color: color,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -59,183 +109,143 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
             alignment: WrapAlignment.start,
             spacing: SizeService.spacingSize(context),
             children: [
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    DeckService().showDeckResetDialog(context, () {
-                      widget.init();
-                      ToastOverlay.show(
-                        context,
-                        '새로운 덱이 생성되었습니다.',
-                        type: ToastType.success
-                      );
-                    });
-                  },
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.add_box),
-                  tooltip: '새로 만들기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => DeckService()
-                      .showDeckClearDialog(context, widget.deck, () {
-                        widget.reload();
-                        ToastOverlay.show(
-                          context,
-                          '덱이 비워졌습니다.',
-                          type: ToastType.warning
-                        );
-                      }),
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.clear),
-                  tooltip: '비우기',
-                ),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => DeckService().showDeckCopyDialog(
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.add_box_outlined,
+                filledIcon: Icons.add_box,
+                tooltip: '새로 만들기',
+                color: const Color(0xFF10B981),
+                onPressed: () {
+                  DeckService().showDeckResetDialog(context, () {
+                    widget.init();
+                    ToastOverlay.show(
                       context,
-                      widget.deck,
-                      onCopy: widget.newCopy,
-                  ),
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.copy),
-                  tooltip: '복사해서 새로운 덱 만들기',
-                ),
+                      '새로운 덱이 생성되었습니다.',
+                      type: ToastType.success
+                    );
+                  });
+                },
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () async {
-                    if (userProvider.isLogin) {
-                      Map<int, FormatDto> formats =
-                          await DeckService().getFormats(widget.deck);
-                      DeckService().showSaveDialog(
-                          context, formats, widget.deck, () {
-                            widget.reload();
-                            ToastOverlay.show(
-                              context,
-                              '덱이 저장되었습니다.',
-                              type: ToastType.success
-                            );
-                          });
-                    } else {
-                      _showLoginDialog(context);
-                    }
-                  },
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.save),
-                  tooltip: '저장',
-                ),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    DeckService().showImportDialog(context, (deckBuild) {
-                      widget.import(deckBuild);
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.clear_outlined,
+                filledIcon: Icons.clear,
+                tooltip: '비우기',
+                color: const Color(0xFFEF4444),
+                onPressed: () => DeckService()
+                    .showDeckClearDialog(context, widget.deck, () {
+                      widget.reload();
                       ToastOverlay.show(
                         context,
-                        '덱을 가져왔습니다.',
-                        type: ToastType.success
+                        '덱이 비워졌습니다.',
+                        type: ToastType.warning
                       );
-                    });
-                  },
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.download),
-                  tooltip: '가져오기',
+                    }),
+              ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.copy_outlined,
+                filledIcon: Icons.copy,
+                tooltip: '복사해서 새로운 덱 만들기',
+                color: const Color(0xFF3B82F6),
+                onPressed: () => DeckService().showDeckCopyDialog(
+                    context,
+                    widget.deck,
+                    onCopy: widget.newCopy,
                 ),
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      DeckService().showExportDialog(context, widget.deck),
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.upload),
-                  tooltip: '내보내기',
-                ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.save_outlined,
+                filledIcon: Icons.save,
+                tooltip: '저장',
+                color: const Color(0xFF7C3AED),
+                onPressed: () async {
+                  if (userProvider.isLogin) {
+                    Map<int, FormatDto> formats =
+                        await DeckService().getFormats(widget.deck);
+                    DeckService().showSaveDialog(
+                        context, formats, widget.deck, () {
+                          widget.reload();
+                          ToastOverlay.show(
+                            context,
+                            '덱이 저장되었습니다.',
+                            type: ToastType.success
+                          );
+                        });
+                  } else {
+                    _showLoginDialog(context);
+                  }
+                },
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    CardOverlayService().removeAllOverlays();
-                    context.router.push(DeckImageRoute(deck: widget.deck));
-                  },
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.image),
-                  tooltip: '이미지 저장',
-                ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.download_outlined,
+                filledIcon: Icons.download,
+                tooltip: '가져오기',
+                color: const Color(0xFF059669),
+                onPressed: () {
+                  DeckService().showImportDialog(context, (deckBuild) {
+                    widget.import(deckBuild);
+                    ToastOverlay.show(
+                      context,
+                      '덱을 가져왔습니다.',
+                      type: ToastType.success
+                    );
+                  });
+                },
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    CardOverlayService().removeAllOverlays();
-                    context.router
-                        .push(GamePlayGroundRoute(deckBuild: widget.deck));
-                  },
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.gamepad),
-                  tooltip: '플레이그라운드',
-                ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.upload_outlined,
+                filledIcon: Icons.upload,
+                tooltip: '내보내기',
+                color: const Color(0xFF0891B2),
+                onPressed: () =>
+                    DeckService().showExportDialog(context, widget.deck),
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(
-                    width: SizeService.largeIconSize(context),
-                    height: SizeService.largeIconSize(context)),
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      DeckService().showDeckReceiptDialog(context, widget.deck),
-                  iconSize: SizeService.largeIconSize(context),
-                  icon: const Icon(Icons.receipt_long),
-                  tooltip: '대회 제출용 레시피',
-                ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.image_outlined,
+                filledIcon: Icons.image,
+                tooltip: '이미지 저장',
+                color: const Color(0xFFDC2626),
+                onPressed: () {
+                  CardOverlayService().removeAllOverlays();
+                  context.router.push(DeckImageRoute(deck: widget.deck));
+                },
+              ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.gamepad_outlined,
+                filledIcon: Icons.gamepad,
+                tooltip: '플레이그라운드',
+                color: const Color(0xFF8B5CF6),
+                onPressed: () {
+                  CardOverlayService().removeAllOverlays();
+                  context.router
+                      .push(GamePlayGroundRoute(deckBuild: widget.deck));
+                },
+              ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.receipt_long_outlined,
+                filledIcon: Icons.receipt_long,
+                tooltip: '대회 제출용 레시피',
+                color: const Color(0xFF0D9488),
+                onPressed: () =>
+                    DeckService().showDeckReceiptDialog(context, widget.deck),
               ),
               if (hasManagerRole)
-                ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                      width: SizeService.largeIconSize(context),
-                      height: SizeService.largeIconSize(context)),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () async {
-                      await DeckService().exportToTTSFile(widget.deck);
-                    },
-                    iconSize: SizeService.largeIconSize(context),
-                    icon: const Icon(Icons.videogame_asset_outlined),
-                    tooltip: 'TTS 파일 내보내기',
-                  ),
+                _buildModernIconButton(
+                  context: context,
+                  icon: Icons.videogame_asset_outlined,
+                  filledIcon: Icons.videogame_asset,
+                  tooltip: 'TTS 파일 내보내기',
+                  color: const Color(0xFF9333EA),
+                  onPressed: () async {
+                    await DeckService().exportToTTSFile(widget.deck);
+                  },
                 ),
             ],
           ),
