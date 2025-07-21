@@ -1690,6 +1690,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
   @override
   Widget build(BuildContext context) {
     dropDownMenuItems = generateDropDownMenuItems();
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Row(
       children: [
@@ -1713,17 +1716,18 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   hintText: '카드명/효과/번호',
                   hintStyle: TextStyle(
                     color: Theme.of(context).primaryColor.withOpacity(0.6),
+                    fontSize: isSmallHeight ? 12 : null, // 작은 화면에서 폰트 크기 줄임
                   ),
                   prefixIcon: Icon(
                     Icons.search,
-                    size: 20,
+                    size: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
                     color: Theme.of(context).primaryColor,
                   ),
                   suffixIcon: _searchStringEditingController?.text.isNotEmpty ?? false
                     ? IconButton(
                         icon: Icon(
                           Icons.clear,
-                          size: 18,
+                          size: isSmallHeight ? 14 : 18, // 작은 화면에서 아이콘 크기 줄임
                           color: Colors.grey.shade600,
                         ),
                         onPressed: () {
@@ -1733,19 +1737,25 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       )
                     : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: isSmallHeight ? 8 : 12, // 작은 화면에서 패딩 줄임
+                    horizontal: isSmallHeight ? 8 : 12,
+                  ),
+                ),
+                style: TextStyle(
+                  fontSize: isSmallHeight ? 12 : null, // 작은 화면에서 폰트 크기 줄임
                 ),
               ),
             )),
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
               child: IconButton(
                 onPressed: () {
                   widget.updateSearchParameter();
                 },
-                icon: const Icon(Icons.search, size: 20),
+                icon: Icon(Icons.search, size: isSmallHeight ? 16 : 20), // 작은 화면에서 아이콘 크기 줄임
                 padding: EdgeInsets.zero,
                 tooltip: '검색',
               ),
@@ -1753,10 +1763,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
               child: IconButton(
                   padding: EdgeInsets.zero,
-                  iconSize: 20,
+                  iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
                   onPressed: () {
                     _showFilterDialog();
                   },
@@ -1766,10 +1776,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
               child: IconButton(
                   padding: EdgeInsets.zero,
-                  iconSize: 20,
+                  iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
                   tooltip: '초기화',
                   onPressed: () {
                     resetSearchCondition();
@@ -1785,10 +1795,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
           Expanded(
             flex: 1,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
               child: IconButton(
                 padding: EdgeInsets.zero,
-                iconSize: 20,
+                iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
                 onPressed: () {
                   if (widget.onViewModeChanged != null) {
                     widget.onViewModeChanged!(

@@ -105,22 +105,27 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
 
-    double height = MediaQuery.of(context).size.height * 0.88;
     if (isPortrait && isInit) {
       _rowNumber = 4;
     }
     isInit = false;
+    
     return Column(
       children: [
-        SizedBox(
-          height: height * 0.3,
+        // 상단 메뉴 영역 - 유연한 크기 사용
+        Container(
+          constraints: BoxConstraints(
+            minHeight: isSmallHeight ? 80 : 120, // 최소 높이 설정
+            maxHeight: isSmallHeight ? 150 : 200, // 최대 높이 제한
+          ),
           child: Padding(
             padding: EdgeInsets.all(SizeService.paddingSize(context)),
             child: Column(
               children: [
                 Expanded(
-                  // flex: 4,
                   child: Row(
                     children: [
                       //메뉴바
@@ -165,7 +170,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             return true; 
           },
           child: Expanded(
-            flex: _isEditorExpanded ? 4 : 1,
+            flex: _isEditorExpanded 
+              ? (isSmallHeight ? 3 : 4)  // 확장 시: 작은 화면에서는 3, 일반 화면에서는 4
+              : 1,                       // 축소 시: 모든 화면에서 1
             child: DeckEditorWidget(
               deck: widget.deck,
               onEditorChanged: () {

@@ -5,6 +5,7 @@ import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/text_simplify_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/header_toggle_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/user_service.dart';
 import 'package:digimon_meta_site_flutter/service/user_setting_service.dart';
@@ -35,6 +36,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => FormatDeckCountProvider()),
       ChangeNotifierProvider(create: (_) => NoteProvider()),
       ChangeNotifierProvider(create: (_) => DeckProvider()),
+      ChangeNotifierProvider(create: (_) => HeaderToggleProvider()),
       ChangeNotifierProxyProvider<UserProvider, CollectProvider>(
         create: (_) => CollectProvider(),
         update: (_, userProvider, collectProvider) {

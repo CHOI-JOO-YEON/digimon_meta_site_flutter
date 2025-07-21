@@ -332,6 +332,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   Widget build(BuildContext context) {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    
     if (isPortrait) {
       if (init) {
         viewMode = "list";
@@ -595,6 +599,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         );
       });
     } else {
+      // 가로 모드 레이아웃 개선
       return Padding(
         padding: EdgeInsets.all(SizeService.paddingSize(context)),
         child: Row(
@@ -633,23 +638,25 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                   padding: EdgeInsets.all(SizeService.paddingSize(context)),
                   child: Column(
                     children: [
+                      // 검색바 높이를 화면 크기에 맞게 조정
+                      SizedBox(
+                        height: isSmallHeight ? 40 : 50, // 작은 화면에서 높이 줄임
+                        child: CardSearchBar(
+                          notes: notes,
+                          searchParameter: searchParameter,
+                          onSearch: initSearch,
+                          viewMode: viewMode,
+                          onViewModeChanged: onViewModeChanged,
+                          updateSearchParameter: updateSearchParameter,
+                        ),
+                      ),
+                      SizedBox(height: isSmallHeight ? 4 : 8), // 간격 조정
                       Expanded(
-                          flex: 1,
-                          child: CardSearchBar(
-                            notes: notes,
-                            searchParameter: searchParameter,
-                            onSearch: initSearch,
-                            viewMode: viewMode,
-                            onViewModeChanged: onViewModeChanged,
-                            updateSearchParameter: updateSearchParameter,
-                          )),
-                      Expanded(
-                          flex: 9,
                           child: !isSearchLoading
                               ? (viewMode == 'grid'
                                   ? CardScrollGridView(
                                       cards: cards,
-                                      rowNumber: 6,
+                                      rowNumber: isSmallHeight ? 4 : 6, // 작은 화면에서 행 수 줄임
                                       loadMoreCards: loadMoreCard,
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
@@ -665,10 +672,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       searchWithParameter: searchWithParameter,
                                     ))
                               : Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                  padding: EdgeInsets.all(isSmallHeight ? 8.0 : 16.0),
                                   child: viewMode == 'grid'
                                       ? CardGridSkeletonLoading(
-                                          crossAxisCount: 6,
+                                          crossAxisCount: isSmallHeight ? 4 : 6,
                                           itemCount: 24,
                                         )
                                       : ListView.builder(

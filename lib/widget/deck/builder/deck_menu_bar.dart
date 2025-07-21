@@ -58,6 +58,9 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
       });
     }
     
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       return Column(
@@ -70,20 +73,34 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                   Expanded(
                       flex: 12,
                       child: TextField(
-                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
+                        style: TextStyle(
+                          fontSize: isSmallHeight 
+                            ? SizeService.bodyFontSize(context) * 0.8 
+                            : SizeService.bodyFontSize(context),
+                        ),
                         controller: widget.textEditingController,
                         onChanged: (v) {
                           widget.deck.deckName = v;
                         },
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: isSmallHeight ? 4 : 8,
+                            horizontal: isSmallHeight ? 4 : 8,
+                          ),
+                          isDense: isSmallHeight, // 작은 화면에서 compact 모드
+                        ),
                       )),
                   Expanded(
                       flex: 2,
                       child: widget.deck.isSave
                           ? Container()
-                          : const TabTooltip(
+                          : TabTooltip(
                               message: '변경 사항이 저장되지 않았습니다.',
-                              child:
-                                  Icon(Icons.warning, color: Colors.amber),
+                              child: Icon(
+                                Icons.warning, 
+                                color: Colors.amber,
+                                size: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
+                              ),
                             )),
                 ],
               )),
