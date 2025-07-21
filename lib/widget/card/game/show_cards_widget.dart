@@ -159,59 +159,63 @@ class _ShowCardsState extends State<ShowCards> {
                         ),
                         child: Column(
                           children: [
-                            Row(
-                              children: [
-                                TextButton(
-                                  onPressed: () =>
-                                      _sendSelectedToDeckBottom(gameState),
-                                  child: Text(
-                                    '덱 아래로 보내기',
-                                    style: TextStyle(
-                                        fontSize: gameState
-                                            .textWidth(widget.cardWidth)),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Wrap(
+                                spacing: 4.0, // 버튼 간 가로 간격
+                                runSpacing: 4.0, // 줄 간 세로 간격
+                                children: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        _sendSelectedToDeckBottom(gameState),
+                                    child: Text(
+                                      '덱 아래로 보내기',
+                                      style: TextStyle(
+                                          fontSize: gameState
+                                              .textWidth(widget.cardWidth)),
+                                    ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      _sendSelectedToDeckTop(gameState),
-                                  child: Text(
-                                    '덱 위로 보내기',
-                                    style: TextStyle(
-                                        fontSize: gameState
-                                            .textWidth(widget.cardWidth)),
+                                  TextButton(
+                                    onPressed: () =>
+                                        _sendSelectedToDeckTop(gameState),
+                                    child: Text(
+                                      '덱 위로 보내기',
+                                      style: TextStyle(
+                                          fontSize: gameState
+                                              .textWidth(widget.cardWidth)),
+                                    ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      _sendSelectedToTrash(gameState),
-                                  child: Text(
-                                    '트래시로 보내기',
-                                    style: TextStyle(
-                                        fontSize: gameState
-                                            .textWidth(widget.cardWidth)),
+                                  TextButton(
+                                    onPressed: () =>
+                                        _sendSelectedToTrash(gameState),
+                                    child: Text(
+                                      '트래시로 보내기',
+                                      style: TextStyle(
+                                          fontSize: gameState
+                                              .textWidth(widget.cardWidth)),
+                                    ),
                                   ),
-                                ),
-                                const Spacer(),
-                                TextButton(
-                                  onPressed: () =>
-                                      _selectAll(gameState.shows.length),
-                                  child: Text(
-                                    '모두 선택',
-                                    style: TextStyle(
-                                        fontSize: gameState
-                                            .textWidth(widget.cardWidth)),
+                                  TextButton(
+                                    onPressed: () =>
+                                        _selectAll(gameState.shows.length),
+                                    child: Text(
+                                      '모두 선택',
+                                      style: TextStyle(
+                                          fontSize: gameState
+                                              .textWidth(widget.cardWidth)),
+                                    ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: _clearSelection,
-                                  child: Text(
-                                    '모두 선택 해제',
-                                    style: TextStyle(
-                                        fontSize: gameState
-                                            .textWidth(widget.cardWidth)),
+                                  TextButton(
+                                    onPressed: _clearSelection,
+                                    child: Text(
+                                      '모두 선택 해제',
+                                      style: TextStyle(
+                                          fontSize: gameState
+                                              .textWidth(widget.cardWidth)),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             DraggableDigimonListWidget(
                               id: id,

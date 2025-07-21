@@ -364,6 +364,10 @@ class GameState extends ChangeNotifier {
     MoveCard move = undoStack.removeLast();
     if (move.moveSet.isNotEmpty) {
       moveOrderedCards(move, false);
+      // show 목록에 카드가 추가되었고 창이 닫혀있으면 자동으로 열기
+      if (move.toId == "show" && shows.isNotEmpty && !isShowDialogOpen) {
+        isShowDialogOpen = true;
+      }
     } else if (move.isMemory) {
       redoStack.add(MoveCard.memory(memory: memory));
       updateMemory(move.memory, false);
@@ -377,6 +381,10 @@ class GameState extends ChangeNotifier {
       List<DigimonCard> cards = getCardsBySourceId(
           move.fromId, move.fromStartIndex, move.fromEndIndex);
       moveCards(move, cards, false);
+      // show 목록에 카드가 추가되었고 창이 닫혀있으면 자동으로 열기
+      if (move.toId == "show" && shows.isNotEmpty && !isShowDialogOpen) {
+        isShowDialogOpen = true;
+      }
     }
     redoStack.add(move.reverse());
   }
@@ -386,6 +394,10 @@ class GameState extends ChangeNotifier {
     MoveCard move = redoStack.removeLast();
     if (move.moveSet.isNotEmpty) {
       moveOrderedCards(move, false);
+      // show 목록에 카드가 추가되었고 창이 닫혀있으면 자동으로 열기
+      if (move.toId == "show" && shows.isNotEmpty && !isShowDialogOpen) {
+        isShowDialogOpen = true;
+      }
     } else if (move.isMemory) {
       undoStack.add(MoveCard.memory(memory: memory));
       updateMemory(move.memory, false);
@@ -399,6 +411,10 @@ class GameState extends ChangeNotifier {
       List<DigimonCard> cards = getCardsBySourceId(
           move.fromId, move.fromStartIndex, move.fromEndIndex);
       moveCards(move, cards, false);
+      // show 목록에 카드가 추가되었고 창이 닫혀있으면 자동으로 열기
+      if (move.toId == "show" && shows.isNotEmpty && !isShowDialogOpen) {
+        isShowDialogOpen = true;
+      }
     }
     undoStack.add(move.reverse());
   }

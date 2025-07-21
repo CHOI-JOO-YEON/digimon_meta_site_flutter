@@ -26,26 +26,40 @@ class DeckArea extends StatelessWidget {
             count: gameState.mainDeck.length,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 2.0, // 버튼 간 가로 간격
+          runSpacing: 2.0, // 줄 간 세로 간격
           children: [
-            IconButton(
-              onPressed: () => gameState.showCard(),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                Icons.search,
-                size: gameState.iconWidth(cardWidth),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: gameState.iconWidth(cardWidth),
+                maxWidth: cardWidth * 0.8, // 최대 너비 제한
               ),
-              tooltip: '오픈',
+              child: IconButton(
+                onPressed: () => gameState.showCard(),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.search,
+                  size: gameState.iconWidth(cardWidth),
+                ),
+                tooltip: '오픈',
+              ),
             ),
-            IconButton(
-              onPressed: () => gameState.toggleShowDialog(),
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                Icons.visibility,
-                size: gameState.iconWidth(cardWidth),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: gameState.iconWidth(cardWidth),
+                maxWidth: cardWidth * 0.8, // 최대 너비 제한
               ),
-              tooltip: '오픈 창 보기',
+              child: IconButton(
+                onPressed: () => gameState.toggleShowDialog(),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.visibility,
+                  size: gameState.iconWidth(cardWidth),
+                ),
+                tooltip: '오픈 창 보기',
+              ),
             ),
           ],
         ),
