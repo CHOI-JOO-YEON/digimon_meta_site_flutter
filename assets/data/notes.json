@@ -892,7 +892,7 @@
   "releaseDate" : "2025-07-18",
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
-  "cardCount" : 100,
+  "cardCount" : 101,
   "isDisable" : false
 }, {
   "noteId" : 267,
@@ -900,7 +900,7 @@
   "releaseDate" : "2025-07-18",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
-  "cardCount" : 6,
+  "cardCount" : 13,
   "isDisable" : false
 }, {
   "noteId" : 147,
