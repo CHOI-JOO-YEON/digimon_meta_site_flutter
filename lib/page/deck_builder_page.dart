@@ -327,6 +327,94 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   bool _overlayRemoved = false;
+  
+  // 하단 시트 상태 관리
+  double _bottomSheetHeight = 0.08; // 8% 높이로 시작
+  bool _isBottomSheetExpanded = false;
+  
+  void _toggleBottomSheet() {
+    setState(() {
+      if (_bottomSheetHeight == 0.08) {
+        _bottomSheetHeight = 0.4; // 40%로 확장
+        _isBottomSheetExpanded = false;
+      } else if (_bottomSheetHeight == 0.4) {
+        _bottomSheetHeight = 0.95; // 95%로 최대 확장 (거의 전체 화면)
+        _isBottomSheetExpanded = true;
+      } else {
+        _bottomSheetHeight = 0.08; // 최소로 축소
+        _isBottomSheetExpanded = false;
+      }
+      
+      // 오버레이 상태 업데이트
+      if (_bottomSheetHeight > 0.1) {
+        _cardOverlayService.updatePanelStatus(true);
+      } else {
+        _cardOverlayService.updatePanelStatus(false);
+      }
+    });
+  }
+
+  // 덱 액션 다이얼로그 표시
+  void _showDeckActions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.share),
+                title: Text('덱 공유'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // 덱 공유 로직 구현 필요
+                  ToastOverlay.show(context, '덱 공유 기능은 개발 중입니다.', type: ToastType.info);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.download),
+                title: Text('덱 이미지 다운로드'),
+                onTap: () {
+                  Navigator.pop(context);
+                  // 덱 이미지 다운로드 로직 구현 필요
+                  ToastOverlay.show(context, '덱 이미지 다운로드 기능은 개발 중입니다.', type: ToastType.info);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.copy),
+                title: Text('덱 복사'),
+                onTap: () {
+                  Navigator.pop(context);
+                  if (deck != null) {
+                    deck!.newCopy();
+                    ToastOverlay.show(context, '덱이 복사되었습니다.', type: ToastType.success);
+                    setState(() {});
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 덱 저장
+  void _saveDeck(BuildContext context) {
+    if (deck != null) {
+      deck!.saveMapToLocalStorage();
+      ToastOverlay.show(context, '덱이 로컬에 저장되었습니다.', type: ToastType.success);
+    } else {
+      ToastOverlay.show(context, '저장할 덱이 없습니다.', type: ToastType.warning);
+    }
+  }
+
+  // 하단 시트 토글 (플로팅 버튼용)
+  void _toggleScroll() {
+    _toggleBottomSheet();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -346,149 +434,23 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-        return SlidingUpPanel(
-          onPanelSlide: (v) {
-            if (v > 0.1) {
-              _cardOverlayService.updatePanelStatus(true);
-            } else {
-              _cardOverlayService.updatePanelStatus(false);
-            }
-            _overlayRemoved = false;
-          },
-          controller: _panelController,
-          renderPanelSheet: false,
-          minHeight: 50,
-          snapPoint: 0.5,
-          maxHeight: constraints.maxHeight,
-          isDraggable: false,
-          panelBuilder: (ScrollController sc) {
-            return Container(
+                return Scaffold(
+          backgroundColor: Colors.grey[50],
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(80), // 검색바 높이
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.all(SizeService.paddingSize(context)),
               decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius:
-                      BorderRadius.circular(SizeService.roundRadius(context))),
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: SizeService.paddingSize(context),
-                    right: SizeService.paddingSize(context),
-                    bottom: SizeService.paddingSize(context)),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: TextButton(
-                                onPressed: () {
-                                  _scrollController.animateTo(
-                                    0,
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                                child: Text(
-                                  '메인',
-                                  style: TextStyle(
-                                      fontSize:
-                                          SizeService.bodyFontSize(context)),
-                                )),
-                          ),
-                          Expanded(
-                              flex: 3,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    onPressed: _panelController.panelPosition >
-                                            0.3
-                                        ? () {
-                                            if (_panelController.panelPosition >
-                                                0.7) {
-                                              _panelController
-                                                  .animatePanelToSnapPoint()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            } else {
-                                              _panelController
-                                                  .close()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            }
-                                          }
-                                        : null,
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color:
-                                          _panelController.panelPosition > 0.3
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
-                                    ),
-                                  ),
-                                  Text(
-                                    '카드 검색 패널',
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeService.bodyFontSize(context),
-                                        color: Theme.of(context).primaryColor),
-                                  ),
-                                  IconButton(
-                                    onPressed: _panelController.panelPosition <
-                                            0.7
-                                        ? () {
-                                            if (_panelController.panelPosition <
-                                                0.3) {
-                                              _panelController
-                                                  .animatePanelToSnapPoint()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            } else {
-                                              _panelController.open().then((_) {
-                                                setState(() {});
-                                              });
-                                            }
-                                          }
-                                        : null,
-                                    icon: Icon(
-                                      Icons.arrow_drop_up,
-                                      color:
-                                          _panelController.panelPosition < 0.7
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              )),
-                          Expanded(
-                            flex: 1,
-                            child: TextButton(
-                                onPressed: () {
-                                  _scrollController.animateTo(
-                                    _scrollController.position.maxScrollExtent,
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                                child: Text(
-                                  '타마',
-                                  style: TextStyle(
-                                      fontSize:
-                                          SizeService.bodyFontSize(context)),
-                                )),
-                          )
-                        ],
-                      ),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
                     ),
-                    Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                                height: 50,
+                  ],
+                ),
                                 child: CardSearchBar(
                                   notes: notes,
                                   searchParameter: searchParameter,
@@ -496,12 +458,20 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   viewMode: viewMode,
                                   onViewModeChanged: onViewModeChanged,
                                   updateSearchParameter: updateSearchParameter,
-                                )),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Expanded(
-                                flex: 9,
+                ),
+              ),
+            ),
+          ),
+          body: Stack(
+            children: [
+              // 배경 카드 목록 (전체 화면 활용)
+              Positioned.fill(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: SizeService.paddingSize(context),
+                    right: SizeService.paddingSize(context),
+                    bottom: MediaQuery.of(context).size.height * 0.08, // 하단 시트 최소 높이만큼 마진
+                  ),
                                 child: !isSearchLoading
                                     ? (viewMode == 'grid'
                                         ? CardScrollGridView(
@@ -521,9 +491,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                             currentPage: currentPage,
                                             searchWithParameter: searchWithParameter,
                                           ))
-                                    : Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: viewMode == 'grid'
+                      : viewMode == 'grid'
                                             ? CardGridSkeletonLoading(
                                                 crossAxisCount: 6,
                                                 itemCount: 24,
@@ -535,9 +503,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                                                     child: Row(
                                                       children: [
-                                                        CardSkeletonLoading(
-                                                          width: 80,
-                                                        ),
+                                      CardSkeletonLoading(width: 80),
                                                         const SizedBox(width: 12),
                                                         Expanded(
                                                           child: Column(
@@ -562,51 +528,231 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                                   );
                                                 },
                                               ),
-                                      )),
-                            Expanded(
-                                flex: _panelController.panelPosition < 0.7
-                                    ? 11
-                                    : 0,
-                                child: Container())
-                          ],
-                        )),
-                  ],
                 ),
               ),
-            );
-          },
-          body: Container(
-            color: Theme.of(context).highlightColor,
-            padding: EdgeInsets.all(SizeService.paddingSize(context)),
-            child: SingleChildScrollView(
-              controller: _scrollController,
+              // 하단 시트 (애니메이션 컨테이너 방식) 
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOutCubic,
+                  height: MediaQuery.of(context).size.height * _bottomSheetHeight,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 15,
+                        offset: Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // 드래그 가능한 헤더 영역 (탭으로 토글)
+                      GestureDetector(
+                        onTap: _toggleBottomSheet,
+                                                 onVerticalDragUpdate: (details) {
+                           // 드래그 제스처로도 조작 가능
+                           if (details.delta.dy < -5) {
+                             // 위로 드래그 시 확장
+                             if (_bottomSheetHeight < 0.9) {
+                               _toggleBottomSheet();
+                             }
+                           } else if (details.delta.dy > 5) {
+                             // 아래로 드래그 시 축소
+                             if (_bottomSheetHeight > 0.1) {
+                               _toggleBottomSheet();
+                             }
+                           }
+                         },
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          color: Colors.transparent,
               child: Column(
                 children: [
-                  if (deck != null) DeckBuilderView(
-                    deck: deck!,
-                    cardPressEvent: removeCardByDeck,
-                    import: deckUpdate,
-                    searchWithParameter: searchWithParameter,
-                    cardOverlayService: _cardOverlayService,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.7,
-                  )
+                              // 드래그 핸들
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              
+                              // 덱 카운트 요약 (항상 표시)
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '총 ${(deck?.deckCount ?? 0) + (deck?.tamaCount ?? 0)}장', 
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '메인덱: ${deck?.deckCount ?? 0}장',
+                                        style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange[50],
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '타마고: ${deck?.tamaCount ?? 0}장',
+                                        style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      if (_bottomSheetHeight > 0.08) ...[
+                        Divider(height: 1, color: Colors.grey[300]),
+                        
+                        // 덱 상세 정보 영역 (확장 시에만 표시)
+                        Expanded(
+                                                    child: deck != null 
+                            ? SingleChildScrollView(
+                                padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                child: DeckBuilderView(
+                                  deck: deck!,
+                                  cardPressEvent: removeCardByDeck,
+                                  import: deckUpdate,
+                                  searchWithParameter: searchWithParameter,
+                                  cardOverlayService: _cardOverlayService,
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  '덱이 비어있습니다',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                        ),
+                      ],
                 ],
               ),
             ),
           ),
+            ],
+          ),
+          
+                    // 플로팅 액션버튼들
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // 덱 공유
+              FloatingActionButton(
+                heroTag: "deck_share",
+                mini: true,
+                onPressed: () => _showDeckActions(context),
+                child: Icon(Icons.share, size: 20),
+                backgroundColor: Colors.orange,
+                tooltip: '덱 공유 및 액션',
+              ),
+              SizedBox(height: 8),
+              
+              // 덱 저장
+              FloatingActionButton(
+                heroTag: "deck_save", 
+                mini: true,
+                onPressed: () => _saveDeck(context),
+                child: Icon(Icons.save, size: 20),
+                backgroundColor: Colors.green,
+                tooltip: '덱 저장',
+              ),
+              SizedBox(height: 8),
+              
+              // 하단 시트 토글
+              FloatingActionButton(
+                heroTag: "bottom_sheet_toggle",
+                mini: true,
+                onPressed: () => _toggleScroll(),
+                child: Icon(
+                  _bottomSheetHeight > 0.8 
+                    ? Icons.expand_less 
+                    : Icons.expand_more, 
+                  size: 20
+                ),
+                backgroundColor: Colors.blue,
+                tooltip: '덱 정보 ${_bottomSheetHeight > 0.8 ? "축소" : "확장"}',
+              ),
+            ],
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         );
       });
     } else {
-      // 가로 모드 레이아웃 개선
+      // 가로 모드 레이아웃 개선 - 모바일 반응형 추가
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isTablet = screenWidth >= 768 && screenWidth < 1024;
+      final isSmallLaptop = screenWidth >= 1024 && screenWidth < 1200;
+      final isMobileDesktop = screenWidth < 768;
+      
+      // 동적 비율 계산
+      int deckFlex, cardFlex;
+      double spacing;
+      
+      if (isMobileDesktop) {
+        // 모바일 데스크톱에서는 더 균형잡힌 비율
+        deckFlex = 1;
+        cardFlex = 1;
+        spacing = MediaQuery.sizeOf(context).width * 0.005; // 더 작은 간격
+      } else if (isTablet) {
+        // 태블릿에서는 약간 조정된 비율
+        deckFlex = 5;
+        cardFlex = 3;
+        spacing = MediaQuery.sizeOf(context).width * 0.008;
+      } else if (isSmallLaptop) {
+        // 작은 노트북에서는 기본 비율에 가깝게
+        deckFlex = 3;
+        cardFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      } else {
+        // 큰 화면에서는 기존 비율 유지
+        deckFlex = 3;
+        cardFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      }
+      
       return Padding(
-        padding: EdgeInsets.all(SizeService.paddingSize(context)),
+        padding: EdgeInsets.all(
+          isMobileDesktop 
+            ? SizeService.paddingSize(context) * 0.5 // 모바일에서 패딩 줄임
+            : SizeService.paddingSize(context)
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
+              flex: deckFlex,
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -617,11 +763,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       const Color(0xFFF8FAFC),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.08),
-                      blurRadius: 16,
+                      blurRadius: isMobileDesktop ? 12 : 16,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -631,7 +777,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                   ),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
                   child: SingleChildScrollView(
                     child: deck != null ? DeckBuilderView(
                       deck: deck!,
@@ -644,11 +790,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 ),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width * 0.01,
-            ),
+            SizedBox(width: spacing),
             Expanded(
-              flex: 2,
+              flex: cardFlex,
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -659,11 +803,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       const Color(0xFFF8FAFC),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.08),
-                      blurRadius: 16,
+                      blurRadius: isMobileDesktop ? 12 : 16,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -673,12 +817,18 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                  padding: EdgeInsets.all(
+                    isMobileDesktop 
+                      ? SizeService.paddingSize(context) * 0.7 // 모바일에서 내부 패딩 줄임
+                      : SizeService.paddingSize(context)
+                  ),
                   child: Column(
                     children: [
                       // 검색바 높이를 화면 크기에 맞게 조정
                       SizedBox(
-                        height: isSmallHeight ? 40 : 50, // 작은 화면에서 높이 줄임
+                        height: isMobileDesktop 
+                          ? 35 // 모바일에서 더 작게
+                          : (isSmallHeight ? 40 : 50),
                         child: CardSearchBar(
                           notes: notes,
                           searchParameter: searchParameter,
@@ -688,13 +838,17 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           updateSearchParameter: updateSearchParameter,
                         ),
                       ),
-                      SizedBox(height: isSmallHeight ? 4 : 8), // 간격 조정
+                      SizedBox(
+                        height: isMobileDesktop ? 3 : (isSmallHeight ? 4 : 8),
+                      ), // 간격 조정
                       Expanded(
                           child: !isSearchLoading
                               ? (viewMode == 'grid'
                                   ? CardScrollGridView(
                                       cards: cards,
-                                      rowNumber: isSmallHeight ? 4 : 6, // 작은 화면에서 행 수 줄임
+                                      rowNumber: isMobileDesktop 
+                                        ? 3 // 모바일에서 행 수 더 줄임
+                                        : (isTablet ? 4 : (isSmallHeight ? 4 : 6)),
                                       loadMoreCards: loadMoreCard,
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,

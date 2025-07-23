@@ -162,6 +162,10 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     String color = widget.card.color2 ?? widget.card.color1!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768; // 모바일 화면 감지
+    final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
+    
     return MouseRegion(
       onEnter: (event) {
         if (event.kind == PointerDeviceKind.mouse) {
@@ -212,7 +216,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   Container(
                     width: widget.width,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(_isHovered ? 0.2 : 0.1),
@@ -230,7 +234,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                       child: ColorFiltered(
                         colorFilter: widget.isActive ?? true
                             ? ColorFilter.mode(
@@ -501,14 +505,14 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   // 카드 수량 표시
                   if (widget.cardCount != null)
                     Positioned(
-                      left: 8,
-                      bottom: 8,
+                      left: isMobile ? 4 : 8,
+                      bottom: isMobile ? 4 : 8,
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 300),
                         curve: Curves.easeOutQuart,
                         padding: EdgeInsets.symmetric(
-                          horizontal: widget.width * 0.08,
-                          vertical: widget.width * 0.05,
+                          horizontal: isMobile ? widget.width * 0.06 : widget.width * 0.08,
+                          vertical: isMobile ? widget.width * 0.03 : widget.width * 0.05,
                         ),
                         decoration: BoxDecoration(
                           gradient: _isHighlighted 
@@ -524,7 +528,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     const Color(0xFF374151),
                                   ],
                                 ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                           boxShadow: [
                             BoxShadow(
                               color: _isHighlighted
@@ -537,15 +541,15 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                           ],
                           border: Border.all(
                             color: Colors.white.withOpacity(0.2),
-                            width: 1,
+                            width: isMobile ? 0.5 : 1,
                           ),
                         ),
                         child: AnimatedDefaultTextStyle(
                           duration: Duration(milliseconds: 300),
                           style: TextStyle(
                             fontSize: _isHighlighted
-                                ? widget.width * 0.14
-                                : widget.width * 0.12,
+                                ? (isMobile ? widget.width * 0.12 : widget.width * 0.14)
+                                : (isMobile ? widget.width * 0.10 : widget.width * 0.12),
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                             shadows: [
@@ -582,12 +586,12 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                           children: [
                             // 닫기 버튼
                             Positioned(
-                              top: 12,
-                              right: 12,
+                              top: isMobile ? 8 : 12,
+                              right: isMobile ? 8 : 12,
                               child: GestureDetector(
                                 onTap: _toggleButtons,
                                 child: Container(
-                                  padding: const EdgeInsets.all(6),
+                                  padding: EdgeInsets.all(isMobile ? 4 : 6),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -606,7 +610,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                   ),
                                   child: Icon(
                                     Icons.close,
-                                    size: 16,
+                                    size: isMobile ? 12 : 16,
                                     color: Colors.grey.shade700,
                                   ),
                                 ),
@@ -634,14 +638,16 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     icon: Icons.remove,
                                     label: "",
                                     color: const Color(0xFFEF4444),
-                                    size: widget.width * 0.4,
+                                    size: isMobile ? widget.width * 0.35 : widget.width * 0.4,
+                                    isMobile: isMobile,
                                   ),
                                   _buildActionButton(
                                     onTap: () => widget.addCard!(widget.card),
                                     icon: Icons.add,
                                     label: "",
                                     color: const Color(0xFF10B981),
-                                    size: widget.width * 0.4,
+                                    size: isMobile ? widget.width * 0.35 : widget.width * 0.4,
+                                    isMobile: isMobile,
                                   ),
                                 ],
                               ),
@@ -665,6 +671,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
     required String label,
     required Color color,
     required double size,
+    bool isMobile = false,
   }) {
     return Material(
       color: Colors.transparent,
@@ -700,7 +707,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
             ],
             border: Border.all(
               color: Colors.white.withOpacity(0.3),
-              width: 1,
+              width: isMobile ? 0.5 : 1,
             ),
           ),
           child: Center(

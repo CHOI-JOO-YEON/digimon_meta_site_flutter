@@ -106,7 +106,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    final isMobile = screenWidth < 768; // 모바일 화면 감지
+    final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 
     if (isPortrait && isInit) {
       _rowNumber = 4;
@@ -117,36 +120,49 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
       children: [
         // 상단 메뉴 영역 - 충분한 공간 확보
         Padding(
-          padding: EdgeInsets.all(SizeService.paddingSize(context)),
+          padding: EdgeInsets.all(
+            isMobile 
+              ? SizeService.paddingSize(context) * 0.7 
+              : SizeService.paddingSize(context)
+          ),
           child: Column(
             children: [
               // 메뉴바 영역 (고정 높이)
               Container(
-                height: isSmallHeight ? 80 : 100,
+                height: isMobile ? (isSmallHeight ? 70 : 80) : (isSmallHeight ? 80 : 100),
                 child: Row(
                   children: [
                     //메뉴바
                     Expanded(
-                        flex: 2,
+                        flex: isMobile ? 3 : 2, // 모바일에서 메뉴바에 더 많은 공간
                         child: DeckBuilderMenuBar(
                           deck: widget.deck,
                           textEditingController: textEditingController,
                         )),
                     Expanded(
-                      flex: 2,
+                      flex: isMobile ? 2 : 2, // 모바일에서 슬라이더 영역 축소
                       child: CustomSlider(
                           sliderValue: _rowNumber,
                           sliderAction: updateRowNumber),
                     ),
-                    Expanded(flex: 3, child: DeckStat(deck: widget.deck)),
+                    Expanded(
+                      flex: isMobile ? 3 : 3, // 모바일에서 덱 통계 영역 유지
+                      child: DeckStat(deck: widget.deck)
+                    ),
                   ],
                 ),
               ),
               // 여백 추가
-              SizedBox(height: SizeService.paddingSize(context)),
+              SizedBox(
+                height: isMobile 
+                  ? SizeService.paddingSize(context) * 0.5 
+                  : SizeService.paddingSize(context)
+              ),
               // 버튼 영역 (고정 높이)
               Container(
-                  height: SizeService.largeIconSize(context) + 16,
+                  height: isMobile 
+                    ? SizeService.largeIconSize(context) * 0.8 + 12
+                    : SizeService.largeIconSize(context) + 16,
                   child: DeckMenuButtons(
                     deck: widget.deck,
                     init: initDeck,
@@ -162,11 +178,19 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         Container(
-          height: SizeService.bodyFontSize(context) * 2.5,
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          height: isMobile 
+            ? SizeService.bodyFontSize(context) * 2.0 
+            : SizeService.bodyFontSize(context) * 2.5,
+          margin: EdgeInsets.symmetric(
+            horizontal: isMobile ? 4 : 8, 
+            vertical: isMobile ? 4 : 8,
+          ),
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 20, 
+                vertical: isMobile ? 6 : 8,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -174,10 +198,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                     const Color(0xFF1D4ED8).withOpacity(0.05),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
                 border: Border.all(
                   color: const Color(0xFF2563EB).withOpacity(0.2),
-                  width: 1,
+                  width: isMobile ? 0.5 : 1,
                 ),
               ),
               child: Row(
@@ -185,14 +209,18 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 children: [
                   Icon(
                     Icons.dashboard_outlined,
-                    size: SizeService.bodyFontSize(context) * 1.2,
+                    size: isMobile 
+                      ? SizeService.bodyFontSize(context) * 1.0 
+                      : SizeService.bodyFontSize(context) * 1.2,
                     color: const Color(0xFF2563EB),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: isMobile ? 6 : 8),
                   Text(
                     '메인',
                     style: TextStyle(
-                      fontSize: SizeService.bodyFontSize(context) * 1.1,
+                      fontSize: isMobile 
+                        ? SizeService.bodyFontSize(context) * 0.95 
+                        : SizeService.bodyFontSize(context) * 1.1,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF1F2937),
                       letterSpacing: 0.5,
@@ -225,7 +253,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          margin: EdgeInsets.symmetric(
+            horizontal: isMobile ? 4 : 8, 
+            vertical: isMobile ? 2 : 4,
+          ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -235,21 +266,21 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 const Color(0xFFFAFBFC),
               ],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.06),
-                blurRadius: 12,
+                blurRadius: isMobile ? 8 : 12,
                 offset: const Offset(0, 2),
               ),
             ],
             border: Border.all(
               color: Colors.grey.withOpacity(0.08),
-              width: 1,
+              width: isMobile ? 0.5 : 1,
             ),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
             child: DeckScrollGridView(
               deckCount: widget.deck.deckMap,
               deck: widget.deck.deckCards,
@@ -263,11 +294,19 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         Container(
-          height: SizeService.bodyFontSize(context) * 2.5,
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          height: isMobile 
+            ? SizeService.bodyFontSize(context) * 2.0 
+            : SizeService.bodyFontSize(context) * 2.5,
+          margin: EdgeInsets.symmetric(
+            horizontal: isMobile ? 4 : 8, 
+            vertical: isMobile ? 4 : 8,
+          ),
           child: Center(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 20, 
+                vertical: isMobile ? 6 : 8,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -275,10 +314,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                     const Color(0xFF6D28D9).withOpacity(0.05),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
                 border: Border.all(
                   color: const Color(0xFF7C3AED).withOpacity(0.2),
-                  width: 1,
+                  width: isMobile ? 0.5 : 1,
                 ),
               ),
               child: Row(
@@ -286,14 +325,18 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 children: [
                   Icon(
                     Icons.pets_outlined,
-                    size: SizeService.bodyFontSize(context) * 1.2,
+                    size: isMobile 
+                      ? SizeService.bodyFontSize(context) * 1.0 
+                      : SizeService.bodyFontSize(context) * 1.2,
                     color: const Color(0xFF7C3AED),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: isMobile ? 6 : 8),
                   Text(
                     '디지타마',
                     style: TextStyle(
-                      fontSize: SizeService.bodyFontSize(context) * 1.1,
+                      fontSize: isMobile 
+                        ? SizeService.bodyFontSize(context) * 0.95 
+                        : SizeService.bodyFontSize(context) * 1.1,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF1F2937),
                       letterSpacing: 0.5,
@@ -305,9 +348,29 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
         ),
         Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: isMobile ? 4 : 8, 
+            vertical: isMobile ? 2 : 4,
+          ),
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(SizeService.roundRadius(context))),
+              borderRadius: BorderRadius.circular(
+                isMobile 
+                  ? SizeService.roundRadius(context) * 0.8 
+                  : SizeService.roundRadius(context)
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: isMobile ? 8 : 12,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.08),
+                width: isMobile ? 0.5 : 1,
+              ),
+          ),
           child: DeckScrollGridView(
             deckCount: widget.deck.tamaMap,
             deck: widget.deck.tamaCards,

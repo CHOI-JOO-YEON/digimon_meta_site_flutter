@@ -47,7 +47,10 @@ class _MainPageState extends State<MainPage> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    final isSmallWidth = screenWidth < 400; // 세로 너비가 작은 화면 감지
+    final isMobilePortrait = isPortrait && screenWidth < 600; // 모바일 세로모드 감지
     
     return AutoTabsRouter.tabBar(
       physics: const NeverScrollableScrollPhysics(),
@@ -73,7 +76,9 @@ class _MainPageState extends State<MainPage> {
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
                     height: headerProvider.isHeaderVisible 
-                      ? SizeService.headerHeight(context) 
+                      ? (isMobilePortrait 
+                          ? (isSmallHeight ? 100 : 120) // 모바일 세로모드에서 높이 줄임
+                          : SizeService.headerHeight(context))
                       : (isSmallHeight ? 40 : 50), // 최소한의 공간 유지
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -104,7 +109,9 @@ class _MainPageState extends State<MainPage> {
                             builder: (context, userProvider, deckProvider, child) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: SizeService.paddingSize(context) * 2,
+                                  horizontal: isMobilePortrait 
+                                    ? (isSmallWidth ? 8 : 12) // 모바일에서 패딩 줄임
+                                    : SizeService.paddingSize(context) * 2,
                                 ),
                                 child: isPortrait
                                     ? Column(
@@ -112,91 +119,113 @@ class _MainPageState extends State<MainPage> {
                                         children: [
                                           // 세로모드에서 로그인 정보와 설정 버튼
                                           Container(
-                                            margin: const EdgeInsets.only(bottom: 4),
+                                            margin: EdgeInsets.only(
+                                              bottom: isMobilePortrait ? 2 : 4,
+                                            ),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 if (userProvider.isLogin)
-                                                  Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        '${userProvider.nickname}',
-                                                        style: TextStyle(
-                                                          fontSize: fontSize,
-                                                          fontWeight: FontWeight.w600,
+                                                  Expanded(
+                                                    flex: 3,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          '${userProvider.nickname}',
+                                                          style: TextStyle(
+                                                            fontSize: isMobilePortrait 
+                                                              ? fontSize * 0.9 // 모바일에서 폰트 크기 줄임
+                                                              : fontSize,
+                                                            fontWeight: FontWeight.w600,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
-                                                        style: TextStyle(
-                                                          fontSize: fontSize * 0.8,
-                                                          color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                                                        Text(
+                                                          '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
+                                                          style: TextStyle(
+                                                            fontSize: isMobilePortrait 
+                                                              ? fontSize * 0.7 // 모바일에서 작게
+                                                              : fontSize * 0.8,
+                                                            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 
                                                 Expanded(
+                                                  flex: userProvider.isLogin ? 2 : 1,
                                                   child: Row(
                                                     mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
-                                                      AnimatedContainer(
-                                                        duration: const Duration(milliseconds: 200),
-                                                        child: Material(
-                                                          color: Colors.transparent,
-                                                          child: InkWell(
-                                                            borderRadius: BorderRadius.circular(20),
-                                                            onTap: () {
-                                                              userProvider.isLogin
-                                                                  ? UserService().logoutWithPopup(context)
-                                                                  : openOAuthPopup();
-                                                            },
-                                                            child: Container(
-                                                              padding: const EdgeInsets.symmetric(
-                                                                horizontal: 16,
-                                                                vertical: 8,
+                                                      // 로그인/로그아웃 버튼
+                                                      Flexible(
+                                                        child: AnimatedContainer(
+                                                          duration: const Duration(milliseconds: 200),
+                                                          child: Material(
+                                                            color: Colors.transparent,
+                                                            child: InkWell(
+                                                              borderRadius: BorderRadius.circular(
+                                                                isMobilePortrait ? 16 : 20,
                                                               ),
-                                                              decoration: BoxDecoration(
-                                                                gradient: userProvider.isLogin
-                                                                    ? LinearGradient(
-                                                                        colors: [
-                                                                          const Color(0xFFEF4444),
-                                                                          const Color(0xFFDC2626),
-                                                                        ],
-                                                                      )
-                                                                    : LinearGradient(
-                                                                        colors: [
-                                                                          Theme.of(context).colorScheme.primary,
-                                                                          const Color(0xFF1D4ED8),
-                                                                        ],
-                                                                      ),
-                                                                borderRadius: BorderRadius.circular(20),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: (userProvider.isLogin 
-                                                                        ? const Color(0xFFEF4444) 
-                                                                        : Theme.of(context).colorScheme.primary)
-                                                                        .withOpacity(0.3),
-                                                                    offset: const Offset(0, 4),
-                                                                    blurRadius: 8,
+                                                              onTap: () {
+                                                                userProvider.isLogin
+                                                                    ? UserService().logoutWithPopup(context)
+                                                                    : openOAuthPopup();
+                                                              },
+                                                              child: Container(
+                                                                padding: EdgeInsets.symmetric(
+                                                                  horizontal: isMobilePortrait ? 10 : 16,
+                                                                  vertical: isMobilePortrait ? 6 : 8,
+                                                                ),
+                                                                decoration: BoxDecoration(
+                                                                  gradient: userProvider.isLogin
+                                                                      ? LinearGradient(
+                                                                          colors: [
+                                                                            const Color(0xFFEF4444),
+                                                                            const Color(0xFFDC2626),
+                                                                          ],
+                                                                        )
+                                                                      : LinearGradient(
+                                                                          colors: [
+                                                                            Theme.of(context).colorScheme.primary,
+                                                                            const Color(0xFF1D4ED8),
+                                                                          ],
+                                                                        ),
+                                                                  borderRadius: BorderRadius.circular(
+                                                                    isMobilePortrait ? 16 : 20,
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: Text(
-                                                                userProvider.isLogin ? '로그아웃' : '로그인',
-                                                                style: TextStyle(
-                                                                  fontSize: fontSize * 0.9,
-                                                                  color: Colors.white,
-                                                                  fontWeight: FontWeight.w600,
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: (userProvider.isLogin 
+                                                                          ? const Color(0xFFEF4444) 
+                                                                          : Theme.of(context).colorScheme.primary)
+                                                                          .withOpacity(0.3),
+                                                                      offset: const Offset(0, 4),
+                                                                      blurRadius: 8,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Text(
+                                                                  userProvider.isLogin ? '로그아웃' : '로그인',
+                                                                  style: TextStyle(
+                                                                    fontSize: isMobilePortrait 
+                                                                      ? fontSize * 0.8 // 모바일에서 작게
+                                                                      : fontSize * 0.9,
+                                                                    color: Colors.white,
+                                                                    fontWeight: FontWeight.w600,
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 12),
+                                                      SizedBox(width: isMobilePortrait ? 6 : 12),
+                                                      // 설정 버튼
                                                       _buildIconButton(
                                                         onPressed: () {
                                                           DeckBuild? deck = deckProvider.currentDeck;
@@ -211,14 +240,17 @@ class _MainPageState extends State<MainPage> {
                                                         icon: Icons.settings,
                                                         tooltip: '덱 설정',
                                                         context: context,
+                                                        isMobile: isMobilePortrait,
                                                       ),
                                                       
-                                                      const SizedBox(width: 8),
+                                                      SizedBox(width: isMobilePortrait ? 4 : 8),
+                                                      // 헤더 접기 버튼
                                                       _buildIconButton(
                                                         onPressed: () => headerProvider.hideHeader(),
                                                         icon: Icons.keyboard_arrow_up,
                                                         tooltip: '메뉴 접기',
                                                         context: context,
+                                                        isMobile: isMobilePortrait,
                                                       ),
                                                     ],
                                                   ),
@@ -228,8 +260,11 @@ class _MainPageState extends State<MainPage> {
                                           ),
                                           // 세로모드에서 탭바
                                           Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                            padding: const EdgeInsets.all(4),
+                                            margin: EdgeInsets.symmetric(
+                                              vertical: isMobilePortrait ? 4 : 8, 
+                                              horizontal: isMobilePortrait ? 4 : 8,
+                                            ),
+                                            padding: EdgeInsets.all(isMobilePortrait ? 2 : 4),
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
@@ -239,7 +274,9 @@ class _MainPageState extends State<MainPage> {
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               ),
-                                              borderRadius: BorderRadius.circular(16),
+                                              borderRadius: BorderRadius.circular(
+                                                isMobilePortrait ? 12 : 16,
+                                              ),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black.withOpacity(0.08),
@@ -256,11 +293,15 @@ class _MainPageState extends State<MainPage> {
                                               controller: controller,
                                               labelStyle: TextStyle(
                                                 fontWeight: FontWeight.w700,
-                                                fontSize: fontSize * 0.85,
+                                                fontSize: isMobilePortrait 
+                                                  ? fontSize * 0.8 // 모바일에서 탭 폰트 크기 줄임
+                                                  : fontSize * 0.85,
                                               ),
                                               unselectedLabelStyle: TextStyle(
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: fontSize * 0.85,
+                                                fontSize: isMobilePortrait 
+                                                  ? fontSize * 0.8
+                                                  : fontSize * 0.85,
                                               ),
                                               indicator: BoxDecoration(
                                                 gradient: LinearGradient(
@@ -269,7 +310,9 @@ class _MainPageState extends State<MainPage> {
                                                     const Color(0xFF1D4ED8),
                                                   ],
                                                 ),
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius: BorderRadius.circular(
+                                                  isMobilePortrait ? 10 : 12,
+                                                ),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
@@ -291,10 +334,10 @@ class _MainPageState extends State<MainPage> {
                                                 },
                                               ),
                                               tabs: [
-                                                _buildModernTabItem(context, Icons.build_outlined, Icons.build, 'Builder', isPortrait, controller.index == 0),
-                                                _buildModernTabItem(context, Icons.list_outlined, Icons.list, 'List', isPortrait, controller.index == 1),
-                                                _buildModernTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', isPortrait, controller.index == 2),
-                                                _buildModernTabItem(context, Icons.info_outline, Icons.info, 'Info', isPortrait, controller.index == 3),
+                                                _buildModernTabItem(context, Icons.build_outlined, Icons.build, 'Builder', isPortrait, controller.index == 0, isMobile: isMobilePortrait),
+                                                _buildModernTabItem(context, Icons.list_outlined, Icons.list, 'List', isPortrait, controller.index == 1, isMobile: isMobilePortrait),
+                                                _buildModernTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', isPortrait, controller.index == 2, isMobile: isMobilePortrait),
+                                                _buildModernTabItem(context, Icons.info_outline, Icons.info, 'Info', isPortrait, controller.index == 3, isMobile: isMobilePortrait),
                                               ],
                                             ),
                                           ),
@@ -624,11 +667,12 @@ class _MainPageState extends State<MainPage> {
     required IconData icon,
     required String tooltip,
     required BuildContext context,
+    bool isMobile = false,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -640,13 +684,13 @@ class _MainPageState extends State<MainPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
           onTap: onPressed,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(isMobile ? 8 : 12),
             child: Icon(
               icon,
-              size: SizeService.largeIconSize(context),
+              size: isMobile ? SizeService.largeIconSize(context) * 0.8 : SizeService.largeIconSize(context),
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
@@ -655,9 +699,9 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildModernTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isPortrait, bool isSelected) {
+  Widget _buildModernTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isPortrait, bool isSelected, {bool isMobile = false}) {
     return Tab(
-      height: isPortrait ? 52 : 56,
+      height: isMobile ? 48 : 56,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         child: Column(
@@ -668,7 +712,7 @@ class _MainPageState extends State<MainPage> {
               child: Icon(
                 isSelected ? filledIcon : outlinedIcon,
                 key: ValueKey(isSelected),
-                size: isPortrait ? 24 : 22,
+                size: isMobile ? 22 : 24,
               ),
             ),
             if (!isPortrait) const SizedBox(height: 4),
@@ -677,7 +721,7 @@ class _MainPageState extends State<MainPage> {
                 label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: isMobile ? 11 : 12,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
                 overflow: TextOverflow.ellipsis,

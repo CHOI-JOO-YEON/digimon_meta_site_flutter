@@ -1691,18 +1691,24 @@ class _CardSearchBarState extends State<CardSearchBar> {
   Widget build(BuildContext context) {
     dropDownMenuItems = generateDropDownMenuItems();
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isMobile = screenWidth < 768; // 모바일 화면 감지
+    final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 
     return Row(
       children: [
         Expanded(
-            flex: 5,
+            flex: isMobile ? 6 : 5, // 모바일에서 검색 필드에 더 많은 공간 할당
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300, width: 1),
+                borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
+                border: Border.all(
+                  color: Colors.grey.shade300, 
+                  width: isMobile ? 0.5 : 1,
+                ),
               ),
               child: TextField(
                 controller: _searchStringEditingController,
@@ -1713,21 +1719,21 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   widget.updateSearchParameter();
                 },
                 decoration: InputDecoration(
-                  hintText: '카드명/효과/번호',
+                  hintText: isMobile ? '카드 검색' : '카드명/효과/번호', // 모바일에서 짧은 힌트 텍스트
                   hintStyle: TextStyle(
                     color: Theme.of(context).primaryColor.withOpacity(0.6),
-                    fontSize: isSmallHeight ? 12 : null, // 작은 화면에서 폰트 크기 줄임
+                    fontSize: isMobile ? 11 : (isSmallHeight ? 12 : null),
                   ),
                   prefixIcon: Icon(
                     Icons.search,
-                    size: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
+                    size: isMobile ? 14 : (isSmallHeight ? 16 : 20),
                     color: Theme.of(context).primaryColor,
                   ),
                   suffixIcon: _searchStringEditingController?.text.isNotEmpty ?? false
                     ? IconButton(
                         icon: Icon(
                           Icons.clear,
-                          size: isSmallHeight ? 14 : 18, // 작은 화면에서 아이콘 크기 줄임
+                          size: isMobile ? 12 : (isSmallHeight ? 14 : 18),
                           color: Colors.grey.shade600,
                         ),
                         onPressed: () {
@@ -1738,67 +1744,98 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     : null,
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
-                    vertical: isSmallHeight ? 8 : 12, // 작은 화면에서 패딩 줄임
-                    horizontal: isSmallHeight ? 8 : 12,
+                    vertical: isMobile ? 6 : (isSmallHeight ? 8 : 12),
+                    horizontal: isMobile ? 6 : (isSmallHeight ? 8 : 12),
                   ),
                 ),
                 style: TextStyle(
-                  fontSize: isSmallHeight ? 12 : null, // 작은 화면에서 폰트 크기 줄임
+                  fontSize: isMobile ? 11 : (isSmallHeight ? 12 : null),
                 ),
               ),
             )),
+        // 검색 버튼
+        if (!isVerySmall) // 매우 작은 화면에서는 검색 버튼 숨김 (Enter로 검색 가능)
+          Expanded(
+              flex: 1,
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    widget.updateSearchParameter();
+                  },
+                  icon: Icon(
+                    Icons.search, 
+                    size: isMobile ? 14 : (isSmallHeight ? 16 : 20),
+                  ),
+                  padding: EdgeInsets.zero,
+                  tooltip: '검색',
+                  constraints: BoxConstraints(
+                    minWidth: isMobile ? 30 : 40,
+                    minHeight: isMobile ? 30 : 40,
+                  ),
+                ),
+              )),
+        // 필터 버튼
         Expanded(
             flex: 1,
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
-              child: IconButton(
-                onPressed: () {
-                  widget.updateSearchParameter();
-                },
-                icon: Icon(Icons.search, size: isSmallHeight ? 16 : 20), // 작은 화면에서 아이콘 크기 줄임
-                padding: EdgeInsets.zero,
-                tooltip: '검색',
+              margin: EdgeInsets.symmetric(
+                horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
               ),
-            )),
-        Expanded(
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
               child: IconButton(
                   padding: EdgeInsets.zero,
-                  iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
+                  iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
                   onPressed: () {
                     _showFilterDialog();
                   },
                   tooltip: '필터',
-                  icon: const Icon(Icons.menu)),
+                  icon: const Icon(Icons.tune), // 더 명확한 필터 아이콘
+                  constraints: BoxConstraints(
+                    minWidth: isMobile ? 30 : 40,
+                    minHeight: isMobile ? 30 : 40,
+                  ),
+              ),
             )),
-        Expanded(
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
-              child: IconButton(
-                  padding: EdgeInsets.zero,
-                  iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
-                  tooltip: '초기화',
-                  onPressed: () {
-                    resetSearchCondition();
-                    ToastOverlay.show(
-                      context,
-                      '검색 조건이 초기화되었습니다.',
-                      type: ToastType.warning
-                    );
-                  },
-                  icon: const Icon(Icons.refresh)),
-            )),
+        // 초기화 버튼 (모바일에서는 조건부 표시)
+        if (!isVerySmall)
+          Expanded(
+              flex: 1,
+              child: Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
+                ),
+                child: IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
+                    tooltip: '초기화',
+                    onPressed: () {
+                      resetSearchCondition();
+                      ToastOverlay.show(
+                        context,
+                        '검색 조건이 초기화되었습니다.',
+                        type: ToastType.warning
+                      );
+                    },
+                    icon: const Icon(Icons.refresh),
+                    constraints: BoxConstraints(
+                      minWidth: isMobile ? 30 : 40,
+                      minHeight: isMobile ? 30 : 40,
+                    ),
+                ),
+              )),
+        // 뷰 모드 전환 버튼
         if (widget.viewMode != null)
           Expanded(
             flex: 1,
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: isSmallHeight ? 2 : 4), // 작은 화면에서 마진 줄임
+              margin: EdgeInsets.symmetric(
+                horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
+              ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                iconSize: isSmallHeight ? 16 : 20, // 작은 화면에서 아이콘 크기 줄임
+                iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
                 onPressed: () {
                   if (widget.onViewModeChanged != null) {
                     widget.onViewModeChanged!(
@@ -1806,8 +1843,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     );
                   }
                 },
+                tooltip: widget.viewMode == 'grid' ? '리스트 뷰' : '그리드 뷰',
                 icon: Icon(
                   widget.viewMode == 'grid' ? Icons.view_list : Icons.grid_view,
+                ),
+                constraints: BoxConstraints(
+                  minWidth: isMobile ? 30 : 40,
+                  minHeight: isMobile ? 30 : 40,
                 ),
               ),
             ),
