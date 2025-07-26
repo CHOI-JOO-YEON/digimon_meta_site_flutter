@@ -28,6 +28,11 @@ class DeckBuilderView extends StatefulWidget {
   final Function(DeckBuild) import;
   final Function(SearchParameter)? searchWithParameter;
   final CardOverlayService cardOverlayService;
+  final bool showMenuBar;
+  final bool showSlider;
+  final bool showButtons;
+  final bool showDeckNameOnly;
+  final int? fixedRowNumber;
 
   const DeckBuilderView(
       {super.key,
@@ -36,7 +41,12 @@ class DeckBuilderView extends StatefulWidget {
       required this.cardPressEvent,
       required this.import,
       this.searchWithParameter,
-      required this.cardOverlayService});
+      required this.cardOverlayService,
+      this.showMenuBar = true,
+      this.showSlider = true,
+      this.showButtons = true,
+      this.showDeckNameOnly = false,
+      this.fixedRowNumber});
 
   @override
   State<DeckBuilderView> createState() => _DeckBuilderViewState();
@@ -47,10 +57,33 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   bool isInit = true;
   int _rowNumber = 9;
   bool _isEditorExpanded = false;
+  String? _lastDeckName;
 
   void updateRowNumber(int n) {
     _rowNumber = n;
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTextController();
+  }
+
+  @override
+  void didUpdateWidget(covariant DeckBuilderView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.deck != oldWidget.deck || widget.deck.deckName != _lastDeckName) {
+      _updateTextController();
+    }
+  }
+
+  void _updateTextController() {
+    final newDeckName = widget.deck.deckName ?? 'My Deck';
+    if (textEditingController.text != newDeckName) {
+      textEditingController.text = newDeckName;
+    }
+    _lastDeckName = widget.deck.deckName;
   }
 
   clearDeck() {
@@ -103,6 +136,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.deck.deckName != _lastDeckName) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateTextController();
+      });
+    }
+
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -111,7 +150,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     final isMobile = screenWidth < 768; // 모바일 화면 감지
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 
-    if (isPortrait && isInit) {
+    if (widget.fixedRowNumber != null) {
+      _rowNumber = widget.fixedRowNumber!;
+    } else if (isPortrait && isInit) {
       _rowNumber = 4;
     }
     isInit = false;
@@ -127,26 +168,116 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
           child: Column(
             children: [
-              // 메뉴바 영역 (고정 높이)
+              // 덱 이름과 통계 표시 (세로 모드용)
+              if (widget.showDeckNameOnly) ...[
+                Container(
+                  height: isMobile ? (isSmallHeight ? 70 : 80) : (isSmallHeight ? 80 : 100),
+                  padding: EdgeInsets.all(
+                    isMobile 
+                      ? SizeService.paddingSize(context) * 0.7 
+                      : SizeService.paddingSize(context)
+                  ),
+                  child: Row(
+                    children: [
+                      // 덱 이름 입력 영역
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white,
+                                const Color(0xFFFAFBFC),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.15),
+                              width: 1,
+                            ),
+                          ),
+                          child: TextField(
+                            style: TextStyle(
+                              fontSize: SizeService.bodyFontSize(context) * 0.8,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1F2937),
+                            ),
+                            controller: textEditingController,
+                            onChanged: (v) {
+                              widget.deck.deckName = v;
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 10,
+                              ),
+                              border: InputBorder.none,
+                              hintText: '덱 이름',
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontWeight: FontWeight.normal,
+                                fontSize: SizeService.bodyFontSize(context) * 0.75,
+                              ),
+                              prefixIcon: Container(
+                                margin: EdgeInsets.all(4),
+                                padding: EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF2563EB).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Icon(
+                                  Icons.edit_outlined,
+                                  size: 12,
+                                  color: const Color(0xFF2563EB),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      // 덱 통계 영역
+                      Expanded(
+                        flex: 3,
+                        child: DeckStat(deck: widget.deck),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              
+              // 상단 영역 (조건부 표시)
+              if (widget.showMenuBar || widget.showSlider) ...[
               Container(
                 height: isMobile ? (isSmallHeight ? 70 : 80) : (isSmallHeight ? 80 : 100),
                 child: Row(
                   children: [
-                    //메뉴바
+                      // 메뉴바 (조건부 표시)
+                      if (widget.showMenuBar)
                     Expanded(
-                        flex: isMobile ? 3 : 2, // 모바일에서 메뉴바에 더 많은 공간
+                            flex: isMobile ? 3 : 2,
                         child: DeckBuilderMenuBar(
                           deck: widget.deck,
                           textEditingController: textEditingController,
                         )),
+                      // 슬라이더 (조건부 표시)
+                      if (widget.showSlider)
                     Expanded(
-                      flex: isMobile ? 2 : 2, // 모바일에서 슬라이더 영역 축소
+                          flex: isMobile ? 2 : 2,
                       child: CustomSlider(
                           sliderValue: _rowNumber,
                           sliderAction: updateRowNumber),
                     ),
+                      // 덱 통계는 항상 표시
                     Expanded(
-                      flex: isMobile ? 3 : 3, // 모바일에서 덱 통계 영역 유지
+                        flex: isMobile ? 3 : 3,
                       child: DeckStat(deck: widget.deck)
                     ),
                   ],
@@ -158,7 +289,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                   ? SizeService.paddingSize(context) * 0.5 
                   : SizeService.paddingSize(context)
               ),
-              // 버튼 영역 (고정 높이)
+              ],
+              // 버튼 영역 (조건부 표시)
+              if (widget.showButtons)
               Container(
                   height: isMobile 
                     ? SizeService.largeIconSize(context) * 0.8 + 12
