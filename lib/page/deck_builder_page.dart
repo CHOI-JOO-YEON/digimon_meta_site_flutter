@@ -82,6 +82,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void dispose() {
     if (mounted) {
       _scrollController.dispose();
+      _bottomSheetController.dispose();
       _debounce?.cancel();
       // DeckProvider 클리어
       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
@@ -329,29 +330,47 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   bool _overlayRemoved = false;
   
   // 하단 시트 상태 관리
-  double _bottomSheetHeight = 0.08; // 8% 높이로 시작
+  final DraggableScrollableController _bottomSheetController = DraggableScrollableController();
+  double _currentBottomSheetSize = 0.08;
   bool _isBottomSheetExpanded = false;
   
   void _toggleBottomSheet() {
+    if (_currentBottomSheetSize <= 0.15) {
+      // 최소 상태에서 중간으로
+      _bottomSheetController.animateTo(
+        0.4,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    } else if (_currentBottomSheetSize <= 0.6) {
+      // 중간 상태에서 최대로
+      _bottomSheetController.animateTo(
+        0.95,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      // 최대 상태에서 최소로
+      _bottomSheetController.animateTo(
+        0.08,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+  }
+  
+  void _onBottomSheetChanged(double size) {
     setState(() {
-      if (_bottomSheetHeight == 0.08) {
-        _bottomSheetHeight = 0.4; // 40%로 확장
-        _isBottomSheetExpanded = false;
-      } else if (_bottomSheetHeight == 0.4) {
-        _bottomSheetHeight = 0.95; // 95%로 최대 확장 (거의 전체 화면)
-        _isBottomSheetExpanded = true;
-      } else {
-        _bottomSheetHeight = 0.08; // 최소로 축소
-        _isBottomSheetExpanded = false;
-      }
-      
-      // 오버레이 상태 업데이트
-      if (_bottomSheetHeight > 0.1) {
-        _cardOverlayService.updatePanelStatus(true);
-      } else {
-        _cardOverlayService.updatePanelStatus(false);
-      }
+      _currentBottomSheetSize = size;
+      _isBottomSheetExpanded = size > 0.8;
     });
+    
+    // 오버레이 상태 업데이트
+    if (size > 0.15) {
+      _cardOverlayService.updatePanelStatus(true);
+    } else {
+      _cardOverlayService.updatePanelStatus(false);
+    }
   }
 
   // 덱 액션 다이얼로그 표시
@@ -434,233 +453,249 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-                return Scaffold(
+                        return Scaffold(
           backgroundColor: Colors.grey[50],
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80), // 검색바 높이
-            child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.all(SizeService.paddingSize(context)),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+          body: Stack(
+            children: [
+              // 메인 컨텐츠 영역
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: constraints.maxHeight * _currentBottomSheetSize, // 바텀시트 현재 크기만큼 공간 확보
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                    // 검색바 영역
+                    Container(
+                      padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CardSearchBar(
+                        notes: notes,
+                        searchParameter: searchParameter,
+                        onSearch: initSearch,
+                        viewMode: viewMode,
+                        onViewModeChanged: onViewModeChanged,
+                        updateSearchParameter: updateSearchParameter,
+                      ),
+                    ),
+                    
+                    // 카드 목록 영역
+                    Expanded(
+                                              child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: SizeService.paddingSize(context),
+                          ),
+                        child: !isSearchLoading
+                            ? (viewMode == 'grid'
+                                ? CardScrollGridView(
+                                    cards: cards,
+                                    rowNumber: 6,
+                                    loadMoreCards: loadMoreCard,
+                                    cardPressEvent: addCardByDeck,
+                                    totalPages: totalPages,
+                                    currentPage: currentPage,
+                                    searchWithParameter: searchWithParameter,
+                                  )
+                                : CardScrollListView(
+                                    cards: cards,
+                                    loadMoreCards: loadMoreCard,
+                                    cardPressEvent: addCardByDeck,
+                                    totalPages: totalPages,
+                                    currentPage: currentPage,
+                                    searchWithParameter: searchWithParameter,
+                                  ))
+                            : viewMode == 'grid'
+                                ? CardGridSkeletonLoading(
+                                    crossAxisCount: 6,
+                                    itemCount: 24,
+                                  )
+                                : ListView.builder(
+                                    itemCount: 10,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Row(
+                                          children: [
+                                            CardSkeletonLoading(width: 80),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  SkeletonLoading(
+                                                    width: double.infinity,
+                                                    height: 24,
+                                                    borderRadius: 4,
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  SkeletonLoading(
+                                                    width: 200,
+                                                    height: 16,
+                                                    borderRadius: 4,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                      ),
                     ),
                   ],
                 ),
-                                child: CardSearchBar(
-                                  notes: notes,
-                                  searchParameter: searchParameter,
-                                  onSearch: initSearch,
-                                  viewMode: viewMode,
-                                  onViewModeChanged: onViewModeChanged,
-                                  updateSearchParameter: updateSearchParameter,
                 ),
               ),
-            ),
-          ),
-          body: Stack(
-            children: [
-              // 배경 카드 목록 (전체 화면 활용)
-              Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: SizeService.paddingSize(context),
-                    right: SizeService.paddingSize(context),
-                    bottom: MediaQuery.of(context).size.height * 0.08, // 하단 시트 최소 높이만큼 마진
-                  ),
-                                child: !isSearchLoading
-                                    ? (viewMode == 'grid'
-                                        ? CardScrollGridView(
-                                            cards: cards,
-                                            rowNumber: 6,
-                                            loadMoreCards: loadMoreCard,
-                                            cardPressEvent: addCardByDeck,
-                                            totalPages: totalPages,
-                                            currentPage: currentPage,
-                                            searchWithParameter: searchWithParameter,
-                                          )
-                                        : CardScrollListView(
-                                            cards: cards,
-                                            loadMoreCards: loadMoreCard,
-                                            cardPressEvent: addCardByDeck,
-                                            totalPages: totalPages,
-                                            currentPage: currentPage,
-                                            searchWithParameter: searchWithParameter,
-                                          ))
-                      : viewMode == 'grid'
-                                            ? CardGridSkeletonLoading(
-                                                crossAxisCount: 6,
-                                                itemCount: 24,
-                                              )
-                                            : ListView.builder(
-                                                itemCount: 10,
-                                                itemBuilder: (context, index) {
-                                                  return Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                    child: Row(
-                                                      children: [
-                                      CardSkeletonLoading(width: 80),
-                                                        const SizedBox(width: 12),
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              SkeletonLoading(
-                                                                width: double.infinity,
-                                                                height: 24,
-                                                                borderRadius: 4,
-                                                              ),
-                                                              const SizedBox(height: 8),
-                                                              SkeletonLoading(
-                                                                width: 200,
-                                                                height: 16,
-                                                                borderRadius: 4,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                ),
-              ),
-              // 하단 시트 (애니메이션 컨테이너 방식) 
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOutCubic,
-                  height: MediaQuery.of(context).size.height * _bottomSheetHeight,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 15,
-                        offset: Offset(0, -5),
+              // DraggableScrollableSheet으로 자연스러운 바텀시트 구현
+              DraggableScrollableSheet(
+                controller: _bottomSheetController,
+                initialChildSize: 0.08,
+                minChildSize: 0.08,
+                maxChildSize: 1.0,
+                snap: false,
+                builder: (context, scrollController) {
+                  return NotificationListener<DraggableScrollableNotification>(
+                    onNotification: (notification) {
+                      _onBottomSheetChanged(notification.extent);
+                      return true;
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 15,
+                            offset: Offset(0, -5),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // 드래그 가능한 헤더 영역 (탭으로 토글)
-                      GestureDetector(
-                        onTap: _toggleBottomSheet,
-                                                 onVerticalDragUpdate: (details) {
-                           // 드래그 제스처로도 조작 가능
-                           if (details.delta.dy < -5) {
-                             // 위로 드래그 시 확장
-                             if (_bottomSheetHeight < 0.9) {
-                               _toggleBottomSheet();
-                             }
-                           } else if (details.delta.dy > 5) {
-                             // 아래로 드래그 시 축소
-                             if (_bottomSheetHeight > 0.1) {
-                               _toggleBottomSheet();
-                             }
-                           }
-                         },
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          color: Colors.transparent,
-              child: Column(
-                children: [
-                              // 드래그 핸들
-                              Container(
-                                width: 40,
-                                height: 4,
+                                            child: CustomScrollView(
+                        controller: scrollController,
+                        physics: ClampingScrollPhysics(),
+                        slivers: [
+                          // 고정된 헤더 영역 (항상 표시)
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: _BottomSheetHeaderDelegate(
+                              minHeight: 80,
+                              maxHeight: 80,
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(vertical: 16),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[400],
-                                  borderRadius: BorderRadius.circular(2),
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                                 ),
-                              ),
-                              SizedBox(height: 8),
-                              
-                              // 덱 카운트 요약 (항상 표시)
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                child: Column(
                                   children: [
-                                    Text(
-                                      '총 ${(deck?.deckCount ?? 0) + (deck?.tamaCount ?? 0)}장', 
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Theme.of(context).primaryColor,
+                                    // 드래그 핸들 (더 크게)
+                                    Container(
+                                      width: 50,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[400],
+                                        borderRadius: BorderRadius.circular(3),
                                       ),
                                     ),
+                                    SizedBox(height: 12),
+                                    
+                                    // 덱 카운트 요약 (항상 표시)
                                     Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '메인덱: ${deck?.deckCount ?? 0}장',
-                                        style: TextStyle(fontSize: 12, color: Colors.blue[700]),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange[50],
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '타마고: ${deck?.tamaCount ?? 0}장',
-                                        style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '총 ${(deck?.deckCount ?? 0) + (deck?.tamaCount ?? 0)}장', 
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Theme.of(context).primaryColor,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue[50],
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              '메인덱: ${deck?.deckCount ?? 0}장',
+                                              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange[50],
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              '타마고: ${deck?.tamaCount ?? 0}장',
+                                              style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      
-                      if (_bottomSheetHeight > 0.08) ...[
-                        Divider(height: 1, color: Colors.grey[300]),
-                        
-                        // 덱 상세 정보 영역 (확장 시에만 표시)
-                        Expanded(
-                                                    child: deck != null 
-                            ? SingleChildScrollView(
-                                padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                child: DeckBuilderView(
-                                  deck: deck!,
-                                  cardPressEvent: removeCardByDeck,
-                                  import: deckUpdate,
-                                  searchWithParameter: searchWithParameter,
-                                  cardOverlayService: _cardOverlayService,
-                                ),
-                              )
-                            : Center(
-                                child: Text(
-                                  '덱이 비어있습니다',
-                                  style: TextStyle(
-                                    color: Colors.grey[500],
-                                    fontSize: 16,
+                          
+                          // 확장 가능한 컨텐츠 영역
+                          if (_currentBottomSheetSize > 0.15) ...[
+                            SliverToBoxAdapter(
+                              child: Divider(height: 1, color: Colors.grey[300]),
+                            ),
+                            
+                            // 덱 상세 정보 영역
+                            SliverToBoxAdapter(
+                              child: deck != null 
+                                ? Padding(
+                                    padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                    child: DeckBuilderView(
+                                      deck: deck!,
+                                      cardPressEvent: removeCardByDeck,
+                                      import: deckUpdate,
+                                      searchWithParameter: searchWithParameter,
+                                      cardOverlayService: _cardOverlayService,
+                                    ),
+                                  )
+                                : Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(50),
+                                      child: Text(
+                                        '덱이 비어있습니다',
+                                        style: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                        ),
-                      ],
-                ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          ),
             ],
           ),
           
@@ -696,13 +731,13 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 mini: true,
                 onPressed: () => _toggleScroll(),
                 child: Icon(
-                  _bottomSheetHeight > 0.8 
+                  _currentBottomSheetSize > 0.8 
                     ? Icons.expand_less 
                     : Icons.expand_more, 
                   size: 20
                 ),
                 backgroundColor: Colors.blue,
-                tooltip: '덱 정보 ${_bottomSheetHeight > 0.8 ? "축소" : "확장"}',
+                tooltip: '덱 정보 ${_currentBottomSheetSize > 0.8 ? "축소" : "확장"}',
               ),
             ],
           ),
@@ -914,5 +949,36 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         ),
       );
     }
+  }
+}
+
+// SliverPersistentHeader를 위한 헤더 델리게이트
+class _BottomSheetHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  _BottomSheetHeaderDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_BottomSheetHeaderDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }
