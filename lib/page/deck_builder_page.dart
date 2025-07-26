@@ -338,7 +338,11 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   bool _isBottomSheetExpanded = false;
   
   void _toggleBottomSheet() {
-    if (_currentBottomSheetSize <= 0.15) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final minSize = _calculateMinBottomSheetSize(screenHeight);
+    final expandThreshold = minSize * 2; // 최소 크기의 2배를 확장 임계값으로
+    
+    if (_currentBottomSheetSize <= expandThreshold) {
       // 최소 상태에서 중간으로
       _bottomSheetController.animateTo(
         0.4,
@@ -355,7 +359,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     } else {
       // 최대 상태에서 최소로
       _bottomSheetController.animateTo(
-        0.08,
+        minSize,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic,
       );
@@ -368,12 +372,28 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       _isBottomSheetExpanded = size > 0.8;
     });
     
-    // 오버레이 상태 업데이트
-    if (size > 0.15) {
+    // 오버레이 상태 업데이트 (동적 임계값 사용)
+    final screenHeight = MediaQuery.of(context).size.height;
+    final minSize = _calculateMinBottomSheetSize(screenHeight);
+    final overlayThreshold = minSize * 1.5; // 최소 크기의 1.5배를 오버레이 임계값으로
+    
+    if (size > overlayThreshold) {
       _cardOverlayService.updatePanelStatus(true);
     } else {
       _cardOverlayService.updatePanelStatus(false);
     }
+  }
+
+  // 바텀시트 최소 크기 계산 (헤더가 완전히 보이도록)
+  double _calculateMinBottomSheetSize(double screenHeight) {
+    const double headerHeight = 80.0; // 헤더 고정 높이
+    const double minRatio = 0.08; // 최소 8%
+    const double maxRatio = 0.15; // 최대 15%
+    
+    double calculatedRatio = headerHeight / screenHeight;
+    
+    // 최소값과 최대값 사이로 제한
+    return calculatedRatio.clamp(minRatio, maxRatio);
   }
 
   // 덱 상세보기 모달 표시
@@ -794,13 +814,13 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 ),
                 ),
               ),
-              // DraggableScrollableSheet으로 자연스러운 바텀시트 구현
-              DraggableScrollableSheet(
-                controller: _bottomSheetController,
-                initialChildSize: 0.08,
-                minChildSize: 0.08,
-                maxChildSize: 1.0,
-                snap: false,
+                    // DraggableScrollableSheet으로 자연스러운 바텀시트 구현
+      DraggableScrollableSheet(
+        controller: _bottomSheetController,
+        initialChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
+        minChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
+        maxChildSize: 1.0,
+        snap: false,
                 builder: (context, scrollController) {
                   return NotificationListener<DraggableScrollableNotification>(
                     onNotification: (notification) {
@@ -855,48 +875,40 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            '총 ${(deck?.deckCount ?? 0) + (deck?.tamaCount ?? 0)}장', 
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Theme.of(context).primaryColor,
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue[50],
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              '메인: ${deck?.deckCount ?? 0}장',
-                                              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
-                                            ),
-                                          ),
-                                                                                  Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.orange[50],
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Text(
-                                                '디지타마: ${deck?.tamaCount ?? 0}장',
-                                                style: TextStyle(fontSize: 12, color: Colors.orange[700]),
-                                              ),
-                                            ),
-                                            // 저장 경고 아이콘
-                                            if (deck != null && !deck!.isSave) ...[
-                                              SizedBox(width: 8),
-                                              GestureDetector(
-                                                onTap: () => ToastOverlay.show(
-                                                  context, 
-                                                  '저장되지 않은 변경사항이 있습니다.', 
-                                                  type: ToastType.warning
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue[50],
+                                                  borderRadius: BorderRadius.circular(12),
                                                 ),
+                                                child: Text(
+                                                  '메인: ${deck?.deckCount ?? 0}장',
+                                                  style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                                                ),
+                                              ),
+                                              SizedBox(width: 8),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.orange[50],
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                child: Text(
+                                                  '디지타마: ${deck?.tamaCount ?? 0}장',
+                                                  style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                                                ),
+                                              ),
+                                              // 저장 경고 아이콘
+                                              if (deck != null && !deck!.isSave) ...[
+                                                SizedBox(width: 8),
+                                                GestureDetector(
+                                                  onTap: () => ToastOverlay.show(
+                                                    context, 
+                                                    '저장되지 않은 변경사항이 있습니다.', 
+                                                    type: ToastType.warning
+                                                  ),
                                                   child: Container(
                                                     padding: EdgeInsets.all(4),
                                                     decoration: BoxDecoration(
@@ -910,10 +922,52 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                                       size: 16,
                                                     ),
                                                   ),
-                                              ),
+                                                ),
+                                              ],
                                             ],
-                                          ],
-                                        ),
+                                          ),
+                                          
+                                          // 메뉴 버튼
+                                          Tooltip(
+                                            message: '덱 메뉴',
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                borderRadius: BorderRadius.circular(12),
+                                                onTap: () => _showDeckMenu(context),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(
+                                                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.menu,
+                                                        color: Theme.of(context).primaryColor,
+                                                        size: 16,
+                                                      ),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        '메뉴',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Theme.of(context).primaryColor,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -924,7 +978,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           ),
                           
                           // 확장 가능한 컨텐츠 영역
-                          if (_currentBottomSheetSize > 0.15) ...[
+                          if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5) ...[
                             SliverToBoxAdapter(
                               child: Divider(height: 1, color: Colors.grey[300]),
                             ),
@@ -969,15 +1023,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               ),
             ],
           ),
-          
-                    // 통합 플로팅 액션버튼
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _showDeckMenu(context),
-            child: Icon(Icons.menu),
-            backgroundColor: Theme.of(context).primaryColor,
-            tooltip: '덱 메뉴',
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         );
       });
     } else {

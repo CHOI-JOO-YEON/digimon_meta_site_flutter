@@ -1,5 +1,6 @@
 import 'package:digimon_meta_site_flutter/widget/deck/deck_count_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/tab_tooltip.dart';
+import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/deck-build.dart';
@@ -48,6 +49,14 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _showUnsavedWarning(BuildContext context) {
+    ToastOverlay.show(
+      context, 
+      '덱에 저장되지 않은 변경사항이 있습니다. 플로팅 버튼에서 저장하세요.', 
+      type: ToastType.warning
+    );
   }
 
   @override
@@ -110,46 +119,48 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                           onChanged: (v) {
                             widget.deck.deckName = v;
                           },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: isMobile ? 6 : (isSmallHeight ? 8 : 12),
-                              horizontal: isMobile ? 8 : (isSmallHeight ? 12 : 16),
-                            ),
-                            border: InputBorder.none,
-                            hintText: isMobile ? '덱 이름' : '덱 이름을 입력하세요', // 모바일에서 짧은 힌트
-                            hintStyle: TextStyle(
-                              color: Colors.grey.shade400,
-                              fontWeight: FontWeight.normal,
-                              fontSize: isMobile 
-                                ? SizeService.bodyFontSize(context) * 0.75
-                                : null,
-                            ),
-                            prefixIcon: Container(
-                              margin: EdgeInsets.all(isMobile ? 6 : 8),
-                              padding: EdgeInsets.all(isMobile ? 4 : 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2563EB).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
+                                                      textAlignVertical: TextAlignVertical.center,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: isMobile ? 6 : (isSmallHeight ? 8 : 12),
+                                horizontal: isMobile ? 8 : (isSmallHeight ? 12 : 16),
                               ),
-                              child: Icon(
+                              border: InputBorder.none,
+                              hintText: isMobile ? '덱 이름' : '덱 이름을 입력하세요', // 모바일에서 짧은 힌트
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontWeight: FontWeight.normal,
+                                fontSize: isMobile 
+                                  ? SizeService.bodyFontSize(context) * 0.75
+                                  : null,
+                              ),
+                              prefixIcon: Icon(
                                 Icons.edit_outlined,
-                                size: isMobile ? 12 : 16,
-                                color: const Color(0xFF2563EB),
+                                size: isMobile ? 14 : 16,
+                                color: Colors.grey[500],
                               ),
                             ),
-                          ),
                         ),
                       )),
                   Expanded(
                       flex: isVerySmall ? 1 : 2, // 매우 작은 화면에서 경고 아이콘 영역 축소
                       child: widget.deck.isSave
                           ? Container()
-                          : TabTooltip(
-                              message: '변경 사항이 저장되지 않았습니다.',
-                              child: Icon(
-                                Icons.warning, 
-                                color: Colors.amber,
-                                size: isMobile ? 14 : (isSmallHeight ? 16 : 20),
+                          : GestureDetector(
+                              onTap: () => _showUnsavedWarning(context),
+                              child: Container(
+                                margin: EdgeInsets.only(left: 4),
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.amber[200]!),
+                                ),
+                                child: Icon(
+                                  Icons.warning_rounded,
+                                  color: Colors.amber[600],
+                                  size: isMobile ? 14 : (isSmallHeight ? 16 : 18),
+                                ),
                               ),
                             )),
                 ],

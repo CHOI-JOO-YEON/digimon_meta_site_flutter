@@ -178,6 +178,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                       : SizeService.paddingSize(context)
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch, // 높이 맞춤
                     children: [
                       // 덱 이름 입력 영역
                       Expanded(
@@ -213,9 +214,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                             onChanged: (v) {
                               widget.deck.deckName = v;
                             },
+                            textAlignVertical: TextAlignVertical.center,
+                            expands: true,
+                            maxLines: null,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
-                                vertical: 6,
+                                vertical: 0,
                                 horizontal: 10,
                               ),
                               border: InputBorder.none,
@@ -225,18 +229,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: SizeService.bodyFontSize(context) * 0.75,
                               ),
-                              prefixIcon: Container(
-                                margin: EdgeInsets.all(4),
-                                padding: EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF2563EB).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Icon(
-                                  Icons.edit_outlined,
-                                  size: 12,
-                                  color: const Color(0xFF2563EB),
-                                ),
+                              prefixIcon: Icon(
+                                Icons.edit_outlined,
+                                size: 16,
+                                color: Colors.grey[500],
                               ),
                             ),
                           ),
@@ -246,7 +242,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                       // 덱 통계 영역
                       Expanded(
                         flex: 3,
-                        child: DeckStat(deck: widget.deck),
+                        child: Container(
+                          height: double.infinity, // 부모 높이에 맞춤
+                          child: DeckStat(deck: widget.deck),
+                        ),
                       ),
                     ],
                   ),
