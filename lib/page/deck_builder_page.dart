@@ -756,7 +756,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             ? (viewMode == 'grid'
                                 ? CardScrollGridView(
                                     cards: cards,
-                                    rowNumber: 6,
+                                    rowNumber: 4,
                                     loadMoreCards: loadMoreCard,
                                     cardPressEvent: addCardByDeck,
                                     totalPages: totalPages,
@@ -1162,9 +1162,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               ? (viewMode == 'grid'
                                   ? CardScrollGridView(
                                       cards: cards,
-                                      rowNumber: isMobileDesktop 
-                                        ? 3 // 모바일에서 행 수 더 줄임
-                                        : (isTablet ? 4 : (isSmallHeight ? 4 : 6)),
+                                      rowNumber: 6,
                                       loadMoreCards: loadMoreCard,
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,

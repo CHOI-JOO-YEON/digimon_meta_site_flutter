@@ -1697,164 +1697,260 @@ class _CardSearchBarState extends State<CardSearchBar> {
     final isMobile = screenWidth < 768; // 모바일 화면 감지
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 
-    return Row(
-      children: [
-        Expanded(
-            flex: isMobile ? 6 : 5, // 모바일에서 검색 필드에 더 많은 공간 할당
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(isMobile ? 6 : 8),
-                border: Border.all(
-                  color: Colors.grey.shade300, 
-                  width: isMobile ? 0.5 : 1,
-                ),
-              ),
-              child: TextField(
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 8 : 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            Colors.grey.shade50,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // 검색 텍스트 필드
+                     Expanded(
+             flex: isMobile ? 6 : 5,
+             child: Container(
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                 boxShadow: [
+                   BoxShadow(
+                     color: Colors.black.withOpacity(0.02),
+                     blurRadius: 4,
+                     offset: const Offset(0, 1),
+                   ),
+                 ],
+               ),
+               child: TextField(
                 controller: _searchStringEditingController,
                 onChanged: (value) {
                   widget.searchParameter.searchString = value;
+                  setState(() {}); // 테두리 색상 업데이트를 위해
                 },
                 onSubmitted: (value) {
                   widget.updateSearchParameter();
                 },
-                decoration: InputDecoration(
-                  hintText: isMobile ? '카드 검색' : '카드명/효과/번호', // 모바일에서 짧은 힌트 텍스트
-                  hintStyle: TextStyle(
-                    color: Theme.of(context).primaryColor.withOpacity(0.6),
-                    fontSize: isMobile ? 11 : (isSmallHeight ? 12 : null),
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    size: isMobile ? 14 : (isSmallHeight ? 16 : 20),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  suffixIcon: _searchStringEditingController?.text.isNotEmpty ?? false
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          size: isMobile ? 12 : (isSmallHeight ? 14 : 18),
-                          color: Colors.grey.shade600,
-                        ),
-                        onPressed: () {
-                          _searchStringEditingController?.clear();
-                          widget.searchParameter.searchString = '';
-                        },
-                      )
-                    : null,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: isMobile ? 6 : (isSmallHeight ? 8 : 12),
-                    horizontal: isMobile ? 6 : (isSmallHeight ? 8 : 12),
-                  ),
-                ),
+                                 decoration: InputDecoration(
+                   hintText: isMobile ? '카드 검색' : '카드명/효과/번호',
+                   hintStyle: TextStyle(
+                     color: Colors.grey.shade500,
+                     fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
+                     fontWeight: FontWeight.w400,
+                   ),
+                   prefixIcon: Container(
+                     margin: const EdgeInsets.all(8),
+                     decoration: BoxDecoration(
+                       color: Theme.of(context).primaryColor.withOpacity(0.1),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: Icon(
+                       Icons.search_rounded,
+                       size: isMobile ? 16 : (isSmallHeight ? 18 : 20),
+                       color: Theme.of(context).primaryColor,
+                     ),
+                   ),
+                   suffixIcon: _searchStringEditingController?.text.isNotEmpty == true
+                     ? Container(
+                         margin: const EdgeInsets.all(8),
+                         child: Material(
+                           color: Colors.grey.shade100,
+                           borderRadius: BorderRadius.circular(6),
+                           child: InkWell(
+                             borderRadius: BorderRadius.circular(6),
+                             onTap: () {
+                               _searchStringEditingController?.clear();
+                               widget.searchParameter.searchString = '';
+                               setState(() {});
+                             },
+                             child: Container(
+                               padding: const EdgeInsets.all(4),
+                               child: Icon(
+                                 Icons.clear_rounded,
+                                 size: isMobile ? 14 : (isSmallHeight ? 16 : 18),
+                                 color: Colors.grey.shade600,
+                               ),
+                             ),
+                           ),
+                         ),
+                       )
+                     : null,
+                   enabledBorder: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                     borderSide: BorderSide(
+                       color: Colors.grey.shade300,
+                       width: 1.5,
+                     ),
+                   ),
+                   focusedBorder: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                     borderSide: BorderSide(
+                       color: Theme.of(context).primaryColor.withOpacity(0.7),
+                       width: 2,
+                     ),
+                   ),
+                   border: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                     borderSide: BorderSide(
+                       color: Colors.grey.shade300,
+                       width: 1.5,
+                     ),
+                   ),
+                   contentPadding: EdgeInsets.symmetric(
+                     vertical: isMobile ? 12 : (isSmallHeight ? 14 : 16),
+                     horizontal: isMobile ? 8 : (isSmallHeight ? 10 : 12),
+                   ),
+                 ),
                 style: TextStyle(
-                  fontSize: isMobile ? 11 : (isSmallHeight ? 12 : null),
-                ),
-              ),
-            )),
-        // 검색 버튼
-        if (!isVerySmall) // 매우 작은 화면에서는 검색 버튼 숨김 (Enter로 검색 가능)
-          Expanded(
-              flex: 1,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    widget.updateSearchParameter();
-                  },
-                  icon: Icon(
-                    Icons.search, 
-                    size: isMobile ? 14 : (isSmallHeight ? 16 : 20),
-                  ),
-                  padding: EdgeInsets.zero,
-                  tooltip: '검색',
-                  constraints: BoxConstraints(
-                    minWidth: isMobile ? 30 : 40,
-                    minHeight: isMobile ? 30 : 40,
-                  ),
-                ),
-              )),
-        // 필터 버튼
-        Expanded(
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
-              ),
-              child: IconButton(
-                  padding: EdgeInsets.zero,
-                  iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
-                  onPressed: () {
-                    _showFilterDialog();
-                  },
-                  tooltip: '필터',
-                  icon: const Icon(Icons.tune), // 더 명확한 필터 아이콘
-                  constraints: BoxConstraints(
-                    minWidth: isMobile ? 30 : 40,
-                    minHeight: isMobile ? 30 : 40,
-                  ),
-              ),
-            )),
-        // 초기화 버튼 (모바일에서는 조건부 표시)
-        if (!isVerySmall)
-          Expanded(
-              flex: 1,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
-                ),
-                child: IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
-                    tooltip: '초기화',
-                    onPressed: () {
-                      resetSearchCondition();
-                      ToastOverlay.show(
-                        context,
-                        '검색 조건이 초기화되었습니다.',
-                        type: ToastType.warning
-                      );
-                    },
-                    icon: const Icon(Icons.refresh),
-                    constraints: BoxConstraints(
-                      minWidth: isMobile ? 30 : 40,
-                      minHeight: isMobile ? 30 : 40,
-                    ),
-                ),
-              )),
-        // 뷰 모드 전환 버튼
-        if (widget.viewMode != null)
-          Expanded(
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: isMobile ? 1 : (isSmallHeight ? 2 : 4),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                iconSize: isMobile ? 14 : (isSmallHeight ? 16 : 20),
-                onPressed: () {
-                  if (widget.onViewModeChanged != null) {
-                    widget.onViewModeChanged!(
-                      widget.viewMode == 'grid' ? 'list' : 'grid',
-                    );
-                  }
-                },
-                tooltip: widget.viewMode == 'grid' ? '리스트 뷰' : '그리드 뷰',
-                icon: Icon(
-                  widget.viewMode == 'grid' ? Icons.view_list : Icons.grid_view,
-                ),
-                constraints: BoxConstraints(
-                  minWidth: isMobile ? 30 : 40,
-                  minHeight: isMobile ? 30 : 40,
+                  fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade800,
                 ),
               ),
             ),
           ),
-      ],
+          
+          SizedBox(width: isMobile ? 6 : 8),
+          
+          // 검색 버튼
+          if (!isVerySmall)
+            _buildActionButton(
+              icon: Icons.search_rounded,
+              tooltip: '검색',
+              onPressed: () {
+                widget.updateSearchParameter();
+              },
+              isMobile: isMobile,
+              isSmallHeight: isSmallHeight,
+              color: Theme.of(context).primaryColor,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            ),
+          
+          if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
+          
+          // 필터 버튼
+          _buildActionButton(
+            icon: Icons.tune_rounded,
+            tooltip: '상세 필터',
+            onPressed: () {
+              _showFilterDialog();
+            },
+            isMobile: isMobile,
+            isSmallHeight: isSmallHeight,
+            color: Colors.orange.shade600,
+            backgroundColor: Colors.orange.shade50,
+          ),
+          
+          SizedBox(width: isMobile ? 4 : 6),
+          
+          // 초기화 버튼
+          if (!isVerySmall)
+            _buildActionButton(
+              icon: Icons.refresh_rounded,
+              tooltip: '초기화',
+              onPressed: () {
+                resetSearchCondition();
+                ToastOverlay.show(
+                  context,
+                  '검색 조건이 초기화되었습니다.',
+                  type: ToastType.warning
+                );
+              },
+              isMobile: isMobile,
+              isSmallHeight: isSmallHeight,
+              color: Colors.red.shade600,
+              backgroundColor: Colors.red.shade50,
+            ),
+          
+          if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
+          
+          // 뷰 모드 전환 버튼
+          if (widget.viewMode != null)
+            _buildActionButton(
+              icon: widget.viewMode == 'grid' 
+                ? Icons.view_list_rounded 
+                : Icons.grid_view_rounded,
+              tooltip: widget.viewMode == 'grid' ? '리스트 뷰' : '그리드 뷰',
+              onPressed: () {
+                if (widget.onViewModeChanged != null) {
+                  widget.onViewModeChanged!(
+                    widget.viewMode == 'grid' ? 'list' : 'grid',
+                  );
+                }
+              },
+              isMobile: isMobile,
+              isSmallHeight: isSmallHeight,
+              color: Colors.purple.shade600,
+              backgroundColor: Colors.purple.shade50,
+            ),
+        ],
+      ),
+    );
+  }
+
+  // 액션 버튼을 생성하는 헬퍼 메서드
+  Widget _buildActionButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+    required bool isMobile,
+    required bool isSmallHeight,
+    required Color color,
+    required Color backgroundColor,
+  }) {
+    final buttonSize = isMobile ? 36.0 : (isSmallHeight ? 40.0 : 44.0);
+    final iconSize = isMobile ? 16.0 : (isSmallHeight ? 18.0 : 20.0);
+    
+    return Container(
+      width: buttonSize,
+      height: buttonSize,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
+            ),
+            child: Tooltip(
+              message: tooltip,
+              child: Icon(
+                icon,
+                size: iconSize,
+                color: color,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
