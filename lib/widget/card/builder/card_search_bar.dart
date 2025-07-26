@@ -215,6 +215,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
   NoteDto all = NoteDto(noteId: null, name: '모든 카드');
   bool _isFeaturesSectionExpanded = false;
   bool _isDetailedSearchSectionExpanded = false;
+  int _selectedFeatureTabIndex = 0;
 
   @override
   void initState() {
@@ -251,19 +252,19 @@ class _CardSearchBarState extends State<CardSearchBar> {
   String getKorColorStringByEn(String s) {
     switch (s) {
       case 'RED':
-        return '적';
+        return '레드';
       case 'BLUE':
-        return '청';
+        return '블루';
       case 'YELLOW':
-        return '황';
+        return '옐로';
       case 'GREEN':
-        return '녹';
+        return '그린';
       case 'BLACK':
-        return '흑';
+        return '블랙';
       case 'PURPLE':
-        return '자';
+        return '퍼플';
       case 'WHITE':
-        return '백';
+        return '화이트';
       default:
         return "에러";
     }
@@ -272,19 +273,24 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
   void _showFilterDialog() {
     CardOverlayService().removeAllOverlays();
-    Set<String> _searchResults = CardDataService().searchTypes("");
-    Set<String> _selectedTypes = widget.searchParameter.types;
     
-    // Add form and attribute variables
-    Set<String> _formSearchResults = CardDataService().searchForms("");
-    Set<String> _selectedForms = widget.searchParameter.forms;
-    int formOperation = widget.searchParameter.typeOperation;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        // 검색 결과 변수들을 StatefulBuilder 내부로 이동
+        Set<String> searchResults = CardDataService().searchTypes("");
+        Set<String> formSearchResults = CardDataService().searchForms("");
+        Set<String> attributeSearchResults = CardDataService().searchAttributes("");
+        
+        // Set 복사본을 생성하여 원본과 분리
+        Set<String> selectedTypes = Set.from(widget.searchParameter.types);
+        Set<String> selectedForms = Set.from(widget.searchParameter.forms);
+        Set<String> selectedAttributes = Set.from(widget.searchParameter.attributes);
+        
+        int formOperation = widget.searchParameter.formOperation;
+        int attributeOperation = widget.searchParameter.attributeOperation;
     
-    Set<String> _attributeSearchResults = CardDataService().searchAttributes("");
-    Set<String> _selectedAttributes = widget.searchParameter.attributes;
-    int attributeOperation = widget.searchParameter.typeOperation;
-    
-    // Add detailed search controllers
     TextEditingController _cardNameSearchController = TextEditingController(
       text: widget.searchParameter.cardNameSearch ?? ''
     );
@@ -348,228 +354,195 @@ class _CardSearchBarState extends State<CardSearchBar> {
     _dialogSearchStringEditingController =
         TextEditingController(text: _searchStringEditingController?.value.text);
     _trieSearchController = TextEditingController();
-    TextEditingController _formSearchController = TextEditingController();
-    TextEditingController _attributeSearchController = TextEditingController();
+    TextEditingController formSearchController = TextEditingController();
+    TextEditingController attributeSearchController = TextEditingController();
     int parallelOption = widget.searchParameter.parallelOption;
     bool enCardInclude = widget.searchParameter.isEnglishCardInclude;
     int typeOperation = widget.searchParameter.typeOperation;
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    
+    return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              titlePadding: const EdgeInsets.all(16),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Row(
-                children: [
-                  Icon(Icons.filter_list, size: 24, color: Theme.of(context).primaryColor),
-                  const SizedBox(width: 8),
-                  const Text("세부 검색 조건"),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: EdgeInsets.all(isPortrait ? 16 : 24),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: isPortrait ? double.infinity : 600,
+                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
                   ),
                 ],
               ),
-              content: SizedBox(
-                width: isPortrait
-                    ? MediaQuery.sizeOf(context).width * 0.8
-                    : MediaQuery.sizeOf(context).width * 0.4,
-                child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min, 
                     children: [
-                      TextField(
-                        controller: _dialogSearchStringEditingController,
-                        decoration: InputDecoration(
-                          labelText: '통합 검색어',
-                          labelStyle: TextStyle(
-                            color: Theme.of(context).primaryColor.withOpacity(0.7),
-                          ),
-                          hintText: '이름/효과/번호',
-                          hintStyle: TextStyle(
-                            color: Theme.of(context).primaryColor.withOpacity(0.6),
-                          ),
-                          prefixIcon: Icon(Icons.search, size: 20, color: Theme.of(context).primaryColor),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                          isDense: true,
+                    // 헤더
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Theme.of(context).primaryColor.withOpacity(0.1),
+                            Theme.of(context).primaryColor.withOpacity(0.05),
+                          ],
                         ),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                       ),
-                      const SizedBox(height: 16),
-                      
-                      // Detailed search section
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isDetailedSearchSectionExpanded = !_isDetailedSearchSectionExpanded;
-                          });
-                        },
-                        child: Center(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                _isDetailedSearchSectionExpanded 
-                                  ? Icons.keyboard_arrow_up 
-                                  : Icons.keyboard_arrow_down,
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.tune_rounded,
                                 color: Theme.of(context).primaryColor,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                '상세 검색',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                _isDetailedSearchSectionExpanded 
-                                  ? Icons.keyboard_arrow_up 
-                                  : Icons.keyboard_arrow_down,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ],
+                              size: 24,
+                            ),
                           ),
-                        ),
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: _isDetailedSearchSectionExpanded ? null : 0,
-                        curve: Curves.easeInOut,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: _isDetailedSearchSectionExpanded ? 1.0 : 0.0,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey.shade50,
-                                ),
+                          const SizedBox(width: 16),
+                          Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(height: 12),
-                                    TextField(
-                                      controller: _cardNameSearchController,
-                                      decoration: InputDecoration(
-                                        labelText: '카드명',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                          fontSize: 14,
-                                        ),
-                                        hintText: '@ 접두사로 정규표현식 사용',
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                          fontSize: 12,
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                        isDense: true,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: _cardNoSearchController,
-                                      decoration: InputDecoration(
-                                        labelText: '카드 번호',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                          fontSize: 14,
-                                        ),
-                                        hintText: '@ 접두사로 정규표현식 사용',
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                          fontSize: 12,
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                        isDense: true,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: _effectSearchController,
-                                      decoration: InputDecoration(
-                                        labelText: '상단 텍스트',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                          fontSize: 14,
-                                        ),
-                                        hintText: '@ 접두사로 정규표현식 사용',
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                          fontSize: 12,
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                        isDense: true,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: _sourceEffectSearchController,
-                                      decoration: InputDecoration(
-                                        labelText: '하단 텍스트',
-                                        labelStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                          fontSize: 14,
-                                        ),
-                                        hintText: '@ 접두사로 정규표현식 사용',
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                          fontSize: 12,
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                        isDense: true,
-                                      ),
+                                Text(
+                                  "세부 검색 조건",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 24),
+                              color: Colors.grey[600],
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // 검색어 입력
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 통합 검색어
+                            _buildSearchSection(
+                              title: "통합 검색",
+                              icon: Icons.search_rounded,
+                              child: TextField(
+                                controller: _dialogSearchStringEditingController,
+                                decoration: InputDecoration(
+                                  hintText: '카드명, 효과, 번호 등 통합 검색',
+                                  hintStyle: TextStyle(color: Colors.grey[500]),
+                                  prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).primaryColor),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(16),
+                                ),
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 상세 검색
+                            _buildExpandableSection(
+                              title: "상세 검색",
+                              icon: Icons.manage_search_rounded,
+                              isExpanded: _isDetailedSearchSectionExpanded,
+                              onToggle: () => setState(() => _isDetailedSearchSectionExpanded = !_isDetailedSearchSectionExpanded),
+                              child: Column(
+                                children: [
+                                  _buildDetailedSearchField(
+                                    controller: _cardNameSearchController,
+                                    label: "카드명",
+                                    hint: "@ 접두사로 정규표현식 사용 가능",
+                                    icon: Icons.badge_rounded,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildDetailedSearchField(
+                                    controller: _cardNoSearchController,
+                                    label: "카드 번호",
+                                    hint: "@ 접두사로 정규표현식 사용 가능",
+                                    icon: Icons.numbers_rounded,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildDetailedSearchField(
+                                    controller: _effectSearchController,
+                                    label: "상단 텍스트",
+                                    hint: "@ 접두사로 정규표현식 사용 가능",
+                                    icon: Icons.description_rounded,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildDetailedSearchField(
+                                    controller: _sourceEffectSearchController,
+                                    label: "하단 텍스트",
+                                    hint: "@ 접두사로 정규표현식 사용 가능",
+                                    icon: Icons.notes_rounded,
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 입수처
+                            _buildSearchSection(
+                              title: "입수처",
+                              icon: Icons.inventory_2_rounded,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey[200]!),
+                                ),
                         child: DropdownButton<NoteDto>(
                           value: selectedNote,
+                                  isExpanded: true,
+                                  underline: const SizedBox(),
+                                  icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey[600]),
                           hint: Text(
-                            selectedNote?.name ?? "입수처",
-                            overflow: TextOverflow.ellipsis,
+                                    selectedNote?.name ?? "입수처 선택",
+                                    style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500),
                           ),
                           items: dropDownMenuItems,
                           onChanged: (NoteDto? newValue) {
@@ -582,886 +555,486 @@ class _CardSearchBarState extends State<CardSearchBar> {
                           },
                         ),
                       ),
-                      const Text(
-                        'LV',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        spacing: 8.0, // 가로 간격
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 레벨
+                            _buildSearchSection(
+                              title: "레벨",
+                              icon: Icons.stairs_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                         children: selectedLvMap.keys.map((lv) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: selectedLvMap[lv] ?? false,
-                                onChanged: (bool? newValue) {
+                                  final isSelected = selectedLvMap[lv] ?? false;
+                                  return _buildFilterChip(
+                                    label: lv == 0 ? '−' : '$lv',
+                                    isSelected: isSelected,
+                                    onSelected: (selected) {
                                   setState(() {
-                                    selectedLvMap[lv] = newValue!;
+                                        selectedLvMap[lv] = selected;
                                   });
                                 },
-                              ),
-                              Text(lv == 0 ? '-' : '$lv'),
-                            ],
                           );
                         }).toList(),
                       ),
-                      const Divider(),
-                      //색 고르기
-                      const Text(
-                        '컬러',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        spacing: 8.0, // 가로 간격
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 컬러
+                            _buildSearchSection(
+                              title: "컬러",
+                              icon: Icons.palette_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                         children: selectedColorMap.keys.map((color) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: selectedColorMap[color] ?? false,
-                                onChanged: (bool? newValue) {
+                                  final isSelected = selectedColorMap[color] ?? false;
+                                  return _buildColorChip(
+                                    color: color,
+                                    label: getKorColorStringByEn(color),
+                                    isSelected: isSelected,
+                                    onSelected: (selected) {
                                   setState(() {
-                                    selectedColorMap[color] = newValue!;
+                                        selectedColorMap[color] = selected;
                                   });
                                 },
-                              ),
-                              Text(
-                                getKorColorStringByEn(color),
-                                style: TextStyle(
-                                    color: ColorService.getColorFromString(
-                                        color.toUpperCase())),
-                              ),
-                            ],
                           );
                         }).toList(),
                       ),
-                      //색 or/and
-                      const Divider(),
-                      //카드 타입 고르기
-                      const Text(
-                        '카드 타입',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        spacing: 8.0, // 가로 간격
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 카드 타입
+                            _buildSearchSection(
+                              title: "카드 타입",
+                              icon: Icons.category_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                         children: selectedCardTypeMap.keys.map((cardType) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: selectedCardTypeMap[cardType] ?? false,
-                                onChanged: (bool? newValue) {
+                                  final isSelected = selectedCardTypeMap[cardType] ?? false;
+                                  return _buildFilterChip(
+                                    label: getCardTypeByString(cardType),
+                                    isSelected: isSelected,
+                                    onSelected: (selected) {
                                   setState(() {
-                                    selectedCardTypeMap[cardType] = newValue!;
+                                        selectedCardTypeMap[cardType] = selected;
                                   });
                                 },
-                              ),
-                              Text(getCardTypeByString(cardType)),
-                            ],
                           );
                         }).toList(),
                       ),
-                      const Divider(),
-                      //레어도 고르기
-                      const Text(
-                        '레어도',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-
-                      Wrap(
-                        spacing: 8.0, // 가로 간격
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 레어도
+                            _buildSearchSection(
+                              title: "레어도",
+                              icon: Icons.diamond_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                         children: selectedRarityMap.keys.map((rarity) {
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: selectedRarityMap[rarity] ?? false,
-                                onChanged: (bool? newValue) {
+                                  final isSelected = selectedRarityMap[rarity] ?? false;
+                                  return _buildFilterChip(
+                                    label: rarity,
+                                    isSelected: isSelected,
+                                    onSelected: (selected) {
                                   setState(() {
-                                    selectedRarityMap[rarity] = newValue!;
+                                        selectedRarityMap[rarity] = selected;
                                   });
                                 },
-                              ),
-                              Text(rarity),
-                            ],
                           );
                         }).toList(),
                       ),
-                      const Divider(),
-                      const Text(
-                        '패럴렐 여부',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                          spacing: 8.0, // 가로 간격
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 패럴렐 여부
+                            _buildSearchSection(
+                              title: "패럴렐 여부",
+                              icon: Icons.auto_awesome_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                           children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: parallelOption == 0,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      parallelOption = 0;
-                                    });
-                                  },
-                                ),
-                                const Text('모두'),
-                              ],
+                                  _buildFilterChip(
+                                    label: "모두",
+                                    isSelected: parallelOption == 0,
+                                    onSelected: (selected) {
+                                      if (selected) setState(() => parallelOption = 0);
+                                    },
+                                  ),
+                                  _buildFilterChip(
+                                    label: "일반 카드만",
+                                    isSelected: parallelOption == 1,
+                                    onSelected: (selected) {
+                                      if (selected) setState(() => parallelOption = 1);
+                                    },
+                                  ),
+                                  _buildFilterChip(
+                                    label: "패럴렐 카드만",
+                                    isSelected: parallelOption == 2,
+                                    onSelected: (selected) {
+                                      if (selected) setState(() => parallelOption = 2);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: parallelOption == 1,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      parallelOption = 1;
-                                    });
-                                  },
-                                ),
-                                const Text('일반 카드만')
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: parallelOption == 2,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      parallelOption = 2;
-                                    });
-                                  },
-                                ),
-                                const Text('패럴렐 카드만'),
-                              ],
-                            )
-                          ]),
-                      const Divider(),
-
-                      const Text(
-                        '미발매 카드 포함 여부',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Wrap(
-                        spacing: 8.0, // 가로 간격
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 미발매 카드 포함 여부
+                            _buildSearchSection(
+                              title: "미발매 카드 포함",
+                              icon: Icons.new_releases_rounded,
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: !enCardInclude,
-                                onChanged: (value) {
-                                  setState(() {
-                                    enCardInclude = !value!;
-                                  });
-                                },
+                                  _buildFilterChip(
+                                    label: "한국 발매카드만",
+                                    isSelected: !enCardInclude,
+                                    onSelected: (selected) {
+                                      if (selected) setState(() => enCardInclude = false);
+                                    },
+                                  ),
+                                  _buildFilterChip(
+                                    label: "미발매 카드 포함",
+                                    isSelected: enCardInclude,
+                                    onSelected: (selected) {
+                                      if (selected) setState(() => enCardInclude = true);
+                                    },
+                                  ),
+                                ],
                               ),
-                              const Text('한국 발매카드만'),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                value: enCardInclude,
-                                onChanged: (value) {
-                                  setState(() {
-                                    enCardInclude = value!;
-                                  });
-                                },
-                              ),
-                              const Text('미발매 카드 포함')
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      //dp
-                      const Text(
-                        'DP',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      RangeSlider(
-                        values: currentDpRange,
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 수치 범위들
+                            _buildRangeSection(
+                              title: "DP",
+                              icon: Icons.flash_on_rounded,
+                              currentRange: currentDpRange,
                         min: 1000,
                         max: 17000,
                         divisions: 16,
-                        labels: RangeLabels(
-                          currentDpRange.start.round().toString(),
-                          currentDpRange.end.round().toString(),
-                        ),
-                        onChanged: (RangeValues values) {
-                          setState(() {
-                            currentDpRange = values;
-                          });
-                        },
-                      ),
-                      const Divider(),
-                      //play cost
-                      const Text(
-                        '등장/사용 코스트',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      RangeSlider(
-                        values: currentPlayCostRange,
+                              onChanged: (values) => setState(() => currentDpRange = values),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            _buildRangeSection(
+                              title: "등장/사용 코스트",
+                              icon: Icons.toll_rounded,
+                              currentRange: currentPlayCostRange,
                         min: 0,
                         max: 20,
                         divisions: 20,
-                        labels: RangeLabels(
-                          currentPlayCostRange.start.round().toString(),
-                          currentPlayCostRange.end.round().toString(),
-                        ),
-                        onChanged: (RangeValues values) {
-                          setState(() {
-                            currentPlayCostRange = values;
-                          });
-                        },
-                      ),
-                      const Divider(),
-
-                      //digivolve cost
-                      const Text(
-                        '진화 코스트',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      RangeSlider(
-                        values: currentDigivolutionCostRange,
+                              onChanged: (values) => setState(() => currentPlayCostRange = values),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            _buildRangeSection(
+                              title: "진화 코스트",
+                              icon: Icons.trending_up_rounded,
+                              currentRange: currentDigivolutionCostRange,
                         min: 0,
                         max: 8,
                         divisions: 8,
-                        labels: RangeLabels(
-                          currentDigivolutionCostRange.start.round().toString(),
-                          currentDigivolutionCostRange.end.round().toString(),
-                        ),
-                        onChanged: (RangeValues values) {
-                          setState(() {
-                            currentDigivolutionCostRange = values;
-                          });
-                        },
-                      ),
-                      const Divider(),
-                      // Replace the static Text with a clickable row
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            // Toggle the expanded state for the features section
-                            _isFeaturesSectionExpanded = !_isFeaturesSectionExpanded;
-                          });
-                        },
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _isFeaturesSectionExpanded 
-                                  ? Icons.keyboard_arrow_up 
-                                  : Icons.keyboard_arrow_down,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                '특징',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                _isFeaturesSectionExpanded 
-                                  ? Icons.keyboard_arrow_up 
-                                  : Icons.keyboard_arrow_down,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Show/hide the features content based on expanded state
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: _isFeaturesSectionExpanded ? null : 0,
-                        curve: Curves.easeInOut,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 300),
-                          opacity: _isFeaturesSectionExpanded ? 1.0 : 0.0,
-                          child: Column(
-                            children: [
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final isNarrow = constraints.maxWidth < 300;
-                                  
-                                  return isNarrow
-                                    ? Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Radio(
-                                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                value: 1,
-                                                groupValue: typeOperation,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    // Use the same value for all three operations
-                                                    typeOperation = value as int;
-                                                    formOperation = value as int;
-                                                    attributeOperation = value as int;
-                                                  });
-                                                },
-                                              ),
-                                              const Text(
-                                                '하나라도 포함',
-                                                style: TextStyle(fontSize: 13),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Radio(
-                                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                value: 0,
-                                                groupValue: typeOperation,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    // Use the same value for all three operations
-                                                    typeOperation = value as int;
-                                                    formOperation = value as int;
-                                                    attributeOperation = value as int;
-                                                  });
-                                                },
-                                              ),
-                                              const Text(
-                                                '모두 포함',
-                                                style: TextStyle(fontSize: 13),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                    : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Radio(
-                                            value: 1,
-                                            groupValue: typeOperation,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                // Use the same value for all three operations
-                                                typeOperation = value as int;
-                                                formOperation = value as int;
-                                                attributeOperation = value as int;
-                                              });
-                                            },
-                                          ),
-                                          const Text(
-                                            '하나라도 포함',
-                                          ),
-                                          const SizedBox(width: 20),
-                                          Radio(
-                                            value: 0,
-                                            groupValue: typeOperation,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                // Use the same value for all three operations
-                                                typeOperation = value as int;
-                                                formOperation = value as int;
-                                                attributeOperation = value as int;
-                                              });
-                                            },
-                                          ),
-                                          const Text(
-                                            '모두 포함',
-                                          ),
-                                        ],
-                                      );
-                                }
-                              ),
-                              
+                              onChanged: (values) => setState(() => currentDigivolutionCostRange = values),
+                            ),
+                            
+                            const SizedBox(height: 24),
+                            
+                            // 특징 섹션
+                            _buildExpandableSection(
+                              title: "특징",
+                              icon: Icons.category_outlined,
+                              isExpanded: _isFeaturesSectionExpanded,
+                              onToggle: () => setState(() => _isFeaturesSectionExpanded = !_isFeaturesSectionExpanded),
+                              child: Column(
+                                children: [
+                                  // 특징 옵션 선택
                               Container(
-                                margin: const EdgeInsets.only(left: 16),
+                                    padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  border: Border(
-                                    left: BorderSide(
-                                      color: Theme.of(context).primaryColor.withOpacity(0.5), 
-                                      width: 2
-                                    )
-                                  )
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 24),
+                                      color: Colors.grey[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey[200]!),
+                                    ),
                                       child: Row(
                                         children: [
                                           Expanded(
-                                            flex: 1,
-                                            child: TextField(
-                                              controller: _formSearchController,
-                                              onChanged: (value) {
+                                          child: _buildFilterChip(
+                                            label: "하나라도 포함",
+                                            isSelected: typeOperation == 1,
+                                            onSelected: (selected) {
+                                              if (selected) {
                                                 setState(() {
-                                                  _formSearchResults =
-                                                      CardDataService().searchForms(value);
+                                                  typeOperation = 1;
+                                                  formOperation = 1;
+                                                  attributeOperation = 1;
                                                 });
-                                              },
-                                              decoration: InputDecoration(
-                                                labelText: '형태',
-                                                labelStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                                ),
-                                                hintStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                                    Expanded(
+                                          child: _buildFilterChip(
+                                            label: "모두 포함",
+                                            isSelected: typeOperation == 0,
+                                            onSelected: (selected) {
+                                              if (selected) {
+                                                                      setState(() {
+                                                  typeOperation = 0;
+                                                  formOperation = 0;
+                                                  attributeOperation = 0;
+                                                                      });
+                                              }
+                                                                    },
+                                                      ),
+                                                    ),
+                                                  ],
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(height: 20),
+                                  
+                                  // 형태, 유형, 속성 검색 탭 (인라인으로 변경)
+                                  Column(
+                                    children: [
+                                      // 커스텀 탭 바
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[100],
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () => setState(() => _selectedFeatureTabIndex = 0),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                                  decoration: BoxDecoration(
+                                                    color: _selectedFeatureTabIndex == 0 ? Theme.of(context).primaryColor : Colors.transparent,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Text(
+                                                    "형태",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: _selectedFeatureTabIndex == 0 ? Colors.white : Colors.grey[700],
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    // 검색 결과 표시
-                                    SizedBox(
-                                      height: 200,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 24),
-                                        child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            final isNarrow = constraints.maxWidth < 400;
-                                            
-                                            return isNarrow
-                                              ? Column(
-                                                  children: [
-                                                    Expanded(
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _formSearchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final form = _formSearchResults.elementAt(index);
-                                                          return ListTile(
-                                                            dense: true,
-                                                            title: Text(
-                                                              CardDataService().getDisplayFormName(form),
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                            onTap: () {
-                                                              _selectedForms.add(form);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () => setState(() => _selectedFeatureTabIndex = 1),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                                  decoration: BoxDecoration(
+                                                    color: _selectedFeatureTabIndex == 1 ? Theme.of(context).primaryColor : Colors.transparent,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Text(
+                                                    "유형",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: _selectedFeatureTabIndex == 1 ? Colors.white : Colors.grey[700],
+                                                      fontWeight: FontWeight.w500,
                                                     ),
-                                                    Expanded(
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedForms
-                                                              .map((form) => MarqueeChip(
-                                                                    label: CardDataService().getDisplayFormName(form),
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedForms.remove(form);
-                                                                      });
-                                                                    },
-                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _formSearchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final form = _formSearchResults.elementAt(index);
-                                                          return ListTile(
-                                                            title: Text(CardDataService().getDisplayFormName(form)),
-                                                            onTap: () {
-                                                              _selectedForms.add(form);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedForms
-                                                              .map((form) => MarqueeChip(
-                                                                    label: CardDataService().getDisplayFormName(form),
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedForms.remove(form);
-                                                                      });
-                                                                    },
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                          }
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    // 검색 결과 표시
-
-                                    
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 24),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: TextField(
-                                              controller: _trieSearchController,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _searchResults =
-                                                      CardDataService().searchTypes(value);
-                                                });
-                                              },
-                                              decoration: InputDecoration(
-                                                labelText: '유형',
-                                                labelStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                                ),
-                                                hintStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                    // 검색 결과 표시
-                                    SizedBox(
-                                      height: 200,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 24),
-                                        child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            final isNarrow = constraints.maxWidth < 400;
-                                            
-                                            return isNarrow
-                                              ? Column(
-                                                  children: [
-                                                    Expanded(
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _searchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final type = _searchResults.elementAt(index);
-                                                          return ListTile(
-                                                            dense: true,
-                                                            title: Text(
-                                                              type,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                            onTap: () {
-                                                              _selectedTypes.add(type);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
+                                            Expanded(
+                                              child: GestureDetector(
+                                                onTap: () => setState(() => _selectedFeatureTabIndex = 2),
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                                  decoration: BoxDecoration(
+                                                    color: _selectedFeatureTabIndex == 2 ? Theme.of(context).primaryColor : Colors.transparent,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Text(
+                                                    "속성",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: _selectedFeatureTabIndex == 2 ? Colors.white : Colors.grey[700],
+                                                      fontWeight: FontWeight.w500,
                                                     ),
-                                                    Expanded(
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedTypes
-                                                              .map((type) => MarqueeChip(
-                                                                    label: type,
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedTypes.remove(type);
-                                                                      });
-                                                                    },
-                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _searchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final type = _searchResults.elementAt(index);
-                                                          return ListTile(
-                                                            title: Text(type),
-                                                            onTap: () {
-                                                              _selectedTypes.add(type);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedTypes
-                                                              .map((type) => MarqueeChip(
-                                                                    label: type,
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedTypes.remove(type);
-                                                                      });
-                                                                    },
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                          }
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 24),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: TextField(
-                                              controller: _attributeSearchController,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _attributeSearchResults =
-                                                      CardDataService().searchAttributes(value);
-                                                });
-                                              },
-                                              decoration: InputDecoration(
-                                                labelText: '속성',
-                                                labelStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.7),
-                                                ),
-                                                hintStyle: TextStyle(
-                                                  color: Theme.of(context).primaryColor.withOpacity(0.6),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 200,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 24),
-                                        child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            final isNarrow = constraints.maxWidth < 400;
-                                            
-                                            return isNarrow
-                                              ? Column(
-                                                  children: [
-                                                    Expanded(
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _attributeSearchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final attribute = _attributeSearchResults.elementAt(index);
-                                                          return ListTile(
-                                                            dense: true,
-                                                            title: Text(
-                                                              attribute,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                            onTap: () {
-                                                              _selectedAttributes.add(attribute);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedAttributes
-                                                              .map((attribute) => MarqueeChip(
-                                                                    label: attribute,
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedAttributes.remove(attribute);
-                                                                      });
-                                                                    },
-                                                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
-                                                        itemCount: _attributeSearchResults.length,
-                                                        itemBuilder: (context, index) {
-                                                          final attribute = _attributeSearchResults.elementAt(index);
-                                                          return ListTile(
-                                                            title: Text(attribute),
-                                                            onTap: () {
-                                                              _selectedAttributes.add(attribute);
-                                                              setState(() {});
-                                                            },
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      flex: 1,
-                                                      child: SingleChildScrollView(
-                                                        child: Wrap(
-                                                          runSpacing: 4,
-                                                          spacing: 8,
-                                                          children: _selectedAttributes
-                                                              .map((attribute) => MarqueeChip(
-                                                                    label: attribute,
-                                                                    labelStyle: const TextStyle(fontSize: 12),
-                                                                    deleteButtonTooltipMessage: '제거',
-                                                                    onDeleted: () {
-                                                                      setState(() {
-                                                                        _selectedAttributes.remove(attribute);
-                                                                      });
-                                                                    },
-                                                                  ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                          }
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                                      const SizedBox(height: 16),
+                                      SizedBox(
+                                        height: 250,
+                                        child: IndexedStack(
+                                          index: _selectedFeatureTabIndex,
+                                          children: [
+                                            // 형태 탭
+                                            _buildSearchResultsList(
+                                              controller: formSearchController,
+                                              results: formSearchResults,
+                                              selectedItems: selectedForms,
+                                              onItemSelected: (item) {
+                                                setState(() {
+                                                  selectedForms.add(item);
+                                                });
+                                              },
+                                              onItemDeselected: (item) {
+                                                setState(() {
+                                                  selectedForms.remove(item);
+                                                });
+                                              },
+                                              hint: "형태 검색",
+                                              icon: Icons.badge_rounded,
+                                              displayTransform: (item) => CardDataService().getDisplayFormName(item),
+                                              onSearchChanged: (value) {
+                                                setState(() {
+                                                  formSearchResults = CardDataService().searchForms(value);
+                                                });
+                                              },
+                                            ),
+                                            // 유형 탭
+                                            _buildSearchResultsList(
+                                              controller: _trieSearchController!,
+                                              results: searchResults,
+                                              selectedItems: selectedTypes,
+                                              onItemSelected: (item) {
+                                                setState(() {
+                                                  selectedTypes.add(item);
+                                                });
+                                              },
+                                              onItemDeselected: (item) {
+                                                setState(() {
+                                                  selectedTypes.remove(item);
+                                                });
+                                              },
+                                              hint: "유형 검색",
+                                              icon: Icons.category_rounded,
+                                              onSearchChanged: (value) {
+                                                setState(() {
+                                                  searchResults = CardDataService().searchTypes(value);
+                                                });
+                                              },
+                                            ),
+                                            // 속성 탭
+                                            _buildSearchResultsList(
+                                              controller: attributeSearchController,
+                                              results: attributeSearchResults,
+                                              selectedItems: selectedAttributes,
+                                              onItemSelected: (item) {
+                                                setState(() {
+                                                  selectedAttributes.add(item);
+                                                });
+                                              },
+                                              onItemDeselected: (item) {
+                                                setState(() {
+                                                  selectedAttributes.remove(item);
+                                                });
+                                              },
+                                              hint: "속성 검색",
+                                              icon: Icons.category_outlined,
+                                              onSearchChanged: (value) {
+                                                setState(() {
+                                                  attributeSearchResults = CardDataService().searchAttributes(value);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                                                      ),
+                                                    ),
+                                                  ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  child: const Text("조건 초기화", style: TextStyle(fontWeight: FontWeight.w500)),
+                    
+                    // 하단 액션 버튼
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                        border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                            flex: 2,
+                            child: OutlinedButton.icon(
                   onPressed: () {
+                                // 초기화 로직
                     selectedNote = all;
-                    for (var color in colors) {
-                      selectedColorMap[color] = false;
-                    }
-
-                    for (var cardType in cardTypes) {
-                      selectedCardTypeMap[cardType] = false;
-                    }
-
-                    for (var lv in levels) {
-                      selectedLvMap[lv] = false;
-                    }
-
-                    for (var rarity in rarities) {
-                      selectedRarityMap[rarity] = false;
-                    }
-
+                                selectedColorMap.updateAll((key, value) => false);
+                                selectedCardTypeMap.updateAll((key, value) => false);
+                                selectedLvMap.updateAll((key, value) => false);
+                                selectedRarityMap.updateAll((key, value) => false);
                     currentDpRange = const RangeValues(1000, 17000);
-
                     currentPlayCostRange = const RangeValues(0, 20);
                     currentDigivolutionCostRange = const RangeValues(0, 8);
                     parallelOption = 0;
-                    _dialogSearchStringEditingController =
-                        TextEditingController(text: '');
-                    
-                    // Reset detailed search fields
+                                                                 _dialogSearchStringEditingController!.clear();
                     _cardNameSearchController.clear();
                     _cardNoSearchController.clear();
                     _effectSearchController.clear();
                     _sourceEffectSearchController.clear();
-                    
                     enCardInclude = true;
-                    _selectedTypes={};
-                    typeOperation=1;
-                    _selectedForms={};
-                    formOperation=typeOperation;
-                    _selectedAttributes={};
-                    attributeOperation=typeOperation;
-
+                                selectedTypes.clear();
+                                typeOperation = 1;
+                                selectedForms.clear();
+                                formOperation = 1;
+                                selectedAttributes.clear();
+                                attributeOperation = 1;
                     setState(() {});
                   },
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    elevation: 1,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text("적용", style: TextStyle(fontWeight: FontWeight.w500)),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                side: BorderSide(color: Colors.grey[300]!),
+                              ),
+                              icon: Icon(Icons.refresh_rounded, color: Colors.grey[600]),
+                              label: Text(
+                                "초기화",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton.icon(
                   onPressed: () {
+                                // 기존 적용 로직
                     if (selectedNote != null) {
                       widget.searchParameter.noteId = selectedNote?.noteId;
                     }
@@ -1502,7 +1075,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     _searchStringEditingController?.text =
                         _dialogSearchStringEditingController!.value.text;
                     
-                    // Apply detailed search parameters
                     widget.searchParameter.cardNameSearch =
                         _cardNameSearchController.text.isEmpty ? null : _cardNameSearchController.text;
                     widget.searchParameter.cardNoSearch =
@@ -1515,17 +1087,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     widget.searchParameter.parallelOption = parallelOption;
                     widget.searchParameter.isEnglishCardInclude = enCardInclude;
                     widget.searchParameter.typeOperation = typeOperation;
-                    widget.searchParameter.types = _selectedTypes;
-                    
-                    // Apply form and attribute values to search parameters
-                    widget.searchParameter.formOperation = typeOperation;
-                    widget.searchParameter.forms = _selectedForms;
-                    widget.searchParameter.attributeOperation = typeOperation;
-                    widget.searchParameter.attributes = _selectedAttributes;
-
+                    widget.searchParameter.types = selectedTypes;
+                    widget.searchParameter.formOperation = formOperation;
+                    widget.searchParameter.forms = selectedForms;
+                    widget.searchParameter.attributeOperation = attributeOperation;
+                    widget.searchParameter.attributes = selectedAttributes;
 
                     Navigator.pop(context);
-
                     widget.updateSearchParameter();
 
                     ToastOverlay.show(
@@ -1534,8 +1102,31 @@ class _CardSearchBarState extends State<CardSearchBar> {
                       type: ToastType.info
                     );
                   },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.search_rounded, color: Colors.white),
+                              label: const Text(
+                                "적용",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         );
@@ -1698,7 +1289,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 
     return Container(
-      padding: EdgeInsets.all(isMobile ? 8 : 12),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 8 : 12,
+        vertical: isPortrait ? (isMobile ? 8 : 12) : (isMobile ? 12 : 16), // 가로모드에서 세로 패딩 증가
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -1718,12 +1312,12 @@ class _CardSearchBarState extends State<CardSearchBar> {
         ],
       ),
       child: Row(
-        children: [
+      children: [
           // 검색 텍스트 필드
-                     Expanded(
+        Expanded(
              flex: isMobile ? 6 : 5,
-             child: Container(
-               decoration: BoxDecoration(
+            child: Container(
+              decoration: BoxDecoration(
                  color: Colors.white,
                  borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                  boxShadow: [
@@ -1733,8 +1327,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                      offset: const Offset(0, 1),
                    ),
                  ],
-               ),
-               child: TextField(
+              ),
+              child: TextField(
                 controller: _searchStringEditingController,
                 onChanged: (value) {
                   widget.searchParameter.searchString = value;
@@ -1743,9 +1337,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 onSubmitted: (value) {
                   widget.updateSearchParameter();
                 },
-                                 decoration: InputDecoration(
+                decoration: InputDecoration(
                    hintText: isMobile ? '카드 검색' : '카드명/효과/번호',
-                   hintStyle: TextStyle(
+                  hintStyle: TextStyle(
                      color: Colors.grey.shade500,
                      fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
                      fontWeight: FontWeight.w400,
@@ -1759,8 +1353,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                      child: Icon(
                        Icons.search_rounded,
                        size: isMobile ? 16 : (isSmallHeight ? 18 : 20),
-                       color: Theme.of(context).primaryColor,
-                     ),
+                    color: Theme.of(context).primaryColor,
+                  ),
                    ),
                    suffixIcon: _searchStringEditingController?.text.isNotEmpty == true
                      ? Container(
@@ -1771,8 +1365,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                            child: InkWell(
                              borderRadius: BorderRadius.circular(6),
                              onTap: () {
-                               _searchStringEditingController?.clear();
-                               widget.searchParameter.searchString = '';
+                          _searchStringEditingController?.clear();
+                          widget.searchParameter.searchString = '';
                                setState(() {});
                              },
                              child: Container(
@@ -1785,8 +1379,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                              ),
                            ),
                          ),
-                       )
-                     : null,
+                      )
+                    : null,
                    enabledBorder: OutlineInputBorder(
                      borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
                      borderSide: BorderSide(
@@ -1808,11 +1402,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
                        width: 1.5,
                      ),
                    ),
-                   contentPadding: EdgeInsets.symmetric(
-                     vertical: isMobile ? 12 : (isSmallHeight ? 14 : 16),
+                  contentPadding: EdgeInsets.symmetric(
+                     vertical: isPortrait 
+                       ? (isMobile ? 12 : (isSmallHeight ? 14 : 16))  // 세로모드
+                       : (isMobile ? 16 : (isSmallHeight ? 18 : 20)), // 가로모드에서 세로 패딩 증가
                      horizontal: isMobile ? 8 : (isSmallHeight ? 10 : 12),
-                   ),
-                 ),
+                  ),
+                ),
                 style: TextStyle(
                   fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
                   fontWeight: FontWeight.w500,
@@ -1829,9 +1425,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
             _buildActionButton(
               icon: Icons.search_rounded,
               tooltip: '검색',
-              onPressed: () {
-                widget.updateSearchParameter();
-              },
+                  onPressed: () {
+                    widget.updateSearchParameter();
+                  },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
               color: Theme.of(context).primaryColor,
@@ -1840,13 +1436,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
           
-          // 필터 버튼
+        // 필터 버튼
           _buildActionButton(
             icon: Icons.tune_rounded,
             tooltip: '상세 필터',
-            onPressed: () {
-              _showFilterDialog();
-            },
+                  onPressed: () {
+                    _showFilterDialog();
+                  },
             isMobile: isMobile,
             isSmallHeight: isSmallHeight,
             color: Colors.orange.shade600,
@@ -1856,18 +1452,18 @@ class _CardSearchBarState extends State<CardSearchBar> {
           SizedBox(width: isMobile ? 4 : 6),
           
           // 초기화 버튼
-          if (!isVerySmall)
+        if (!isVerySmall)
             _buildActionButton(
               icon: Icons.refresh_rounded,
-              tooltip: '초기화',
-              onPressed: () {
-                resetSearchCondition();
-                ToastOverlay.show(
-                  context,
-                  '검색 조건이 초기화되었습니다.',
-                  type: ToastType.warning
-                );
-              },
+                    tooltip: '초기화',
+                    onPressed: () {
+                      resetSearchCondition();
+                      ToastOverlay.show(
+                        context,
+                        '검색 조건이 초기화되었습니다.',
+                        type: ToastType.warning
+                      );
+                    },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
               color: Colors.red.shade600,
@@ -1876,20 +1472,20 @@ class _CardSearchBarState extends State<CardSearchBar> {
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
           
-          // 뷰 모드 전환 버튼
-          if (widget.viewMode != null)
+        // 뷰 모드 전환 버튼
+        if (widget.viewMode != null)
             _buildActionButton(
               icon: widget.viewMode == 'grid' 
                 ? Icons.view_list_rounded 
                 : Icons.grid_view_rounded,
               tooltip: widget.viewMode == 'grid' ? '리스트 뷰' : '그리드 뷰',
-              onPressed: () {
-                if (widget.onViewModeChanged != null) {
-                  widget.onViewModeChanged!(
-                    widget.viewMode == 'grid' ? 'list' : 'grid',
-                  );
-                }
-              },
+                onPressed: () {
+                  if (widget.onViewModeChanged != null) {
+                    widget.onViewModeChanged!(
+                      widget.viewMode == 'grid' ? 'list' : 'grid',
+                    );
+                  }
+                },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
               color: Colors.purple.shade600,
@@ -1951,6 +1547,399 @@ class _CardSearchBarState extends State<CardSearchBar> {
           ),
         ),
       ),
+    );
+  }
+
+  // 검색 섹션을 생성하는 헬퍼 메서드
+  Widget _buildSearchSection({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: Theme.of(context).primaryColor, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        child,
+      ],
+    );
+  }
+
+  // 확장 가능한 섹션을 생성하는 헬퍼 메서드
+  Widget _buildExpandableSection({
+    required String title,
+    required IconData icon,
+    bool isExpanded = false,
+    VoidCallback? onToggle,
+    required Widget child,
+  }) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Theme.of(context).primaryColor, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ),
+                Icon(
+                  isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                  color: Colors.grey[600],
+                  size: 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (isExpanded) child,
+      ],
+    );
+  }
+
+  // 상세 검색 필드를 생성하는 헬퍼 메서드
+  Widget _buildDetailedSearchField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: Colors.grey[500]),
+              prefixIcon: Icon(icon, color: Theme.of(context).primaryColor),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+     // 필터 칩을 생성하는 헬퍼 메서드
+   Widget _buildFilterChip({
+     required String label,
+     bool isSelected = false,
+     Function(bool)? onSelected,
+   }) {
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: onSelected,
+      backgroundColor: Colors.grey[100],
+      selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+      labelStyle: TextStyle(
+        color: isSelected ? Theme.of(context).primaryColor : Colors.grey[800],
+        fontWeight: FontWeight.w500,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+    );
+  }
+
+     // 색상 칩을 생성하는 헬퍼 메서드
+   Widget _buildColorChip({
+     required String color,
+     required String label,
+     bool isSelected = false,
+     Function(bool)? onSelected,
+   }) {
+    return FilterChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: ColorService.getColorFromString(color.toUpperCase()),
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
+      ),
+      selected: isSelected,
+      onSelected: onSelected,
+      backgroundColor: Colors.grey[100],
+      selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+      labelStyle: TextStyle(
+        color: isSelected ? Theme.of(context).primaryColor : Colors.grey[800],
+        fontWeight: FontWeight.w500,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
+    );
+  }
+
+  // 범위 선택 섹션을 생성하는 헬퍼 메서드
+     Widget _buildRangeSection({
+     required String title,
+     required IconData icon,
+     required RangeValues currentRange,
+     double min = 0,
+     double max = 100,
+     int divisions = 10,
+     ValueChanged<RangeValues>? onChanged,
+   }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: Theme.of(context).primaryColor, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        RangeSlider(
+          values: currentRange,
+          min: min,
+          max: max,
+          divisions: divisions,
+          labels: RangeLabels(
+            currentRange.start.round().toString(),
+            currentRange.end.round().toString(),
+          ),
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  // 검색 결과 목록을 표시하는 위젯
+  Widget _buildSearchResultsList({
+    required TextEditingController controller,
+    required Set<String> results,
+    required Set<String> selectedItems,
+    required ValueChanged<String> onItemSelected,
+    required ValueChanged<String> onItemDeselected,
+    required String hint,
+    required IconData icon,
+    String Function(String)? displayTransform,
+    ValueChanged<String>? onSearchChanged,
+  }) {
+    return Column(
+      children: [
+        // 검색 필드
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: TextField(
+            controller: controller,
+            onChanged: onSearchChanged,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+              prefixIcon: Icon(icon, color: Theme.of(context).primaryColor, size: 20),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        
+        // 결과 리스트 (고정 높이)
+        Container(
+          height: 180, // 고정 높이로 사이즈 문제 해결
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 검색 결과 (왼쪽)
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '검색 결과',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: results.isEmpty
+                          ? Center(
+                              child: Text(
+                                '검색 결과 없음',
+                                style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(8),
+                              itemCount: results.length,
+                              itemBuilder: (context, index) {
+                                final item = results.elementAt(index);
+                                final isSelected = selectedItems.contains(item);
+                                final displayLabel = displayTransform?.call(item) ?? item;
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                  child: _buildFilterChip(
+                                    label: displayLabel,
+                                    isSelected: isSelected,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        onItemSelected(item);
+                                      } else {
+                                        onItemDeselected(item);
+                                      }
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // 선택된 항목 (오른쪽)
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '선택된 항목',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: selectedItems.isEmpty
+                          ? Center(
+                              child: Text(
+                                '선택된 항목 없음',
+                                style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          : SingleChildScrollView(
+                              padding: const EdgeInsets.all(8),
+                              child: Wrap(
+                                runSpacing: 4,
+                                spacing: 4,
+                                children: selectedItems
+                                    .map((item) => MarqueeChip(
+                                          label: displayTransform?.call(item) ?? item,
+                                          deleteButtonTooltipMessage: '제거',
+                                          onDeleted: () => onItemDeselected(item),
+                                          labelStyle: TextStyle(
+                                            color: Theme.of(context).primaryColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12,
+                                          ),
+                                          labelPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

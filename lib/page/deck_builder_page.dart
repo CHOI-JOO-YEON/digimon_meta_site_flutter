@@ -1143,8 +1143,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                       // 검색바 높이를 화면 크기에 맞게 조정
                       SizedBox(
                         height: isMobileDesktop 
-                          ? 35 // 모바일에서 더 작게
-                          : (isSmallHeight ? 40 : 50),
+                          ? 60 // 모바일 가로모드에서도 충분한 높이
+                          : (isSmallHeight ? 65 : 80), // 데스크톱에서 더 여유롭게
                         child: CardSearchBar(
                           notes: notes,
                           searchParameter: searchParameter,
