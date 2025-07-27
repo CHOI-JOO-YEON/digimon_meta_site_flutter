@@ -54,7 +54,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   void _showUnsavedWarning(BuildContext context) {
     ToastOverlay.show(
       context, 
-      '덱에 저장되지 않은 변경사항이 있습니다.', 
+      '저장되지 않은 변경사항이 있습니다.', 
       type: ToastType.warning
     );
   }

@@ -152,14 +152,6 @@ class DeckCount extends StatelessWidget {
                   ),
                 ),
               ),
-              if (isComplete) ...[
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.check_circle,
-                  size: isSmallHeight ? 10 : 12,
-                  color: color,
-                ),
-              ],
             ],
           ),
         ],
