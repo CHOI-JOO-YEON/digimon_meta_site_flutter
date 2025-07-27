@@ -313,60 +313,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ],
           ),
         ),
-        Container(
-          height: isMobile 
-            ? SizeService.bodyFontSize(context) * 2.0 
-            : SizeService.bodyFontSize(context) * 2.5,
-          margin: EdgeInsets.symmetric(
-            horizontal: isMobile ? 4 : 8, 
-            vertical: isMobile ? 4 : 8,
-          ),
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 12 : 20, 
-                vertical: isMobile ? 6 : 8,
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF2563EB).withOpacity(0.1),
-                    const Color(0xFF1D4ED8).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
-                border: Border.all(
-                  color: const Color(0xFF2563EB).withOpacity(0.2),
-                  width: isMobile ? 0.5 : 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.dashboard_outlined,
-                    size: isMobile 
-                      ? SizeService.bodyFontSize(context) * 1.0 
-                      : SizeService.bodyFontSize(context) * 1.2,
-                    color: const Color(0xFF2563EB),
-                  ),
-                  SizedBox(width: isMobile ? 6 : 8),
-                  Text(
-                    '메인',
-                    style: TextStyle(
-                      fontSize: isMobile 
-                        ? SizeService.bodyFontSize(context) * 0.95 
-                        : SizeService.bodyFontSize(context) * 1.1,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1F2937),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        // 덱 설명 위젯을 맨 위로 이동
         NotificationListener<DeckDescriptionChangedNotification>(
           onNotification: (notification) {
             // 알림을 처리하고 상위 위젯으로 전파하지 않음
@@ -388,6 +335,58 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
+        // 메인 섹션 헤더 - 높이 증가 및 텍스트 잘림 방지
+        Container(
+          height: isPortrait 
+            ? SizeService.bodyFontSize(context) * 3.5 
+            : (isMobile 
+                ? SizeService.bodyFontSize(context) * 2.5 
+                : SizeService.bodyFontSize(context) * 3.0),
+          margin: EdgeInsets.symmetric(
+            horizontal: isMobile ? 4 : 8, 
+            vertical: isMobile ? 4 : 8,
+          ),
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isPortrait ? 20 : (isMobile ? 16 : 24), 
+                vertical: isPortrait ? 12 : (isMobile ? 8 : 12),
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF2563EB).withOpacity(0.1),
+                    const Color(0xFF1D4ED8).withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
+                border: Border.all(
+                  color: const Color(0xFF2563EB).withOpacity(0.2),
+                  width: isMobile ? 0.5 : 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                                      Text(
+                      '메인',
+                      style: TextStyle(
+                        fontSize: isPortrait 
+                          ? SizeService.bodyFontSize(context) * 0.9
+                          : (isMobile 
+                              ? SizeService.bodyFontSize(context) * 1.0 
+                              : SizeService.bodyFontSize(context) * 1.2),
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1F2937),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // 메인 덱 리스트
         Container(
           margin: EdgeInsets.symmetric(
             horizontal: isMobile ? 4 : 8, 
@@ -436,10 +435,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
+        // 디지타마 섹션 헤더 - 높이 증가 및 텍스트 잘림 방지
         Container(
-          height: isMobile 
-            ? SizeService.bodyFontSize(context) * 2.0 
-            : SizeService.bodyFontSize(context) * 2.5,
+          height: isPortrait 
+            ? SizeService.bodyFontSize(context) * 3.5 
+            : (isMobile 
+                ? SizeService.bodyFontSize(context) * 2.5 
+                : SizeService.bodyFontSize(context) * 3.0),
           margin: EdgeInsets.symmetric(
             horizontal: isMobile ? 4 : 8, 
             vertical: isMobile ? 4 : 8,
@@ -447,8 +449,8 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           child: Center(
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 12 : 20, 
-                vertical: isMobile ? 6 : 8,
+                horizontal: isPortrait ? 20 : (isMobile ? 16 : 24), 
+                vertical: isPortrait ? 12 : (isMobile ? 8 : 12),
               ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -466,30 +468,25 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.pets_outlined,
-                    size: isMobile 
-                      ? SizeService.bodyFontSize(context) * 1.0 
-                      : SizeService.bodyFontSize(context) * 1.2,
-                    color: const Color(0xFF7C3AED),
-                  ),
-                  SizedBox(width: isMobile ? 6 : 8),
-                  Text(
-                    '디지타마',
-                    style: TextStyle(
-                      fontSize: isMobile 
-                        ? SizeService.bodyFontSize(context) * 0.95 
-                        : SizeService.bodyFontSize(context) * 1.1,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1F2937),
-                      letterSpacing: 0.5,
+                                      Text(
+                      '디지타마',
+                      style: TextStyle(
+                        fontSize: isPortrait 
+                          ? SizeService.bodyFontSize(context) * 0.9
+                          : (isMobile 
+                              ? SizeService.bodyFontSize(context) * 1.0 
+                              : SizeService.bodyFontSize(context) * 1.2),
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1F2937),
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
           ),
         ),
+        // 디지타마 리스트
         Container(
           margin: EdgeInsets.symmetric(
             horizontal: isMobile ? 4 : 8, 

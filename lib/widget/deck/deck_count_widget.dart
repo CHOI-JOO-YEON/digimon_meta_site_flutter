@@ -31,7 +31,6 @@ class DeckCount extends StatelessWidget {
         children: [
           Expanded(
             child: _buildCompactDeckCount(
-              icon: Icons.style_outlined,
               title: '메인',
               current: deck.deckCount,
               max: 50,
@@ -43,7 +42,6 @@ class DeckCount extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: _buildCompactDeckCount(
-              icon: Icons.pets_outlined,
               title: '디지타마',
               current: deck.tamaCount,
               max: 5,
@@ -58,7 +56,6 @@ class DeckCount extends StatelessWidget {
   }
 
   Widget _buildCompactDeckCount({
-    required IconData icon,
     required String title,
     required int current,
     required int max,
@@ -98,12 +95,6 @@ class DeckCount extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: isSmallHeight ? 12 : 14,
-                color: color,
-              ),
-              const SizedBox(width: 4),
               Text(
                 title,
                 style: TextStyle(

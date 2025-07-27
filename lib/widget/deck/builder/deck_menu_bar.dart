@@ -54,7 +54,7 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
   void _showUnsavedWarning(BuildContext context) {
     ToastOverlay.show(
       context, 
-      '덱에 저장되지 않은 변경사항이 있습니다. 플로팅 버튼에서 저장하세요.', 
+      '덱에 저장되지 않은 변경사항이 있습니다.', 
       type: ToastType.warning
     );
   }
@@ -83,8 +83,8 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                      flex: isVerySmall ? 14 : 12, // 매우 작은 화면에서 텍스트 필드에 더 많은 공간
                       child: Container(
+                        height: isMobile ? 40 : (isSmallHeight ? 44 : 48), // 명시적 높이 설정
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -142,27 +142,26 @@ class _DeckBuilderMenuBarState extends State<DeckBuilderMenuBar> {
                             ),
                         ),
                       )),
-                  Expanded(
-                      flex: isVerySmall ? 1 : 2, // 매우 작은 화면에서 경고 아이콘 영역 축소
-                      child: widget.deck.isSave
-                          ? Container()
-                          : GestureDetector(
-                              onTap: () => _showUnsavedWarning(context),
-                              child: Container(
-                                margin: EdgeInsets.only(left: 4),
-                                padding: EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber[50],
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.amber[200]!),
-                                ),
-                                child: Icon(
-                                  Icons.warning_rounded,
-                                  color: Colors.amber[600],
-                                  size: isMobile ? 14 : (isSmallHeight ? 16 : 18),
-                                ),
-                              ),
-                            )),
+                  widget.deck.isSave
+                      ? Container()
+                      : GestureDetector(
+                          onTap: () => _showUnsavedWarning(context),
+                          child: Container(
+                            width: isMobile ? 40 : (isSmallHeight ? 44 : 48), // 정사각형을 위한 width
+                            height: isMobile ? 40 : (isSmallHeight ? 44 : 48), // 정사각형을 위한 height
+                            margin: EdgeInsets.only(left: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.amber[200]!),
+                            ),
+                            child: Icon(
+                              Icons.warning_rounded,
+                              color: Colors.amber[600],
+                              size: isMobile ? 20 : (isSmallHeight ? 22 : 24),
+                            ),
+                          ),
+                        ),
                 ],
               )),
           Expanded(
