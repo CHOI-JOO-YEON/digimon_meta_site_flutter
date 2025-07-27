@@ -64,10 +64,16 @@ class DeckEditorWidget extends StatefulWidget {
   State<DeckEditorWidget> createState() => _DeckEditorWidgetState();
 }
 
-class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBindingObserver {
+class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBindingObserver, TickerProviderStateMixin {
   final TextEditingController _editorController = TextEditingController();
   final FocusNode _editorFocusNode = FocusNode();
   bool _isEditorExpanded = false;
+  
+  // 애니메이션 컨트롤러들
+  late AnimationController _expandAnimationController;
+  late AnimationController _pulseAnimationController;
+  late Animation<double> _expandAnimation;
+  late Animation<double> _pulseAnimation;
   
   // 슬래시 패턴 (슬래시로 시작하는 명령어)
   final RegExp _slashCommandRegex = RegExp(r'(/[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ_]*)$');
@@ -124,6 +130,31 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     super.initState();
     _editorController.text = widget.deck.description ?? '';
     
+    // 애니메이션 컨트롤러 초기화
+    _expandAnimationController = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _pulseAnimationController = AnimationController(
+      duration: Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _expandAnimation = CurvedAnimation(
+      parent: _expandAnimationController,
+      curve: Curves.easeInOutCubic,
+    );
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _pulseAnimationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    // 펄스 애니메이션 반복
+    _pulseAnimationController.repeat(reverse: true);
+    
     // 텍스트 변경 리스너
     _editorController.addListener(_onTextChanged);
     
@@ -140,11 +171,25 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     
     // 초기 참조 카드 로드
     _updateReferencedCards();
+    
+    // 초기 확장 상태 설정
+    if (widget.isExpanded) {
+      _expandAnimationController.value = 1.0;
+    }
   }
   
   @override
   void didUpdateWidget(DeckEditorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
+    // 확장 상태가 변경된 경우 애니메이션 실행
+    if (widget.isExpanded != oldWidget.isExpanded) {
+      if (widget.isExpanded) {
+        _expandAnimationController.forward();
+      } else {
+        _expandAnimationController.reverse();
+      }
+    }
     
     // 덱이 변경되었고, 현재 에디터 내용과 다른 경우 에디터 텍스트 업데이트
     if (widget.deck != oldWidget.deck || 
@@ -170,6 +215,10 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
   void dispose() {
     // WidgetsBinding 옵저버 제거
     WidgetsBinding.instance.removeObserver(this);
+    
+    // 애니메이션 컨트롤러 정리
+    _expandAnimationController.dispose();
+    _pulseAnimationController.dispose();
     
     _removeSuggestions();
     _editorController.dispose();
@@ -273,6 +322,9 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     
     // 참조된 카드 목록 업데이트
     _updateReferencedCards();
+    
+    // 헤더의 카운터 업데이트를 위해 setState 호출
+    setState(() {});
 
     // 텍스트 입력으로 높이가 변할 수 있으므로 오버레이 위치 업데이트
     if (_showSuggestions) {
@@ -642,7 +694,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     _overlayOffset = _calculateCaretOffset();
     
     // 고정 높이 정의
-    final double maxOverlayHeight = 300.0; // 최대 높이 제한
+    final double maxOverlayHeight = 320.0; // 최대 높이 제한 약간 증가
     
     return OverlayEntry(
       builder: (context) => Positioned(
@@ -651,120 +703,272 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
           link: _layerLink,
           showWhenUnlinked: false,
           offset: _overlayOffset,
-          child: Material(
-            elevation: 4.0,
-            borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
-            child: Container(
-              // 최대 높이 지정
-              constraints: BoxConstraints(
-                maxHeight: maxOverlayHeight,
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Flexible(
-                    child: _suggestions.isEmpty 
-                      ? Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              '검색 결과가 없습니다',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: SizeService.bodyFontSize(context),
+          child: TweenAnimationBuilder<double>(
+            duration: Duration(milliseconds: 200),
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: 0.95 + (0.05 * value),
+                alignment: Alignment.topCenter,
+                child: Opacity(
+                  opacity: value,
+                  child: Material(
+                    elevation: 12.0,
+                    borderRadius: BorderRadius.circular(16),
+                    shadowColor: Colors.black.withOpacity(0.15),
+                    child: Container(
+                      // 최대 높이 지정
+                      constraints: BoxConstraints(
+                        maxHeight: maxOverlayHeight,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Theme.of(context).cardColor,
+                            Theme.of(context).cardColor.withOpacity(0.95),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: Theme.of(context).primaryColor.withOpacity(0.2),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // 헤더 추가
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).primaryColor.withOpacity(0.1),
+                                  Theme.of(context).primaryColor.withOpacity(0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(14),
+                                topRight: Radius.circular(14),
                               ),
                             ),
-                          ),
-                        )
-                      : ScrollConfiguration(
-                          behavior: ScrollBehavior().copyWith(
-                            scrollbars: true,
-                            dragDevices: {
-                              PointerDeviceKind.touch,
-                              PointerDeviceKind.mouse,
-                              PointerDeviceKind.trackpad,
-                              PointerDeviceKind.stylus,
-                              PointerDeviceKind.unknown,
-                            },
-                            physics: ClampingScrollPhysics(), 
-                          ),
-                          child: RawScrollbar(
-                            controller: _scrollController,
-                            thumbVisibility: true,
-                            thickness: 6.0,
-                            radius: Radius.circular(10),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              controller: _scrollController,
-                              padding: EdgeInsets.zero,
-                              itemCount: _suggestions.length,
-                              itemBuilder: (context, index) {
-                                final card = _suggestions[index];
-                                final isSelected = index == _selectedSuggestionIndex;
-                                final isHovered = index == _hoverIndex;
-                                
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedSuggestionIndex = index;
-                                    });
-                                    _selectSuggestion(card);
-                                  },
-                                  behavior: HitTestBehavior.opaque,
-                                  child: MouseRegion(
-                                    onEnter: (event) {
-                                      setState(() {
-                                        _hoverIndex = index;
-                                        _selectedSuggestionIndex = index;
-                                      });
-                                      _updateOverlay();
-                                    },
-                                    onExit: (event) {
-                                      if (_hoverIndex == index) {
-                                        setState(() {
-                                          _hoverIndex = null;
-                                        });
-                                        _updateOverlay();
-                                      }
-                                    },
-                                    cursor: SystemMouseCursors.click,
-                                    child: Container(
-                                      height: 48.0,
-                                      decoration: BoxDecoration(
-                                        color: isSelected || isHovered 
-                                            ? Theme.of(context).primaryColor.withOpacity(0.1) 
-                                            : null,
-                                        border: isSelected || isHovered
-                                            ? Border(left: BorderSide(color: Theme.of(context).primaryColor, width: 3.0)) 
-                                            : null,
-                                      ),
-                                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                      child: Text(
-                                        "${card.cardNo} ${card.getDisplayName()}",
-                                        style: TextStyle(
-                                          fontSize: SizeService.bodyFontSize(context),
-                                          fontWeight: (isSelected || isHovered) ? FontWeight.bold : FontWeight.normal,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search_rounded,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '카드 검색 결과',
+                                  style: TextStyle(
+                                    fontSize: SizeService.bodyFontSize(context) * 0.85,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                                Spacer(),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${_suggestions.length}개',
+                                    style: TextStyle(
+                                      fontSize: SizeService.bodyFontSize(context) * 0.75,
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).primaryColor,
                                     ),
                                   ),
-                                );
-                              },
+                                ),
+                              ],
                             ),
                           ),
-                        ),
+                          Flexible(
+                            child: _suggestions.isEmpty 
+                              ? Container(
+                                  height: 80,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.search_off_rounded,
+                                          color: Colors.grey.shade400,
+                                          size: 24,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          '검색 결과가 없습니다',
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: SizeService.bodyFontSize(context) * 0.9,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : ScrollConfiguration(
+                                  behavior: ScrollBehavior().copyWith(
+                                    scrollbars: true,
+                                    dragDevices: {
+                                      PointerDeviceKind.touch,
+                                      PointerDeviceKind.mouse,
+                                      PointerDeviceKind.trackpad,
+                                      PointerDeviceKind.stylus,
+                                      PointerDeviceKind.unknown,
+                                    },
+                                    physics: ClampingScrollPhysics(), 
+                                  ),
+                                  child: RawScrollbar(
+                                    controller: _scrollController,
+                                    thumbVisibility: true,
+                                    thickness: 4.0,
+                                    radius: Radius.circular(10),
+                                    thumbColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      controller: _scrollController,
+                                      padding: EdgeInsets.symmetric(vertical: 4),
+                                      itemCount: _suggestions.length,
+                                      itemBuilder: (context, index) {
+                                        final card = _suggestions[index];
+                                        final isSelected = index == _selectedSuggestionIndex;
+                                        final isHovered = index == _hoverIndex;
+                                        
+                                        return AnimatedContainer(
+                                          duration: Duration(milliseconds: 150),
+                                          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedSuggestionIndex = index;
+                                              });
+                                              _selectSuggestion(card);
+                                            },
+                                            behavior: HitTestBehavior.opaque,
+                                            child: MouseRegion(
+                                              onEnter: (event) {
+                                                setState(() {
+                                                  _hoverIndex = index;
+                                                  _selectedSuggestionIndex = index;
+                                                });
+                                                _updateOverlay();
+                                              },
+                                              onExit: (event) {
+                                                if (_hoverIndex == index) {
+                                                  setState(() {
+                                                    _hoverIndex = null;
+                                                  });
+                                                  _updateOverlay();
+                                                }
+                                              },
+                                              cursor: SystemMouseCursors.click,
+                                              child: AnimatedContainer(
+                                                duration: Duration(milliseconds: 150),
+                                                height: 52.0,
+                                                decoration: BoxDecoration(
+                                                  gradient: isSelected || isHovered 
+                                                      ? LinearGradient(
+                                                          colors: [
+                                                            Theme.of(context).primaryColor.withOpacity(0.15),
+                                                            Theme.of(context).primaryColor.withOpacity(0.08),
+                                                          ],
+                                                        )
+                                                      : null,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: isSelected || isHovered
+                                                      ? Border.all(
+                                                          color: Theme.of(context).primaryColor.withOpacity(0.3),
+                                                          width: 1.5,
+                                                        )
+                                                      : null,
+                                                  boxShadow: isSelected || isHovered 
+                                                      ? [
+                                                          BoxShadow(
+                                                            color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                            blurRadius: 8,
+                                                            offset: Offset(0, 2),
+                                                          ),
+                                                        ]
+                                                      : null,
+                                                ),
+                                                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: _getColorForCardType(card).withOpacity(0.1),
+                                                        borderRadius: BorderRadius.circular(6),
+                                                        border: Border.all(
+                                                          color: _getColorForCardType(card).withOpacity(0.3),
+                                                          width: 1,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        card.cardNo ?? '',
+                                                        style: TextStyle(
+                                                          fontSize: SizeService.bodyFontSize(context) * 0.8,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: _getColorForCardType(card),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: Text(
+                                                        card.getDisplayName() ?? '',
+                                                        style: TextStyle(
+                                                          fontSize: SizeService.bodyFontSize(context) * 0.9,
+                                                          fontWeight: (isSelected || isHovered) ? FontWeight.w600 : FontWeight.w500,
+                                                          color: (isSelected || isHovered) 
+                                                              ? Theme.of(context).primaryColor
+                                                              : Theme.of(context).textTheme.bodyLarge?.color,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                    if (isSelected || isHovered)
+                                                      Icon(
+                                                        Icons.arrow_forward_ios_rounded,
+                                                        size: 14,
+                                                        color: Theme.of(context).primaryColor,
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -820,119 +1024,346 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
         // 다른 모든 키 이벤트는 전달됨
         return KeyEventResult.ignored;
       },
-      child: TextField(
-        key: _editableTextKey,
-        controller: _editorController,
-        focusNode: _editorFocusNode,
-        maxLines: 10,
-        minLines: 5,
-        maxLength: 1000,
-        buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
-          return Text(
-            '$currentLength/$maxLength',
-            style: TextStyle(
-              fontSize: SizeService.bodyFontSize(context) * 0.8,
-              color: currentLength >= maxLength! ? Colors.red : Colors.grey.shade600,
-            ),
-          );
-        },
-        inputFormatters: [
-          LengthLimitingTextInputFormatter(1000),
-        ],
-        decoration: InputDecoration(
-          hintText: '덱 설명을 입력하세요 (최대 1000자)',
-          contentPadding: EdgeInsets.all(SizeService.paddingSize(context)),
-          border: InputBorder.none,
-          counterText: null, // buildCounter를 사용하므로 기본 카운터 텍스트 숨김
-        ),
-        scrollPadding: EdgeInsets.zero,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
-        enableInteractiveSelection: true,
-        // 화면 바깥 터치 시 키보드 닫기만 처리
-        onTapOutside: (event) {
-          // 화면 바깥을 터치했을 때 키보드는 닫히지만 자동완성은 유지
-          if (!_showSuggestions) {
-            _editorFocusNode.unfocus();
-          }
-        },
-        // 모바일 웹에서의 동작 개선
-        autocorrect: false, // 자동 수정 비활성화
-        enableSuggestions: false, // 제안 기능 비활성화
-      ),
+             child: TextField(
+         key: _editableTextKey,
+         controller: _editorController,
+         focusNode: _editorFocusNode,
+         maxLines: 10,
+         minLines: 5,
+         maxLength: 1000,
+         style: TextStyle(
+           fontSize: SizeService.bodyFontSize(context),
+           height: 1.5,
+           letterSpacing: 0.2,
+         ),
+         buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
+           // 카운터를 헤더로 이동했으므로 빈 위젯 반환
+           return SizedBox.shrink();
+         },
+         inputFormatters: [
+           LengthLimitingTextInputFormatter(1000),
+         ],
+         decoration: InputDecoration(
+           hintText: '덱 설명을 입력하세요 (최대 1000자)',
+           hintStyle: TextStyle(
+             color: Colors.grey.shade500,
+             fontSize: SizeService.bodyFontSize(context) * 0.95,
+             fontWeight: FontWeight.w400,
+           ),
+           contentPadding: EdgeInsets.all(SizeService.paddingSize(context) * 1.2),
+           filled: true,
+           fillColor: Colors.transparent,
+           border: InputBorder.none,
+           enabledBorder: InputBorder.none,
+           focusedBorder: InputBorder.none,
+           errorBorder: InputBorder.none,
+           focusedErrorBorder: InputBorder.none,
+           disabledBorder: InputBorder.none,
+           counterText: null, // buildCounter를 사용하므로 기본 카운터 텍스트 숨김
+         ),
+         scrollPadding: EdgeInsets.zero,
+         keyboardType: TextInputType.multiline,
+         textInputAction: TextInputAction.newline,
+         enableInteractiveSelection: true,
+         // 화면 바깥 터치 시 키보드 닫기만 처리
+         onTapOutside: (event) {
+           // 화면 바깥을 터치했을 때 키보드는 닫히지만 자동완성은 유지
+           if (!_showSuggestions) {
+             _editorFocusNode.unfocus();
+           }
+         },
+         // 모바일 웹에서의 동작 개선
+         autocorrect: false, // 자동 수정 비활성화
+         enableSuggestions: false, // 제안 기능 비활성화
+       ),
     );
 
     // 카드 검색 버튼 제거
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
-      ),
-      margin: EdgeInsets.only(bottom: SizeService.paddingSize(context)),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              // 상위 위젯에 있는 토글 함수 호출
-              widget.toggleExpanded(!widget.isExpanded);
-            },
-            child: Padding(
-              padding: EdgeInsets.all(SizeService.paddingSize(context) / 2),
-              child: Row(
-                children: [
-                  Icon(
-                    widget.isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: SizeService.bodyFontSize(context) * 1.5,
-                  ),
-                  SizedBox(width: SizeService.paddingSize(context) / 2),
-                  Text(
-                    '덱 설명',
-                    style: TextStyle(
-                      fontSize: SizeService.bodyFontSize(context),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+    return AnimatedBuilder(
+      animation: _expandAnimation,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).cardColor,
+                Theme.of(context).cardColor.withOpacity(0.95),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 15,
+                offset: Offset(0, 4),
               ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: Offset(0, 1),
+              ),
+            ],
+            border: Border.all(
+              color: Colors.grey.shade200,
+              width: 1,
             ),
           ),
-          if (widget.isExpanded)
-            Padding(
-              padding: EdgeInsets.all(SizeService.paddingSize(context)),
-              child: Column(
-                children: [
-                  CompositedTransformTarget(
-                    link: _layerLink,
-                    child: Container(
-                      key: _textFieldKey,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(SizeService.roundRadius(context) / 2),
+          margin: EdgeInsets.only(bottom: SizeService.paddingSize(context)),
+          child: Column(
+            children: [
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    // 상위 위젯에 있는 토글 함수 호출
+                    widget.toggleExpanded(!widget.isExpanded);
+                  },
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                    bottomLeft: widget.isExpanded ? Radius.zero : Radius.circular(20),
+                    bottomRight: widget.isExpanded ? Radius.zero : Radius.circular(20),
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Theme.of(context).primaryColor.withOpacity(0.1),
+                          Theme.of(context).primaryColor.withOpacity(0.05),
+                        ],
                       ),
-                      child: textField,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomLeft: widget.isExpanded ? Radius.zero : Radius.circular(20),
+                        bottomRight: widget.isExpanded ? Radius.zero : Radius.circular(20),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        AnimatedRotation(
+                          turns: widget.isExpanded ? 0.5 : 0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOutCubic,
+                          child: AnimatedBuilder(
+                            animation: _pulseAnimation,
+                            builder: (context, child) {
+                              return Transform.scale(
+                                scale: widget.isExpanded ? 1.0 : _pulseAnimation.value,
+                                child: Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.expand_more_rounded,
+                                    size: SizeService.bodyFontSize(context) * 1.3,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: SizeService.paddingSize(context)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.edit_note_rounded,
+                                    size: SizeService.bodyFontSize(context) * 1.2,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    '덱 설명',
+                                    style: TextStyle(
+                                      fontSize: SizeService.bodyFontSize(context) * 1.1,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (!widget.isExpanded && _referencedCards.isNotEmpty)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    '${_referencedCards.length}개의 카드 참조',
+                                    style: TextStyle(
+                                      fontSize: SizeService.bodyFontSize(context) * 0.85,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                                                 if (widget.isExpanded) ...[
+                           Container(
+                             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                             decoration: BoxDecoration(
+                               color: _editorController.text.length >= 1000
+                                   ? Colors.red.withOpacity(0.1)
+                                   : Colors.grey.withOpacity(0.1),
+                               borderRadius: BorderRadius.circular(8),
+                             ),
+                             child: Text(
+                               '${_editorController.text.length}/1000',
+                               style: TextStyle(
+                                 fontSize: SizeService.bodyFontSize(context) * 0.75,
+                                 fontWeight: FontWeight.w500,
+                                 color: _editorController.text.length >= 1000 ? Colors.red : Colors.grey.shade600,
+                               ),
+                             ),
+                           ),
+                           SizedBox(width: 8),
+                           Container(
+                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                             decoration: BoxDecoration(
+                               color: Theme.of(context).primaryColor.withOpacity(0.1),
+                               borderRadius: BorderRadius.circular(20),
+                               border: Border.all(
+                                 color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                 width: 1,
+                               ),
+                             ),
+                             child: Row(
+                               mainAxisSize: MainAxisSize.min,
+                               children: [
+                                 Icon(
+                                   Icons.keyboard_rounded,
+                                   size: 14,
+                                   color: Theme.of(context).primaryColor,
+                                 ),
+                                 SizedBox(width: 4),
+                                 Text(
+                                   '편집중',
+                                   style: TextStyle(
+                                     fontSize: SizeService.bodyFontSize(context) * 0.8,
+                                     fontWeight: FontWeight.w600,
+                                     color: Theme.of(context).primaryColor,
+                                   ),
+                                 ),
+                               ],
+                             ),
+                           ),
+                         ],
+                      ],
                     ),
                   ),
-                  SizedBox(height: SizeService.paddingSize(context)),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
-                      style: TextStyle(
-                        fontSize: SizeService.bodyFontSize(context) * 0.8,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  
-                  // 참조된 카드 표시 영역
-                  if (_referencedCards.isNotEmpty) 
-                    _buildReferencedCardsSection(),
-                ],
+                ),
               ),
-            ),
-        ],
-      ),
+              ClipRect(
+                child: AnimatedSize(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOutCubic,
+                  child: widget.isExpanded
+                      ? Padding(
+                          padding: EdgeInsets.all(SizeService.paddingSize(context) * 1.2),
+                          child: Column(
+                                                         children: [
+                               CompositedTransformTarget(
+                                 link: _layerLink,
+                                 child: Material(
+                                   key: _textFieldKey,
+                                   clipBehavior: Clip.antiAlias,
+                                   borderRadius: BorderRadius.circular(16),
+                                   elevation: _editorFocusNode.hasFocus ? 4 : 2,
+                                   shadowColor: _editorFocusNode.hasFocus 
+                                       ? Theme.of(context).primaryColor.withOpacity(0.2)
+                                       : Colors.black.withOpacity(0.1),
+                                   child: Container(
+                                     decoration: BoxDecoration(
+                                       gradient: LinearGradient(
+                                         begin: Alignment.topLeft,
+                                         end: Alignment.bottomRight,
+                                         colors: [
+                                           Colors.grey.shade50,
+                                           Colors.white,
+                                         ],
+                                       ),
+                                       border: Border.all(
+                                         color: _editorFocusNode.hasFocus 
+                                             ? Theme.of(context).primaryColor.withOpacity(0.5)
+                                             : Colors.grey.shade300,
+                                         width: _editorFocusNode.hasFocus ? 2 : 1,
+                                       ),
+                                       borderRadius: BorderRadius.circular(16),
+                                     ),
+                                     child: textField,
+                                   ),
+                                 ),
+                               ),
+                              SizedBox(height: SizeService.paddingSize(context)),
+                              Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.blue.shade50,
+                                      Colors.indigo.shade50,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.blue.shade200,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.lightbulb_outline_rounded,
+                                        size: 16,
+                                        color: Colors.blue.shade700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        '/ 명령어를 입력하면 카드 참조를 추가할 수 있습니다.',
+                                        style: TextStyle(
+                                          fontSize: SizeService.bodyFontSize(context) * 0.85,
+                                          color: Colors.blue.shade700,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              
+                              // 참조된 카드 표시 영역
+                              if (_referencedCards.isNotEmpty) 
+                                _buildReferencedCardsSection(),
+                            ],
+                          ),
+                        )
+                      : SizedBox.shrink(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -956,35 +1387,101 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: SizeService.paddingSize(context)),
-        Divider(height: 1, color: Colors.grey.shade300),
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '참조된 카드',
-              style: TextStyle(
-                fontSize: SizeService.bodyFontSize(context) * 0.9,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
+        SizedBox(height: SizeService.paddingSize(context) * 1.5),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.15),
+                      Theme.of(context).primaryColor.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.link_rounded,
+                  size: 18,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
-            ),
+              SizedBox(width: 12),
+              Text(
+                '참조된 카드',
+                style: TextStyle(
+                  fontSize: SizeService.bodyFontSize(context) * 1.05,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(width: 8),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${_referencedCards.length}',
+                  style: TextStyle(
+                    fontSize: SizeService.bodyFontSize(context) * 0.8,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(8.0),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.grey.shade50,
+                Colors.white,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.grey.shade200,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(16.0),
           child: Wrap(
-            spacing: 8.0, // 가로 간격
-            runSpacing: 8.0, // 세로 간격
-            children: _referencedCards.map((card) {
-              return CardReferenceChip(
-                card: card,
-                onTap: () => _showCardInfo(context, card.cardNo!),
+            spacing: 12.0, // 가로 간격
+            runSpacing: 12.0, // 세로 간격
+            children: _referencedCards.asMap().entries.map((entry) {
+              final index = entry.key;
+              final card = entry.value;
+              return TweenAnimationBuilder<double>(
+                duration: Duration(milliseconds: 300 + (index * 50)),
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Opacity(
+                      opacity: value,
+                      child: CardReferenceChip(
+                        card: card,
+                        onTap: () => _showCardInfo(context, card.cardNo!),
+                      ),
+                    ),
+                  );
+                },
               );
             }).toList(),
           ),
@@ -1010,10 +1507,22 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
       _updateOverlay();
     }
   }
+
+  // 카드 타입에 따른 배경색 반환 함수
+  Color _getColorForCardType(DigimonCard card) {
+    if (card.color1 == 'RED') return Colors.red.shade600;
+    if (card.color1 == 'BLUE') return Colors.blue.shade600;
+    if (card.color1 == 'GREEN') return Colors.green.shade600;
+    if (card.color1 == 'YELLOW') return Colors.orange.shade600;
+    if (card.color1 == 'BLACK') return Colors.grey.shade700;
+    if (card.color1 == 'PURPLE') return Colors.purple.shade600;
+    if (card.color1 == 'WHITE') return Colors.blueGrey.shade500;
+    return Colors.grey.shade600;
+  }
 }
 
 // 참조된 카드를 나타내는 칩 위젯
-class CardReferenceChip extends StatelessWidget {
+class CardReferenceChip extends StatefulWidget {
   final DigimonCard card;
   final VoidCallback onTap;
 
@@ -1024,64 +1533,164 @@ class CardReferenceChip extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CardReferenceChip> createState() => _CardReferenceChipState();
+}
+
+class _CardReferenceChipState extends State<CardReferenceChip> with SingleTickerProviderStateMixin {
+  late AnimationController _hoverController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _elevationAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoverController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOutCubic,
+    ));
+    _elevationAnimation = Tween<double>(
+      begin: 2.0,
+      end: 8.0,
+    ).animate(CurvedAnimation(
+      parent: _hoverController,
+      curve: Curves.easeOutCubic,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: _getColorForCardType(card),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '${card.cardNo}',
-              style: TextStyle(
-                fontSize: SizeService.bodyFontSize(context) * 0.8,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            if (card.getDisplayName() != null) ...[
-              SizedBox(width: 4),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 120),
-                child: Text(
-                  card.getDisplayName()!,
-                  style: TextStyle(
-                    fontSize: SizeService.bodyFontSize(context) * 0.8,
-                    color: Colors.white,
+    final cardColor = _getColorForCardType(widget.card);
+    
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        _hoverController.forward();
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        _hoverController.reverse();
+      },
+      cursor: SystemMouseCursors.click,
+      child: AnimatedBuilder(
+        animation: _hoverController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: GestureDetector(
+              onTap: widget.onTap,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      cardColor.withOpacity(0.9),
+                      cardColor.withOpacity(0.7),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: cardColor.withOpacity(0.3),
+                      blurRadius: _elevationAnimation.value,
+                      offset: Offset(0, _elevationAnimation.value / 2),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${widget.card.cardNo}',
+                        style: TextStyle(
+                          fontSize: SizeService.bodyFontSize(context) * 0.75,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    if (widget.card.getDisplayName() != null) ...[
+                      SizedBox(width: 8),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 140),
+                        child: Text(
+                          widget.card.getDisplayName()!,
+                          style: TextStyle(
+                            fontSize: SizeService.bodyFontSize(context) * 0.85,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.3),
+                                offset: Offset(0, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    if (_isHovered) ...[
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.open_in_new_rounded,
+                        size: 14,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ],
-          ],
-        ),
+            ),
+          );
+        },
       ),
     );
   }
   
   // 카드 타입에 따른 배경색 반환
   Color _getColorForCardType(DigimonCard card) {
-    if (card.color1 == 'RED') return Colors.red.shade700;
-    if (card.color1 == 'BLUE') return Colors.blue.shade700;
-    if (card.color1 == 'GREEN') return Colors.green.shade700;
-    if (card.color1 == 'YELLOW') return Colors.amber.shade700;
-    if (card.color1 == 'BLACK') return Colors.grey.shade800;
-    if (card.color1 == 'PURPLE') return Colors.purple.shade700;
-    if (card.color1 == 'WHITE') return Colors.blueGrey.shade400;
-    return Colors.grey.shade700;
+    if (card.color1 == 'RED') return Colors.red.shade600;
+    if (card.color1 == 'BLUE') return Colors.blue.shade600;
+    if (card.color1 == 'GREEN') return Colors.green.shade600;
+    if (card.color1 == 'YELLOW') return Colors.orange.shade600;
+    if (card.color1 == 'BLACK') return Colors.grey.shade700;
+    if (card.color1 == 'PURPLE') return Colors.purple.shade600;
+    if (card.color1 == 'WHITE') return Colors.blueGrey.shade500;
+    return Colors.grey.shade600;
   }
 } 
