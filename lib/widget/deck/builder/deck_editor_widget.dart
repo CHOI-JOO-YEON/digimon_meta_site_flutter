@@ -1438,6 +1438,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
           ),
         ),
         Container(
+          width: double.infinity, // 전체 가로 폭 사용
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -1461,30 +1462,44 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
             ],
           ),
           padding: EdgeInsets.all(16.0),
-          child: Wrap(
-            spacing: 12.0, // 가로 간격
-            runSpacing: 12.0, // 세로 간격
-            children: _referencedCards.asMap().entries.map((entry) {
-              final index = entry.key;
-              final card = entry.value;
-              return TweenAnimationBuilder<double>(
-                duration: Duration(milliseconds: 300 + (index * 50)),
-                tween: Tween(begin: 0.0, end: 1.0),
-                builder: (context, value, child) {
-                  return Transform.scale(
-                    scale: value,
-                    child: Opacity(
-                      opacity: value,
-                      child: CardReferenceChip(
-                        card: card,
-                        onTap: () => _showCardInfo(context, card.cardNo!),
+          child: _referencedCards.isEmpty
+              ? Container(
+                  height: 60,
+                  child: Center(
+                    child: Text(
+                      '참조된 카드가 없습니다',
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: SizeService.bodyFontSize(context) * 0.9,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
+                  ),
+                )
+              : Wrap(
+                  spacing: 12.0, // 가로 간격
+                  runSpacing: 12.0, // 세로 간격
+                  children: _referencedCards.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final card = entry.value;
+                    return TweenAnimationBuilder<double>(
+                      duration: Duration(milliseconds: 300 + (index * 50)),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: value,
+                          child: Opacity(
+                            opacity: value,
+                            child: CardReferenceChip(
+                              card: card,
+                              onTap: () => _showCardInfo(context, card.cardNo!),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
         ),
       ],
     );
