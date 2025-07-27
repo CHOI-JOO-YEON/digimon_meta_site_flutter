@@ -31,8 +31,12 @@ class DeckViewerView extends StatefulWidget {
 class _DeckViewerViewState extends State<DeckViewerView> {
   int _rowNumber = 9;
   bool isInit = true;
-
+  double _cardWidth = 100; // 기본값
+  
   DeckSortProvider _deckSortProvider = DeckSortProvider();
+  
+  // 카드 크기 기준 컨테이너 radius 계산
+  double get containerRadius => _cardWidth * 0.12;
 
   @override
   void initState() {
@@ -127,7 +131,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(containerRadius),
           ),
           child: DeckScrollGridView(
             deckCount: widget.deck.deckMap,
@@ -136,6 +140,13 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             isTama: false,
             cardOverlayService: cardOverlayService,
             searchWithParameter: widget.searchWithParameter,
+            onCardSizeCalculated: (cardWidth) {
+              if (_cardWidth != cardWidth) {
+                setState(() {
+                  _cardWidth = cardWidth;
+                });
+              }
+            },
           ),
         ),
         SizedBox(
@@ -148,7 +159,7 @@ class _DeckViewerViewState extends State<DeckViewerView> {
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(SizeService.roundRadius(context)),
+            borderRadius: BorderRadius.circular(containerRadius),
           ),
           child: DeckScrollGridView(
             deckCount: widget.deck.tamaMap,
@@ -157,6 +168,13 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             searchWithParameter: widget.searchWithParameter,
             isTama: true,
             cardOverlayService: cardOverlayService,
+            onCardSizeCalculated: (cardWidth) {
+              if (_cardWidth != cardWidth) {
+                setState(() {
+                  _cardWidth = cardWidth;
+                });
+              }
+            },
           ),
         ),
         SizedBox(height: SizeService.paddingSize(context)),

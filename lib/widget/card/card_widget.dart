@@ -73,6 +73,11 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
   int? _previousCount;
   bool _isHighlighted = false;
 
+  // 카드 크기 기준 고정 radius 계산
+  double get cardRadius => widget.width * 0.06;
+  double get cardCountBadgeRadius => widget.width * 0.04;
+  double get parallelBadgeRadius => widget.width * 0.03;
+
   @override
   void initState() {
     super.initState();
@@ -216,25 +221,17 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   Container(
                     width: widget.width,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(_isHovered ? 0.2 : 0.1),
-                          blurRadius: _isHovered ? 20 : 12,
-                          offset: Offset(0, _isHovered ? 8 : 4),
-                          spreadRadius: _isHovered ? 2 : 0,
-                        ),
-                        if (_isHovered)
-                          BoxShadow(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 16,
-                            offset: const Offset(0, 0),
-                            spreadRadius: 0,
-                          ),
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                          spreadRadius: 0,
+                        )
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+                      borderRadius: BorderRadius.circular(cardRadius),
                       child: ColorFiltered(
                         colorFilter: widget.isActive ?? true
                             ? ColorFilter.mode(
@@ -295,7 +292,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     const Color(0xFF4B5563),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(cardRadius),
                                 border: Border.all(
                                   color: Colors.white.withOpacity(0.2),
                                   width: 1,
@@ -372,7 +369,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                 color: ColorService.getColorFromString(
                                     widget.card.color1!),
                                 borderRadius:
-                                    BorderRadius.circular(widget.width * 0.05)),
+                                    BorderRadius.circular(parallelBadgeRadius)),
                             child: Center(
                               child: Text(
                                 '패럴렐',
@@ -528,7 +525,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     const Color(0xFF374151),
                                   ],
                                 ),
-                          borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
+                          borderRadius: BorderRadius.circular(cardCountBadgeRadius),
                           boxShadow: [
                             BoxShadow(
                               color: _isHighlighted
@@ -577,11 +574,11 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.black.withOpacity(0.7),
-                              Colors.black.withOpacity(0.8),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
+                                                          Colors.black.withOpacity(0.8),
+                          ],
                         ),
+                        borderRadius: BorderRadius.circular(cardRadius),
+                      ),
                         child: Stack(
                           children: [
                             // 닫기 버튼

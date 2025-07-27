@@ -58,6 +58,10 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   int _rowNumber = 9;
   bool _isEditorExpanded = false;
   String? _lastDeckName;
+  double _cardWidth = 100; // 기본값
+  
+  // 카드 크기 기준 컨테이너 radius 계산
+  double get containerRadius => _cardWidth * 0.12;
 
   void updateRowNumber(int n) {
     _rowNumber = n;
@@ -398,7 +402,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
                 const Color(0xFFFAFBFC),
               ],
             ),
-            borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+            borderRadius: BorderRadius.circular(containerRadius),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.06),
@@ -412,7 +416,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+            borderRadius: BorderRadius.circular(containerRadius),
             child: DeckScrollGridView(
               deckCount: widget.deck.deckMap,
               deck: widget.deck.deckCards,
@@ -422,6 +426,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
               removeCard: removeCard,
               isTama: false,
               cardOverlayService: widget.cardOverlayService,
+              onCardSizeCalculated: (cardWidth) {
+                if (_cardWidth != cardWidth) {
+                  setState(() {
+                    _cardWidth = cardWidth;
+                  });
+                }
+              },
             ),
           ),
         ),
@@ -486,11 +497,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           ),
           decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(
-                isMobile 
-                  ? SizeService.roundRadius(context) * 0.8 
-                  : SizeService.roundRadius(context)
-              ),
+              borderRadius: BorderRadius.circular(containerRadius),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.06),
@@ -512,6 +519,13 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             removeCard: removeCard,
             isTama: true,
             cardOverlayService: widget.cardOverlayService,
+            onCardSizeCalculated: (cardWidth) {
+              if (_cardWidth != cardWidth) {
+                setState(() {
+                  _cardWidth = cardWidth;
+                });
+              }
+            },
           ),
         ),
       ],

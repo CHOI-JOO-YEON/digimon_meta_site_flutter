@@ -1330,6 +1330,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
               ),
               child: TextField(
                 controller: _searchStringEditingController,
+                maxLines: 1,
+                textAlignVertical: TextAlignVertical.center,
+                scrollPhysics: const BouncingScrollPhysics(),
                 onChanged: (value) {
                   widget.searchParameter.searchString = value;
                   setState(() {}); // 테두리 색상 업데이트를 위해
