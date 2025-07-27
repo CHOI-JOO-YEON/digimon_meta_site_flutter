@@ -39,6 +39,8 @@ import 'color_service.dart';
 import 'lang_service.dart';
 import 'card_data_service.dart';
 import '../model/sort_criterion_dto.dart';
+import 'dialog_service.dart';
+import '../widget/dialog/deck/deck_setting_dialog.dart';
 
 class DeckService {
   DeckApi deckApi = DeckApi();
@@ -760,94 +762,66 @@ class DeckService {
     }
   }
 
-  void showDeckReceiptDialog(BuildContext context, DeckBuild deck) {
+  /// 덱 레시피 다운로드 확인 및 실행
+  Future<bool> downloadDeckReceipt(BuildContext context, DeckBuild deck) async {
     CardOverlayService().removeAllOverlays();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('대회 제출용 레시피 다운로드'),
-          content: const SizedBox(
-            width: 300,
-            child: Text(
-              '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 초과하는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
-              softWrap: true,
-            ),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            ElevatedButton(
-              child: const Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text(
-                '다운로드',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () async {
-                await DeckService().generateDeckRecipePDF(deck);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+    
+    final confirmed = await DialogService.showConfirmation(
+      context,
+      title: '대회 제출용 레시피 다운로드',
+      message: '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 초과하는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
+      confirmText: '다운로드',
+      cancelText: '취소',
+      icon: Icons.download,
     );
+
+    if (confirmed) {
+      await generateDeckRecipePDF(deck);
+      return true;
+    }
+    
+    return false;
   }
 
-  void showDeckCopyDialog(BuildContext context, DeckBuild deck, {Function()? onCopy}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('덱 복사'),
-          content: Text('이 덱을 카피하여 새로운 덱을 만들겠습니까?'),
-          actions: [
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('예'),
-              onPressed: () {
-                // 덱 카피 실행
-                deck.newCopy();
-                
-                Navigator.of(context).pop();
-                
-                // onCopy 콜백 호출 (UI 업데이트용)
-                if (onCopy != null) {
-                  onCopy();
-                }
-                
-                // 토스트 메시지 표시
-                ToastOverlay.show(
-                  context,
-                  '덱이 복사되었습니다.',
-                  type: ToastType.success
-                );
-
-                // 새 덱 복사본을 생성하지 않고, 현재 덱의 상태를 업데이트한 후 리디렉션
-                // 텍스트 필드 업데이트를 위해 약간의 지연을 추가
-                Future.delayed(Duration(milliseconds: 100), () {
-                  context.navigateTo(DeckBuilderRoute(deck: deck));
-                });
-              },
-            ),
-          ],
-        );
-      },
+  /// 덱 복사 확인 및 실행
+  Future<bool> copyDeck(BuildContext context, DeckBuild deck, {Function()? onCopy}) async {
+    final confirmed = await DialogService.showConfirmation(
+      context,
+      title: '덱 복사',
+      message: '이 덱을 카피하여 새로운 덱을 만들겠습니까?',
+      confirmText: '예',
+      cancelText: '취소',
+      icon: Icons.copy,
     );
+
+    if (confirmed) {
+      // 덱 카피 실행
+      deck.newCopy();
+      
+      // onCopy 콜백 호출 (UI 업데이트용)
+      if (onCopy != null) {
+        onCopy();
+      }
+      
+      // 토스트 메시지 표시
+      DialogService.showSuccess(context, '덱이 복사되었습니다.');
+
+      // 새 덱 복사본을 생성하지 않고, 현재 덱의 상태를 업데이트한 후 리디렉션
+      // 텍스트 필드 업데이트를 위해 약간의 지연을 추가
+      Future.delayed(Duration(milliseconds: 100), () {
+        context.navigateTo(DeckBuilderRoute(deck: deck));
+      });
+      
+      return true;
+    }
+    
+    return false;
   }
 
   void showExportDialog(BuildContext context, DeckBuild deck) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         SiteName selectedButton = SiteName.values.first;
         TextEditingController textEditingController = TextEditingController(
@@ -928,6 +902,7 @@ class DeckService {
     List<String> items = criterion.orderMap!.keys.toList();
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -982,394 +957,18 @@ class DeckService {
     );
   }
 
-  void showDeckSettingDialog(
-      BuildContext context, DeckBuild deck, Function() reload) {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    double width = isPortrait
-        ? MediaQuery.sizeOf(context).width * 0.9
-        : MediaQuery.sizeOf(context).width / 3;
-    double height = MediaQuery.sizeOf(context).height / 2;
+  /// 덱 설정 다이얼로그 표시
+  Future<void> showDeckSettings(BuildContext context, DeckBuild deck, Function() reload) async {
     CardOverlayService().removeAllOverlays();
-    showDialog(
+    
+    // DeckSettingDialog import 필요
+    await showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return Consumer3<LimitProvider, DeckSortProvider, UserProvider>(
-          builder: (context, limitProvider, deckSortProvider, userProvider, child) {
-            // selectedLimit 초기화 - 저장된 설정을 확인하여 초기화
-            LimitDto? selectedLimit = limitProvider.selectedLimit;
-            
-            // 로컬 스토리지에서 defaultLimitId 직접 확인
-            final defaultLimitIdStr = html.window.localStorage['defaultLimitId'];
-            final defaultLimitId = defaultLimitIdStr != null ? int.tryParse(defaultLimitIdStr) : null;
-            
-            if (defaultLimitId == null || defaultLimitId == 0) {
-              // defaultLimitId가 null이거나 0이면 "항상 최신 금제로 설정" 옵션으로 설정
-              selectedLimit = LimitDto(
-                id: 0,
-                restrictionBeginDate: DateTime.now(),
-                allowedQuantityMap: {},
-                limitPairs: [],
-              );
-            }
-            
-            bool isStrict = deck.isStrict;
-            List<SortCriterion> sortPriority = List.from(
-              deckSortProvider.sortPriority.map(
-                (criterion) => SortCriterion(
-                  criterion.field,
-                  ascending: criterion.ascending,
-                  orderMap: criterion.orderMap != null
-                      ? Map<String, int>.from(criterion.orderMap!)
-                      : null,
-                ),
-              ),
-            );
-
-            return StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-              return SizedBox(
-                width: width,
-                height: height,
-                child: AlertDialog(
-                  actions: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('취소'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (!deck.isStrict && isStrict) {
-                              // 엄격한 덱 작성 모드 활성화 시 먼저 확인
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('경고'),
-                                    content: Text(
-                                        '엄격한 덱 작성 모드를 활성화하시겠습니까? \n지금까지 작성된 내용은 사라집니다.'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('취소'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Close warning dialog
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('확인'),
-                                        onPressed: () async {
-                                          // 확인 후 설정 저장
-                                          UserSettingDto setting = UserSettingDto(
-                                            defaultLimitId: selectedLimit?.id == 0 ? 0 : selectedLimit?.id,
-                                            strictDeck: isStrict,
-                                            sortPriority: sortPriority.map((criterion) => 
-                                              SortCriterionDto(
-                                                field: criterion.field,
-                                                ascending: criterion.ascending,
-                                                orderMap: criterion.orderMap,
-                                              )
-                                            ).toList(),
-                                          );
-
-                                          // 설정을 즉시 적용
-                                          await UserSettingService().applyUserSetting(context, setting);
-
-                                          // 서버에 설정 저장 (로그인된 경우)
-                                          if (userProvider.isLogin) {
-                                            bool saveSuccess = await UserSettingService().saveUserSetting(context, setting);
-                                            if (saveSuccess) {
-                                              ToastOverlay.show(
-                                                context,
-                                                '설정이 서버에 저장되었습니다.',
-                                                type: ToastType.success
-                                              );
-                                            } else {
-                                              ToastOverlay.show(
-                                                context,
-                                                '서버 저장에 실패했습니다. 브라우저에만 저장됩니다.',
-                                                type: ToastType.warning
-                                              );
-                                            }
-                                          } else {
-                                            // 로컬에만 저장
-                                            await UserSettingService().saveUserSetting(context, setting);
-                                            ToastOverlay.show(
-                                              context,
-                                              '설정이 브라우저에 저장되었습니다.',
-                                              type: ToastType.info
-                                            );
-                                          }
-
-                                          // Apply changes after confirmation
-                                          if (selectedLimit != null) {
-                                            limitProvider.updateSelectLimit(
-                                                selectedLimit!.restrictionBeginDate);
-                                          }
-                                          deck.clear();
-                                          deck.updateIsStrict(isStrict);
-                                          deckSortProvider.setSortPriority(sortPriority);
-                                          reload();
-                                          Navigator.of(context).pop(); // Close warning dialog
-                                          Navigator.of(context).pop(); // Close settings dialog
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            } else {
-                              // 일반적인 경우 설정 저장
-                              UserSettingDto setting = UserSettingDto(
-                                defaultLimitId: selectedLimit?.id == 0 ? 0 : selectedLimit?.id,
-                                strictDeck: isStrict,
-                                sortPriority: sortPriority.map((criterion) => 
-                                  SortCriterionDto(
-                                    field: criterion.field,
-                                    ascending: criterion.ascending,
-                                    orderMap: criterion.orderMap,
-                                  )
-                                ).toList(),
-                              );
-
-                              // 설정을 즉시 적용
-                              await UserSettingService().applyUserSetting(context, setting);
-
-                              // 서버에 설정 저장 (로그인된 경우)
-                              if (userProvider.isLogin) {
-                                bool saveSuccess = await UserSettingService().saveUserSetting(context, setting);
-                                if (saveSuccess) {
-                                  ToastOverlay.show(
-                                    context,
-                                    '설정이 서버에 저장되었습니다.',
-                                    type: ToastType.success
-                                  );
-                                } else {
-                                  ToastOverlay.show(
-                                    context,
-                                    '서버 저장에 실패했습니다. 로컬에만 저장됩니다.',
-                                    type: ToastType.warning
-                                  );
-                                }
-                              } else {
-                                // 로컬에만 저장
-                                await UserSettingService().saveUserSetting(context, setting);
-                                ToastOverlay.show(
-                                  context,
-                                  '설정이 로컬에 저장되었습니다.',
-                                  type: ToastType.info
-                                );
-                              }
-
-                              // Proceed without warning
-                              if (selectedLimit != null) {
-                                limitProvider.updateSelectLimit(
-                                    selectedLimit!.restrictionBeginDate);
-                              }
-                              deck.updateIsStrict(isStrict);
-                              deckSortProvider.setSortPriority(sortPriority);
-                              reload();
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          child: const Text('확인'),
-                        ),
-                      ],
-                    ),
-                  ],
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            '금지/제한: ',
-                            style: TextStyle(
-                                fontSize: SizeService.bodyFontSize(context)),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: DropdownButtonFormField<LimitDto>(
-                              value: selectedLimit?.id == 0 ? null : selectedLimit,
-                              hint: selectedLimit?.id == 0 
-                                  ? Text(
-                                      '항상 최신 금제로 설정',
-                                      style: TextStyle(
-                                        fontSize: SizeService.bodyFontSize(context),
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                    )
-                                  : Text(
-                                      '금지/제한 선택',
-                                      style: TextStyle(
-                                        fontSize: SizeService.bodyFontSize(context),
-                                      ),
-                                    ),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedLimit = newValue;
-                                  // "항상 최신 금제로 설정" 옵션을 선택한 경우
-                                  if (newValue != null && newValue.id == 0) {
-                                    selectedLimit = LimitDto(
-                                      id: 0,
-                                      restrictionBeginDate: DateTime.now(),
-                                      allowedQuantityMap: {},
-                                      limitPairs: [],
-                                    );
-                                  }
-                                });
-                              },
-                              items: [
-                                // 최신 금제 옵션 추가 - 가장 최근 금제 날짜 표시
-                                DropdownMenuItem<LimitDto>(
-                                  value: LimitDto(
-                                    id: 0,
-                                    restrictionBeginDate: DateTime.now(),
-                                    allowedQuantityMap: {},
-                                    limitPairs: [],
-                                  ),
-                                  child: Text(
-                                    '항상 최신 금제로 설정${limitProvider.limits.isNotEmpty ? ' (현재: ${DateFormat('yyyy-MM-dd').format(limitProvider.limits.values.reduce((a, b) => a.restrictionBeginDate.isAfter(b.restrictionBeginDate) ? a : b).restrictionBeginDate)})' : ''}',
-                                    style: TextStyle(
-                                      fontSize: SizeService.bodyFontSize(context),
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                  ),
-                                ),
-                                // 기존 금제 목록들의 선택 시 표시될 텍스트
-                                ...limitProvider.limits.values.map((limitDto) {
-                                  return DropdownMenuItem<LimitDto>(
-                                    value: limitDto,
-                                    child: Text(
-                                      '${DateFormat('yyyy-MM-dd').format(limitDto.restrictionBeginDate)}',
-                                      style: TextStyle(
-                                        fontSize:
-                                            SizeService.bodyFontSize(context),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            '엄격한 덱 작성 모드',
-                            style: TextStyle(
-                                fontSize: SizeService.bodyFontSize(context)),
-                          ),
-                          Transform.scale(
-                            scale: SizeService.switchScale(context),
-                            child: Switch(
-                              inactiveThumbColor: Colors.red,
-                              value: isStrict,
-                              onChanged: (bool v) {
-                                setState(() {
-                                  isStrict = v;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '정렬 우선순위 변경',
-                            style: TextStyle(
-                                fontSize: SizeService.bodyFontSize(context)),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  // 정렬 우선순위만 초기화
-                                  sortPriority = deckSortProvider.getOriginalSortPriority();
-                                });
-                              },
-                              icon: Icon(Icons.refresh))
-                        ],
-                      ),
-                      SizedBox(
-                        width: width * 0.8,
-                        height: height * 0.6,
-                        child: ReorderableListView.builder(
-                          shrinkWrap: true,
-                          itemCount: sortPriority.length,
-                          onReorder: (int oldIndex, int newIndex) {
-                            if (newIndex > oldIndex) {
-                              newIndex -= 1;
-                            }
-                            final SortCriterion item =
-                                sortPriority.removeAt(oldIndex);
-                            sortPriority.insert(newIndex, item);
-                            setState(() {});
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            final criterion = sortPriority[index];
-                            return ListTile(
-                              key: ValueKey('${criterion.field}-$index'),
-                              title: Text(
-                                deckSortProvider
-                                    .getSortPriorityKor(criterion.field),
-                                style: TextStyle(
-                                    fontSize:
-                                        SizeService.smallFontSize(context)),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (criterion.field == 'cardType' ||
-                                      criterion.field == 'color1' ||
-                                      criterion.field == 'color2')
-                                    IconButton(
-                                      padding: EdgeInsets.zero,
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () {
-                                        showOrderMapDialog(context, criterion,
-                                            setState, width * 0.8);
-                                      },
-                                    ),
-                                  IconButton(
-                                    tooltip: '오름차순/내림차순',
-                                    icon: (criterion.ascending ?? true)
-                                        ? const Icon(Icons.arrow_drop_up)
-                                        : const Icon(Icons.arrow_drop_down),
-                                    onPressed: () {
-                                      setState(() {
-                                        criterion.ascending =
-                                            !(criterion.ascending ?? true);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            });
-          },
-        );
-      },
+      barrierDismissible: true,
+      builder: (context) => DeckSettingDialog(
+        deck: deck,
+        onSettingsChanged: reload,
+      ),
     );
   }
 
@@ -1377,6 +976,7 @@ class DeckService {
     CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         SiteName selectedButton = SiteName.values.first;
         TextEditingController textEditingController = TextEditingController();
@@ -1526,6 +1126,7 @@ class DeckService {
                       if (textEditingController.text.isEmpty) {
                         showDialog(
                           context: context,
+                          barrierDismissible: true,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('오류'),
@@ -1563,6 +1164,7 @@ class DeckService {
                         isSubmitted = true;
                         showDialog(
                           context: context,
+                          barrierDismissible: true,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: const Text('오류'),
@@ -1591,38 +1193,27 @@ class DeckService {
     );
   }
 
-  void showDeckClearDialog(
-      BuildContext context, DeckBuild deck, Function() reload) {
+  /// 덱 비우기 확인 및 실행
+  Future<bool> clearDeck(BuildContext context, DeckBuild deck, Function() reload) async {
     CardOverlayService().removeAllOverlays();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('덱 비우기'),
-          content: const Text('덱을 비우시겠습니까?'),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            ElevatedButton(
-              child: const Text('아니오'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text(
-                '예',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                deck.clear();
-                reload();
-              },
-            ),
-          ],
-        );
-      },
+    
+    final confirmed = await DialogService.showConfirmation(
+      context,
+      title: '덱 비우기',
+      message: '덱을 비우시겠습니까?',
+      confirmText: '예',
+      cancelText: '아니오',
+      isDangerous: true,
+      icon: Icons.clear_all,
     );
+
+    if (confirmed) {
+      deck.clear();
+      reload();
+      return true;
+    }
+    
+    return false;
   }
 
   Widget _colorSelectionWidget(DeckBuild deck) {
@@ -1710,6 +1301,7 @@ class DeckService {
 
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -1846,36 +1438,26 @@ class DeckService {
     );
   }
 
-  void showDeckResetDialog(BuildContext context, Function() init) {
+  /// 새 덱 만들기 확인 및 실행
+  Future<bool> resetDeck(BuildContext context, Function() init) async {
     CardOverlayService().removeAllOverlays();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('새로 만들기'),
-          content: const Text('새로운 덱을 작성하시겠습니까? \n저장되지 않은 변경사항은 사라집니다.'),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            ElevatedButton(
-              child: const Text('아니오'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text(
-                '예',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                init();
-              },
-            ),
-          ],
-        );
-      },
+    
+    final confirmed = await DialogService.showConfirmation(
+      context,
+      title: '새로 만들기',
+      message: '새로운 덱을 작성하시겠습니까?\n저장되지 않은 변경사항은 사라집니다.',
+      confirmText: '예',
+      cancelText: '아니오',
+      isDangerous: true,
+      icon: Icons.add,
     );
+
+    if (confirmed) {
+      init();
+      return true;
+    }
+    
+    return false;
   }
 
   DeckBuild importDeckQr(String deckMapString, BuildContext context) {
@@ -2052,6 +1634,7 @@ class DeckService {
     CardOverlayService().removeAllOverlays();
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(text),

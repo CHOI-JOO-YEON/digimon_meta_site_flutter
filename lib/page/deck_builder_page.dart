@@ -555,7 +555,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     subtitle: Text('새로운 덱으로 시작'),
                     onTap: () {
                       Navigator.pop(context);
-                      DeckService().showDeckResetDialog(context, () {
+                      DeckService().resetDeck(context, () {
                         if (deck != null) {
                           deck!.init();
                           ToastOverlay.show(context, '새로운 덱이 생성되었습니다.', type: ToastType.success);
@@ -573,7 +573,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     onTap: () {
                       Navigator.pop(context);
                       if (deck != null) {
-                        DeckService().showDeckClearDialog(context, deck!, () {
+                        DeckService().clearDeck(context, deck!, () {
                           ToastOverlay.show(context, '덱이 비워졌습니다.', type: ToastType.warning);
                           setState(() {});
                         });
@@ -589,7 +589,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     onTap: () {
                       Navigator.pop(context);
                       if (deck != null) {
-                        DeckService().showDeckCopyDialog(
+                        DeckService().copyDeck(
                           context,
                           deck!,
                           onCopy: () {
@@ -672,7 +672,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                     onTap: () {
                       Navigator.pop(context);
                       if (deck != null) {
-                        DeckService().showDeckReceiptDialog(context, deck!);
+                        DeckService().downloadDeckReceipt(context, deck!);
                       }
                     },
                   ),

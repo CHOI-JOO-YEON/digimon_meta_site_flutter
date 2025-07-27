@@ -116,7 +116,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 tooltip: '새로 만들기',
                 color: const Color(0xFF10B981),
                 onPressed: () {
-                  DeckService().showDeckResetDialog(context, () {
+                  DeckService().resetDeck(context, () {
                     widget.init();
                     ToastOverlay.show(
                       context,
@@ -133,7 +133,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 tooltip: '비우기',
                 color: const Color(0xFFEF4444),
                 onPressed: () => DeckService()
-                    .showDeckClearDialog(context, widget.deck, () {
+                    .clearDeck(context, widget.deck, () {
                       widget.reload();
                       ToastOverlay.show(
                         context,
@@ -148,7 +148,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 filledIcon: Icons.copy,
                 tooltip: '복사해서 새로운 덱 만들기',
                 color: const Color(0xFF3B82F6),
-                onPressed: () => DeckService().showDeckCopyDialog(
+                onPressed: () => DeckService().copyDeck(
                     context,
                     widget.deck,
                     onCopy: widget.newCopy,
@@ -234,7 +234,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 tooltip: '대회 제출용 레시피',
                 color: const Color(0xFF0D9488),
                 onPressed: () =>
-                    DeckService().showDeckReceiptDialog(context, widget.deck),
+                    DeckService().downloadDeckReceipt(context, widget.deck),
               ),
               if (hasManagerRole)
                 _buildModernIconButton(

@@ -39,7 +39,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () => DeckService().showDeckCopyDialog(context, widget.deck),
+                    onPressed: () => DeckService().copyDeck(context, widget.deck),
                     iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.copy),
                     tooltip: '복사해서 새로운 덱 만들기',
@@ -90,7 +90,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                       width: SizeService.largeIconSize(context), height: SizeService.largeIconSize(context)),
                   child: IconButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () => DeckService().showDeckReceiptDialog(context, widget.deck),
+                    onPressed: () => DeckService().downloadDeckReceipt(context, widget.deck),
                     iconSize: SizeService.largeIconSize(context),
                     icon: const Icon(Icons.receipt_long),
                     tooltip: '대회 제출용 레시피',

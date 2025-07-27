@@ -232,7 +232,7 @@ class _MainPageState extends State<MainPage> {
                                                           if (deck == null) {
                                                             deck = DeckBuild(context);
                                                           }
-                                                          DeckService().showDeckSettingDialog(
+                                                          DeckService().showDeckSettings(
                                                               context, deck, () {
                                                             setState(() {});
                                                           });
@@ -537,7 +537,7 @@ class _MainPageState extends State<MainPage> {
                                                           if (deck == null) {
                                                             deck = DeckBuild(context);
                                                           }
-                                                          DeckService().showDeckSettingDialog(
+                                                          DeckService().showDeckSettings(
                                                               context, deck, () {
                                                             setState(() {});
                                                           });
