@@ -203,21 +203,40 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         tabBarTheme: TabBarTheme(
-          labelColor: const Color(0xFF2563EB),
+          labelColor: Colors.white,
           unselectedLabelColor: const Color(0xFF6B7280),
           indicatorColor: const Color(0xFF2563EB),
-          indicatorSize: TabBarIndicatorSize.label,
+          indicatorSize: TabBarIndicatorSize.tab,
           labelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             fontSize: 14,
           ),
           unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
           indicator: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: const Color(0xFF2563EB).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF2563EB),
+                const Color(0xFF1D4ED8),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2563EB).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          dividerColor: Colors.transparent,
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+            (Set<MaterialState> states) {
+              return Colors.transparent;
+            },
           ),
         ),
         textTheme: const TextTheme(

@@ -49,6 +49,7 @@ class _MainPageState extends State<MainPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
+    final isVerySmallHeight = screenHeight < 500; // 매우 작은 높이 감지
     final isSmallWidth = screenWidth < 400; // 세로 너비가 작은 화면 감지
     final isMobilePortrait = isPortrait && screenWidth < 600; // 모바일 세로모드 감지
     
@@ -69,17 +70,19 @@ class _MainPageState extends State<MainPage> {
           builder: (context, headerProvider, _) {
             return Scaffold(
               resizeToAvoidBottomInset: false,
-              body: Column(
-                children: [
-                  // 메인 헤더 (숨김 상태에서는 최소한의 공간만 표시)
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    height: headerProvider.isHeaderVisible 
-                      ? (isMobilePortrait 
-                          ? (isSmallHeight ? 100 : 120) // 모바일 세로모드에서 높이 줄임
-                          : SizeService.headerHeight(context))
-                      : (isSmallHeight ? 40 : 50), // 최소한의 공간 유지
+              bottomNavigationBar: isPortrait ? _buildBottomTabBar(context, controller) : null,
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    // 메인 헤더 (숨김 상태에서는 최소한의 공간만 표시)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      height: headerProvider.isHeaderVisible 
+                        ? (isMobilePortrait 
+                            ? null // 자동 높이로 변경
+                            : SizeService.headerHeight(context))
+                        : (isVerySmallHeight ? 30 : (isSmallHeight ? 40 : 50)), // 최소한의 공간 유지
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -119,9 +122,9 @@ class _MainPageState extends State<MainPage> {
                                         children: [
                                           // 세로모드에서 로그인 정보와 설정 버튼
                                           Container(
-                                            margin: EdgeInsets.only(
-                                              bottom: isMobilePortrait ? 2 : 4,
-                                            ),
+                                                                        margin: EdgeInsets.only(
+                              bottom: isVerySmallHeight ? 1 : (isMobilePortrait ? 2 : 4),
+                            ),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
@@ -258,89 +261,7 @@ class _MainPageState extends State<MainPage> {
                                               ],
                                             ),
                                           ),
-                                          // 세로모드에서 탭바
-                                          Container(
-                                            margin: EdgeInsets.symmetric(
-                                              vertical: isMobilePortrait ? 4 : 8, 
-                                              horizontal: isMobilePortrait ? 4 : 8,
-                                            ),
-                                            padding: EdgeInsets.all(isMobilePortrait ? 2 : 4),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.white,
-                                                  const Color(0xFFF8FAFC),
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              borderRadius: BorderRadius.circular(
-                                                isMobilePortrait ? 12 : 16,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.08),
-                                                  blurRadius: 12,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                              border: Border.all(
-                                                color: Colors.grey.withOpacity(0.1),
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: TabBar(
-                                              controller: controller,
-                                              labelStyle: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: isMobilePortrait 
-                                                  ? fontSize * 0.8 // 모바일에서 탭 폰트 크기 줄임
-                                                  : fontSize * 0.85,
-                                              ),
-                                              unselectedLabelStyle: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: isMobilePortrait 
-                                                  ? fontSize * 0.8
-                                                  : fontSize * 0.85,
-                                              ),
-                                              indicator: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Theme.of(context).colorScheme.primary,
-                                                    const Color(0xFF1D4ED8),
-                                                  ],
-                                                ),
-                                                borderRadius: BorderRadius.circular(
-                                                  isMobilePortrait ? 10 : 12,
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                                    blurRadius: 8,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              padding: EdgeInsets.zero,
-                                              labelPadding: EdgeInsets.zero,
-                                              indicatorPadding: EdgeInsets.zero,
-                                              labelColor: Colors.white,
-                                              unselectedLabelColor: Colors.grey.shade600,
-                                              dividerColor: Colors.transparent,
-                                              splashFactory: NoSplash.splashFactory,
-                                              overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                                                (Set<MaterialState> states) {
-                                                  return Colors.transparent;
-                                                },
-                                              ),
-                                              tabs: [
-                                                _buildModernTabItem(context, Icons.build_outlined, Icons.build, 'Builder', isPortrait, controller.index == 0, isMobile: isMobilePortrait),
-                                                _buildModernTabItem(context, Icons.list_outlined, Icons.list, 'List', isPortrait, controller.index == 1, isMobile: isMobilePortrait),
-                                                _buildModernTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', isPortrait, controller.index == 2, isMobile: isMobilePortrait),
-                                                _buildModernTabItem(context, Icons.info_outline, Icons.info, 'Info', isPortrait, controller.index == 3, isMobile: isMobilePortrait),
-                                              ],
-                                            ),
-                                          ),
+                                          
                                         ],
                                       )
                                     : Row(
@@ -507,7 +428,10 @@ class _MainPageState extends State<MainPage> {
                                                 ),
                                                 padding: EdgeInsets.zero,
                                                 labelPadding: EdgeInsets.zero,
-                                                indicatorPadding: EdgeInsets.zero,
+                                                indicatorPadding: const EdgeInsets.symmetric(
+                                                  horizontal: 4,
+                                                  vertical: 4,
+                                                ),
                                                 labelColor: Colors.white,
                                                 unselectedLabelColor: Colors.grey.shade600,
                                                 dividerColor: Colors.transparent,
@@ -622,6 +546,8 @@ class _MainPageState extends State<MainPage> {
                           ),
                     ),
                   ),
+                  
+
                   Expanded(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
@@ -630,7 +556,8 @@ class _MainPageState extends State<MainPage> {
                       child: child,
                     ),
                   )
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -699,7 +626,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildModernTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isPortrait, bool isSelected, {bool isMobile = false}) {
+    Widget _buildModernTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isPortrait, bool isSelected, {bool isMobile = false}) {
     return Tab(
       height: isMobile ? 48 : 56,
       child: AnimatedContainer(
@@ -731,4 +658,88 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-}
+
+  Widget _buildBottomTabBar(BuildContext context, TabController controller) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobilePortrait = screenWidth < 600;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.withOpacity(0.2),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Container(
+          height: 60,
+          child: TabBar(
+            controller: controller,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 11,
+            ),
+            indicator: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: EdgeInsets.zero,
+            labelPadding: EdgeInsets.zero,
+            indicatorPadding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor: Colors.grey.shade500,
+            dividerColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+                return Colors.transparent;
+              },
+            ),
+            tabs: [
+              _buildBottomTabItem(context, Icons.build_outlined, Icons.build, 'Builder', controller.index == 0),
+              _buildBottomTabItem(context, Icons.list_outlined, Icons.list, 'List', controller.index == 1),
+              _buildBottomTabItem(context, Icons.collections_bookmark_outlined, Icons.collections_bookmark_rounded, 'Collect', controller.index == 2),
+              _buildBottomTabItem(context, Icons.info_outline, Icons.info, 'Info', controller.index == 3),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomTabItem(BuildContext context, IconData outlinedIcon, IconData filledIcon, String label, bool isSelected) {
+    return Tab(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Icon(
+              isSelected ? filledIcon : outlinedIcon,
+              key: ValueKey(isSelected),
+              size: 22,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+ 
+  }
