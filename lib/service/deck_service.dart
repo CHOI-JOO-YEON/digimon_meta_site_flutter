@@ -772,7 +772,6 @@ class DeckService {
       message: '* 덱은 31종, 디지타마는 5종까지만 레시피에 기입되며, 이를 초과하는 카드 종류는 레시피에 반영되지 않습니다.\n* 레시피 불일치로 발생하는 문제는 책임지지 않으며, 제출 전 꼭 확인 바랍니다.',
       confirmText: '다운로드',
       cancelText: '취소',
-      icon: Icons.download,
     );
 
     if (confirmed) {
@@ -791,7 +790,6 @@ class DeckService {
       message: '이 덱을 카피하여 새로운 덱을 만들겠습니까?',
       confirmText: '예',
       cancelText: '취소',
-      icon: Icons.copy,
     );
 
     if (confirmed) {
@@ -830,49 +828,179 @@ class DeckService {
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // 화면 크기 정보 가져오기
+            final screenSize = MediaQuery.of(context).size;
+            final isSmallScreen = screenSize.width < 600;
+            final theme = Theme.of(context);
+            
             return AlertDialog(
-              title: const Text('내보내기'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: SiteName.values.map((siteName) {
+              title: Text(
+                '내보내기',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                ),
+              ),
+              contentPadding: EdgeInsets.all(isSmallScreen ? 16.0 : 24.0),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: isSmallScreen ? screenSize.width * 0.9 : 500,
+                  maxHeight: screenSize.height * 0.7,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 사이트 선택 제목
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 12.0),
+                        child: Text(
+                          '내보낼 사이트 선택',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      // 사이트 선택 옵션들
+                      ...SiteName.values.map((siteName) {
                         String name = siteName.getName;
-                        return Expanded(
-                          child: ListTile(
-                            title: Text(name),
-                            leading: Radio<SiteName>(
-                              value: siteName,
-                              groupValue: selectedButton,
-                              onChanged: (SiteName? value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedButton = value;
-                                    textEditingController.text =
-                                        selectedButton.ExportToSiteDeckCode(deck);
-                                  });
-                                }
-                              },
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 8.0),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedButton = siteName;
+                                textEditingController.text =
+                                    selectedButton.ExportToSiteDeckCode(deck);
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.0,
+                                vertical: 8.0,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: selectedButton == siteName
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outline.withOpacity(0.3),
+                                  width: selectedButton == siteName ? 2.0 : 1.0,
+                                ),
+                                color: selectedButton == siteName
+                                    ? theme.colorScheme.primary.withOpacity(0.1)
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                children: [
+                                  Radio<SiteName>(
+                                    value: siteName,
+                                    groupValue: selectedButton,
+                                    onChanged: (SiteName? value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          selectedButton = value;
+                                          textEditingController.text =
+                                              selectedButton.ExportToSiteDeckCode(deck);
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      style: theme.textTheme.bodyLarge?.copyWith(
+                                        fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                        fontWeight: selectedButton == siteName
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                        color: selectedButton == siteName
+                                            ? theme.colorScheme.primary
+                                            : theme.textTheme.bodyLarge?.color,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
                       }).toList(),
-                    ),
-                    TextField(
-                      controller: textEditingController,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: 'Paste your deck.',
+                      SizedBox(height: 16.0),
+                      // 덱 코드 제목
+                      Text(
+                        '덱 코드',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      enabled: false,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.copy),
+                      SizedBox(height: 8.0),
+                      // 덱 코드 텍스트 필드
+                      TextField(
+                        controller: textEditingController,
+                        maxLines: isSmallScreen ? 4 : 6,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                          fontSize: isSmallScreen ? 12.0 : 14.0,
+                        ),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.3),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.all(12.0),
+                          hintText: '덱 코드가 여기에 표시됩니다.',
+                          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                            fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                          ),
+                        ),
+                        readOnly: true,
+                      ),
+                      SizedBox(height: 16.0),
+                      // 복사 버튼
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: Icon(
+                            Icons.copy,
+                            size: isSmallScreen ? 18.0 : 20.0,
+                          ),
+                          label: Text(
+                            '클립보드에 복사',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 12.0 : 16.0,
+                              horizontal: 16.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(
                                     text: textEditingController.text))
@@ -885,11 +1013,24 @@ class DeckService {
                             });
                           },
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    '닫기',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -983,74 +1124,183 @@ class DeckService {
         bool isSubmitted = false;
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // 화면 크기 정보 가져오기
+            final screenSize = MediaQuery.of(context).size;
+            final isSmallScreen = screenSize.width < 600;
+            final theme = Theme.of(context);
+            
             return AlertDialog(
-              title: const Text('덱 가져오기'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: SiteName.values.map((siteName) {
+              title: Text(
+                '덱 가져오기',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                ),
+              ),
+              contentPadding: EdgeInsets.all(isSmallScreen ? 16.0 : 24.0),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: isSmallScreen ? screenSize.width * 0.9 : 500,
+                  maxHeight: screenSize.height * 0.8,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 사이트 선택 제목
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 12.0),
+                        child: Text(
+                          '가져올 사이트 선택',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      // 사이트 선택 옵션들
+                      ...SiteName.values.map((siteName) {
                         String name = siteName.getName;
-                        return Expanded(
-                          child: ListTile(
-                            title: Text(name),
-                            leading: Radio<SiteName>(
-                              value: siteName,
-                              groupValue: selectedButton,
-                              onChanged: (SiteName? value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedButton = value;
-                                  });
-                                }
-                              },
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 8.0),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedButton = siteName;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.0,
+                                vertical: 8.0,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: selectedButton == siteName
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outline.withOpacity(0.3),
+                                  width: selectedButton == siteName ? 2.0 : 1.0,
+                                ),
+                                color: selectedButton == siteName
+                                    ? theme.colorScheme.primary.withOpacity(0.1)
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                children: [
+                                  Radio<SiteName>(
+                                    value: siteName,
+                                    groupValue: selectedButton,
+                                    onChanged: (SiteName? value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          selectedButton = value;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      style: theme.textTheme.bodyLarge?.copyWith(
+                                        fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                        fontWeight: selectedButton == siteName
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                        color: selectedButton == siteName
+                                            ? theme.colorScheme.primary
+                                            : theme.textTheme.bodyLarge?.color,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
                       }).toList(),
-                    ),
-                    TextField(
-                      controller: textEditingController,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        hintText: '덱 코드를 붙여넣으세요.',
+                      SizedBox(height: 16.0),
+                      // 덱 코드 입력 제목
+                      Text(
+                        '덱 코드 입력',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      enabled: true,
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.qr_code_scanner),
-                      label: const Text('덱 이미지에서 가져오기'),
-                      onPressed: () async {
-                        // 로딩 다이얼로그 표시 - 파일 선택 전에 먼저 표시
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              content: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(width: 20),
-                                  Text("QR 코드 이미지 불러오는 중...")
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                        
-                        try {
-                          FilePickerResult? result = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['jpg', 'jpeg', 'png'],
-                          );
-                          
-                          if (result != null) {
-                            // 로딩 다이얼로그 업데이트
-                            Navigator.pop(context);
+                      SizedBox(height: 8.0),
+                      // 덱 코드 입력 필드
+                      TextField(
+                        controller: textEditingController,
+                        maxLines: isSmallScreen ? 4 : 6,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                          fontSize: isSmallScreen ? 12.0 : 14.0,
+                        ),
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.3),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                              color: theme.colorScheme.outline.withOpacity(0.2),
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.all(12.0),
+                          hintText: '덱 코드를 붙여넣으세요.',
+                          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                            fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                          ),
+                        ),
+                        enabled: true,
+                      ),
+                      SizedBox(height: 16.0),
+                      // QR 이미지에서 가져오기 버튼
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: Icon(
+                            Icons.qr_code_scanner,
+                            size: isSmallScreen ? 18.0 : 20.0,
+                          ),
+                          label: Text(
+                            '덱 이미지에서 가져오기',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 12.0 : 16.0,
+                              horizontal: 16.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          onPressed: () async {
+                            // 로딩 다이얼로그 표시 - 파일 선택 전에 먼저 표시
                             showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -1061,65 +1311,118 @@ class DeckService {
                                     children: [
                                       CircularProgressIndicator(),
                                       SizedBox(width: 20),
-                                      Text("QR 코드 처리 중...")
+                                      Expanded(
+                                        child: Text(
+                                          "QR 코드 이미지 불러오는 중...",
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 );
                               },
                             );
                             
-                            if (result.files.isNotEmpty && result.files.first.bytes != null) {
-                              Uint8List fileBytes = result.files.first.bytes!;
-                              String? qrData = await decodeQrCodeFromImage(fileBytes);
+                            try {
+                              FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                type: FileType.custom,
+                                allowedExtensions: ['jpg', 'jpeg', 'png'],
+                              );
                               
-                              // 로딩 다이얼로그 닫기
-                              Navigator.pop(context);
-                              
-                              if (qrData != null) {
-                                DeckBuild deck = importDeckQr(qrData, context);
-                                Navigator.pop(context); // Import 다이얼로그 닫기
-                                importAction(deck);
+                              if (result != null) {
+                                // 로딩 다이얼로그 업데이트
+                                Navigator.pop(context);
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(width: 20),
+                                          Expanded(
+                                            child: Text(
+                                              "QR 코드 처리 중...",
+                                              style: theme.textTheme.bodyMedium?.copyWith(
+                                                fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
                                 
-                                // 토스트 메시지 표시
-                                ToastOverlay.show(
-                                  context,
-                                  'QR코드에서 덱을 가져왔습니다.',
-                                  type: ToastType.success
-                                );
+                                if (result.files.isNotEmpty && result.files.first.bytes != null) {
+                                  Uint8List fileBytes = result.files.first.bytes!;
+                                  String? qrData = await decodeQrCodeFromImage(fileBytes);
+                                  
+                                  // 로딩 다이얼로그 닫기
+                                  Navigator.pop(context);
+                                  
+                                  if (qrData != null) {
+                                    DeckBuild deck = importDeckQr(qrData, context);
+                                    Navigator.pop(context); // Import 다이얼로그 닫기
+                                    importAction(deck);
+                                    
+                                    // 토스트 메시지 표시
+                                    ToastOverlay.show(
+                                      context,
+                                      'QR코드에서 덱을 가져왔습니다.',
+                                      type: ToastType.success
+                                    );
+                                  } else {
+                                    ToastOverlay.show(
+                                      context,
+                                      'QR코드를 인식할 수 없습니다.',
+                                      type: ToastType.error
+                                    );
+                                  }
+                                } else {
+                                  Navigator.pop(context);
+                                  ToastOverlay.show(
+                                    context,
+                                    '파일을 읽을 수 없습니다.',
+                                    type: ToastType.error
+                                  );
+                                }
                               } else {
-                                ToastOverlay.show(
-                                  context,
-                                  'QR코드를 인식할 수 없습니다.',
-                                  type: ToastType.error
-                                );
+                                // 파일 선택 취소 시 로딩 다이얼로그 닫기
+                                Navigator.pop(context);
                               }
-                            } else {
+                            } catch (e) {
+                              // 오류 발생 시 로딩 다이얼로그 닫기
                               Navigator.pop(context);
                               ToastOverlay.show(
                                 context,
-                                '파일을 읽을 수 없습니다.',
+                                '이미지 처리 중 오류가 발생했습니다.',
                                 type: ToastType.error
                               );
                             }
-                          } else {
-                            // 파일 선택 취소 시 로딩 다이얼로그 닫기
-                            Navigator.pop(context);
-                          }
-                        } catch (e) {
-                          // 오류 발생 시 로딩 다이얼로그 닫기
-                          Navigator.pop(context);
-                          ToastOverlay.show(
-                            context,
-                            '이미지 처리 중 오류가 발생했습니다.',
-                            type: ToastType.error
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    '취소',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                    ),
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     try {
@@ -1129,14 +1432,29 @@ class DeckService {
                           barrierDismissible: true,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text('오류'),
-                              content: const Text('덱 코드를 입력해주세요.'),
+                              title: Text(
+                                '오류',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                ),
+                              ),
+                              content: Text(
+                                '덱 코드를 입력해주세요.',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                ),
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('확인'),
+                                  child: Text(
+                                    '확인',
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                    ),
+                                  ),
                                 ),
                               ],
                             );
@@ -1167,14 +1485,29 @@ class DeckService {
                           barrierDismissible: true,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text('오류'),
-                              content: const Text('덱 코드를 확인해주세요.'),
+                              title: Text(
+                                '오류',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                ),
+                              ),
+                              content: Text(
+                                '덱 코드를 확인해주세요.',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                ),
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('확인'),
+                                  child: Text(
+                                    '확인',
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                                    ),
+                                  ),
                                 ),
                               ],
                             );
@@ -1183,7 +1516,22 @@ class DeckService {
                       }
                     }
                   },
-                  child: const Text('가져오기'),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: isSmallScreen ? 8.0 : 12.0,
+                      horizontal: 16.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: Text(
+                    '가져오기',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontFamily: theme.textTheme.bodyLarge?.fontFamily,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -1204,7 +1552,6 @@ class DeckService {
       confirmText: '예',
       cancelText: '아니오',
       isDangerous: true,
-      icon: Icons.clear_outlined,
     );
 
     if (confirmed) {
@@ -1449,7 +1796,6 @@ class DeckService {
       confirmText: '예',
       cancelText: '아니오',
       isDangerous: true,
-      icon: Icons.add_box_outlined,
     );
 
     if (confirmed) {

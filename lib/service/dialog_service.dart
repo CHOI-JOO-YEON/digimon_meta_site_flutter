@@ -22,7 +22,6 @@ class DialogService {
     String confirmText = '확인',
     String cancelText = '취소',
     bool isDangerous = false,
-    IconData? icon,
   }) async {
     final result = await showDialog<bool>(
       context: context,
@@ -30,23 +29,9 @@ class DialogService {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: AppDialogTheme.dialogShape,
-          title: Row(
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  color: isDangerous ? AppDialogTheme.errorColor : AppDialogTheme.primaryColor,
-                  size: 24,
-                ),
-                const SizedBox(width: AppDialogTheme.smallSpacing),
-              ],
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppDialogTheme.titleTextStyle,
-                ),
-              ),
-            ],
+          title: Text(
+            title,
+            style: AppDialogTheme.titleTextStyle,
           ),
           content: ConstrainedBox(
             constraints: BoxConstraints(
