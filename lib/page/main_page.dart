@@ -49,7 +49,6 @@ class _MainPageState extends State<MainPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
-    final isVerySmallHeight = screenHeight < 500; // 매우 작은 높이 감지
     final isSmallWidth = screenWidth < 400; // 세로 너비가 작은 화면 감지
     final isMobilePortrait = isPortrait && screenWidth < 600; // 모바일 세로모드 감지
     
@@ -78,11 +77,9 @@ class _MainPageState extends State<MainPage> {
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
-                      height: headerProvider.isHeaderVisible 
-                        ? (isMobilePortrait 
-                            ? null // 자동 높이로 변경
-                            : SizeService.headerHeight(context))
-                        : (isVerySmallHeight ? 30 : (isSmallHeight ? 40 : 50)), // 최소한의 공간 유지
+                      height: isMobilePortrait 
+                        ? null // 자동 높이로 변경
+                        : SizeService.headerHeight(context),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -107,8 +104,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                     child: ClipRect(
-                      child: headerProvider.isHeaderVisible 
-                        ? Consumer2<UserProvider, DeckProvider>(
+                      child: Consumer2<UserProvider, DeckProvider>(
                             builder: (context, userProvider, deckProvider, child) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(
@@ -123,7 +119,7 @@ class _MainPageState extends State<MainPage> {
                                           // 세로모드에서 로그인 정보와 설정 버튼
                                           Container(
                                                                         margin: EdgeInsets.only(
-                              bottom: isVerySmallHeight ? 1 : (isMobilePortrait ? 2 : 4),
+                              bottom: isMobilePortrait ? 2 : 4,
                             ),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,16 +197,16 @@ class _MainPageState extends State<MainPage> {
                                                                   borderRadius: BorderRadius.circular(
                                                                     isMobilePortrait ? 16 : 20,
                                                                   ),
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                      color: (userProvider.isLogin 
-                                                                          ? const Color(0xFFEF4444) 
-                                                                          : Theme.of(context).colorScheme.primary)
-                                                                          .withOpacity(0.3),
-                                                                      offset: const Offset(0, 4),
-                                                                      blurRadius: 8,
-                                                                    ),
-                                                                  ],
+                                                                  // boxShadow: [
+                                                                  //   BoxShadow(
+                                                                  //     color: (userProvider.isLogin 
+                                                                  //         ? const Color(0xFFEF4444) 
+                                                                  //         : Theme.of(context).colorScheme.primary)
+                                                                  //         .withOpacity(0.3),
+                                                                  //     offset: const Offset(0, 4),
+                                                                  //     blurRadius: 8,
+                                                                  //   ),
+                                                                  // ],
                                                                 ),
                                                                 child: Text(
                                                                   userProvider.isLogin ? '로그아웃' : '로그인',
@@ -242,16 +238,6 @@ class _MainPageState extends State<MainPage> {
                                                         },
                                                         icon: Icons.settings,
                                                         tooltip: '덱 설정',
-                                                        context: context,
-                                                        isMobile: isMobilePortrait,
-                                                      ),
-                                                      
-                                                      SizedBox(width: isMobilePortrait ? 4 : 8),
-                                                      // 헤더 접기 버튼
-                                                      _buildIconButton(
-                                                        onPressed: () => headerProvider.hideHeader(),
-                                                        icon: Icons.keyboard_arrow_up,
-                                                        tooltip: '메뉴 접기',
                                                         context: context,
                                                         isMobile: isMobilePortrait,
                                                       ),
@@ -470,14 +456,6 @@ class _MainPageState extends State<MainPage> {
                                                         tooltip: '덱 설정',
                                                         context: context,
                                                       ),
-                                                      
-                                                      const SizedBox(width: 12),
-                                                      _buildIconButton(
-                                                        onPressed: () => headerProvider.hideHeader(),
-                                                        icon: Icons.keyboard_arrow_up,
-                                                        tooltip: '메뉴 접기',
-                                                        context: context,
-                                                      ),
                                                     ],
                                                   )),
                                         ],
@@ -485,65 +463,7 @@ class _MainPageState extends State<MainPage> {
                               );
                             },
                           )
-                        : // 헤더가 숨겨진 상태에서는 최소한의 바만 표시
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: SizeService.paddingSize(context) * 2,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: () => headerProvider.showHeader(),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Theme.of(context).colorScheme.primary,
-                                              const Color(0xFF1D4ED8),
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(20),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 8,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.keyboard_arrow_down,
-                                              size: 20,
-                                              color: Colors.white,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '메뉴',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+
                     ),
                   ),
                   
@@ -596,30 +516,17 @@ class _MainPageState extends State<MainPage> {
     required BuildContext context,
     bool isMobile = false,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-          onTap: onPressed,
-          child: Container(
-            padding: EdgeInsets.all(isMobile ? 8 : 12),
-            child: Icon(
-              icon,
-              size: isMobile ? SizeService.largeIconSize(context) * 0.8 : SizeService.largeIconSize(context),
-              color: Theme.of(context).colorScheme.primary,
-            ),
+        onTap: onPressed,
+        child: Container(
+          padding: EdgeInsets.all(isMobile ? 8 : 12),
+          child: Icon(
+            icon,
+            size: isMobile ? SizeService.largeIconSize(context) * 0.8 : SizeService.largeIconSize(context),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
+import 'package:digimon_meta_site_flutter/theme/app_design_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -1303,13 +1304,13 @@ class _CardSearchBarState extends State<CardSearchBar> {
           ],
         ),
         borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.05),
+        //     blurRadius: 10,
+        //     offset: const Offset(0, 2),
+        //   ),
+        // ],
       ),
       child: Row(
       children: [
@@ -1317,17 +1318,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
         Expanded(
              flex: isMobile ? 6 : 5,
             child: Container(
-              decoration: BoxDecoration(
-                 color: Colors.white,
-                 borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                 boxShadow: [
-                   BoxShadow(
-                     color: Colors.black.withOpacity(0.02),
-                     blurRadius: 4,
-                     offset: const Offset(0, 1),
-                   ),
-                 ],
-              ),
+              decoration: AppComponentStyles.cardDecoration(),
               child: TextField(
                 controller: _searchStringEditingController,
                 maxLines: 1,
@@ -1340,36 +1331,33 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 onSubmitted: (value) {
                   widget.updateSearchParameter();
                 },
-                decoration: InputDecoration(
-                   hintText: isMobile ? '카드 검색' : '카드명/효과/번호',
-                  hintStyle: TextStyle(
-                     color: Colors.grey.shade500,
-                     fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
-                     fontWeight: FontWeight.w400,
-                   ),
+                decoration: AppComponentStyles.searchFieldDecoration(
+                  hintText: '카드명/효과/번호',
+                  isMobile: isMobile,
+                                 ).copyWith(
                    prefixIcon: Container(
                      margin: const EdgeInsets.all(8),
                      decoration: BoxDecoration(
-                       color: Theme.of(context).primaryColor.withOpacity(0.1),
-                       borderRadius: BorderRadius.circular(8),
+                       color: AppColors.primary.withOpacity(0.1),
+                       borderRadius: BorderRadius.circular(AppRadius.small),
                      ),
                      child: Icon(
                        Icons.search_rounded,
                        size: isMobile ? 16 : (isSmallHeight ? 18 : 20),
-                    color: Theme.of(context).primaryColor,
-                  ),
+                       color: AppColors.primary,
+                     ),
                    ),
                    suffixIcon: _searchStringEditingController?.text.isNotEmpty == true
                      ? Container(
                          margin: const EdgeInsets.all(8),
                          child: Material(
-                           color: Colors.grey.shade100,
-                           borderRadius: BorderRadius.circular(6),
+                           color: AppColors.neutral400,
+                           borderRadius: BorderRadius.circular(AppRadius.small),
                            child: InkWell(
-                             borderRadius: BorderRadius.circular(6),
+                             borderRadius: BorderRadius.circular(AppRadius.small),
                              onTap: () {
-                          _searchStringEditingController?.clear();
-                          widget.searchParameter.searchString = '';
+                               _searchStringEditingController?.clear();
+                               widget.searchParameter.searchString = '';
                                setState(() {});
                              },
                              child: Container(
@@ -1377,46 +1365,17 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                child: Icon(
                                  Icons.clear_rounded,
                                  size: isMobile ? 14 : (isSmallHeight ? 16 : 18),
-                                 color: Colors.grey.shade600,
+                                 color: AppColors.textTertiary,
                                ),
                              ),
                            ),
                          ),
-                      )
-                    : null,
-                   enabledBorder: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                     borderSide: BorderSide(
-                       color: Colors.grey.shade300,
-                       width: 1.5,
-                     ),
-                   ),
-                   focusedBorder: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                     borderSide: BorderSide(
-                       color: Theme.of(context).primaryColor.withOpacity(0.7),
-                       width: 2,
-                     ),
-                   ),
-                   border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(isMobile ? 8 : 12),
-                     borderSide: BorderSide(
-                       color: Colors.grey.shade300,
-                       width: 1.5,
-                     ),
-                   ),
-                  contentPadding: EdgeInsets.symmetric(
-                     vertical: isPortrait 
-                       ? (isMobile ? 12 : (isSmallHeight ? 14 : 16))  // 세로모드
-                       : (isMobile ? 16 : (isSmallHeight ? 18 : 20)), // 가로모드에서 세로 패딩 증가
-                     horizontal: isMobile ? 8 : (isSmallHeight ? 10 : 12),
-                  ),
-                ),
-                style: TextStyle(
-                  fontSize: isMobile ? 12 : (isSmallHeight ? 13 : 14),
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade800,
-                ),
+                       )
+                     : null,
+                 ),
+                style: isMobile 
+                  ? AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500)
+                  : AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
           ),
@@ -1433,8 +1392,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
-              color: Theme.of(context).primaryColor,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              style: AppComponentStyles.primaryButtonOutline(
+                isMobile: isMobile,
+                isSmall: isSmallHeight,
+              ),
             ),
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
@@ -1448,8 +1409,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   },
             isMobile: isMobile,
             isSmallHeight: isSmallHeight,
-            color: Colors.orange.shade600,
-            backgroundColor: Colors.orange.shade50,
+            style: AppComponentStyles.secondaryButton(
+              isMobile: isMobile,
+              isSmall: isSmallHeight,
+            ),
           ),
           
           SizedBox(width: isMobile ? 4 : 6),
@@ -1469,8 +1432,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
-              color: Colors.red.shade600,
-              backgroundColor: Colors.red.shade50,
+              style: AppComponentStyles.warningButton(
+                isMobile: isMobile,
+                isSmall: isSmallHeight,
+              ),
             ),
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
@@ -1491,62 +1456,47 @@ class _CardSearchBarState extends State<CardSearchBar> {
                 },
               isMobile: isMobile,
               isSmallHeight: isSmallHeight,
-              color: Colors.purple.shade600,
-              backgroundColor: Colors.purple.shade50,
+              style: AppComponentStyles.accentButton(
+                isMobile: isMobile,
+                isSmall: isSmallHeight,
+              ),
             ),
         ],
       ),
     );
   }
 
-  // 액션 버튼을 생성하는 헬퍼 메서드
+  // 🎨 새로운 디자인 시스템을 적용한 액션 버튼
   Widget _buildActionButton({
     required IconData icon,
     required String tooltip,
     required VoidCallback onPressed,
     required bool isMobile,
     required bool isSmallHeight,
-    required Color color,
-    required Color backgroundColor,
+    required ButtonStyle style,
   }) {
     final buttonSize = isMobile ? 36.0 : (isSmallHeight ? 40.0 : 44.0);
     final iconSize = isMobile ? 16.0 : (isSmallHeight ? 18.0 : 20.0);
     
-    return Container(
+    return SizedBox(
       width: buttonSize,
       height: buttonSize,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: style.copyWith(
+          minimumSize: MaterialStateProperty.all(Size(buttonSize, buttonSize)),
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.small),
+            ),
           ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
-          onTap: onPressed,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
-            ),
-            child: Tooltip(
-              message: tooltip,
-              child: Icon(
-                icon,
-                size: iconSize,
-                color: color,
-              ),
-            ),
+        ),
+        child: Tooltip(
+          message: tooltip,
+          child: Icon(
+            icon,
+            size: iconSize,
           ),
         ),
       ),

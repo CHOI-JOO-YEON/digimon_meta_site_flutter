@@ -52,13 +52,12 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
   }
 
   void _scrollListener() {
-    if (_isAtBottom && _hasMorePages) {
+    // 스크롤이 끝에서 200px 정도 남았을 때 미리 로딩 시작
+    if (_scrollController.position.pixels >= 
+        _scrollController.position.maxScrollExtent - 200 &&
+        _hasMorePages) {
       _loadMoreItems();
     }
-  }
-
-  bool get _isAtBottom {
-    return _scrollController.position.pixels == _scrollController.position.maxScrollExtent;
   }
 
   bool get _hasMorePages {
@@ -66,9 +65,54 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
   }
 
   Future<void> _loadMoreItems() async {
+    if (isLoading) return;
+    
     setState(() => isLoading = true);
-    await widget.loadMoreCards();
-    setState(() => isLoading = false);
+    
+    try {
+      await widget.loadMoreCards();
+    } catch (e) {
+      debugPrint('Error loading more cards: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  Widget _buildLoadingIndicator(BoxConstraints constraints) {
+    return Container(
+      height: (constraints.maxWidth / widget.rowNumber) * 1.4,
+      margin: EdgeInsets.all(constraints.maxWidth / 100),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).primaryColor.withOpacity(0.7),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '로딩 중...',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              fontFamily: 'JalnanGothic',
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -92,11 +136,11 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
     );
   }
 
-  int _getItemCount() => widget.cards.length + (isLoading ? 1 : 0);
+  int _getItemCount() => widget.cards.length + (isLoading ? widget.rowNumber : 0); // 한 줄 전체에 로딩 표시
 
   Widget _buildGridItem(int index, BoxConstraints constraints, _GridSizes sizes) {
     if (index >= widget.cards.length) {
-      return const Center(child: CircularProgressIndicator());
+      return _buildLoadingIndicator(constraints);
     }
 
     String cardId = widget.cards[index].cardId?.toString() ?? 'card_$index';
