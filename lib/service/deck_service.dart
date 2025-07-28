@@ -1204,7 +1204,7 @@ class DeckService {
       confirmText: '예',
       cancelText: '아니오',
       isDangerous: true,
-      icon: Icons.clear_all,
+      icon: Icons.clear_outlined,
     );
 
     if (confirmed) {
@@ -1449,7 +1449,7 @@ class DeckService {
       confirmText: '예',
       cancelText: '아니오',
       isDangerous: true,
-      icon: Icons.add,
+      icon: Icons.add_box_outlined,
     );
 
     if (confirmed) {
