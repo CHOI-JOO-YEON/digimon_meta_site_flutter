@@ -17,11 +17,13 @@ import '../../../provider/deck_sort_provider.dart';
 class DeckViewerView extends StatefulWidget {
   final DeckBuild deck;
   final Function(SearchParameter)? searchWithParameter;
+  final int? fixedRowNumber; // 고정 행 수 (설정되면 슬라이더 숨김)
 
   const DeckViewerView({
     super.key,
     required this.deck,
-    this.searchWithParameter, 
+    this.searchWithParameter,
+    this.fixedRowNumber,
   });
 
   @override
@@ -41,6 +43,22 @@ class _DeckViewerViewState extends State<DeckViewerView> {
   @override
   void initState() {
     super.initState();
+    // fixedRowNumber가 설정되면 그 값을 사용
+    if (widget.fixedRowNumber != null) {
+      _rowNumber = widget.fixedRowNumber!;
+    }
+  }
+
+  @override
+  void didUpdateWidget(DeckViewerView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // fixedRowNumber가 변경되면 _rowNumber 업데이트
+    if (widget.fixedRowNumber != null && widget.fixedRowNumber != _rowNumber) {
+      setState(() {
+        _rowNumber = widget.fixedRowNumber!;
+      });
+    }
   }
 
   @override
@@ -99,10 +117,29 @@ class _DeckViewerViewState extends State<DeckViewerView> {
                       ),
                       Expanded(
                         flex: 2,
-                        child: CustomSlider(
-                          sliderValue: _rowNumber,
-                          sliderAction: updateRowNumber,
-                        ),
+                        child: widget.fixedRowNumber == null
+                            ? CustomSlider(
+                                sliderValue: _rowNumber,
+                                sliderAction: updateRowNumber,
+                              )
+                            : Center(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.grey[300]!),
+                                  ),
+                                  child: Text(
+                                    '${_rowNumber}열',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ),
                       Expanded(
                         flex: 3,
