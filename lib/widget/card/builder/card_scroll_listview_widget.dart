@@ -9,7 +9,7 @@ import '../../../service/size_service.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
-  final VoidCallback? loadMoreCards;
+  final Future<void> Function()? loadMoreCards; // Changed to return Future
   final Function(DigimonCard)? cardPressEvent;
   final int totalPages;
   final int currentPage;
@@ -44,8 +44,9 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
+    // 스크롤이 끝에서 300px 정도 남았을 때 미리 로딩 시작 (ListView는 좀 더 여유롭게)
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 300 &&
         !isLoading &&
         widget.currentPage < widget.totalPages) {
       loadMoreItems();
@@ -60,11 +61,20 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   }
 
   Future<void> loadMoreItems() async {
+    if (isLoading || widget.loadMoreCards == null) return;
+    
     setState(() => isLoading = true);
-    if (widget.loadMoreCards != null) {
-      widget.loadMoreCards!();
+    
+    try {
+      await widget.loadMoreCards!(); // 실제 로딩 완료까지 기다림
+    } catch (e) {
+      // 에러 처리
+      debugPrint('Error loading more cards: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
-    setState(() => isLoading = false);
   }
 
   // Play addition animation for a card
@@ -89,6 +99,36 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   void _handleCardAddition(DigimonCard card) {
     _playAdditionEffect(card);
     widget.cardPressEvent!(card);
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: EdgeInsets.all(SizeService.paddingSize(context) * 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).primaryColor.withOpacity(0.7),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '더 많은 카드를 불러오는 중...',
+            style: TextStyle(
+              fontSize: SizeService.bodyFontSize(context) * 0.9,
+              color: Colors.grey[600],
+              fontFamily: 'JalnanGothic',
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -229,7 +269,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                   ),
                 );
               } else {
-                return const Center(child: CircularProgressIndicator());
+                // 로딩 인디케이터
+                return _buildLoadingIndicator();
               }
             },
           ),
