@@ -71,17 +71,17 @@ class _DeckListPageState extends State<DeckListPage> {
       userProvider.addListener(_onUserLoginStateChanged);
     });
 
-    // 세로 모드에서 초기 위치 설정
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (MediaQuery.of(context).orientation == Orientation.portrait &&
-          _bottomSheetController.isAttached) {
-        _bottomSheetController.animateTo(
-          0.4,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    // 세로 모드에서 초기 위치는 initialChildSize로 설정되므로 별도 애니메이션 불필요
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (MediaQuery.of(context).orientation == Orientation.portrait &&
+    //       _bottomSheetController.isAttached) {
+    //     _bottomSheetController.animateTo(
+    //       0.3,
+    //       duration: Duration(milliseconds: 300),
+    //       curve: Curves.easeInOut,
+    //     );
+    //   }
+    // });
   }
 
   void _onUserLoginStateChanged() {
@@ -202,120 +202,116 @@ class _DeckListPageState extends State<DeckListPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          
                           // 덱 뷰 행 수 조정
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.view_column, color: Colors.purple[600], size: 24),
-                                    SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '한 줄에 표시할 카드 장수',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${_deckViewRowNumber}장',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
+                                Icon(Icons.view_column, color: Colors.purple[600], size: 24),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '한 줄에 표시할 카드 장수',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      Text(
+                                        '${_deckViewRowNumber}장',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                            
-                            // 복사해서 새로운 덱 만들기
+                              ],
+                            ),
+                          ),
+                          
+                          // 복사해서 새로운 덱 만들기
+                          ListTile(
+                            leading: Icon(Icons.copy_outlined, color: Colors.blue[600]),
+                            title: Text('덱 복사하기'),
+                            subtitle: Text('이 덱을 복사해서 새로운 덱 만들기'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (_selectedDeck != null) {
+                                DeckService().copyDeck(context, _selectedDeck!);
+                              }
+                            },
+                          ),
+                          
+                          // 덱 내보내기
+                          ListTile(
+                            leading: Icon(Icons.upload_outlined, color: Colors.purple[600]),
+                            title: Text('덱 내보내기'),
+                            subtitle: Text('파일로 내보내기'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (_selectedDeck != null) {
+                                DeckService().showExportDialog(context, _selectedDeck!);
+                              }
+                            },
+                          ),
+                          
+                          // 이미지 저장
+                          ListTile(
+                            leading: Icon(Icons.image_outlined, color: Colors.pink[600]),
+                            title: Text('덱 이미지 저장'),
+                            subtitle: Text('덱을 이미지로 저장'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (_selectedDeck != null) {
+                                context.navigateTo(DeckImageRoute(deck: _selectedDeck!));
+                              }
+                            },
+                          ),
+                          
+                          // 플레이그라운드
+                          ListTile(
+                            leading: Icon(Icons.gamepad_outlined, color: Colors.green[600]),
+                            title: Text('플레이그라운드'),
+                            subtitle: Text('게임 시뮬레이션으로 테스트'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (_selectedDeck != null) {
+                                context.navigateTo(GamePlayGroundRoute(deckBuild: _selectedDeck!));
+                              }
+                            },
+                          ),
+                          
+                          // 대회 제출용 레시피
+                          ListTile(
+                            leading: Icon(Icons.receipt_long_outlined, color: Colors.teal[600]),
+                            title: Text('대회 제출용 레시피'),
+                            subtitle: Text('대회용 덱리스트 다운로드'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (_selectedDeck != null) {
+                                DeckService().downloadDeckReceipt(context, _selectedDeck!);
+                              }
+                            },
+                          ),
+                          
+                          // TTS 파일 내보내기 (관리자만)
+                          if (userProvider.hasManagerRole())
                             ListTile(
-                              leading: Icon(Icons.copy_outlined, color: Colors.blue[600]),
-                              title: Text('덱 복사하기'),
-                              subtitle: Text('이 덱을 복사해서 새로운 덱 만들기'),
-                              onTap: () {
+                              leading: Icon(Icons.videogame_asset_outlined, color: Colors.indigo[600]),
+                              title: Text('TTS 파일 내보내기'),
+                              subtitle: Text('Table Top Simulator용 파일'),
+                              onTap: () async {
                                 Navigator.pop(context);
                                 if (_selectedDeck != null) {
-                                  DeckService().copyDeck(context, _selectedDeck!);
+                                  await DeckService().exportToTTSFile(_selectedDeck!);
                                 }
                               },
                             ),
-                            
-                            // 덱 내보내기
-                            ListTile(
-                              leading: Icon(Icons.upload_outlined, color: Colors.purple[600]),
-                              title: Text('덱 내보내기'),
-                              subtitle: Text('파일로 내보내기'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (_selectedDeck != null) {
-                                  DeckService().showExportDialog(context, _selectedDeck!);
-                                }
-                              },
-                            ),
-                            
-                            // 이미지 저장
-                            ListTile(
-                              leading: Icon(Icons.image_outlined, color: Colors.pink[600]),
-                              title: Text('덱 이미지 저장'),
-                              subtitle: Text('덱을 이미지로 저장'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (_selectedDeck != null) {
-                                  context.navigateTo(DeckImageRoute(deck: _selectedDeck!));
-                                }
-                              },
-                            ),
-                            
-                            // 플레이그라운드
-                            ListTile(
-                              leading: Icon(Icons.gamepad_outlined, color: Colors.green[600]),
-                              title: Text('플레이그라운드'),
-                              subtitle: Text('게임 시뮬레이션으로 테스트'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (_selectedDeck != null) {
-                                  context.navigateTo(GamePlayGroundRoute(deckBuild: _selectedDeck!));
-                                }
-                              },
-                            ),
-                            
-                            // 대회 제출용 레시피
-                            ListTile(
-                              leading: Icon(Icons.receipt_long_outlined, color: Colors.teal[600]),
-                              title: Text('대회 제출용 레시피'),
-                              subtitle: Text('대회용 덱리스트 다운로드'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                if (_selectedDeck != null) {
-                                  DeckService().downloadDeckReceipt(context, _selectedDeck!);
-                                }
-                              },
-                            ),
-                            
-                            // TTS 파일 내보내기 (관리자만)
-                            if (userProvider.hasManagerRole())
-                              ListTile(
-                                leading: Icon(Icons.videogame_asset_outlined, color: Colors.indigo[600]),
-                                title: Text('TTS 파일 내보내기'),
-                                subtitle: Text('Table Top Simulator용 파일'),
-                                onTap: () async {
-                                  Navigator.pop(context);
-                                  if (_selectedDeck != null) {
-                                    await DeckService().exportToTTSFile(_selectedDeck!);
-                                  }
-                                },
-                              ),
-                          ],
                         ],
                       ),
                     ),
@@ -402,10 +398,10 @@ class _DeckListPageState extends State<DeckListPage> {
                   ),
                 ),
                 
-                // DraggableScrollableSheet으로 검색 패널 구현
+                // DraggableScrollableSheet으로 검색 패널 구현 - 초기 크기를 크게 하여 덱 리스트가 바로 보이도록 함
                 DraggableScrollableSheet(
                   controller: _bottomSheetController,
-                  initialChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
+                  initialChildSize: 0.3,
                   minChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
                   maxChildSize: 1.0,
                   snap: false,
@@ -542,24 +538,23 @@ class _DeckListPageState extends State<DeckListPage> {
                               ),
                             ),
                             
-                            // 확장 가능한 컨텐츠 영역 (검색 패널)
-                            if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5) ...[
-                              SliverToBoxAdapter(
-                                child: Divider(height: 1, color: Colors.grey[300]),
-                              ),
-                              
-                              // 덱 검색 패널
-                              SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                  child: DeckSearchView(
-                                    deckUpdate: updateSelectedDeck,
-                                    deckSearchParameter: deckSearchParameter,
-                                    updateSearchParameter: updateSearchParameter,
-                                  ),
+                            // 확장 가능한 컨텐츠 영역 (검색 패널) - 항상 표시하여 덱 리스트에 쉽게 접근할 수 있도록 함
+                            SliverToBoxAdapter(
+                              child: Divider(height: 1, color: Colors.grey[300]),
+                            ),
+                            
+                            // 덱 검색 패널 - 명확한 높이 제약을 주어 무한 영역 사이즈 문제 해결
+                            SliverToBoxAdapter(
+                              child: Container(
+                                height: constraints.maxHeight * 0.6, // 바텀시트 높이의 60%
+                                padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                child: DeckSearchView(
+                                  deckUpdate: updateSelectedDeck,
+                                  deckSearchParameter: deckSearchParameter,
+                                  updateSearchParameter: updateSearchParameter,
                                 ),
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
