@@ -205,30 +205,55 @@ class _DeckListPageState extends State<DeckListPage> {
                           // 덱 뷰 행 수 조정
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.view_column, color: Colors.purple[600], size: 24),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '한 줄에 표시할 카드 장수',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.view_column, color: Colors.purple[600], size: 24),
+                                    SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '한 줄에 표시할 카드 장수',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${_deckViewRowNumber}장',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        '${_deckViewRowNumber}장',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                StatefulBuilder(
+                                  builder: (context, setSliderState) {
+                                    return Slider(
+                                      value: _deckViewRowNumber.toDouble(),
+                                      min: 2,
+                                      max: 8,
+                                      divisions: 6,
+                                      activeColor: Colors.purple[600],
+                                      label: '${_deckViewRowNumber}장',
+                                      onChanged: (value) {
+                                        setSliderState(() {
+                                          _deckViewRowNumber = value.round();
+                                        });
+                                        // 즉시 상위 위젯 상태 업데이트
+                                        setState(() {});
+                                      },
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -383,11 +408,17 @@ class _DeckListPageState extends State<DeckListPage> {
                               controller: _scrollController,
                               child: Column(
                                 children: [
-                                  DeckViewerView(
-                                    deck: _selectedDeck!,
-                                    searchWithParameter: searchWithParameter,
-                                    fixedRowNumber: _deckViewRowNumber,
-                                  ),
+                                  _selectedDeck != null 
+                                    ? DeckViewerView(
+                                        deck: _selectedDeck!,
+                                        searchWithParameter: searchWithParameter,
+                                        fixedRowNumber: _deckViewRowNumber,
+                                        showMenuBar: false, // 세로모드에서는 메뉴바 숨김
+                                        showSlider: false, // 세로모드에서는 슬라이더 숨김 (메뉴에서 조정)
+                                        showButtons: false, // 세로모드에서는 버튼 숨김
+                                        showDeckInfo: true, // 세로모드에서는 덱 정보 표시
+                                      )
+                                    : SizedBox.shrink(),
                                   SizedBox(
                                     height: MediaQuery.sizeOf(context).height * 0.2,
                                   ),
@@ -567,42 +598,185 @@ class _DeckListPageState extends State<DeckListPage> {
         },
       );
     } else {
-      // 가로 모드 (기존 코드 유지, 나중에 개선)
+      // 가로 모드 레이아웃 개선 - 모바일 반응형 추가
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isTablet = screenWidth >= 768 && screenWidth < 1024;
+      final isSmallLaptop = screenWidth >= 1024 && screenWidth < 1200;
+      final isMobileDesktop = screenWidth < 768;
+      
+      // 동적 비율 계산
+      int deckFlex, searchFlex;
+      double spacing;
+      
+      if (isMobileDesktop) {
+        // 모바일 데스크톱에서는 더 균형잡힌 비율
+        deckFlex = 1;
+        searchFlex = 1;
+        spacing = MediaQuery.sizeOf(context).width * 0.005; // 더 작은 간격
+      } else if (isTablet) {
+        // 태블릿에서는 약간 조정된 비율
+        deckFlex = 5;
+        searchFlex = 3;
+        spacing = MediaQuery.sizeOf(context).width * 0.008;
+      } else if (isSmallLaptop) {
+        // 작은 노트북에서는 기본 비율에 가깝게
+        deckFlex = 3;
+        searchFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      } else {
+        // 큰 화면에서는 기존 비율 유지
+        deckFlex = 3;
+        searchFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      }
+      
       return Padding(
-        padding: EdgeInsets.all(SizeService.paddingSize(context)),
+        padding: EdgeInsets.all(
+          isMobileDesktop 
+            ? SizeService.paddingSize(context) * 0.5 // 모바일에서 패딩 줄임
+            : SizeService.paddingSize(context)
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
+              flex: deckFlex,
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Theme.of(context).highlightColor),
-                child: SingleChildScrollView(
-                  child: _selectedDeck == null
-                      ? Container()
-                      : DeckViewerView(
-                          deck: _selectedDeck!,
-                          searchWithParameter: searchWithParameter,
-                          fixedRowNumber: _deckViewRowNumber,
-                        ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: isMobileDesktop ? 12 : 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  child: SingleChildScrollView(
+                    child: _selectedDeck == null
+                        ? Container(
+                            height: 400,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.style,
+                                    size: 64,
+                                    color: Colors.grey[400],
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    '덱을 선택해주세요',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    '오른쪽 검색 패널에서 덱을 찾아보세요',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : _selectedDeck != null 
+                            ? DeckViewerView(
+                                deck: _selectedDeck!,
+                                searchWithParameter: searchWithParameter,
+                                fixedRowNumber: null, // 가로모드에서는 슬라이더를 통해 조정 가능
+                                showMenuBar: true, // 가로모드에서는 메뉴바 표시
+                                showSlider: true, // 가로모드에서는 슬라이더 표시
+                                showButtons: true, // 가로모드에서는 버튼 표시
+                              )
+                            : Container(
+                                height: 400,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.style,
+                                        size: 64,
+                                        color: Colors.grey[400],
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        '덱을 선택해주세요',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        '오른쪽 검색 패널에서 덱을 찾아보세요',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[500],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                  ),
                 ),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width * 0.01,
-            ),
+            SizedBox(width: spacing),
             Expanded(
-              flex: 2,
+              flex: searchFlex,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor,
-                  borderRadius: BorderRadius.circular(5),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: isMobileDesktop ? 12 : 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(
-                      MediaQuery.sizeOf(context).width * 0.01),
+                    isMobileDesktop 
+                      ? SizeService.paddingSize(context) * 0.7 // 모바일에서 내부 패딩 줄임
+                      : SizeService.paddingSize(context)
+                  ),
                   child: DeckSearchView(
                     deckUpdate: updateSelectedDeck,
                     deckSearchParameter: deckSearchParameter,

@@ -18,12 +18,20 @@ class DeckViewerView extends StatefulWidget {
   final DeckBuild deck;
   final Function(SearchParameter)? searchWithParameter;
   final int? fixedRowNumber; // 고정 행 수 (설정되면 슬라이더 숨김)
+  final bool showMenuBar; // 메뉴바 표시 여부
+  final bool showSlider; // 슬라이더 표시 여부
+  final bool showButtons; // 버튼 표시 여부
+  final bool showDeckInfo; // 덱 이름과 스탯 표시 여부
 
   const DeckViewerView({
     super.key,
     required this.deck,
     this.searchWithParameter,
     this.fixedRowNumber,
+    this.showMenuBar = true,
+    this.showSlider = true,
+    this.showButtons = true,
+    this.showDeckInfo = true,
   });
 
   @override
@@ -89,75 +97,156 @@ class _DeckViewerViewState extends State<DeckViewerView> {
   Widget build(BuildContext context) {
     CardOverlayService cardOverlayService = CardOverlayService();
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
 
     double height = MediaQuery.of(context).size.height * 0.88;
     if (isPortrait && isInit) {
       _rowNumber = 4;
     }
     isInit = false;
+    
     return Column(
       children: [
-        SizedBox(
-          height: height * 0.3,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+        // 덱 정보 영역 - 세로모드에서 메뉴바와 스탯 표시
+        if (isPortrait && widget.showDeckInfo) ...[
+          Container(
+            padding: EdgeInsets.all(SizeService.paddingSize(context) * 0.8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white,
+                  const Color(0xFFFAFBFC),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 덱 메뉴바 (덱 이름, 작성자) - 안전하게 처리
                 Expanded(
-                  // flex:  4,
-                  child: Row(
+                  flex: 2,
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 메뉴바
-                      Expanded(
-                        flex: 2,
-                        child: DeckViewerMenuBar(
-                          deck: widget.deck,
-                        ),
+                      Text(
+                        '${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
+                        style: TextStyle(fontSize: SizeService.smallFontSize(context)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: widget.fixedRowNumber == null
-                            ? CustomSlider(
-                                sliderValue: _rowNumber,
-                                sliderAction: updateRowNumber,
-                              )
-                            : Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[100],
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.grey[300]!),
-                                  ),
-                                  child: Text(
-                                    '${_rowNumber}열',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: DeckStat(deck: widget.deck),
+                      SizedBox(height: 4),
+                      Text(
+                        widget.deck.deckName ?? 'Untitled Deck',
+                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
+                SizedBox(width: SizeService.paddingSize(context) * 0.5),
+                // 덱 스탯 - 안전하게 처리
                 Expanded(
-                  // flex: 2,
-                  child: DeckMenuButtons(
-                    deck: widget.deck,
+                  flex: 3,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: 60,
+                      maxHeight: 100,
+                    ),
+                    child: DeckStat(deck: widget.deck),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          SizedBox(height: SizeService.paddingSize(context) * 0.5),
+        ],
+        
+        // 상단 메뉴 영역 - 가로모드에서만 표시
+        if (!isPortrait && (widget.showMenuBar || widget.showSlider || widget.showButtons)) ...[
+          SizedBox(
+            height: height * 0.3,
+            child: Padding(
+              padding: EdgeInsets.all(isMobile ? 6.0 : 8.0),
+              child: Column(
+                children: [
+                  if (widget.showMenuBar || widget.showSlider) ...[
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 메뉴바
+                          if (widget.showMenuBar) ...[
+                            Expanded(
+                              flex: 2,
+                              child: DeckViewerMenuBar(
+                                deck: widget.deck,
+                              ),
+                            ),
+                          ],
+                          // 슬라이더 또는 고정 행 수 표시
+                          if (widget.showSlider) ...[
+                            Expanded(
+                              flex: 2,
+                              child: widget.fixedRowNumber == null
+                                  ? CustomSlider(
+                                      sliderValue: _rowNumber,
+                                      sliderAction: updateRowNumber,
+                                    )
+                                  : Center(
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[100],
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.grey[300]!),
+                                        ),
+                                        child: Text(
+                                          '${_rowNumber}열',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[700],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ],
+                          // 덱 통계
+                          Expanded(
+                            flex: 3,
+                            child: DeckStat(deck: widget.deck),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (widget.showButtons) ...[
+                    Expanded(
+                      child: DeckMenuButtons(
+                        deck: widget.deck,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
         SizedBox(
           height: SizeService.bodyFontSize(context) * 1.5,
           child: Text(
