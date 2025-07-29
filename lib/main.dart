@@ -132,7 +132,7 @@ class _MyAppState extends State<MyApp> {
       title: 'DGCHub',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-        dialogTheme: DialogTheme(
+        dialogTheme: DialogThemeData(
           backgroundColor: Colors.white,
           elevation: 16.0,
           shape: RoundedRectangleBorder(
@@ -166,7 +166,7 @@ class _MyAppState extends State<MyApp> {
           onSurface: const Color(0xFF1F2937),
           onBackground: const Color(0xFF374151),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 8.0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
@@ -202,7 +202,7 @@ class _MyAppState extends State<MyApp> {
             fontFamily: 'JalnanGothic',
           ),
         ),
-        tabBarTheme: TabBarTheme(
+        tabBarTheme: TabBarThemeData(
           labelColor: Colors.white,
           unselectedLabelColor: const Color(0xFF6B7280),
           indicatorColor: const Color(0xFF2563EB),
