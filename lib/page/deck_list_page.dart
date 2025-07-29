@@ -468,18 +468,43 @@ class _DeckListPageState extends State<DeckListPage> {
                                   width: double.infinity,
                                   padding: EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[50],
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white,
+                                        const Color(0xFFF8FAFC),
+                                      ],
+                                    ),
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey.withOpacity(0.1),
+                                        width: 1,
+                                      ),
+                                    ),
                                   ),
                                   child: Column(
                                     children: [
-                                      // 드래그 핸들
+                                      // 드래그 핸들 (더 세련된 디자인)
                                       Container(
-                                        width: 50,
-                                        height: 6,
+                                        width: 60,
+                                        height: 5,
                                         decoration: BoxDecoration(
-                                          color: Colors.grey[400],
-                                          borderRadius: BorderRadius.circular(3),
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.grey[300]!,
+                                              Colors.grey[400]!,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(2.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       SizedBox(height: 12),
@@ -490,68 +515,128 @@ class _DeckListPageState extends State<DeckListPage> {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                             // 덱 카운트 요약 (덱빌더와 동일)
+                                             // 덱 카운트 요약 (더 세련된 디자인)
                                              Row(
                                                children: [
                                                  Container(
-                                                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                    decoration: BoxDecoration(
-                                                     color: Colors.blue[50],
-                                                     borderRadius: BorderRadius.circular(12),
+                                                     gradient: LinearGradient(
+                                                       colors: [Colors.blue[50]!, Colors.blue[100]!],
+                                                     ),
+                                                     borderRadius: BorderRadius.circular(16),
+                                                     border: Border.all(
+                                                       color: Colors.blue[200]!,
+                                                       width: 0.5,
+                                                     ),
+                                                     boxShadow: [
+                                                       BoxShadow(
+                                                         color: Colors.blue.withOpacity(0.1),
+                                                         blurRadius: 4,
+                                                         offset: Offset(0, 2),
+                                                       ),
+                                                     ],
                                                    ),
-                                                   child: Text(
-                                                     '메인: ${_selectedDeck?.deckCount ?? 0}장',
-                                                     style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+                                                   child: Row(
+                                                     mainAxisSize: MainAxisSize.min,
+                                                     children: [
+                                                       Icon(Icons.style, size: 14, color: Colors.blue[700]),
+                                                       SizedBox(width: 4),
+                                                       Text(
+                                                         '메인 ${_selectedDeck?.deckCount ?? 0}',
+                                                         style: TextStyle(
+                                                           fontSize: 12, 
+                                                           color: Colors.blue[700],
+                                                           fontWeight: FontWeight.w600,
+                                                         ),
+                                                       ),
+                                                     ],
                                                    ),
                                                  ),
                                                  SizedBox(width: 8),
                                                  Container(
-                                                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                    decoration: BoxDecoration(
-                                                     color: Colors.orange[50],
-                                                     borderRadius: BorderRadius.circular(12),
+                                                     gradient: LinearGradient(
+                                                       colors: [Colors.orange[50]!, Colors.orange[100]!],
+                                                     ),
+                                                     borderRadius: BorderRadius.circular(16),
+                                                     border: Border.all(
+                                                       color: Colors.orange[200]!,
+                                                       width: 0.5,
+                                                     ),
+                                                     boxShadow: [
+                                                       BoxShadow(
+                                                         color: Colors.orange.withOpacity(0.1),
+                                                         blurRadius: 4,
+                                                         offset: Offset(0, 2),
+                                                       ),
+                                                     ],
                                                    ),
-                                                   child: Text(
-                                                     '디지타마: ${_selectedDeck?.tamaCount ?? 0}장',
-                                                     style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                                                   child: Row(
+                                                     mainAxisSize: MainAxisSize.min,
+                                                     children: [
+                                                       Icon(Icons.egg, size: 14, color: Colors.orange[700]),
+                                                       SizedBox(width: 4),
+                                                       Text(
+                                                         '디지타마 ${_selectedDeck?.tamaCount ?? 0}',
+                                                         style: TextStyle(
+                                                           fontSize: 12, 
+                                                           color: Colors.orange[700],
+                                                           fontWeight: FontWeight.w600,
+                                                         ),
+                                                       ),
+                                                     ],
                                                    ),
                                                  ),
                                                ],
                                              ),
                                              
-                                             // 메뉴 버튼 (덱빌더와 동일)
+                                             // 메뉴 버튼 (더 세련된 디자인)
                                              Tooltip(
                                                message: '덱 메뉴',
                                                child: Material(
                                                  color: Colors.transparent,
                                                  child: InkWell(
-                                                   borderRadius: BorderRadius.circular(12),
+                                                   borderRadius: BorderRadius.circular(16),
                                                    onTap: () => _showDeckSearchMenu(context),
                                                    child: Container(
-                                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                                      decoration: BoxDecoration(
-                                                       color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                                       borderRadius: BorderRadius.circular(12),
-                                                       border: Border.all(
-                                                         color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                         width: 1,
+                                                       gradient: LinearGradient(
+                                                         colors: [
+                                                           Theme.of(context).primaryColor.withOpacity(0.1),
+                                                           Theme.of(context).primaryColor.withOpacity(0.15),
+                                                         ],
                                                        ),
+                                                       borderRadius: BorderRadius.circular(16),
+                                                       border: Border.all(
+                                                         color: Theme.of(context).primaryColor.withOpacity(0.3),
+                                                         width: 0.5,
+                                                       ),
+                                                       boxShadow: [
+                                                         BoxShadow(
+                                                           color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                           blurRadius: 4,
+                                                           offset: Offset(0, 2),
+                                                         ),
+                                                       ],
                                                      ),
                                                      child: Row(
                                                        mainAxisSize: MainAxisSize.min,
                                                        children: [
                                                          Icon(
-                                                           Icons.menu,
+                                                           Icons.tune,
                                                            color: Theme.of(context).primaryColor,
                                                            size: 16,
                                                          ),
-                                                         SizedBox(width: 4),
+                                                         SizedBox(width: 6),
                                                          Text(
                                                            '메뉴',
                                                            style: TextStyle(
                                                              fontSize: 12,
                                                              color: Theme.of(context).primaryColor,
-                                                             fontWeight: FontWeight.w500,
+                                                             fontWeight: FontWeight.w600,
                                                            ),
                                                          ),
                                                        ],
@@ -579,6 +664,16 @@ class _DeckListPageState extends State<DeckListPage> {
                               child: Container(
                                 height: constraints.maxHeight * 0.6, // 바텀시트 높이의 60%
                                 padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.white,
+                                      const Color(0xFFF8FAFC),
+                                    ],
+                                  ),
+                                ),
                                 child: DeckSearchView(
                                   deckUpdate: updateSelectedDeck,
                                   deckSearchParameter: deckSearchParameter,

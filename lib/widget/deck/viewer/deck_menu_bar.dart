@@ -43,7 +43,7 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                     Text('${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
                       style: TextStyle(fontSize: SizeService.smallFontSize(context)),),
                     Text(
-                      widget.deck.deckName ?? 'Untitled',
+                      widget.deck.deckName ?? 'Untitled Deck',
                       style: TextStyle(fontSize: SizeService.bodyFontSize(context)
                         // ,overflow: TextOverflow.ellipsis,
                       ),

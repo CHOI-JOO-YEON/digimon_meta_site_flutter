@@ -97,9 +97,10 @@ class _DeckViewerViewState extends State<DeckViewerView> {
   Widget build(BuildContext context) {
     CardOverlayService cardOverlayService = CardOverlayService();
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+        final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 768;
-
+    final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     double height = MediaQuery.of(context).size.height * 0.88;
     if (isPortrait && isInit) {
       _rowNumber = 4;
@@ -108,64 +109,145 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     
     return Column(
       children: [
-        // 덱 정보 영역 - 세로모드에서 메뉴바와 스탯 표시
+        // 덱 정보 영역 - 세로모드에서 덱빌더와 동일한 비율로 컴팩트 레이아웃
         if (isPortrait && widget.showDeckInfo) ...[
           Container(
-            padding: EdgeInsets.all(SizeService.paddingSize(context) * 0.8),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white,
-                  const Color(0xFFFAFBFC),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-              border: Border.all(
-                color: Colors.grey.withOpacity(0.1),
-                width: 1,
-              ),
+            height: isMobile ? (isSmallHeight ? 70 : 80) : (isSmallHeight ? 80 : 100),
+            padding: EdgeInsets.all(
+              isMobile 
+                ? SizeService.paddingSize(context) * 0.7 
+                : SizeService.paddingSize(context)
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 덱 메뉴바 (덱 이름, 작성자) - 안전하게 처리
+                // 왼쪽 영역 (작성자 + 덱이름) - 덱빌더와 동일한 2:3 비율
                 Expanded(
                   flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
-                        style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white,
+                          const Color(0xFFFAFBFC),
+                        ],
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        widget.deck.deckName ?? 'Untitled Deck',
-                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.15),
+                        width: 1,
                       ),
-                    ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 작성자 정보 (상단)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        const Color(0xFF4F46E5),
+                                        const Color(0xFF7C3AED),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 10,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Tooltip(
+                                    message: '작성자: ${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
+                                    waitDuration: Duration(milliseconds: 500),
+                                    child: Text(
+                                      '${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
+                                      style: TextStyle(
+                                        fontSize: SizeService.smallFontSize(context) * 0.85,
+                                        color: const Color(0xFF64748B),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          // 덱 이름 (하단)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        const Color(0xFF0EA5E9),
+                                        const Color(0xFF3B82F6),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.style,
+                                    color: Colors.white,
+                                    size: 10,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Tooltip(
+                                    message: '덱 이름: ${widget.deck.deckName ?? 'Untitled Deck'}',
+                                    waitDuration: Duration(milliseconds: 500),
+                                    child: Text(
+                                      widget.deck.deckName ?? 'Untitled Deck',
+                                      style: TextStyle(
+                                        fontSize: SizeService.bodyFontSize(context) * 0.85,
+                                        color: const Color(0xFF1F2937),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(width: SizeService.paddingSize(context) * 0.5),
-                // 덱 스탯 - 안전하게 처리
+                
+                SizedBox(width: 8),
+                
+                // 오른쪽 영역 (덱 스탯) - 덱빌더와 동일한 비율
                 Expanded(
                   flex: 3,
                   child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: 60,
-                      maxHeight: 100,
-                    ),
+                    height: double.infinity,
                     child: DeckStat(deck: widget.deck),
                   ),
                 ),
