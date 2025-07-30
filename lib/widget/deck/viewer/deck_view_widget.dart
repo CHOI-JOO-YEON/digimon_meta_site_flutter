@@ -10,6 +10,7 @@ import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widge
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/viewer/deck_description_view.dart';
+import 'package:digimon_meta_site_flutter/widget/common/deck_section_header.dart';
 
 import '../../../model/deck-build.dart';
 import '../../../provider/deck_sort_provider.dart';
@@ -329,13 +330,13 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             ),
           ),
         ],
-        SizedBox(
-          height: SizeService.bodyFontSize(context) * 1.5,
-          child: Text(
-            '메인',
-            style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
-          ),
+        DeckSectionHeader(
+          title: '메인',
+          isPortrait: isPortrait,
+          isMobile: isMobile,
+          isEmpty: widget.deck.deckCards.isEmpty,
         ),
+        if (widget.deck.deckCards.isNotEmpty)
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
@@ -357,13 +358,13 @@ class _DeckViewerViewState extends State<DeckViewerView> {
             },
           ),
         ),
-        SizedBox(
-          height: SizeService.bodyFontSize(context) * 1.5,
-          child: Text(
-            '디지타마',
-            style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
-          ),
+        DeckSectionHeader(
+          title: '디지타마',
+          isPortrait: isPortrait,
+          isMobile: isMobile,
+          isEmpty: widget.deck.tamaCards.isEmpty,
         ),
+        if (widget.deck.tamaCards.isNotEmpty)
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,

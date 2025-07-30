@@ -27,6 +27,7 @@ import 'dart:html' as html;
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:digimon_meta_site_flutter/widget/common/skeleton_loading.dart';
+import '../widget/common/deck_menu_dialog.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
@@ -428,266 +429,40 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   // 통합 덱 메뉴 다이얼로그
   void _showDeckMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      enableDrag: true,
-      isDismissible: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Consumer<UserProvider>(
-          builder: (context, userProvider, child) {
-            return Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 고정 헤더 (드래그 핸들 + 제목)
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 드래그 핸들
-                        Center(
-                          child: Container(
-                            width: 50,
-                            height: 5,
-                            margin: EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2.5),
-                            ),
-                          ),
-                        ),
-                        
-                        Row(
-                          children: [
-                            Icon(Icons.menu, color: Colors.grey[700]),
-                            SizedBox(width: 8),
-                            Text(
-                              '덱 관리',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // 스크롤 가능한 메뉴 리스트
-                  Flexible(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                
-                                      // 카드 행 수 조정
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.view_column, color: Colors.purple[600], size: 24),
-                              SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                                                         Text(
-                                       '한 줄에 표시할 카드 장수',
-                                       style: TextStyle(
-                                         fontSize: 16,
-                                         fontWeight: FontWeight.w500,
-                                       ),
-                                     ),
-                                     Text(
-                                       '${_deckViewRowNumber}장',
-                                       style: TextStyle(
-                                         fontSize: 14,
-                                         color: Colors.grey[600],
-                                       ),
-                                     ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          StatefulBuilder(
-                            builder: (context, setSliderState) {
-                              return Slider(
-                                value: _deckViewRowNumber.toDouble(),
-                                min: 2,
-                                max: 8,
-                                divisions: 6,
-                                activeColor: Colors.purple[600],
-                                label: '${_deckViewRowNumber}장',
-                                onChanged: (value) {
-                                  setSliderState(() {
-                                    _deckViewRowNumber = value.round();
-                                  });
-                                  // 즉시 상위 위젯 상태 업데이트
-                                  setState(() {});
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  
-                  // 새로 만들기
-                  ListTile(
-                    leading: Icon(Icons.add_box_outlined, color: Colors.green[600]),
-                    title: Text('새로 만들기'),
-                    subtitle: Text('새로운 덱으로 시작'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      DeckService().resetDeck(context, () {
-                        if (deck != null) {
-                          deck!.init();
-                          ToastOverlay.show(context, '새로운 덱이 생성되었습니다.', type: ToastType.success);
-                          setState(() {});
-                        }
-                      });
-                    },
-                  ),
-                  
-                  // 비우기
-                  ListTile(
-                    leading: Icon(Icons.clear_outlined, color: Colors.red[600]),
-                    title: Text('덱 비우기'),
-                    subtitle: Text('모든 카드 제거'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        DeckService().clearDeck(context, deck!, () {
-                          ToastOverlay.show(context, '덱이 비워졌습니다.', type: ToastType.warning);
-                          setState(() {});
-                        });
-                      }
-                    },
-                  ),
-                  
-                  // 복사해서 새로운 덱 만들기
-                  ListTile(
-                    leading: Icon(Icons.copy_outlined, color: Colors.blue[600]),
-                    title: Text('덱 복사'),
-                    subtitle: Text('현재 덱을 복사하여 새로 만들기'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        DeckService().copyDeck(
-                          context,
-                          deck!,
-                          onCopy: () {
-                            deck!.newCopy();
-                            ToastOverlay.show(context, '덱이 복사되었습니다.', type: ToastType.success);
-                            setState(() {});
-                          },
-                        );
-                      }
-                    },
-                  ),
-                  
-                  // 저장
-                  ListTile(
-                    leading: Icon(Icons.save_outlined, color: Colors.purple[600]),
-                    title: Text('덱 저장'),
-                    subtitle: Text('서버에 덱 저장'),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      if (userProvider.isLogin && deck != null) {
-                        Map<int, FormatDto> formats = await DeckService().getFormats(deck!);
-                        DeckService().showSaveDialog(context, formats, deck!, () {
-                          ToastOverlay.show(context, '덱이 저장되었습니다.', type: ToastType.success);
-                          setState(() {});
-                        });
-                      } else {
-                        ToastOverlay.show(context, '로그인이 필요합니다.', type: ToastType.warning);
-                      }
-                    },
-                  ),
-                  
-                  // 가져오기
-                  ListTile(
-                    leading: Icon(Icons.download_outlined, color: Colors.green[600]),
-                    title: Text('덱 가져오기'),
-                    subtitle: Text('파일에서 덱 불러오기'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        DeckService().showImportDialog(context, (deckBuild) {
-                          deckUpdate(deckBuild);
-                          ToastOverlay.show(context, '덱을 가져왔습니다.', type: ToastType.success);
-                        });
-                      }
-                    },
-                  ),
-                  
-                  // 내보내기
-                  ListTile(
-                    leading: Icon(Icons.upload_outlined, color: Colors.cyan[600]),
-                    title: Text('덱 내보내기'),
-                    subtitle: Text('파일로 내보내기'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        DeckService().showExportDialog(context, deck!);
-                      }
-                    },
-                  ),
-                  
-                  // 이미지 저장
-                  ListTile(
-                    leading: Icon(Icons.image_outlined, color: Colors.pink[600]),
-                    title: Text('덱 이미지'),
-                    subtitle: Text('덱을 이미지로 저장'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        CardOverlayService().removeAllOverlays();
-                        context.navigateTo(DeckImageRoute(deck: deck!));
-                      }
-                    },
-                  ),
-                  
-                  // 대회 제출용 레시피
-                  ListTile(
-                    leading: Icon(Icons.receipt_long_outlined, color: Colors.teal[600]),
-                    title: Text('대회 제출용 레시피'),
-                    subtitle: Text('대회용 덱리스트 생성'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (deck != null) {
-                        DeckService().downloadDeckReceipt(context, deck!);
-                      }
-                    },
-                  ),
-              
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+    if (deck != null) {
+      DeckMenuDialog.show(
+        context: context,
+        deck: deck!,
+        menuType: DeckMenuType.deckBuilder,
+        deckViewRowNumber: _deckViewRowNumber,
+        onRowNumberChanged: (value) {
+          setState(() {
+            _deckViewRowNumber = value;
+          });
+        },
+        onDeckInit: () {
+          if (deck != null) {
+            deck!.init();
+            setState(() {});
+          }
+        },
+        onDeckClear: () {
+          setState(() {});
+        },
+        onDeckImport: (deckBuild) {
+          deckUpdate(deckBuild);
+        },
+        onDeckCopy: () {
+          if (deck != null) {
+            deck!.newCopy();
+            setState(() {});
+          }
+        },
+        onReload: () {
+          setState(() {});
+        },
+      );
+    }
   }
 
 

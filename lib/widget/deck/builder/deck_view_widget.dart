@@ -5,6 +5,7 @@ import 'package:digimon_meta_site_flutter/widget/custom_slider_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_buttons.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_menu_bar.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_editor_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/common/deck_section_header.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_stat_view.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/deck_scroll_gridview_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -335,56 +336,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
-        // 메인 섹션 헤더 - 높이 증가 및 텍스트 잘림 방지
-        Container(
-          height: isPortrait 
-            ? SizeService.bodyFontSize(context) * 3.5 
-            : (isMobile 
-                ? SizeService.bodyFontSize(context) * 2.5 
-                : SizeService.bodyFontSize(context) * 3.0),
-          margin: EdgeInsets.symmetric(
-            horizontal: isMobile ? 4 : 8, 
-            vertical: isMobile ? 4 : 8,
-          ),
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isPortrait ? 20 : (isMobile ? 16 : 24), 
-                vertical: isPortrait ? 12 : (isMobile ? 8 : 12),
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF2563EB).withOpacity(0.1),
-                    const Color(0xFF1D4ED8).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
-                border: Border.all(
-                  color: const Color(0xFF2563EB).withOpacity(0.2),
-                  width: isMobile ? 0.5 : 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                                      Text(
-                      '메인',
-                      style: TextStyle(
-                        fontSize: isPortrait 
-                          ? SizeService.bodyFontSize(context) * 0.9
-                          : (isMobile 
-                              ? SizeService.bodyFontSize(context) * 1.0 
-                              : SizeService.bodyFontSize(context) * 1.2),
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1F2937),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+        // 메인 섹션 헤더
+        DeckSectionHeader(
+          title: '메인',
+          isPortrait: isPortrait,
+          isMobile: isMobile,
+          isEmpty: widget.deck.deckCards.isEmpty,
         ),
         // 메인 덱 리스트
         Container(
@@ -435,56 +392,12 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
             ),
           ),
         ),
-        // 디지타마 섹션 헤더 - 높이 증가 및 텍스트 잘림 방지
-        Container(
-          height: isPortrait 
-            ? SizeService.bodyFontSize(context) * 3.5 
-            : (isMobile 
-                ? SizeService.bodyFontSize(context) * 2.5 
-                : SizeService.bodyFontSize(context) * 3.0),
-          margin: EdgeInsets.symmetric(
-            horizontal: isMobile ? 4 : 8, 
-            vertical: isMobile ? 4 : 8,
-          ),
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isPortrait ? 20 : (isMobile ? 16 : 24), 
-                vertical: isPortrait ? 12 : (isMobile ? 8 : 12),
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF7C3AED).withOpacity(0.1),
-                    const Color(0xFF6D28D9).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
-                border: Border.all(
-                  color: const Color(0xFF7C3AED).withOpacity(0.2),
-                  width: isMobile ? 0.5 : 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                                      Text(
-                      '디지타마',
-                      style: TextStyle(
-                        fontSize: isPortrait 
-                          ? SizeService.bodyFontSize(context) * 0.9
-                          : (isMobile 
-                              ? SizeService.bodyFontSize(context) * 1.0 
-                              : SizeService.bodyFontSize(context) * 1.2),
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1F2937),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+        // 디지타마 섹션 헤더
+        DeckSectionHeader(
+          title: '디지타마',
+          isPortrait: isPortrait,
+          isMobile: isMobile,
+          isEmpty: widget.deck.tamaCards.isEmpty,
         ),
         // 디지타마 리스트
         Container(

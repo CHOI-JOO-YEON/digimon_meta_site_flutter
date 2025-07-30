@@ -23,6 +23,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
   Widget _buildModernIconButton({
     required BuildContext context,
     required IconData icon,
+    required IconData filledIcon,
     required String tooltip,
     required Color color,
     required VoidCallback onPressed,
@@ -86,6 +87,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 _buildModernIconButton(
                   context: context,
                   icon: Icons.copy_outlined,
+                  filledIcon: Icons.copy,
                   tooltip: '복사해서 새로운 덱 만들기',
                   color: const Color(0xFF3B82F6),
                   onPressed: () => DeckService().copyDeck(context, widget.deck),
@@ -93,6 +95,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 _buildModernIconButton(
                   context: context,
                   icon: Icons.upload_outlined,
+                  filledIcon: Icons.upload,
                   tooltip: '내보내기',
                   color: const Color(0xFF0891B2),
                   onPressed: () => DeckService().showExportDialog(context, widget.deck),
@@ -100,6 +103,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 _buildModernIconButton(
                   context: context,
                   icon: Icons.image_outlined,
+                  filledIcon: Icons.image,
                   tooltip: '이미지 저장',
                   color: const Color(0xFFEC4899),
                   onPressed: () {
@@ -109,6 +113,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 _buildModernIconButton(
                   context: context,
                   icon: Icons.gamepad_outlined,
+                  filledIcon: Icons.gamepad,
                   tooltip: '플레이그라운드',
                   color: const Color(0xFF8B5CF6),
                   onPressed: () {
@@ -118,6 +123,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 _buildModernIconButton(
                   context: context,
                   icon: Icons.receipt_long_outlined,
+                  filledIcon: Icons.receipt_long,
                   tooltip: '대회 제출용 레시피',
                   color: const Color(0xFF0D9488),
                   onPressed: () => DeckService().downloadDeckReceipt(context, widget.deck),
@@ -126,6 +132,7 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                   _buildModernIconButton(
                     context: context,
                     icon: Icons.videogame_asset_outlined,
+                    filledIcon: Icons.videogame_asset,
                     tooltip: 'TTS 파일 내보내기',
                     color: const Color(0xFF9333EA),
                     onPressed: () async {

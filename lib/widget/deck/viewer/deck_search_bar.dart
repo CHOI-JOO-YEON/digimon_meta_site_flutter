@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
+import 'package:digimon_meta_site_flutter/theme/app_design_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -610,31 +611,40 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
   @override
   Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallHeight = screenHeight < 600;
+    final isMobile = screenWidth < 768;
+    final isVerySmall = screenWidth < 480;
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 검색 필드와 결과 수를 함께 표시
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 3,
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 8 : 12,
+        vertical: isPortrait ? (isMobile ? 8 : 12) : (isMobile ? 12 : 16),
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            Colors.grey.shade50,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+      ),
+      child: Row(
+        children: [
+          // 검색 텍스트 필드
+          Expanded(
+            flex: isMobile ? 6 : 5,
+            child: Container(
+              decoration: AppComponentStyles.cardDecoration(),
               child: TextField(
                 controller: _searchController,
-                style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                decoration: InputDecoration(
-                  labelText: '검색어',
-                  labelStyle: TextStyle(
-                    fontSize: SizeService.smallFontSize(context),
-                    color: Theme.of(context).primaryColor.withOpacity(0.7),
-                  ),
-                  prefixIcon: const Icon(Icons.search),
-                  hintStyle: TextStyle(
-                    fontSize: SizeService.smallFontSize(context),
-                    color: Theme.of(context).primaryColor.withOpacity(0.6),
-                  ),
-                ),
+                maxLines: 1,
+                textAlignVertical: TextAlignVertical.center,
+                scrollPhysics: const BouncingScrollPhysics(),
                 onChanged: (value) {
                   widget.searchParameter.searchString = value;
                 },
@@ -642,80 +652,181 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                   widget.searchParameter.searchString = value;
                   widget.search(1);
                 },
+                decoration: AppComponentStyles.searchFieldDecoration(
+                  hintText: '검색어',
+                  isMobile: isMobile,
+                ).copyWith(
+                  prefixIcon: Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppRadius.small),
+                    ),
+                    child: Icon(
+                      Icons.search_rounded,
+                      size: isMobile ? 16 : (isSmallHeight ? 18 : 20),
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                    ? Container(
+                        margin: const EdgeInsets.all(8),
+                        child: Material(
+                          color: AppColors.neutral400,
+                          borderRadius: BorderRadius.circular(AppRadius.small),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadius.small),
+                            onTap: () {
+                              _searchController.clear();
+                              widget.searchParameter.searchString = '';
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              child: Icon(
+                                Icons.clear_rounded,
+                                size: isMobile ? 14 : (isSmallHeight ? 16 : 18),
+                                color: AppColors.textTertiary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
+                ),
+                style: isMobile 
+                  ? AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500)
+                  : AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
-            
-            // 결과 수 표시 (검색바 옆에 컴팩트하게)
-            if (widget.totalResults != null) ...[
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
-                    width: 1,
-                  ),
+          ),
+          
+          SizedBox(width: isMobile ? 6 : 8),
+          
+          // 결과 수 표시
+          if (widget.totalResults != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(context).primaryColor.withOpacity(0.3),
+                  width: 1,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.format_list_numbered,
-                      size: 12,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.format_list_numbered,
+                    size: 12,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${widget.totalResults}',
+                    style: TextStyle(
+                      fontSize: SizeService.smallFontSize(context) * 0.9,
+                      fontWeight: FontWeight.w600,
                       color: Theme.of(context).primaryColor,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${widget.totalResults}',
-                      style: TextStyle(
-                        fontSize: SizeService.smallFontSize(context) * 0.9,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            
-            Expanded(
-              flex: 1,
-              child: TextButton(
-                onPressed: () {
-                  widget.search(1);
-                },
-                child: Text(
-                  '검색',
-                  style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                )
+                  ),
+                ],
               ),
             ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => _showAdvancedFilterDialog(context),
-              iconSize: SizeService.mediumIconSize(context),
-              icon: const Icon(Icons.tune),
-              tooltip: '고급 검색 필터',
-            ),
-            // 필터 초기화 버튼 (활성 필터가 있을 때만 표시)
-            if (_hasActiveFilters()) ...[
-              IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  _clearAllFilters();
-                  widget.search(1);
-                },
-                iconSize: SizeService.mediumIconSize(context),
-                icon: const Icon(Icons.filter_alt_off),
-                tooltip: '필터 초기화',
-                color: Theme.of(context).colorScheme.error,
-              ),
-            ],
+            SizedBox(width: isMobile ? 4 : 6),
           ],
+          
+          // 검색 버튼
+          if (!isVerySmall)
+            _buildActionButton(
+              icon: Icons.search_rounded,
+              tooltip: '검색',
+              onPressed: () {
+                widget.search(1);
+              },
+              isMobile: isMobile,
+              isSmallHeight: isSmallHeight,
+              style: AppComponentStyles.primaryButtonOutline(
+                isMobile: isMobile,
+                isSmall: isSmallHeight,
+              ),
+            ),
+          
+          if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
+          
+          // 필터 버튼
+          _buildActionButton(
+            icon: Icons.tune_rounded,
+            tooltip: '고급 검색 필터',
+            onPressed: () {
+              _showAdvancedFilterDialog(context);
+            },
+            isMobile: isMobile,
+            isSmallHeight: isSmallHeight,
+            style: AppComponentStyles.secondaryButton(
+              isMobile: isMobile,
+              isSmall: isSmallHeight,
+            ),
+          ),
+          
+          SizedBox(width: isMobile ? 4 : 6),
+          
+          // 필터 초기화 버튼 (활성 필터가 있을 때만 표시)
+          if (_hasActiveFilters() && !isVerySmall)
+            _buildActionButton(
+              icon: Icons.refresh_rounded,
+              tooltip: '필터 초기화',
+              onPressed: () {
+                _clearAllFilters();
+                widget.search(1);
+              },
+              isMobile: isMobile,
+              isSmallHeight: isSmallHeight,
+              style: AppComponentStyles.warningButton(
+                isMobile: isMobile,
+                isSmall: isSmallHeight,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // 🎨 새로운 디자인 시스템을 적용한 액션 버튼
+  Widget _buildActionButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+    required bool isMobile,
+    required bool isSmallHeight,
+    required ButtonStyle style,
+  }) {
+    final buttonSize = isMobile ? 36.0 : (isSmallHeight ? 40.0 : 44.0);
+    final iconSize = isMobile ? 16.0 : (isSmallHeight ? 18.0 : 20.0);
+    
+    return SizedBox(
+      width: buttonSize,
+      height: buttonSize,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: style.copyWith(
+          minimumSize: MaterialStateProperty.all(Size(buttonSize, buttonSize)),
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.small),
+            ),
+          ),
         ),
-      ],
+        child: Tooltip(
+          message: tooltip,
+          child: Icon(
+            icon,
+            size: iconSize,
+          ),
+        ),
+      ),
     );
   }
 

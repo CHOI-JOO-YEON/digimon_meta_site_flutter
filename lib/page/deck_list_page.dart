@@ -20,6 +20,7 @@ import '../service/size_service.dart';
 import '../provider/format_deck_count_provider.dart';
 import '../provider/user_provider.dart';
 import '../service/deck_service.dart';
+import '../widget/common/deck_menu_dialog.dart';
 
 @RoutePage()
 class DeckListPage extends StatefulWidget {
@@ -140,214 +141,19 @@ class _DeckListPageState extends State<DeckListPage> {
 
   // 덱 검색 메뉴 다이얼로그
   void _showDeckSearchMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      enableDrag: true,
-      isDismissible: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Consumer<UserProvider>(
-          builder: (context, userProvider, child) {
-            return Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 고정 헤더 (드래그 핸들 + 제목)
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 드래그 핸들
-                        Center(
-                          child: Container(
-                            width: 50,
-                            height: 5,
-                            margin: EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2.5),
-                            ),
-                          ),
-                        ),
-                        
-                        Row(
-                          children: [
-                            Icon(Icons.tune, color: Colors.grey[700]),
-                            SizedBox(width: 8),
-                            Text(
-                              '메뉴',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // 스크롤 가능한 메뉴 리스트
-                  Flexible(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 덱 뷰 행 수 조정
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.view_column, color: Colors.purple[600], size: 24),
-                                    SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '한 줄에 표시할 카드 장수',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${_deckViewRowNumber}장',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                StatefulBuilder(
-                                  builder: (context, setSliderState) {
-                                    return Slider(
-                                      value: _deckViewRowNumber.toDouble(),
-                                      min: 2,
-                                      max: 8,
-                                      divisions: 6,
-                                      activeColor: Colors.purple[600],
-                                      label: '${_deckViewRowNumber}장',
-                                      onChanged: (value) {
-                                        setSliderState(() {
-                                          _deckViewRowNumber = value.round();
-                                        });
-                                        // 즉시 상위 위젯 상태 업데이트
-                                        setState(() {});
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          
-                          // 복사해서 새로운 덱 만들기
-                          ListTile(
-                            leading: Icon(Icons.copy_outlined, color: Colors.blue[600]),
-                            title: Text('덱 복사하기'),
-                            subtitle: Text('이 덱을 복사해서 새로운 덱 만들기'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (_selectedDeck != null) {
-                                DeckService().copyDeck(context, _selectedDeck!);
-                              }
-                            },
-                          ),
-                          
-                          // 덱 내보내기
-                          ListTile(
-                            leading: Icon(Icons.upload_outlined, color: Colors.purple[600]),
-                            title: Text('덱 내보내기'),
-                            subtitle: Text('파일로 내보내기'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (_selectedDeck != null) {
-                                DeckService().showExportDialog(context, _selectedDeck!);
-                              }
-                            },
-                          ),
-                          
-                          // 이미지 저장
-                          ListTile(
-                            leading: Icon(Icons.image_outlined, color: Colors.pink[600]),
-                            title: Text('덱 이미지 저장'),
-                            subtitle: Text('덱을 이미지로 저장'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (_selectedDeck != null) {
-                                context.navigateTo(DeckImageRoute(deck: _selectedDeck!));
-                              }
-                            },
-                          ),
-                          
-                          // 플레이그라운드
-                          ListTile(
-                            leading: Icon(Icons.gamepad_outlined, color: Colors.green[600]),
-                            title: Text('플레이그라운드'),
-                            subtitle: Text('게임 시뮬레이션으로 테스트'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (_selectedDeck != null) {
-                                context.navigateTo(GamePlayGroundRoute(deckBuild: _selectedDeck!));
-                              }
-                            },
-                          ),
-                          
-                          // 대회 제출용 레시피
-                          ListTile(
-                            leading: Icon(Icons.receipt_long_outlined, color: Colors.teal[600]),
-                            title: Text('대회 제출용 레시피'),
-                            subtitle: Text('대회용 덱리스트 다운로드'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (_selectedDeck != null) {
-                                DeckService().downloadDeckReceipt(context, _selectedDeck!);
-                              }
-                            },
-                          ),
-                          
-                          // TTS 파일 내보내기 (관리자만)
-                          if (userProvider.hasManagerRole())
-                            ListTile(
-                              leading: Icon(Icons.videogame_asset_outlined, color: Colors.indigo[600]),
-                              title: Text('TTS 파일 내보내기'),
-                              subtitle: Text('Table Top Simulator용 파일'),
-                              onTap: () async {
-                                Navigator.pop(context);
-                                if (_selectedDeck != null) {
-                                  await DeckService().exportToTTSFile(_selectedDeck!);
-                                }
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+    if (_selectedDeck != null) {
+      DeckMenuDialog.show(
+        context: context,
+        deck: _selectedDeck!,
+        menuType: DeckMenuType.deckList,
+        deckViewRowNumber: _deckViewRowNumber,
+        onRowNumberChanged: (value) {
+          setState(() {
+            _deckViewRowNumber = value;
+          });
+        },
+      );
+    }
   }
 
   @override
@@ -449,10 +255,10 @@ class _DeckListPageState extends State<DeckListPage> {
                   ),
                 ),
                 
-                // DraggableScrollableSheet으로 검색 패널 구현 - 초기 크기를 크게 하여 덱 리스트가 바로 보이도록 함
+                // DraggableScrollableSheet으로 검색 패널 구현 - 덱빌더와 동일한 초기 사이즈 사용
                 DraggableScrollableSheet(
                   controller: _bottomSheetController,
-                  initialChildSize: 0.3,
+                  initialChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
                   minChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
                   maxChildSize: 1.0,
                   snap: false,
