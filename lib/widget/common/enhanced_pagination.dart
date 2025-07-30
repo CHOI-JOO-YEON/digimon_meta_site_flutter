@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../service/size_service.dart';
 
 class EnhancedPagination extends StatefulWidget {
@@ -21,34 +20,7 @@ class EnhancedPagination extends StatefulWidget {
 }
 
 class _EnhancedPaginationState extends State<EnhancedPagination> {
-  late TextEditingController _pageController;
-  bool _showPageInput = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _goToPage() {
-    final pageText = _pageController.text.trim();
-    if (pageText.isNotEmpty) {
-      final page = int.tryParse(pageText);
-      if (page != null && page >= 1 && page <= widget.totalPages) {
-        widget.onPageChanged(page);
-        setState(() {
-          _showPageInput = false;
-        });
-      }
-    }
-    _pageController.clear();
-  }
 
   List<int> _getVisiblePages() {
     if (widget.totalPages <= 7) {
@@ -152,7 +124,6 @@ class _EnhancedPaginationState extends State<EnhancedPagination> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // 메인 페이징 컨트롤
-          if (!isPortrait || !_showPageInput) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -235,85 +206,8 @@ class _EnhancedPaginationState extends State<EnhancedPagination> {
                   tooltip: '마지막 페이지',
                 ),
                 
-                const SizedBox(width: 12),
-                
-                // 페이지 입력 버튼
-                _buildNavigationButton(
-                  icon: Icons.more_horiz,
-                  onPressed: !widget.isLoading ? () {
-                    setState(() {
-                      _showPageInput = !_showPageInput;
-                    });
-                  } : null,
-                  tooltip: '페이지 직접 입력',
-                ),
               ],
             ),
-          ],
-          
-          // 페이지 입력 필드 (모바일에서만 또는 입력 모드일 때)
-          if (_showPageInput) ...[
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  child: TextField(
-                    controller: _pageController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      hintText: '페이지',
-                      hintStyle: TextStyle(
-                        fontSize: SizeService.smallFontSize(context),
-                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-                      ),
-                    ),
-                    onSubmitted: (_) => _goToPage(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: widget.isLoading ? null : _goToPage,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    minimumSize: Size.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  child: Text(
-                    '이동',
-                    style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _showPageInput = false;
-                    });
-                    _pageController.clear();
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    minimumSize: Size.zero,
-                  ),
-                  child: Text(
-                    '취소',
-                    style: TextStyle(fontSize: SizeService.smallFontSize(context)),
-                  ),
-                ),
-              ],
-            ),
-          ],
           
           // 로딩 표시
           if (widget.isLoading) ...[

@@ -132,31 +132,173 @@ class _DeckListViewerState extends State<DeckListViewer> {
         ),
         Expanded(
           child: Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-            child: ListView.builder(
-              itemCount: decks.length,
-              itemBuilder: (context, index) {
-                final deck = decks[index];
-                return ListTile(
-                  leading: ColorWheel(
-                    colors: deck.colors!,
-                  ),
-                  selected: index == _selectedIndex,
-                  title: Text(deck.deckName ?? '',
-                      style: TextStyle(
-                          fontSize: SizeService.bodyFontSize(context))),
-                  subtitle: Text(
-                    '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
-                    style: TextStyle(
-                      fontSize: SizeService.smallFontSize(context)
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white,
+                  const Color(0xFFF8FAFC),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                  spreadRadius: 0,
+                ),
+              ],
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: isLoading
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            '덱을 검색 중입니다...',
+                            style: TextStyle(
+                              fontSize: SizeService.bodyFontSize(context),
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
                     )
+                  : decks.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                '검색 결과가 없습니다',
+                                style: TextStyle(
+                                  fontSize: SizeService.bodyFontSize(context) * 1.2,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '다른 검색 조건을 시도해보세요',
+                                style: TextStyle(
+                                  fontSize: SizeService.bodyFontSize(context),
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: decks.length,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          cacheExtent: 500.0, // 캐시 확장으로 스크롤 성능 개선
+                          itemBuilder: (context, index) {
+                final deck = decks[index];
+                final isSelected = index == _selectedIndex;
+                
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    gradient: isSelected
+                        ? LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Theme.of(context).primaryColor.withOpacity(0.1),
+                              Theme.of(context).primaryColor.withOpacity(0.05),
+                            ],
+                          )
+                        : null,
+                    color: isSelected ? null : const Color(0xFFFAFAFA), // 선택되지 않은 경우 약간 회색빛 배경
+                    borderRadius: BorderRadius.circular(12),
+                    border: isSelected
+                        ? Border.all(
+                            color: Theme.of(context).primaryColor.withOpacity(0.3),
+                            width: 2,
+                          )
+                        : Border.all(
+                            color: Colors.grey.withOpacity(0.1),
+                            width: 1,
+                          ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: Theme.of(context).primaryColor.withOpacity(0.15),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.02),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
                   ),
-                  onTap: () {
-                    _selectedIndex = index;
-                    widget.deckUpdate(decks[index]);
-                  },
-                );
-              },
+                  child: ListTile(
+                    leading: ColorWheel(
+                      colors: deck.colors!,
+                    ),
+                    selected: isSelected,
+                    selectedTileColor: Colors.transparent, // 기본 선택 색상 제거
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    title: Text(
+                      deck.deckName ?? '',
+                      style: TextStyle(
+                        fontSize: SizeService.bodyFontSize(context),
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected 
+                            ? Theme.of(context).primaryColor 
+                            : null,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${deck.authorName}#${(deck.authorId! - 3).toString().padLeft(4, '0')}',
+                      style: TextStyle(
+                        fontSize: SizeService.smallFontSize(context),
+                        color: isSelected 
+                            ? Theme.of(context).primaryColor.withOpacity(0.8)
+                            : null,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                      widget.deckUpdate(decks[index]);
+                    },
+                  ),
+                            );
+                          },
+                        ),
             ),
           ),
         ),
