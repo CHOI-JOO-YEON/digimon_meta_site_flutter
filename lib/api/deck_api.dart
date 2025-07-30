@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/deck_request_dto.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
@@ -124,11 +125,12 @@ class DeckApi {
   }
 
   Future<PagedResponseDeckDto?> findDecks(
-      DeckSearchParameter deckSearchParameter) async {
+      DeckSearchParameter deckSearchParameter, {CancelToken? cancelToken}) async {
     try {
       var response = await dioClient.dio.get(
         '$baseUrl/api/deck',
         queryParameters: deckSearchParameter.toJson(),
+        cancelToken: cancelToken,
       );
       if (response.statusCode == 200) {
         return PagedResponseDeckDto.fromJson(response.data);
@@ -138,6 +140,10 @@ class DeckApi {
         return null;
       }
     } catch (e) {
+      if (e is DioException && e.type == DioExceptionType.cancel) {
+        // 요청이 취소된 경우 - 정상적인 상황이므로 null 반환
+        return null;
+      }
       return null;
     }
   }

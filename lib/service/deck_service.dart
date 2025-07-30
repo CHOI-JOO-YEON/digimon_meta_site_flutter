@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:digimon_meta_site_flutter/api/deck_api.dart';
 import 'package:digimon_meta_site_flutter/model/deck-view.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
@@ -113,7 +114,7 @@ class DeckService {
   }
 
   Future<PagedResponseDeckDto?> getDeck(
-      DeckSearchParameter deckSearchParameter, BuildContext context) async {
+      DeckSearchParameter deckSearchParameter, BuildContext context, {CancelToken? cancelToken}) async {
     LimitProvider limitProvider = Provider.of(context, listen: false);
 
     if (limitProvider.selectedLimit != null) {
@@ -121,7 +122,7 @@ class DeckService {
     }
 
     PagedResponseDeckDto? decks =
-        await DeckApi().findDecks(deckSearchParameter);
+        await DeckApi().findDecks(deckSearchParameter, cancelToken: cancelToken);
 
     return decks;
   }

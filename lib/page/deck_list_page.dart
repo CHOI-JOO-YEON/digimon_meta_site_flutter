@@ -365,7 +365,9 @@ class _DeckListPageState extends State<DeckListPage> {
             body: Stack(
               children: [
                 // 메인 컨텐츠 영역 (선택된 덱 표시)
-                Positioned(
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOut,
                   top: 0,
                   left: 0,
                   right: 0,
@@ -404,26 +406,44 @@ class _DeckListPageState extends State<DeckListPage> {
                                 ],
                               ),
                             )
-                          : SingleChildScrollView(
-                              controller: _scrollController,
-                              child: Column(
-                                children: [
-                                  _selectedDeck != null 
-                                    ? DeckViewerView(
-                                        deck: _selectedDeck!,
-                                        searchWithParameter: searchWithParameter,
-                                        fixedRowNumber: _deckViewRowNumber,
-                                        showMenuBar: false, // 세로모드에서는 메뉴바 숨김
-                                        showSlider: false, // 세로모드에서는 슬라이더 숨김 (메뉴에서 조정)
-                                        showButtons: false, // 세로모드에서는 버튼 숨김
-                                        showDeckInfo: true, // 세로모드에서는 덱 정보 표시
-                                      )
-                                    : SizedBox.shrink(),
-                                  SizedBox(
-                                    height: MediaQuery.sizeOf(context).height * 0.2,
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                // 사용 가능한 높이 계산 (패딩 제외)
+                                final availableHeight = constraints.maxHeight - (SizeService.paddingSize(context) * 2);
+                                
+                                return SingleChildScrollView(
+                                  controller: _scrollController,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minHeight: availableHeight,
+                                    ),
+                                    child: IntrinsicHeight(
+                                      child: Column(
+                                        children: [
+                                          if (_selectedDeck != null) ...[
+                                            Flexible(
+                                              child: DeckViewerView(
+                                                deck: _selectedDeck!,
+                                                searchWithParameter: searchWithParameter,
+                                                fixedRowNumber: _deckViewRowNumber,
+                                                showMenuBar: false, // 세로모드에서는 메뉴바 숨김
+                                                showSlider: false, // 세로모드에서는 슬라이더 숨김 (메뉴에서 조정)
+                                                showButtons: false, // 세로모드에서는 버튼 숨김
+                                                showDeckInfo: true, // 세로모드에서는 덱 정보 표시
+                                              ),
+                                            ),
+                                          ] else ...[
+                                            // 덱이 선택되지 않았을 때 전체 높이를 사용하도록 Expanded 사용
+                                            Expanded(
+                                              child: SizedBox.shrink(),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                     ),
                   ),
@@ -659,10 +679,17 @@ class _DeckListPageState extends State<DeckListPage> {
                               child: Divider(height: 1, color: Colors.grey[300]),
                             ),
                             
-                            // 덱 검색 패널 - 명확한 높이 제약을 주어 무한 영역 사이즈 문제 해결
-                            SliverToBoxAdapter(
-                              child: Container(
-                                height: constraints.maxHeight * 0.6, // 바텀시트 높이의 60%
+                            // 덱 검색 패널 - 동적 높이 조정
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                // 바텀시트 확장 정도에 따라 동적 높이 계산
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight * 0.6,
+                                  maxHeight: constraints.maxHeight * (_currentBottomSheetSize > 0.8 ? 0.95 : 0.8),
+                                ),
                                 padding: EdgeInsets.all(SizeService.paddingSize(context)),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
