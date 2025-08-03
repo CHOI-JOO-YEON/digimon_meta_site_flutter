@@ -344,6 +344,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           isEmpty: widget.deck.deckCards.isEmpty,
         ),
         // 메인 덱 리스트
+        if (widget.deck.deckCards.isNotEmpty) 
         Container(
           margin: EdgeInsets.symmetric(
             horizontal: isMobile ? 4 : 8, 
@@ -400,6 +401,7 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
           isEmpty: widget.deck.tamaCards.isEmpty,
         ),
         // 디지타마 리스트
+        if (widget.deck.tamaCards.isNotEmpty) 
         Container(
           margin: EdgeInsets.symmetric(
             horizontal: isMobile ? 4 : 8, 
