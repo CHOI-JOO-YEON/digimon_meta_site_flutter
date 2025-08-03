@@ -21,6 +21,7 @@ import '../provider/format_deck_count_provider.dart';
 import '../provider/user_provider.dart';
 import '../service/deck_service.dart';
 import '../widget/common/deck_menu_dialog.dart';
+import '../widget/common/bottom_sheet_header.dart';
 
 @RoutePage()
 class DeckListPage extends StatefulWidget {
@@ -288,171 +289,12 @@ class _DeckListPageState extends State<DeckListPage> {
                                       ),
                                     ),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      // 드래그 핸들 (더 세련된 디자인)
-                                      Container(
-                                        width: 60,
-                                        height: 5,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Colors.grey[300]!,
-                                              Colors.grey[400]!,
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(2.5),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.1),
-                                              blurRadius: 2,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 12),
-                                      
-                                      // 덱 정보 요약 및 메뉴
-                                      Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                             // 덱 카운트 요약 (더 세련된 디자인)
-                                             Row(
-                                               children: [
-                                                 Container(
-                                                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                   decoration: BoxDecoration(
-                                                     gradient: LinearGradient(
-                                                       colors: [Colors.blue[50]!, Colors.blue[100]!],
-                                                     ),
-                                                     borderRadius: BorderRadius.circular(16),
-                                                     border: Border.all(
-                                                       color: Colors.blue[200]!,
-                                                       width: 0.5,
-                                                     ),
-                                                     boxShadow: [
-                                                       BoxShadow(
-                                                         color: Colors.blue.withOpacity(0.1),
-                                                         blurRadius: 4,
-                                                         offset: Offset(0, 2),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                   child: Row(
-                                                     mainAxisSize: MainAxisSize.min,
-                                                     children: [
-                                                       Icon(Icons.style, size: 14, color: Colors.blue[700]),
-                                                       SizedBox(width: 4),
-                                                       Text(
-                                                         '메인 ${_selectedDeck?.deckCount ?? 0}',
-                                                         style: TextStyle(
-                                                           fontSize: 12, 
-                                                           color: Colors.blue[700],
-                                                           fontWeight: FontWeight.w600,
-                                                         ),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                 ),
-                                                 SizedBox(width: 8),
-                                                 Container(
-                                                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                   decoration: BoxDecoration(
-                                                     gradient: LinearGradient(
-                                                       colors: [Colors.orange[50]!, Colors.orange[100]!],
-                                                     ),
-                                                     borderRadius: BorderRadius.circular(16),
-                                                     border: Border.all(
-                                                       color: Colors.orange[200]!,
-                                                       width: 0.5,
-                                                     ),
-                                                     boxShadow: [
-                                                       BoxShadow(
-                                                         color: Colors.orange.withOpacity(0.1),
-                                                         blurRadius: 4,
-                                                         offset: Offset(0, 2),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                   child: Row(
-                                                     mainAxisSize: MainAxisSize.min,
-                                                     children: [
-                                                       Icon(Icons.egg, size: 14, color: Colors.orange[700]),
-                                                       SizedBox(width: 4),
-                                                       Text(
-                                                         '디지타마 ${_selectedDeck?.tamaCount ?? 0}',
-                                                         style: TextStyle(
-                                                           fontSize: 12, 
-                                                           color: Colors.orange[700],
-                                                           fontWeight: FontWeight.w600,
-                                                         ),
-                                                       ),
-                                                     ],
-                                                   ),
-                                                 ),
-                                               ],
-                                             ),
-                                             
-                                             // 메뉴 버튼 (더 세련된 디자인)
-                                             Tooltip(
-                                               message: '덱 메뉴',
-                                               child: Material(
-                                                 color: Colors.transparent,
-                                                 child: InkWell(
-                                                   borderRadius: BorderRadius.circular(16),
-                                                   onTap: () => _showDeckSearchMenu(context),
-                                                   child: Container(
-                                                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                     decoration: BoxDecoration(
-                                                       gradient: LinearGradient(
-                                                         colors: [
-                                                           Theme.of(context).primaryColor.withOpacity(0.1),
-                                                           Theme.of(context).primaryColor.withOpacity(0.15),
-                                                         ],
-                                                       ),
-                                                       borderRadius: BorderRadius.circular(16),
-                                                       border: Border.all(
-                                                         color: Theme.of(context).primaryColor.withOpacity(0.3),
-                                                         width: 0.5,
-                                                       ),
-                                                       boxShadow: [
-                                                         BoxShadow(
-                                                           color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                                           blurRadius: 4,
-                                                           offset: Offset(0, 2),
-                                                         ),
-                                                       ],
-                                                     ),
-                                                     child: Row(
-                                                       mainAxisSize: MainAxisSize.min,
-                                                       children: [
-                                                         Icon(
-                                                           Icons.tune,
-                                                           color: Theme.of(context).primaryColor,
-                                                           size: 16,
-                                                         ),
-                                                         SizedBox(width: 6),
-                                                         Text(
-                                                           '메뉴',
-                                                           style: TextStyle(
-                                                             fontSize: 12,
-                                                             color: Theme.of(context).primaryColor,
-                                                             fontWeight: FontWeight.w600,
-                                                           ),
-                                                         ),
-                                                       ],
-                                                     ),
-                                                   ),
-                                                 ),
-                                               ),
-                                             ),
-                                           ],
-                                         ),
-                                       ),
-                                    ],
+                                  child: BottomSheetHeader(
+                                    deck: _selectedDeck,
+                                    onMenuTap: () => _showDeckSearchMenu(context),
+                                    showDragHandle: true,
+                                    enableMouseDrag: false,
+                                    showSaveWarning: false,
                                   ),
                                 ),
                               ),
