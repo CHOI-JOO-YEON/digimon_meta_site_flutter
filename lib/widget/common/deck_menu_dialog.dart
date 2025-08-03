@@ -97,8 +97,7 @@ class DeckMenuDialog {
                               onRowNumberChanged,
                             ),
                           
-                          // 덱빌더 전용 메뉴
-                          if (menuType == DeckMenuType.deckBuilder) ...[
+                          if (menuType == DeckMenuType.deckBuilder)
                             _buildMenuItem(
                               icon: Icons.add_box_outlined,
                               color: Colors.green[600]!,
@@ -121,7 +120,8 @@ class DeckMenuDialog {
                                 }
                               },
                             ),
-                            
+
+                            if (menuType == DeckMenuType.deckBuilder)
                             _buildMenuItem(
                               icon: Icons.clear_outlined,
                               color: Colors.red[600]!,
@@ -144,7 +144,30 @@ class DeckMenuDialog {
                                 }
                               },
                             ),
-                            
+
+
+                            _buildMenuItem(
+                            icon: Icons.copy_outlined,
+                            color: Colors.blue[600]!,
+                            title: '덱 복사하기',
+                            subtitle: menuType == DeckMenuType.deckBuilder 
+                              ? '현재 덱을 복사하여 새로 만들기'
+                              : '이 덱을 복사해서 새로운 덱 만들기',
+                            onTap: () {
+                              Navigator.pop(context);
+                              // 모달이 닫힌 후 작업 수행
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                if (parentContext.mounted) {
+                                  if (menuType == DeckMenuType.deckBuilder && onDeckCopy != null) {
+                                    DeckService().copyDeck(parentContext, deck, onCopy: onDeckCopy);
+                                  } else {
+                                    DeckService().copyDeck(parentContext, deck);
+                                  }
+                                }
+                              });
+                            },
+                          ),
+                            if (menuType == DeckMenuType.deckBuilder)                           
                             _buildMenuItem(
                               icon: Icons.save_outlined,
                               color: Colors.purple[600]!,
@@ -173,12 +196,13 @@ class DeckMenuDialog {
                                 });
                               },
                             ),
-                            
+
+                            if (menuType == DeckMenuType.deckBuilder)
                             _buildMenuItem(
                               icon: Icons.download_outlined,
                               color: Colors.green[600]!,
                               title: '덱 가져오기',
-                              subtitle: '파일에서 덱 불러오기',
+                              subtitle: '덱 코드/이미지에서 불러오기',
                               onTap: () {
                                 Navigator.pop(context);
                                 if (onDeckImport != null) {
@@ -196,36 +220,12 @@ class DeckMenuDialog {
                                 }
                               },
                             ),
-                          ],
-                          
-                          // 공통 메뉴
-                          _buildMenuItem(
-                            icon: Icons.copy_outlined,
-                            color: Colors.blue[600]!,
-                            title: '덱 복사하기',
-                            subtitle: menuType == DeckMenuType.deckBuilder 
-                              ? '현재 덱을 복사하여 새로 만들기'
-                              : '이 덱을 복사해서 새로운 덱 만들기',
-                            onTap: () {
-                              Navigator.pop(context);
-                              // 모달이 닫힌 후 작업 수행
-                              Future.delayed(const Duration(milliseconds: 300), () {
-                                if (parentContext.mounted) {
-                                  if (menuType == DeckMenuType.deckBuilder && onDeckCopy != null) {
-                                    DeckService().copyDeck(parentContext, deck, onCopy: onDeckCopy);
-                                  } else {
-                                    DeckService().copyDeck(parentContext, deck);
-                                  }
-                                }
-                              });
-                            },
-                          ),
                           
                           _buildMenuItem(
                             icon: Icons.upload_outlined,
                             color: Colors.purple[600]!,
                             title: '덱 내보내기',
-                            subtitle: '파일로 내보내기',
+                            subtitle: '덱 코드 내보내기',
                             onTap: () {
                               Navigator.pop(context);
                               // 모달이 닫힌 후 작업 수행
@@ -268,40 +268,6 @@ class DeckMenuDialog {
                               });
                             },
                           ),
-                          
-                          // 덱리스트 전용 메뉴
-                          if (menuType == DeckMenuType.deckList)
-                            _buildMenuItem(
-                              icon: Icons.gamepad_outlined,
-                              color: Colors.green[600]!,
-                              title: '플레이그라운드',
-                              subtitle: '게임 시뮬레이션으로 테스트',
-                              onTap: () {
-                                Navigator.pop(context);
-                                // 모달이 닫힌 후 네비게이션 수행
-                                Future.delayed(const Duration(milliseconds: 300), () {
-                                  if (parentContext.mounted) {
-                                    parentContext.navigateTo(GamePlayGroundRoute(deckBuild: deck));
-                                  }
-                                });
-                              },
-                            ),
-                          
-                          // TTS 파일 내보내기 (관리자만, 양쪽 모두)
-                          if (userProvider.hasManagerRole())
-                            _buildMenuItem(
-                              icon: Icons.videogame_asset_outlined,
-                              color: Colors.indigo[600]!,
-                              title: 'TTS 파일 내보내기',
-                              subtitle: 'Table Top Simulator용 파일',
-                              onTap: () {
-                                Navigator.pop(context);
-                                // 모달이 닫힌 후 작업 수행
-                                Future.delayed(const Duration(milliseconds: 300), () async {
-                                  await DeckService().exportToTTSFile(deck);
-                                });
-                              },
-                            ),
                         ],
                       ),
                     ),
