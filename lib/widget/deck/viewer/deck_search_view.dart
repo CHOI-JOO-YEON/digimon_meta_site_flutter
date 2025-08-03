@@ -35,23 +35,41 @@ class _DeckSearchViewState extends State<DeckSearchView>
   FormatDto? selectedFormat;
   bool isLoading = true;
   List<bool> _isDisabled = [false, false];
+  
+  // 각 탭별 선택된 덱 저장
+  DeckView? _selectedAllDeck;
+  DeckView? _selectedMyDeck;
+  
+  // 각 탭별 검색 파라미터 분리
+  late DeckSearchParameter _allDeckSearchParameter;
+  late DeckSearchParameter _myDeckSearchParameter;
 
   void updateSelectFormat(FormatDto formatDto) {
     selectedFormat = formatDto;
+    _allDeckSearchParameter.formatId = formatDto.formatId;
+    _myDeckSearchParameter.formatId = formatDto.formatId;
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    
+    // 검색 파라미터 초기화
+    _allDeckSearchParameter = DeckSearchParameter(isMyDeck: false);
+    _myDeckSearchParameter = DeckSearchParameter(isMyDeck: true);
+    
+    // 초기 탭 설정
+    final initialIndex = widget.deckSearchParameter.isMyDeck ? 1 : 0;
+    _tabController = TabController(length: 2, vsync: this, initialIndex: initialIndex);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging && mounted) {
         setState(() {
-          widget.deckSearchParameter.isMyDeck = _tabController.index == 1;
-          // 로딩이 완료된 후에만 파라미터 업데이트 호출
-          if (!isLoading) {
-            widget.updateSearchParameter();
+          // 탭 전환 시 선택된 덱 복원
+          if (_tabController.index == 0 && _selectedAllDeck != null) {
+            widget.deckUpdate(_selectedAllDeck!);
+          } else if (_tabController.index == 1 && _selectedMyDeck != null) {
+            widget.deckUpdate(_selectedMyDeck!);
           }
         });
       }
@@ -74,6 +92,10 @@ class _DeckSearchViewState extends State<DeckSearchView>
           break;
         }
       }
+      
+      // 각 검색 파라미터에 formatId 설정
+      _allDeckSearchParameter.formatId = selectedFormat!.formatId;
+      _myDeckSearchParameter.formatId = selectedFormat!.formatId;
       
       // Load deck counts when formats are loaded
       Provider.of<FormatDeckCountProvider>(context, listen: false).loadDeckCounts();
@@ -104,8 +126,8 @@ class _DeckSearchViewState extends State<DeckSearchView>
         ? const Center(child: CircularProgressIndicator())
         : Consumer<UserProvider>(builder: (context, userProvider, child) {
             _isDisabled[1] = !userProvider.isLogin;
-            _tabController.index=widget.deckSearchParameter.isMyDeck?1:0;
-            if (!userProvider.isLogin) {
+            // 로그인하지 않은 경우 전체 덱 탭으로 강제 이동
+            if (!userProvider.isLogin && _tabController.index == 1) {
               _tabController.index = 0;
             }
 
@@ -148,8 +170,6 @@ class _DeckSearchViewState extends State<DeckSearchView>
                         child: GestureDetector(
                           onTap: () {
                             _tabController.animateTo(0);
-                            widget.deckSearchParameter.isMyDeck = false;
-                            widget.updateSearchParameter();
                           },
                           child: AnimatedContainer(
                             duration: Duration(milliseconds: 200),
@@ -221,8 +241,6 @@ class _DeckSearchViewState extends State<DeckSearchView>
                               ? null
                               : () {
                                   _tabController.animateTo(1);
-                                  widget.deckSearchParameter.isMyDeck = true;
-                                  widget.updateSearchParameter();
                                 },
                           child: AnimatedContainer(
                             duration: Duration(milliseconds: 200),
@@ -299,19 +317,25 @@ class _DeckSearchViewState extends State<DeckSearchView>
                       controller: _tabController, children: [
                     DeckListViewer(
                       formatList: formats,
-                      deckUpdate: widget.deckUpdate,
+                      deckUpdate: (deck) {
+                        _selectedAllDeck = deck;
+                        widget.deckUpdate(deck);
+                      },
                       selectedFormat: selectedFormat!,
                       updateSelectFormat: updateSelectFormat,
-                      deckSearchParameter: widget.deckSearchParameter,
-                      updateSearchParameter: widget.updateSearchParameter,
+                      deckSearchParameter: _allDeckSearchParameter,
+                      updateSearchParameter: () {},
                     ),
                     MyDeckListViewer(
                       formatList: formats,
-                      deckUpdate: widget.deckUpdate,
+                      deckUpdate: (deck) {
+                        _selectedMyDeck = deck;
+                        widget.deckUpdate(deck);
+                      },
                       selectedFormat: selectedFormat!,
                       updateSelectFormat: updateSelectFormat,
-                      deckSearchParameter: widget.deckSearchParameter,
-                      updateSearchParameter: widget.updateSearchParameter,
+                      deckSearchParameter: _myDeckSearchParameter,
+                      updateSearchParameter: () {},
                     )
                   ]),
                 )

@@ -34,7 +34,11 @@ class DeckListViewer extends StatefulWidget {
   State<DeckListViewer> createState() => _DeckListViewerState();
 }
 
-class _DeckListViewerState extends State<DeckListViewer> {
+class _DeckListViewerState extends State<DeckListViewer> 
+    with AutomaticKeepAliveClientMixin {
+  
+  @override
+  bool get wantKeepAlive => true;
   List<DeckView> decks = [];
   int currentPage = 1;
   int maxPage = 0;
@@ -42,6 +46,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
   int _selectedIndex = -1;
   bool isLoading = false;
   CancelToken? _cancelToken;
+  DeckView? _currentSelectedDeck; // 현재 선택된 덱 저장
 
   @override
   void initState() {
@@ -85,16 +90,32 @@ class _DeckListViewerState extends State<DeckListViewer> {
           decks = pagedDeck.decks;
           maxPage = pagedDeck.totalPages;
           totalResults = pagedDeck.totalElements;
-          _selectedIndex = 0;
-
-          if (decks.isNotEmpty) {
-            widget.deckUpdate(decks.first);
+          
+          // 이전에 선택된 덱이 있으면 찾아서 유지
+          if (_currentSelectedDeck != null) {
+            int foundIndex = decks.indexWhere((deck) => deck.deckId == _currentSelectedDeck!.deckId);
+            if (foundIndex != -1) {
+              _selectedIndex = foundIndex;
+            } else {
+              // 이전 선택 덱이 목록에 없으면 첫 번째 선택
+              _selectedIndex = decks.isNotEmpty ? 0 : -1;
+              if (decks.isNotEmpty) {
+                _currentSelectedDeck = decks.first;
+                widget.deckUpdate(decks.first);
+              }
+            }
+          } else {
+            // 처음 로드 시
+            _selectedIndex = decks.isNotEmpty ? 0 : -1;
+            if (decks.isNotEmpty) {
+              _currentSelectedDeck = decks.first;
+              widget.deckUpdate(decks.first);
+            }
           }
         }
         
         if (mounted) {
           setState(() {
-            widget.updateSearchParameter();
             isLoading = false;
           });
         }
@@ -116,6 +137,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // AutomaticKeepAliveClientMixin 필수
     return Column(
       children: [
         DeckSearchBar(
@@ -292,6 +314,7 @@ class _DeckListViewerState extends State<DeckListViewer> {
                     onTap: () {
                       setState(() {
                         _selectedIndex = index;
+                        _currentSelectedDeck = decks[index];
                       });
                       widget.deckUpdate(decks[index]);
                     },
