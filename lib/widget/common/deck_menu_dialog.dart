@@ -26,6 +26,8 @@ class DeckMenuDialog {
     Function()? onDeckCopy,
     Function()? onReload,
   }) {
+    // 부모 컨텍스트를 미리 저장
+    final parentContext = context;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -105,9 +107,16 @@ class DeckMenuDialog {
                               onTap: () {
                                 Navigator.pop(context);
                                 if (onDeckInit != null) {
-                                  DeckService().resetDeck(context, () {
-                                    onDeckInit();
-                                    ToastOverlay.show(context, '새로운 덱이 생성되었습니다.', type: ToastType.success);
+                                  // 모달이 닫힌 후 작업 수행
+                                  Future.delayed(const Duration(milliseconds: 300), () {
+                                    if (parentContext.mounted) {
+                                      DeckService().resetDeck(parentContext, () {
+                                        onDeckInit();
+                                        if (parentContext.mounted) {
+                                          ToastOverlay.show(parentContext, '새로운 덱이 생성되었습니다.', type: ToastType.success);
+                                        }
+                                      });
+                                    }
                                   });
                                 }
                               },
@@ -121,9 +130,16 @@ class DeckMenuDialog {
                               onTap: () {
                                 Navigator.pop(context);
                                 if (onDeckClear != null) {
-                                  DeckService().clearDeck(context, deck, () {
-                                    onDeckClear();
-                                    ToastOverlay.show(context, '덱이 비워졌습니다.', type: ToastType.warning);
+                                  // 모달이 닫힌 후 작업 수행
+                                  Future.delayed(const Duration(milliseconds: 300), () {
+                                    if (parentContext.mounted) {
+                                      DeckService().clearDeck(parentContext, deck, () {
+                                        onDeckClear();
+                                        if (parentContext.mounted) {
+                                          ToastOverlay.show(parentContext, '덱이 비워졌습니다.', type: ToastType.warning);
+                                        }
+                                      });
+                                    }
                                   });
                                 }
                               },
@@ -134,17 +150,27 @@ class DeckMenuDialog {
                               color: Colors.purple[600]!,
                               title: '덱 저장',
                               subtitle: '서버에 덱 저장',
-                              onTap: () async {
+                              onTap: () {
                                 Navigator.pop(context);
-                                if (userProvider.isLogin) {
-                                  Map<int, FormatDto> formats = await DeckService().getFormats(deck);
-                                  DeckService().showSaveDialog(context, formats, deck, () {
-                                    if (onReload != null) onReload();
-                                    ToastOverlay.show(context, '덱이 저장되었습니다.', type: ToastType.success);
-                                  });
-                                } else {
-                                  ToastOverlay.show(context, '로그인이 필요합니다.', type: ToastType.warning);
-                                }
+                                // 모달이 닫힌 후 작업 수행
+                                Future.delayed(const Duration(milliseconds: 300), () async {
+                                  if (!parentContext.mounted) return;
+                                  if (userProvider.isLogin) {
+                                    Map<int, FormatDto> formats = await DeckService().getFormats(deck);
+                                    if (parentContext.mounted) {
+                                      DeckService().showSaveDialog(parentContext, formats, deck, () {
+                                        if (onReload != null) onReload();
+                                        if (parentContext.mounted) {
+                                          ToastOverlay.show(parentContext, '덱이 저장되었습니다.', type: ToastType.success);
+                                        }
+                                      });
+                                    }
+                                  } else {
+                                    if (parentContext.mounted) {
+                                      ToastOverlay.show(parentContext, '로그인이 필요합니다.', type: ToastType.warning);
+                                    }
+                                  }
+                                });
                               },
                             ),
                             
@@ -156,9 +182,16 @@ class DeckMenuDialog {
                               onTap: () {
                                 Navigator.pop(context);
                                 if (onDeckImport != null) {
-                                  DeckService().showImportDialog(context, (deckBuild) {
-                                    onDeckImport(deckBuild);
-                                    ToastOverlay.show(context, '덱을 가져왔습니다.', type: ToastType.success);
+                                  // 모달이 닫힌 후 작업 수행
+                                  Future.delayed(const Duration(milliseconds: 300), () {
+                                    if (parentContext.mounted) {
+                                      DeckService().showImportDialog(parentContext, (deckBuild) {
+                                        onDeckImport(deckBuild);
+                                        if (parentContext.mounted) {
+                                          ToastOverlay.show(parentContext, '덱을 가져왔습니다.', type: ToastType.success);
+                                        }
+                                      });
+                                    }
                                   });
                                 }
                               },
@@ -175,11 +208,16 @@ class DeckMenuDialog {
                               : '이 덱을 복사해서 새로운 덱 만들기',
                             onTap: () {
                               Navigator.pop(context);
-                              if (menuType == DeckMenuType.deckBuilder && onDeckCopy != null) {
-                                DeckService().copyDeck(context, deck, onCopy: onDeckCopy);
-                              } else {
-                                DeckService().copyDeck(context, deck);
-                              }
+                              // 모달이 닫힌 후 작업 수행
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                if (parentContext.mounted) {
+                                  if (menuType == DeckMenuType.deckBuilder && onDeckCopy != null) {
+                                    DeckService().copyDeck(parentContext, deck, onCopy: onDeckCopy);
+                                  } else {
+                                    DeckService().copyDeck(parentContext, deck);
+                                  }
+                                }
+                              });
                             },
                           ),
                           
@@ -190,7 +228,12 @@ class DeckMenuDialog {
                             subtitle: '파일로 내보내기',
                             onTap: () {
                               Navigator.pop(context);
-                              DeckService().showExportDialog(context, deck);
+                              // 모달이 닫힌 후 작업 수행
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                if (parentContext.mounted) {
+                                  DeckService().showExportDialog(parentContext, deck);
+                                }
+                              });
                             },
                           ),
                           
@@ -201,7 +244,12 @@ class DeckMenuDialog {
                             subtitle: '덱을 이미지로 저장',
                             onTap: () {
                               Navigator.pop(context);
-                              context.navigateTo(DeckImageRoute(deck: deck));
+                              // 모달이 닫힌 후 네비게이션 수행
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                if (parentContext.mounted) {
+                                  parentContext.navigateTo(DeckImageRoute(deck: deck));
+                                }
+                              });
                             },
                           ),
                           
@@ -212,7 +260,12 @@ class DeckMenuDialog {
                             subtitle: '대회용 덱리스트 다운로드',
                             onTap: () {
                               Navigator.pop(context);
-                              DeckService().downloadDeckReceipt(context, deck);
+                              // 모달이 닫힌 후 작업 수행
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                if (parentContext.mounted) {
+                                  DeckService().downloadDeckReceipt(parentContext, deck);
+                                }
+                              });
                             },
                           ),
                           
@@ -225,7 +278,12 @@ class DeckMenuDialog {
                               subtitle: '게임 시뮬레이션으로 테스트',
                               onTap: () {
                                 Navigator.pop(context);
-                                context.navigateTo(GamePlayGroundRoute(deckBuild: deck));
+                                // 모달이 닫힌 후 네비게이션 수행
+                                Future.delayed(const Duration(milliseconds: 300), () {
+                                  if (parentContext.mounted) {
+                                    parentContext.navigateTo(GamePlayGroundRoute(deckBuild: deck));
+                                  }
+                                });
                               },
                             ),
                           
@@ -236,9 +294,12 @@ class DeckMenuDialog {
                               color: Colors.indigo[600]!,
                               title: 'TTS 파일 내보내기',
                               subtitle: 'Table Top Simulator용 파일',
-                              onTap: () async {
+                              onTap: () {
                                 Navigator.pop(context);
-                                await DeckService().exportToTTSFile(deck);
+                                // 모달이 닫힌 후 작업 수행
+                                Future.delayed(const Duration(milliseconds: 300), () async {
+                                  await DeckService().exportToTTSFile(deck);
+                                });
                               },
                             ),
                         ],

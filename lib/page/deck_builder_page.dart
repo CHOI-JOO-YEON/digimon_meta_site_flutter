@@ -397,36 +397,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     return calculatedRatio.clamp(minRatio, maxRatio);
   }
 
-  // 덱 상세보기 모달 표시
-  void _showFullDeckViewer(BuildContext context) {
-    if (deck != null) {
-      FullDeckViewerModal.show(
-        context: context,
-        deck: deck!,
-        cardPressEvent: removeCardByDeck,
-        import: deckUpdate,
-        searchWithParameter: searchWithParameter,
-        cardOverlayService: _cardOverlayService,
-      );
-    }
-  }
-
-  // 덱 저장
-  void _saveDeck(BuildContext context) {
-    if (deck != null) {
-      deck!.saveMapToLocalStorage();
-      ToastOverlay.show(context, '덱이 로컬에 저장되었습니다.', type: ToastType.success);
-    } else {
-      ToastOverlay.show(context, '저장할 덱이 없습니다.', type: ToastType.warning);
-    }
-  }
-
-
-
-
-
-
-
   // 통합 덱 메뉴 다이얼로그
   void _showDeckMenu(BuildContext context) {
     if (deck != null) {
@@ -453,10 +423,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
           deckUpdate(deckBuild);
         },
         onDeckCopy: () {
-          if (deck != null) {
-            deck!.newCopy();
-            setState(() {});
-          }
+          // DeckService.copyDeck()에서 이미 newCopy()를 호출하므로 여기서는 UI 업데이트만
+          setState(() {});
         },
         onReload: () {
           setState(() {});
