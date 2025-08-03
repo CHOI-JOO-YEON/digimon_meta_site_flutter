@@ -35,12 +35,33 @@ class DeckStat extends StatelessWidget {
       return Container(
         height: constraints.maxHeight,
         decoration: BoxDecoration(
-            borderRadius:
-                BorderRadius.circular(radius??SizeService.roundRadius(context)),
-            color: backGroundColor ?? Theme.of(context).cardColor),
+          gradient: backGroundColor != null 
+            ? null 
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  const Color(0xFFF8FAFC),
+                ],
+              ),
+          color: backGroundColor,
+          borderRadius: BorderRadius.circular(radius ?? 16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(constraints.maxHeight * 0.05),
+            padding: EdgeInsets.all(constraints.maxHeight * 0.08),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: indicators,
@@ -65,29 +86,33 @@ class DeckStat extends StatelessWidget {
     };
 
     for (var card in deck.deckMap.keys) {
+      final cardCount = deck.deckMap[card] ?? 0;
       if (card.lv == 0) {
-        counts['-'] = counts['-']! + deck.deckMap[card]!;
+        counts['-'] = (counts['-'] ?? 0) + cardCount;
       } else if (card.lv == 2) {
-        counts['2'] = counts['2']! + deck.deckMap[card]!;
+        counts['2'] = (counts['2'] ?? 0) + cardCount;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
-        counts['${card.lv}'] = counts['${card.lv}']! + deck.deckMap[card]!;
+        final key = '${card.lv}';
+        counts[key] = (counts[key] ?? 0) + cardCount;
       } else if (card.cardType == 'TAMER') {
-        counts['T'] = counts['T']! + deck.deckMap[card]!;
+        counts['T'] = (counts['T'] ?? 0) + cardCount;
       } else if (card.cardType == 'OPTION') {
-        counts['O'] = counts['O']! + deck.deckMap[card]!;
+        counts['O'] = (counts['O'] ?? 0) + cardCount;
       }
     }
     for (var card in deck.tamaMap.keys) {
+      final cardCount = deck.tamaMap[card] ?? 0;
       if (card.lv == 0) {
-        counts['-'] = counts['-']! + deck.tamaMap[card]!;
+        counts['-'] = (counts['-'] ?? 0) + cardCount;
       } else if (card.lv == 2) {
-        counts['2'] = counts['2']! + deck.tamaMap[card]!;
+        counts['2'] = (counts['2'] ?? 0) + cardCount;
       } else if (card.lv != null && card.lv! >= 3 && card.lv! <= 7) {
-        counts['${card.lv}'] = counts['${card.lv}']! + deck.tamaMap[card]!;
+        final key = '${card.lv}';
+        counts[key] = (counts[key] ?? 0) + cardCount;
       } else if (card.cardType == 'TAMER') {
-        counts['T'] = counts['T']! + deck.tamaMap[card]!;
+        counts['T'] = (counts['T'] ?? 0) + cardCount;
       } else if (card.cardType == 'OPTION') {
-        counts['O'] = counts['O']! + deck.tamaMap[card]!;
+        counts['O'] = (counts['O'] ?? 0) + cardCount;
       }
     }
     return counts;

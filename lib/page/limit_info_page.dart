@@ -523,11 +523,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                 Divider(height: 1, thickness: 1, color: Colors.red.shade100),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _getSortedCardChips(
+                  child: _buildCenteredCardWrap(
+                    _getSortedCardChips(
                       limit.allowedQuantityMap.entries
                         .where((e) => e.value == 0)
                         .map((e) => e.key)
@@ -561,11 +558,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _getSortedCardChips(
+                        _buildCenteredCardWrap(
+                          _getSortedCardChips(
                             removedBanCards,
                             Colors.green,
                             isRemovedCard: true,
@@ -620,11 +614,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                 Divider(height: 1, thickness: 1, color: Colors.orange.shade100),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _getSortedCardChips(
+                  child: _buildCenteredCardWrap(
+                    _getSortedCardChips(
                       limit.allowedQuantityMap.entries
                         .where((e) => e.value == 1)
                         .map((e) => e.key)
@@ -658,11 +649,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _getSortedCardChips(
+                        _buildCenteredCardWrap(
+                          _getSortedCardChips(
                             removedRestrictCards,
                             Colors.blue,
                             isRemovedCard: true,
@@ -900,11 +888,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _getSortedCardChips(
+                      _buildCenteredCardWrap(
+                        _getSortedCardChips(
                           pair.acardPairNos, 
                           isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
                           isRemovedCard: isRemovedPair,
@@ -967,11 +952,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _getSortedCardChips(
+                      _buildCenteredCardWrap(
+                        _getSortedCardChips(
                           pair.bcardPairNos, 
                           isRemovedPair ? Colors.grey.shade400 : Colors.purple.shade300,
                           isRemovedCard: isRemovedPair,
@@ -985,6 +967,32 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
           ),
         ],
       ),
+    );
+  }
+
+  // 카드 배치를 왼쪽 정렬로 통일
+  Widget _buildCenteredCardWrap(List<Widget> children) {
+    if (children.isEmpty) return SizedBox.shrink();
+    
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = 67; // 카드 폭 + 마진
+        final maxCrossAxisCount = (constraints.maxWidth / cardWidth).floor();
+        final crossAxisCount = maxCrossAxisCount > 0 ? maxCrossAxisCount : 1;
+        
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: 65 / 91, // 카드 비율
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
+          ),
+          itemCount: children.length,
+          itemBuilder: (context, index) => children[index],
+        );
+      },
     );
   }
 
@@ -1079,44 +1087,24 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     // 비패럴렐 카드를 우선적으로 가져옴
     var card = CardDataService().getNonParallelCardByCardNo(cardNo);
     
-    // 새로 추가된 카드인 경우 테두리 스타일 설정
-    BoxDecoration decoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(
-        color: isNewlyAdded 
-          ? Colors.yellow 
-          : (isRemovedCard ? Colors.grey.shade400 : color),
-        width: isNewlyAdded ? 3 : 2,
-      ),
-      boxShadow: isNewlyAdded ? [
-        BoxShadow(
-          color: Colors.yellow.withOpacity(0.5),
-          spreadRadius: 1,
-          blurRadius: 3,
-          offset: Offset(0, 0),
-        )
-      ] : null,
-    );
+    // 모든 카드가 동일한 크기를 갖도록 처리
     
-    // 새로 추가된 카드는 표시를 위한 추가 위젯
-    Widget? badge;
+    // 새로 추가된 카드는 내부 오버레이로 표시 (크기 변화 없음)
+    Widget? overlayContent;
     if (isNewlyAdded) {
-      badge = Positioned(
-        top: 0,
-        right: 0,
+      overlayContent = Positioned(
+        top: 2,
+        right: 2,
         child: Container(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           decoration: BoxDecoration(
             color: Colors.yellow,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-            ),
+            borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             'NEW',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 8,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
@@ -1124,23 +1112,19 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
         ),
       );
     } else if (isRemovedCard) {
-      // 제한 해제된 카드 표시
-      badge = Positioned(
-        top: 0,
-        right: 0,
+      overlayContent = Positioned(
+        top: 2,
+        right: 2,
         child: Container(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           decoration: BoxDecoration(
             color: Colors.grey.shade400,
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-            ),
+            borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             '해제',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 8,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -1156,10 +1140,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     if (card == null) {
       // 카드가 없는 경우 대체 UI 표시
       return Container(
-        margin: const EdgeInsets.only(right: 4, bottom: 4),
-        decoration: decoration,
         width: cardWidth,
         height: cardHeight,
+        margin: const EdgeInsets.only(right: 2, bottom: 2),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Stack(
           children: [
             Center(
@@ -1172,7 +1159,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                 ),
               ),
             ),
-            if (badge != null) badge,
+            if (overlayContent != null) overlayContent,
           ],
         ),
       );
@@ -1180,29 +1167,25 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     
     // CustomCard 위젯을 사용하여 카드 표시
     return Container(
-      decoration: decoration,
-      margin: const EdgeInsets.only(right: 4, bottom: 4),
+      width: cardWidth,
+      height: cardHeight,
+      margin: const EdgeInsets.only(right: 2, bottom: 2),
       child: Stack(
         children: [
           CustomCard(
-            width: cardWidth, // 고정된 크기 사용
+            width: cardWidth,
             card: card,
             cardPressEvent: (selectedCard) {
-              // 카드 클릭 시 동작
               CardService().showImageDialog(context, selectedCard, searchWithParameter: searchWithParameter);
             },
             onLongPress: () {
-              // 길게 누르면 카드 상세 정보 표시
               CardService().showImageDialog(context, card, searchWithParameter: searchWithParameter);
             },
-            // 항상 컬러로 표시 (흑백 처리 제거)
             isActive: true,
-            // 줌 아이콘 비활성화하여 UI 깔끔하게 유지
             zoomActive: false,
-            // 금지/제한/페어제한 배지 숨기기
             hideLimitBadges: true,
           ),
-          if (badge != null) badge,
+          if (overlayContent != null) overlayContent,
         ],
       ),
     );

@@ -61,7 +61,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             children: [
               if (_showUsedCards) ...[
                 Text(
-                  '같이 채용된 카드',
+                  '같이 사용된 카드',
                   style: TextStyle(
                     fontSize: fontSize * 1.2,
                     fontWeight: FontWeight.bold,
@@ -124,7 +124,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                       onPressed: _toggleUsedCards,
                       child: Text(
                         _showUsedCards ? '카드 정보로 돌아가기' : '같이 사용된 카드 보기',
-                        style: TextStyle(fontSize: fontSize),
+                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -142,7 +142,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                       },
                       child: Text(
                         '다른 일러스트 검색',
-                        style: TextStyle(fontSize: fontSize),
+                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -242,7 +242,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
               ),
               child: Text(
                 'Lv.${widget.card.lv == 0 ? '-' : widget.card.lv}',
-                style: TextStyle(fontSize: fontSize),
+                style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
               ),
             ),
         ],
@@ -528,19 +528,27 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                 // "/" 문자가 포함된 경우, 분리하여 각각의 칩으로 만듦
                 if (attribute.contains('/')) {
                   final parts = attribute.split('/');
-                  return parts.map((part) => Chip(
-                    label: Text(
-                      part.trim(),
-                      style: TextStyle(fontSize: fontSize * 0.9),
+                  return parts.map((part) => Tooltip(
+                    message: part.trim(),
+                    triggerMode: TooltipTriggerMode.tap,
+                    child: Chip(
+                      label: Text(
+                        part.trim(),
+                        style: TextStyle(fontSize: fontSize * 0.9),
+                      ),
                     ),
                   ));
                 } else {
                   // 기존과 같이 단일 칩으로 표시
                   return [
-                    Chip(
-                      label: Text(
-                        attribute,
-                        style: TextStyle(fontSize: fontSize * 0.9),
+                    Tooltip(
+                      message: attribute,
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Chip(
+                        label: Text(
+                          attribute,
+                          style: TextStyle(fontSize: fontSize * 0.9),
+                        ),
                       ),
                     )
                   ];

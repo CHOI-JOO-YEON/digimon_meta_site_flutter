@@ -77,8 +77,10 @@ class DigimonCard {
         return '얼티메이트/어플몬';
       case 'GOD':
         return '갓/어플몬';
+      case 'EATER':
+        return '이터';
       default:
-        return '';
+        return form!;
     }
   }
 

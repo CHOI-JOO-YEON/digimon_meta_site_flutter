@@ -18,6 +18,7 @@ import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdivi
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
+import 'package:digimon_meta_site_flutter/widget/deck/full_deck_viewer_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -26,10 +27,12 @@ import 'dart:html' as html;
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:digimon_meta_site_flutter/widget/common/skeleton_loading.dart';
+import '../widget/common/deck_menu_dialog.dart';
 
 import '../model/card.dart';
 import '../model/note.dart';
 import '../widget/card/builder/card_search_bar.dart';
+import 'package:digimon_meta_site_flutter/model/format.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
@@ -64,6 +67,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   SearchParameter searchParameter = SearchParameter();
   DigimonCard? selectCard;
   Timer? _debounce;
+  int _deckViewRowNumber = 4; // 세로 모드에서 덱 뷰의 행 수
   
   DeckSortProvider? _deckSortProvider;
 
@@ -82,6 +86,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   void dispose() {
     if (mounted) {
       _scrollController.dispose();
+      _bottomSheetController.dispose();
       _debounce?.cancel();
       // DeckProvider 클리어
       final deckProvider = Provider.of<DeckProvider>(context, listen: false);
@@ -327,6 +332,108 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 
   bool _overlayRemoved = false;
+  
+  // 하단 시트 상태 관리
+  final DraggableScrollableController _bottomSheetController = DraggableScrollableController();
+  double _currentBottomSheetSize = 0.08;
+  bool _isBottomSheetExpanded = false;
+  
+  void _toggleBottomSheet() {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final minSize = _calculateMinBottomSheetSize(screenHeight);
+    final expandThreshold = minSize * 2; // 최소 크기의 2배를 확장 임계값으로
+    
+    if (_currentBottomSheetSize <= expandThreshold) {
+      // 최소 상태에서 중간으로
+      _bottomSheetController.animateTo(
+        0.4,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    } else if (_currentBottomSheetSize <= 0.6) {
+      // 중간 상태에서 최대로
+      _bottomSheetController.animateTo(
+        0.95,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      // 최대 상태에서 최소로
+      _bottomSheetController.animateTo(
+        minSize,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+  }
+  
+  void _onBottomSheetChanged(double size) {
+    setState(() {
+      _currentBottomSheetSize = size;
+      _isBottomSheetExpanded = size > 0.8;
+    });
+    
+    // 오버레이 상태 업데이트 (동적 임계값 사용)
+    final screenHeight = MediaQuery.of(context).size.height;
+    final minSize = _calculateMinBottomSheetSize(screenHeight);
+    final overlayThreshold = minSize * 1.5; // 최소 크기의 1.5배를 오버레이 임계값으로
+    
+    if (size > overlayThreshold) {
+      _cardOverlayService.updatePanelStatus(true);
+    } else {
+      _cardOverlayService.updatePanelStatus(false);
+    }
+  }
+
+  // 바텀시트 최소 크기 계산 (헤더가 완전히 보이도록)
+  double _calculateMinBottomSheetSize(double screenHeight) {
+    const double headerHeight = 80.0; // 헤더 고정 높이
+    const double minRatio = 0.08; // 최소 8%
+    const double maxRatio = 0.15; // 최대 15%
+    
+    double calculatedRatio = headerHeight / screenHeight;
+    
+    // 최소값과 최대값 사이로 제한
+    return calculatedRatio.clamp(minRatio, maxRatio);
+  }
+
+  // 통합 덱 메뉴 다이얼로그
+  void _showDeckMenu(BuildContext context) {
+    if (deck != null) {
+      DeckMenuDialog.show(
+        context: context,
+        deck: deck!,
+        menuType: DeckMenuType.deckBuilder,
+        deckViewRowNumber: _deckViewRowNumber,
+        onRowNumberChanged: (value) {
+          setState(() {
+            _deckViewRowNumber = value;
+          });
+        },
+        onDeckInit: () {
+          if (deck != null) {
+            deck!.init();
+            setState(() {});
+          }
+        },
+        onDeckClear: () {
+          setState(() {});
+        },
+        onDeckImport: (deckBuild) {
+          deckUpdate(deckBuild);
+        },
+        onDeckCopy: () {
+          // DeckService.copyDeck()에서 이미 newCopy()를 호출하므로 여기서는 UI 업데이트만
+          setState(() {});
+        },
+        onReload: () {
+          setState(() {});
+        },
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -346,301 +453,542 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-        return SlidingUpPanel(
-          onPanelSlide: (v) {
-            if (v > 0.1) {
-              _cardOverlayService.updatePanelStatus(true);
-            } else {
-              _cardOverlayService.updatePanelStatus(false);
-            }
-            _overlayRemoved = false;
-          },
-          controller: _panelController,
-          renderPanelSheet: false,
-          minHeight: 50,
-          snapPoint: 0.5,
-          maxHeight: constraints.maxHeight,
-          isDraggable: false,
-          panelBuilder: (ScrollController sc) {
-            return Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius:
-                      BorderRadius.circular(SizeService.roundRadius(context))),
-              child: Padding(
-                padding: EdgeInsets.only(
-                    left: SizeService.paddingSize(context),
-                    right: SizeService.paddingSize(context),
-                    bottom: SizeService.paddingSize(context)),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: TextButton(
-                                onPressed: () {
-                                  _scrollController.animateTo(
-                                    0,
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                                child: Text(
-                                  '메인',
-                                  style: TextStyle(
-                                      fontSize:
-                                          SizeService.bodyFontSize(context)),
-                                )),
+                        return Scaffold(
+          backgroundColor: Colors.grey[50],
+          body: Stack(
+            children: [
+              // 메인 컨텐츠 영역
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: constraints.maxHeight * _currentBottomSheetSize, // 바텀시트 현재 크기만큼 공간 확보
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                    // 검색바 영역
+                    Container(
+                      padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
                           ),
-                          Expanded(
-                              flex: 3,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    onPressed: _panelController.panelPosition >
-                                            0.3
-                                        ? () {
-                                            if (_panelController.panelPosition >
-                                                0.7) {
-                                              _panelController
-                                                  .animatePanelToSnapPoint()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            } else {
-                                              _panelController
-                                                  .close()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            }
-                                          }
-                                        : null,
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color:
-                                          _panelController.panelPosition > 0.3
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
+                        ],
+                      ),
+                      child: CardSearchBar(
+                        notes: notes,
+                        searchParameter: searchParameter,
+                        onSearch: initSearch,
+                        viewMode: viewMode,
+                        onViewModeChanged: onViewModeChanged,
+                        updateSearchParameter: updateSearchParameter,
+                      ),
+                    ),
+                    
+                    // 카드 목록 영역
+                    Expanded(
+                                              child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: SizeService.paddingSize(context),
+                          ),
+                        child: !isSearchLoading
+                            ? (viewMode == 'grid'
+                                ? CardScrollGridView(
+                                    cards: cards,
+                                    rowNumber: _deckViewRowNumber,
+                                    loadMoreCards: loadMoreCard,
+                                    cardPressEvent: addCardByDeck,
+                                    totalPages: totalPages,
+                                    currentPage: currentPage,
+                                    searchWithParameter: searchWithParameter,
+                                  )
+                                : CardScrollListView(
+                                    cards: cards,
+                                    loadMoreCards: loadMoreCard,
+                                    cardPressEvent: addCardByDeck,
+                                    totalPages: totalPages,
+                                    currentPage: currentPage,
+                                    searchWithParameter: searchWithParameter,
+                                  ))
+                            : viewMode == 'grid'
+                                ? CardGridSkeletonLoading(
+                                    crossAxisCount: _deckViewRowNumber,
+                                    itemCount: 24,
+                                  )
+                                : ListView.builder(
+                                    itemCount: 10,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Row(
+                                          children: [
+                                            CardSkeletonLoading(width: 80),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  SkeletonLoading(
+                                                    width: double.infinity,
+                                                    height: 24,
+                                                    borderRadius: 4,
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  SkeletonLoading(
+                                                    width: 200,
+                                                    height: 16,
+                                                    borderRadius: 4,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                      ),
+                    ),
+                  ],
+                ),
+                ),
+              ),
+                    // DraggableScrollableSheet으로 자연스러운 바텀시트 구현
+      DraggableScrollableSheet(
+        controller: _bottomSheetController,
+        initialChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
+        minChildSize: _calculateMinBottomSheetSize(constraints.maxHeight),
+        maxChildSize: 1.0,
+        snap: false,
+                builder: (context, scrollController) {
+                  return NotificationListener<DraggableScrollableNotification>(
+                    onNotification: (notification) {
+                      _onBottomSheetChanged(notification.extent);
+                      return true;
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 15,
+                            offset: Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                                            child: CustomScrollView(
+                        controller: scrollController,
+                        physics: ClampingScrollPhysics(),
+                        slivers: [
+                          // 고정된 헤더 영역 (항상 표시)
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: _BottomSheetHeaderDelegate(
+                              minHeight: 80,
+                              maxHeight: 80,
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.white,
+                                      const Color(0xFFF8FAFC),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      width: 1,
                                     ),
                                   ),
-                                  Text(
-                                    '카드 검색 패널',
-                                    style: TextStyle(
-                                        fontSize:
-                                            SizeService.bodyFontSize(context),
-                                        color: Theme.of(context).primaryColor),
-                                  ),
-                                  IconButton(
-                                    onPressed: _panelController.panelPosition <
-                                            0.7
-                                        ? () {
-                                            if (_panelController.panelPosition <
-                                                0.3) {
-                                              _panelController
-                                                  .animatePanelToSnapPoint()
-                                                  .then((_) {
-                                                setState(() {});
-                                              });
-                                            } else {
-                                              _panelController.open().then((_) {
-                                                setState(() {});
-                                              });
-                                            }
+                                ),
+                                child: Column(
+                                  children: [
+                                    // 드래그 핸들 (마우스 드래그 지원)
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.resizeUpDown,
+                                      child: GestureDetector(
+                                        onPanUpdate: (details) {
+                                          // 마우스/터치 드래그 처리
+                                          if (_bottomSheetController.isAttached) {
+                                            double currentSize = _bottomSheetController.size;
+                                            double delta = -details.delta.dy / MediaQuery.of(context).size.height;
+                                            double newSize = (currentSize + delta).clamp(
+                                              _calculateMinBottomSheetSize(MediaQuery.of(context).size.height),
+                                              1.0
+                                            );
+                                            _bottomSheetController.jumpTo(newSize);
                                           }
-                                        : null,
-                                    icon: Icon(
-                                      Icons.arrow_drop_up,
-                                      color:
-                                          _panelController.panelPosition < 0.7
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
+                                        },
+                                        child: Container(
+                                          width: 60,
+                                          height: 5,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.grey[300]!,
+                                                Colors.grey[400]!,
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(2.5),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.1),
+                                                blurRadius: 2,
+                                                offset: Offset(0, 1),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    
+                                    // 덱 카운트 요약 (항상 표시)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [Colors.blue[50]!, Colors.blue[100]!],
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(
+                                                    color: Colors.blue[200]!,
+                                                    width: 0.5,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.blue.withOpacity(0.1),
+                                                      blurRadius: 4,
+                                                      offset: Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(Icons.style, size: 14, color: Colors.blue[700]),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      '메인 ${deck?.deckCount ?? 0}',
+                                                      style: TextStyle(
+                                                        fontSize: 12, 
+                                                        color: Colors.blue[700],
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(width: 8),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [Colors.orange[50]!, Colors.orange[100]!],
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  border: Border.all(
+                                                    color: Colors.orange[200]!,
+                                                    width: 0.5,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.orange.withOpacity(0.1),
+                                                      blurRadius: 4,
+                                                      offset: Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(Icons.egg, size: 14, color: Colors.orange[700]),
+                                                    SizedBox(width: 4),
+                                                    Text(
+                                                      '디지타마 ${deck?.tamaCount ?? 0}',
+                                                      style: TextStyle(
+                                                        fontSize: 12, 
+                                                        color: Colors.orange[700],
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // 저장 경고 아이콘
+                                              if (deck != null && !deck!.isSave) ...[
+                                                SizedBox(width: 8),
+                                                GestureDetector(
+                                                  onTap: () => ToastOverlay.show(
+                                                    context, 
+                                                    '저장되지 않은 변경사항이 있습니다.', 
+                                                    type: ToastType.warning
+                                                  ),
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.amber[50],
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(color: Colors.amber[200]!),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.warning_rounded,
+                                                      color: Colors.amber[600],
+                                                      size: 16,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                          
+                                          // 메뉴 버튼 (더 세련된 디자인)
+                                          Tooltip(
+                                            message: '덱 메뉴',
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                borderRadius: BorderRadius.circular(16),
+                                                onTap: () => _showDeckMenu(context),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        Theme.of(context).primaryColor.withOpacity(0.1),
+                                                        Theme.of(context).primaryColor.withOpacity(0.15),
+                                                      ],
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(16),
+                                                    border: Border.all(
+                                                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                                                      width: 0.5,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                        blurRadius: 4,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.tune,
+                                                        color: Theme.of(context).primaryColor,
+                                                        size: 16,
+                                                      ),
+                                                      SizedBox(width: 6),
+                                                      Text(
+                                                        '메뉴',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Theme.of(context).primaryColor,
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          
+                          // 확장 가능한 컨텐츠 영역
+                          if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5) ...[
+                            SliverToBoxAdapter(
+                              child: Divider(height: 1, color: Colors.grey[300]),
+                            ),
+                            
+                            // 덱 상세 정보 영역
+                            SliverToBoxAdapter(
+                                                              child: deck != null 
+                                ? Padding(
+                                    padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                    child: DeckBuilderView(
+                                      deck: deck!,
+                                      cardPressEvent: removeCardByDeck,
+                                      import: deckUpdate,
+                                      searchWithParameter: searchWithParameter,
+                                      cardOverlayService: _cardOverlayService,
+                                      showMenuBar: false, // 세로 모드에서는 메뉴바 숨김
+                                      showSlider: false, // 세로 모드에서는 슬라이더 숨김
+                                      showButtons: false, // 세로 모드에서는 버튼들 숨김
+                                      showDeckNameOnly: true, // 세로 모드에서는 덱 이름만 표시
+                                      fixedRowNumber: _deckViewRowNumber, // 조정 가능한 행 수 사용
+                                    ),
+                                  )
+                                : Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(50),
+                                      child: Text(
+                                        '덱이 비어있습니다',
+                                        style: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 16,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ],
-                              )),
-                          Expanded(
-                            flex: 1,
-                            child: TextButton(
-                                onPressed: () {
-                                  _scrollController.animateTo(
-                                    _scrollController.position.maxScrollExtent,
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                                child: Text(
-                                  '타마',
-                                  style: TextStyle(
-                                      fontSize:
-                                          SizeService.bodyFontSize(context)),
-                                )),
-                          )
+                            ),
+                          ],
                         ],
                       ),
                     ),
-                    Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                                height: 50,
-                                child: CardSearchBar(
-                                  notes: notes,
-                                  searchParameter: searchParameter,
-                                  onSearch: initSearch,
-                                  viewMode: viewMode,
-                                  onViewModeChanged: onViewModeChanged,
-                                  updateSearchParameter: updateSearchParameter,
-                                )),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Expanded(
-                                flex: 9,
-                                child: !isSearchLoading
-                                    ? (viewMode == 'grid'
-                                        ? CardScrollGridView(
-                                            cards: cards,
-                                            rowNumber: 6,
-                                            loadMoreCards: loadMoreCard,
-                                            cardPressEvent: addCardByDeck,
-                                            totalPages: totalPages,
-                                            currentPage: currentPage,
-                                            searchWithParameter: searchWithParameter,
-                                          )
-                                        : CardScrollListView(
-                                            cards: cards,
-                                            loadMoreCards: loadMoreCard,
-                                            cardPressEvent: addCardByDeck,
-                                            totalPages: totalPages,
-                                            currentPage: currentPage,
-                                            searchWithParameter: searchWithParameter,
-                                          ))
-                                    : Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: viewMode == 'grid'
-                                            ? CardGridSkeletonLoading(
-                                                crossAxisCount: 6,
-                                                itemCount: 24,
-                                              )
-                                            : ListView.builder(
-                                                itemCount: 10,
-                                                itemBuilder: (context, index) {
-                                                  return Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        CardSkeletonLoading(
-                                                          width: 80,
-                                                        ),
-                                                        const SizedBox(width: 12),
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            children: [
-                                                              SkeletonLoading(
-                                                                width: double.infinity,
-                                                                height: 24,
-                                                                borderRadius: 4,
-                                                              ),
-                                                              const SizedBox(height: 8),
-                                                              SkeletonLoading(
-                                                                width: 200,
-                                                                height: 16,
-                                                                borderRadius: 4,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                      )),
-                            Expanded(
-                                flex: _panelController.panelPosition < 0.7
-                                    ? 11
-                                    : 0,
-                                child: Container())
-                          ],
-                        )),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-          body: Container(
-            color: Theme.of(context).highlightColor,
-            padding: EdgeInsets.all(SizeService.paddingSize(context)),
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Column(
-                children: [
-                  if (deck != null) DeckBuilderView(
-                    deck: deck!,
-                    cardPressEvent: removeCardByDeck,
-                    import: deckUpdate,
-                    searchWithParameter: searchWithParameter,
-                    cardOverlayService: _cardOverlayService,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.7,
-                  )
-                ],
-              ),
-            ),
+            ],
           ),
         );
       });
     } else {
-      // 가로 모드 레이아웃 개선
+      // 가로 모드 레이아웃 개선 - 모바일 반응형 추가
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isTablet = screenWidth >= 768 && screenWidth < 1024;
+      final isSmallLaptop = screenWidth >= 1024 && screenWidth < 1200;
+      final isMobileDesktop = screenWidth < 768;
+      
+      // 동적 비율 계산
+      int deckFlex, cardFlex;
+      double spacing;
+      
+      if (isMobileDesktop) {
+        // 모바일 데스크톱에서는 더 균형잡힌 비율
+        deckFlex = 1;
+        cardFlex = 1;
+        spacing = MediaQuery.sizeOf(context).width * 0.005; // 더 작은 간격
+      } else if (isTablet) {
+        // 태블릿에서는 약간 조정된 비율
+        deckFlex = 5;
+        cardFlex = 3;
+        spacing = MediaQuery.sizeOf(context).width * 0.008;
+      } else if (isSmallLaptop) {
+        // 작은 노트북에서는 기본 비율에 가깝게
+        deckFlex = 3;
+        cardFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      } else {
+        // 큰 화면에서는 기존 비율 유지
+        deckFlex = 3;
+        cardFlex = 2;
+        spacing = MediaQuery.sizeOf(context).width * 0.01;
+      }
+      
       return Padding(
-        padding: EdgeInsets.all(SizeService.paddingSize(context)),
+        padding: EdgeInsets.all(
+          isMobileDesktop 
+            ? SizeService.paddingSize(context) * 0.5 // 모바일에서 패딩 줄임
+            : SizeService.paddingSize(context)
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
+              flex: deckFlex,
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(SizeService.roundRadius(context)),
-                    color: Theme.of(context).highlightColor),
-                child: SingleChildScrollView(
-                  child: deck != null ? DeckBuilderView(
-                    deck: deck!,
-                    cardPressEvent: removeCardByDeck,
-                    import: deckUpdate,
-                    searchWithParameter: searchWithParameter,
-                    cardOverlayService: _cardOverlayService,
-                  ) : Container(),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: isMobileDesktop ? 12 : 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  child: SingleChildScrollView(
+                    child: deck != null ? DeckBuilderView(
+                      deck: deck!,
+                      cardPressEvent: removeCardByDeck,
+                      import: deckUpdate,
+                      searchWithParameter: searchWithParameter,
+                      cardOverlayService: _cardOverlayService,
+                    ) : Container(),
+                  ),
                 ),
               ),
             ),
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width * 0.01,
-            ),
+            SizedBox(width: spacing),
             Expanded(
-              flex: 2,
+              flex: cardFlex,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor,
-                  borderRadius:
-                      BorderRadius.circular(SizeService.roundRadius(context)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(isMobileDesktop ? 16 : 20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: isMobileDesktop ? 12 : 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                  padding: EdgeInsets.all(
+                    isMobileDesktop 
+                      ? SizeService.paddingSize(context) * 0.7 // 모바일에서 내부 패딩 줄임
+                      : SizeService.paddingSize(context)
+                  ),
                   child: Column(
                     children: [
                       // 검색바 높이를 화면 크기에 맞게 조정
                       SizedBox(
-                        height: isSmallHeight ? 40 : 50, // 작은 화면에서 높이 줄임
+                        height: isMobileDesktop 
+                          ? 60 // 모바일 가로모드에서도 충분한 높이
+                          : (isSmallHeight ? 65 : 80), // 데스크톱에서 더 여유롭게
                         child: CardSearchBar(
                           notes: notes,
                           searchParameter: searchParameter,
@@ -650,13 +998,15 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           updateSearchParameter: updateSearchParameter,
                         ),
                       ),
-                      SizedBox(height: isSmallHeight ? 4 : 8), // 간격 조정
+                      SizedBox(
+                        height: isMobileDesktop ? 3 : (isSmallHeight ? 4 : 8),
+                      ), // 간격 조정
                       Expanded(
                           child: !isSearchLoading
                               ? (viewMode == 'grid'
                                   ? CardScrollGridView(
                                       cards: cards,
-                                      rowNumber: isSmallHeight ? 4 : 6, // 작은 화면에서 행 수 줄임
+                                      rowNumber: 6, // 가로모드에서는 6개로 고정
                                       loadMoreCards: loadMoreCard,
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
@@ -675,7 +1025,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   padding: EdgeInsets.all(isSmallHeight ? 8.0 : 16.0),
                                   child: viewMode == 'grid'
                                       ? CardGridSkeletonLoading(
-                                          crossAxisCount: isSmallHeight ? 4 : 6,
+                                          crossAxisCount: 6, // 가로모드에서는 6개로 고정
                                           itemCount: 24,
                                         )
                                       : ListView.builder(
@@ -722,5 +1072,36 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         ),
       );
     }
+  }
+}
+
+// SliverPersistentHeader를 위한 헤더 델리게이트
+class _BottomSheetHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  _BottomSheetHeaderDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  @override
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_BottomSheetHeaderDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }

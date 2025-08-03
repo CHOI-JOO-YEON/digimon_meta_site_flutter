@@ -46,10 +46,13 @@ class _DeckSearchViewState extends State<DeckSearchView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
+      if (!_tabController.indexIsChanging && mounted) {
         setState(() {
           widget.deckSearchParameter.isMyDeck = _tabController.index == 1;
-          widget.updateSearchParameter();
+          // 로딩이 완료된 후에만 파라미터 업데이트 호출
+          if (!isLoading) {
+            widget.updateSearchParameter();
+          }
         });
       }
     });
@@ -108,31 +111,187 @@ class _DeckSearchViewState extends State<DeckSearchView>
 
             return Column(
               children: [
-                TabBar(
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: _tabController,
-                  tabs: [
-                    Tab(
-                      child: Text(
-                        '전체 덱',
-                        style: TextStyle(fontSize: SizeService.bodyFontSize(context)),
+                // 모던한 세그먼트 컨트롤
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: SizeService.paddingSize(context),
+                    vertical: SizeService.paddingSize(context) * 0.5,
+                  ),
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFF1F5F9),
+                        const Color(0xFFE2E8F0),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                        spreadRadius: 0,
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.8),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // 전체 덱 버튼
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            _tabController.animateTo(0);
+                            widget.deckSearchParameter.isMyDeck = false;
+                            widget.updateSearchParameter();
+                          },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: _tabController.index == 0
+                                  ? LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        const Color(0xFF3B82F6),
+                                        const Color(0xFF2563EB),
+                                      ],
+                                    )
+                                  : null,
+                              color: _tabController.index == 0
+                                  ? null
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: _tabController.index == 0
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                        spreadRadius: 0,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.public,
+                                  size: 18,
+                                  color: _tabController.index == 0
+                                      ? Colors.white
+                                      : const Color(0xFF64748B),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '전체 덱',
+                                  style: TextStyle(
+                                    fontSize: SizeService.bodyFontSize(context) * 0.9,
+                                    fontWeight: _tabController.index == 0
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: _tabController.index == 0
+                                        ? Colors.white
+                                        : const Color(0xFF64748B),
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                       
-                    ),
-                    Tab(
-                      child: Text(
-                        '나의 덱',
-                        style: TextStyle(
-                            fontSize: SizeService.bodyFontSize(context),
-                            color: _isDisabled[1] ? Colors.grey : Colors.black),
+                      // 나의 덱 버튼
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _isDisabled[1]
+                              ? null
+                              : () {
+                                  _tabController.animateTo(1);
+                                  widget.deckSearchParameter.isMyDeck = true;
+                                  widget.updateSearchParameter();
+                                },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: _tabController.index == 1 && !_isDisabled[1]
+                                  ? LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        const Color(0xFF7C3AED),
+                                        const Color(0xFF6D28D9),
+                                      ],
+                                    )
+                                  : null,
+                              color: _tabController.index == 1 && !_isDisabled[1]
+                                  ? null
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: _tabController.index == 1 && !_isDisabled[1]
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF7C3AED).withOpacity(0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                        spreadRadius: 0,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  _isDisabled[1] ? Icons.lock_outline : Icons.person,
+                                  size: 18,
+                                  color: _isDisabled[1]
+                                      ? const Color(0xFFCBD5E1)
+                                      : (_tabController.index == 1
+                                          ? Colors.white
+                                          : const Color(0xFF64748B)),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '나의 덱',
+                                  style: TextStyle(
+                                    fontSize: SizeService.bodyFontSize(context) * 0.9,
+                                    fontWeight: _tabController.index == 1 && !_isDisabled[1]
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    color: _isDisabled[1]
+                                        ? const Color(0xFFCBD5E1)
+                                        : (_tabController.index == 1
+                                            ? Colors.white
+                                            : const Color(0xFF64748B)),
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    
-                  ],
-                  onTap: (index) {
-                    widget.deckSearchParameter.isMyDeck = index == 1;
-                    widget.updateSearchParameter();
-                  },
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: TabBarView(

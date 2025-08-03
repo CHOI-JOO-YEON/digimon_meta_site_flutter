@@ -169,4 +169,83 @@ class SizeService {
       ).value;
     }
   }
+
+  // EdgeInsets 관련 함수들
+  static EdgeInsets allPadding(BuildContext context) {
+    return EdgeInsets.all(paddingSize(context));
+  }
+
+  static EdgeInsets horizontalPadding(BuildContext context) {
+    return EdgeInsets.symmetric(horizontal: paddingSize(context));
+  }
+
+  static EdgeInsets verticalPadding(BuildContext context) {
+    return EdgeInsets.symmetric(vertical: paddingSize(context));
+  }
+
+  static EdgeInsets symmetricPadding(BuildContext context, {double? horizontal, double? vertical}) {
+    final baseSize = paddingSize(context);
+    return EdgeInsets.symmetric(
+      horizontal: horizontal != null ? baseSize * horizontal : baseSize,
+      vertical: vertical != null ? baseSize * vertical : baseSize,
+    );
+  }
+
+  static EdgeInsets customPadding(BuildContext context, {
+    double? left, 
+    double? top, 
+    double? right, 
+    double? bottom
+  }) {
+    final baseSize = paddingSize(context);
+    return EdgeInsets.only(
+      left: left != null ? baseSize * left : 0,
+      top: top != null ? baseSize * top : 0,
+      right: right != null ? baseSize * right : 0,
+      bottom: bottom != null ? baseSize * bottom : 0,
+    );
+  }
+
+  // SizedBox 관련 함수들
+  static SizedBox horizontalSpacing(BuildContext context, {double multiplier = 1.0}) {
+    return SizedBox(width: spacingSize(context) * multiplier);
+  }
+
+  static SizedBox verticalSpacing(BuildContext context, {double multiplier = 1.0}) {
+    return SizedBox(height: spacingSize(context) * multiplier);
+  }
+
+  // BorderRadius 관련 함수들
+  static BorderRadius cardRadius(BuildContext context) {
+    return BorderRadius.circular(roundRadius(context));
+  }
+
+  static BorderRadius buttonRadius(BuildContext context) {
+    return BorderRadius.circular(roundRadius(context) * 0.8);
+  }
+
+  static BorderRadius dialogRadius(BuildContext context) {
+    return BorderRadius.circular(roundRadius(context) * 2);
+  }
+
+  static BorderRadius customRadius(BuildContext context, {double multiplier = 1.0}) {
+    return BorderRadius.circular(roundRadius(context) * multiplier);
+  }
+
+  // 자주 사용되는 크기 배수들
+  static double largePadding(BuildContext context) {
+    return paddingSize(context) * 2;
+  }
+
+  static double smallPadding(BuildContext context) {
+    return paddingSize(context) * 0.5;
+  }
+
+  static double largeSpacing(BuildContext context) {
+    return spacingSize(context) * 2;
+  }
+
+  static double smallSpacing(BuildContext context) {
+    return spacingSize(context) * 0.5;
+  }
 }

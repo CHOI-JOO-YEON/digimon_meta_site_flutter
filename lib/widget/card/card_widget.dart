@@ -73,6 +73,11 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
   int? _previousCount;
   bool _isHighlighted = false;
 
+  // 카드 크기 기준 고정 radius 계산
+  double get cardRadius => widget.width * 0.06;
+  double get cardCountBadgeRadius => widget.width * 0.04;
+  double get parallelBadgeRadius => widget.width * 0.03;
+
   @override
   void initState() {
     super.initState();
@@ -162,6 +167,10 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     String color = widget.card.color2 ?? widget.card.color1!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768; // 모바일 화면 감지
+    final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
+    
     return MouseRegion(
       onEnter: (event) {
         if (event.kind == PointerDeviceKind.mouse) {
@@ -212,17 +221,17 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   Container(
                     width: widget.width,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(_isHovered ? 0.25 : 0.15),
-                          blurRadius: _isHovered ? 8 : 5,
-                          offset: Offset(0, _isHovered ? 4 : 2),
-                        ),
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                          spreadRadius: 0,
+                        )
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(cardRadius),
                       child: ColorFiltered(
                         colorFilter: widget.isActive ?? true
                             ? ColorFilter.mode(
@@ -275,35 +284,62 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                             
                             return Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(widget.width * 0.05),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    const Color(0xFF6B7280),
+                                    const Color(0xFF4B5563),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(cardRadius),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1,
+                                ),
                               ),
                               child: Center(
                                 child: Padding(
-                                  padding: EdgeInsets.all(widget.width * 0.05),
+                                  padding: EdgeInsets.all(widget.width * 0.08),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      Icon(
+                                        Icons.image_not_supported_outlined,
+                                        size: widget.width * 0.2,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                      SizedBox(height: widget.width * 0.04),
                                       Text(
                                         cardNo,
                                         style: TextStyle(
-                                          fontSize: widget.width * 0.15,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: widget.width * 0.14,
+                                          fontWeight: FontWeight.w700,
                                           color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              offset: const Offset(0, 1),
+                                              blurRadius: 2,
+                                              color: Colors.black.withOpacity(0.5),
+                                            ),
+                                          ],
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
-                                      if (cardName.isNotEmpty) 
+                                      if (cardName.isNotEmpty) ...[
+                                        SizedBox(height: widget.width * 0.02),
                                         Text(
                                           cardName,
                                           style: TextStyle(
-                                            fontSize: widget.width * 0.12,
-                                            color: Colors.white,
+                                            fontSize: widget.width * 0.1,
+                                            color: Colors.white.withOpacity(0.9),
+                                            fontWeight: FontWeight.w500,
                                           ),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -333,7 +369,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                 color: ColorService.getColorFromString(
                                     widget.card.color1!),
                                 borderRadius:
-                                    BorderRadius.circular(widget.width * 0.05)),
+                                    BorderRadius.circular(parallelBadgeRadius)),
                             child: Center(
                               child: Text(
                                 '패럴렐',
@@ -466,39 +502,60 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   // 카드 수량 표시
                   if (widget.cardCount != null)
                     Positioned(
-                      left: 0,
-                      bottom: 0,
+                      left: isMobile ? 4 : 8,
+                      bottom: isMobile ? 4 : 8,
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 300),
+                        curve: Curves.easeOutQuart,
                         padding: EdgeInsets.symmetric(
-                          horizontal: widget.width * 0.07,
-                          vertical: widget.width * 0.04,
+                          horizontal: isMobile ? widget.width * 0.06 : widget.width * 0.08,
+                          vertical: isMobile ? widget.width * 0.03 : widget.width * 0.05,
                         ),
                         decoration: BoxDecoration(
-                          color: _isHighlighted 
-                              ? Colors.orange.withOpacity(0.9)
-                              : Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(8),
+                          gradient: _isHighlighted 
+                              ? LinearGradient(
+                                  colors: [
+                                    const Color(0xFFFF6B35),
+                                    const Color(0xFFFF8E53),
+                                  ],
+                                )
+                              : LinearGradient(
+                                  colors: [
+                                    const Color(0xFF1F2937),
+                                    const Color(0xFF374151),
+                                  ],
+                                ),
+                          borderRadius: BorderRadius.circular(cardCountBadgeRadius),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _isHighlighted
+                                  ? const Color(0xFFFF6B35).withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.3),
+                              blurRadius: _isHighlighted ? 12 : 8,
+                              offset: const Offset(0, 4),
+                              spreadRadius: _isHighlighted ? 1 : 0,
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: isMobile ? 0.5 : 1,
                           ),
-                          boxShadow: _isHighlighted
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.orange.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  )
-                                ]
-                              : null,
                         ),
                         child: AnimatedDefaultTextStyle(
                           duration: Duration(milliseconds: 300),
                           style: TextStyle(
                             fontSize: _isHighlighted
-                                ? widget.width * 0.14
-                                : widget.width * 0.11,
+                                ? (isMobile ? widget.width * 0.12 : widget.width * 0.14)
+                                : (isMobile ? widget.width * 0.10 : widget.width * 0.12),
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(0, 1),
+                                blurRadius: 2,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                            ],
                           ),
                           child: Text(
                             '${widget.cardCount}',
@@ -509,26 +566,50 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                   // 카드 선택 시 표시되는 증감 버튼
                   if (_isShowingButtons && widget.addCard != null && widget.removeCard != null)
                     Positioned.fill(
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(8),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.7),
+                                                          Colors.black.withOpacity(0.8),
+                          ],
                         ),
+                        borderRadius: BorderRadius.circular(cardRadius),
+                      ),
                         child: Stack(
                           children: [
                             // 닫기 버튼
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: isMobile ? 8 : 12,
+                              right: isMobile ? 8 : 12,
                               child: GestureDetector(
                                 onTap: _toggleButtons,
                                 child: Container(
-                                  padding: EdgeInsets.all(4),
+                                  padding: EdgeInsets.all(isMobile ? 4 : 6),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.9),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white,
+                                        Colors.grey.shade100,
+                                      ],
+                                    ),
                                     shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                  child: Icon(Icons.close, size: 14, color: Colors.black87),
+                                  child: Icon(
+                                    Icons.close,
+                                    size: isMobile ? 12 : 16,
+                                    color: Colors.grey.shade700,
+                                  ),
                                 ),
                               ),
                             ),
@@ -553,15 +634,17 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                     },
                                     icon: Icons.remove,
                                     label: "",
-                                    color: Colors.red.shade700,
-                                    size: widget.width * 0.4,
+                                    color: const Color(0xFFEF4444),
+                                    size: isMobile ? widget.width * 0.35 : widget.width * 0.4,
+                                    isMobile: isMobile,
                                   ),
                                   _buildActionButton(
                                     onTap: () => widget.addCard!(widget.card),
                                     icon: Icons.add,
                                     label: "",
-                                    color: Colors.green.shade700,
-                                    size: widget.width * 0.4,
+                                    color: const Color(0xFF10B981),
+                                    size: isMobile ? widget.width * 0.35 : widget.width * 0.4,
+                                    isMobile: isMobile,
                                   ),
                                 ],
                               ),
@@ -585,28 +668,58 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
     required String label,
     required Color color,
     required double size,
+    bool isMobile = false,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size * 0.8,
-        height: size * 0.8,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 4,
-              spreadRadius: 0.5,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(size * 0.4),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: size * 0.8,
+          height: size * 0.8,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                color,
+                Color.lerp(color, Colors.black, 0.2)!,
+              ],
             ),
-          ],
-        ),
-        child: Center(
-          child: Icon(
-            icon,
-            size: size * 0.4,
-            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 12,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: isMobile ? 0.5 : 1,
+            ),
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              size: size * 0.4,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  offset: const Offset(0, 1),
+                  blurRadius: 2,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ],
+            ),
           ),
         ),
       ),

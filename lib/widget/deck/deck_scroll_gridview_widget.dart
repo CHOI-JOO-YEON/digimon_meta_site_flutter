@@ -16,6 +16,7 @@ class DeckScrollGridView extends StatefulWidget {
   final Function(DigimonCard)? removeCard;
   final CardOverlayService cardOverlayService;
   final bool isTama;
+  final Function(double)? onCardSizeCalculated;
 
   const DeckScrollGridView({
     super.key,
@@ -27,6 +28,7 @@ class DeckScrollGridView extends StatefulWidget {
     this.removeCard,
     required this.cardOverlayService,
     required this.isTama,
+    this.onCardSizeCalculated,
   });
 
   @override
@@ -92,6 +94,14 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        // 카드 크기 계산 및 부모에게 전달
+        final cardWidth = (constraints.maxWidth / widget.rowNumber) * 0.99;
+        if (widget.onCardSizeCalculated != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.onCardSizeCalculated!(cardWidth);
+          });
+        }
+        
         return GridView.builder(
           shrinkWrap: true,
           controller: _scrollController,

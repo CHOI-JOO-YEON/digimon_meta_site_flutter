@@ -31,27 +31,26 @@ class InfoPage extends StatelessWidget {
         return Scaffold(
           body: Column(
             children: [
-              TabBar(
-                controller: controller,
-                tabs: [
-                  Tab(
-                    icon: Icon(Icons.block),
-                    text: '금지/제한',
-                  ),
-                  Tab(
-                    icon: Icon(Icons.info_outline),
-                    text: '키워드',
-                  ),
-                  // 향후 룰 탭이 추가될 예정
-                  // Tab(
-                  //   icon: Icon(Icons.rule),
-                  //   text: '룰',
-                  // ),
-                ],
-                // TabBar가 앱바 밖에 있으므로 라벨 색상을 수동으로 설정
-                labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Theme.of(context).primaryColor,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TabBar(
+                  controller: controller,
+                  tabs: [
+                    Tab(
+                      icon: Icon(Icons.block),
+                      text: '금지/제한',
+                    ),
+                    Tab(
+                      icon: Icon(Icons.info_outline),
+                      text: '키워드',
+                    ),
+                    // 향후 룰 탭이 추가될 예정
+                    // Tab(
+                    //   icon: Icon(Icons.rule),
+                    //   text: '룰',
+                    // ),
+                  ],
+                ),
               ),
               Expanded(
                 child: child,

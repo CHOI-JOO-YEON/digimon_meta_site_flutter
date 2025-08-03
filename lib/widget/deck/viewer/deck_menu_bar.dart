@@ -40,10 +40,10 @@ class _DeckViewerMenuBarState extends State<DeckViewerMenuBar> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${widget.deck.author}#${(widget.deck.authorId!-3).toString().padLeft(4,'0')}',
+                    Text('${widget.deck.author ?? 'Unknown'}${widget.deck.authorId != null ? '#${(widget.deck.authorId! - 3).toString().padLeft(4, '0')}' : ''}',
                       style: TextStyle(fontSize: SizeService.smallFontSize(context)),),
                     Text(
-                      widget.deck.deckName,
+                      widget.deck.deckName ?? 'Untitled Deck',
                       style: TextStyle(fontSize: SizeService.bodyFontSize(context)
                         // ,overflow: TextOverflow.ellipsis,
                       ),
