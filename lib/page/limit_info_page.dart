@@ -1100,6 +1100,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
           decoration: BoxDecoration(
             color: Colors.yellow,
             borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
           child: Text(
             'NEW',
@@ -1120,6 +1127,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
           decoration: BoxDecoration(
             color: Colors.grey.shade400,
             borderRadius: BorderRadius.circular(4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
           child: Text(
             '해제',
@@ -1143,24 +1157,29 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
         width: cardWidth,
         height: cardHeight,
         margin: const EdgeInsets.only(right: 2, bottom: 2),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: Stack(
-          children: [
-            Center(
-              child: Text(
-                cardNo,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: isRemovedCard ? Colors.grey : color,
-                ),
-              ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
             ),
-            if (overlayContent != null) overlayContent,
-          ],
+            child: Stack(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                Center(
+                  child: Text(
+                    cardNo,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: isRemovedCard ? Colors.grey : color,
+                    ),
+                  ),
+                ),
+                if (overlayContent != null) overlayContent,
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -1170,23 +1189,27 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       width: cardWidth,
       height: cardHeight,
       margin: const EdgeInsets.only(right: 2, bottom: 2),
-      child: Stack(
-        children: [
-          CustomCard(
-            width: cardWidth,
-            card: card,
-            cardPressEvent: (selectedCard) {
-              CardService().showImageDialog(context, selectedCard, searchWithParameter: searchWithParameter);
-            },
-            onLongPress: () {
-              CardService().showImageDialog(context, card, searchWithParameter: searchWithParameter);
-            },
-            isActive: true,
-            zoomActive: false,
-            hideLimitBadges: true,
-          ),
-          if (overlayContent != null) overlayContent,
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(cardWidth * 0.06), // CustomCard와 동일한 radius
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            CustomCard(
+              width: cardWidth,
+              card: card,
+              cardPressEvent: (selectedCard) {
+                CardService().showImageDialog(context, selectedCard, searchWithParameter: searchWithParameter);
+              },
+              onLongPress: () {
+                CardService().showImageDialog(context, card, searchWithParameter: searchWithParameter);
+              },
+              isActive: true,
+              zoomActive: false,
+              hideLimitBadges: true,
+            ),
+            if (overlayContent != null) overlayContent,
+          ],
+        ),
       ),
     );
   }
