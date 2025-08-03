@@ -61,7 +61,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             children: [
               if (_showUsedCards) ...[
                 Text(
-                  '같이 채용된 카드',
+                  '같이 사용된 카드',
                   style: TextStyle(
                     fontSize: fontSize * 1.2,
                     fontWeight: FontWeight.bold,
