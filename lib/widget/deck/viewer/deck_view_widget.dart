@@ -104,7 +104,8 @@ class _DeckViewerViewState extends State<DeckViewerView> {
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     double height = MediaQuery.of(context).size.height * 0.88;
     if (isPortrait && isInit) {
-      _rowNumber = 4;
+      // fixedRowNumber가 설정되어 있으면 그 값을 사용, 없으면 기본값 4
+      _rowNumber = widget.fixedRowNumber ?? 4;
     }
     isInit = false;
     

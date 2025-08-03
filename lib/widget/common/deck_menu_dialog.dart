@@ -90,8 +90,9 @@ class DeckMenuDialog {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 덱 뷰 행 수 조정 (공통)
-                          if (deckViewRowNumber != null && onRowNumberChanged != null)
+                          // 덱 뷰 행 수 조정 (세로모드에서만)
+                          if (deckViewRowNumber != null && onRowNumberChanged != null && 
+                              MediaQuery.of(context).orientation == Orientation.portrait)
                             _buildRowNumberSlider(
                               deckViewRowNumber,
                               onRowNumberChanged,
@@ -285,58 +286,9 @@ class DeckMenuDialog {
     int deckViewRowNumber,
     Function(int) onRowNumberChanged,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.view_column, color: Colors.purple[600], size: 24),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '한 줄에 표시할 카드 장수',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          '${deckViewRowNumber}장',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Slider(
-                value: deckViewRowNumber.toDouble(),
-                min: 2,
-                max: 8,
-                divisions: 6,
-                activeColor: Colors.purple[600],
-                label: '${deckViewRowNumber}장',
-                onChanged: (value) {
-                  setState(() {
-                    onRowNumberChanged(value.round());
-                  });
-                },
-              ),
-            ],
-          );
-        },
-      ),
+    return _RowNumberSlider(
+      initialValue: deckViewRowNumber,
+      onChanged: onRowNumberChanged,
     );
   }
 
@@ -352,6 +304,91 @@ class DeckMenuDialog {
       title: Text(title),
       subtitle: Text(subtitle),
       onTap: onTap,
+    );
+  }
+}
+
+class _RowNumberSlider extends StatefulWidget {
+  final int initialValue;
+  final Function(int) onChanged;
+  
+  const _RowNumberSlider({
+    required this.initialValue,
+    required this.onChanged,
+  });
+  
+  @override
+  _RowNumberSliderState createState() => _RowNumberSliderState();
+}
+
+class _RowNumberSliderState extends State<_RowNumberSlider> {
+  late int currentValue;
+  
+  @override
+  void initState() {
+    super.initState();
+    currentValue = widget.initialValue;
+  }
+  
+  @override
+  void didUpdateWidget(_RowNumberSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialValue != widget.initialValue) {
+      currentValue = widget.initialValue;
+    }
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.view_column, color: Colors.purple[600], size: 24),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '한 줄에 표시할 카드 장수',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      '$currentValue장',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Slider(
+            value: currentValue.toDouble(),
+            min: 2,
+            max: 8,
+            divisions: 6,
+            activeColor: Colors.purple[600],
+            label: '$currentValue장',
+            onChanged: (value) {
+              setState(() {
+                currentValue = value.round();
+              });
+              widget.onChanged(currentValue);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

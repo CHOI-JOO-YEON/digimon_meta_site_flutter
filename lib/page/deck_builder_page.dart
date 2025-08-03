@@ -499,7 +499,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                             ? (viewMode == 'grid'
                                 ? CardScrollGridView(
                                     cards: cards,
-                                    rowNumber: 4,
+                                    rowNumber: _deckViewRowNumber,
                                     loadMoreCards: loadMoreCard,
                                     cardPressEvent: addCardByDeck,
                                     totalPages: totalPages,
@@ -516,7 +516,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   ))
                             : viewMode == 'grid'
                                 ? CardGridSkeletonLoading(
-                                    crossAxisCount: 6,
+                                    crossAxisCount: _deckViewRowNumber,
                                     itemCount: 24,
                                   )
                                 : ListView.builder(
@@ -990,7 +990,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               ? (viewMode == 'grid'
                                   ? CardScrollGridView(
                                       cards: cards,
-                                      rowNumber: 6,
+                                      rowNumber: 6, // 가로모드에서는 6개로 고정
                                       loadMoreCards: loadMoreCard,
                                       cardPressEvent: addCardByDeck,
                                       totalPages: totalPages,
@@ -1009,7 +1009,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                   padding: EdgeInsets.all(isSmallHeight ? 8.0 : 16.0),
                                   child: viewMode == 'grid'
                                       ? CardGridSkeletonLoading(
-                                          crossAxisCount: isSmallHeight ? 4 : 6,
+                                          crossAxisCount: 6, // 가로모드에서는 6개로 고정
                                           itemCount: 24,
                                         )
                                       : ListView.builder(
