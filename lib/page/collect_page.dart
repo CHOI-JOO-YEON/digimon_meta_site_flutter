@@ -225,8 +225,9 @@ class _CollectPageState extends State<CollectPage> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.only(
-                      left: MediaQuery.sizeOf(context).width * 0.01,
-                      right: MediaQuery.sizeOf(context).width * 0.01,
+                      left: MediaQuery.sizeOf(context).width * 0.015,
+                      right: MediaQuery.sizeOf(context).width * 0.015,
+                      top: MediaQuery.sizeOf(context).width * 0.01,
                       bottom: MediaQuery.sizeOf(context).width * 0.01,
                     ),
                     child: Column(
@@ -235,8 +236,9 @@ class _CollectPageState extends State<CollectPage> {
                           flex: 2,
                           child: Column(
                             children: [
-                              SizedBox(
-                                height: 50,
+                              Container(
+                                height: isPortrait ? 60 : 70,
+                                margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: CardSearchBar(
                                   notes: notes,
                                   searchParameter: searchParameter,
@@ -244,9 +246,8 @@ class _CollectPageState extends State<CollectPage> {
                                   updateSearchParameter: updateSearchParameter,
                                 ),
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 12),
                               Expanded(
-                                flex: 9,
                                 child: !isSearchLoading
                                     ? CardScrollGridView(
                                         cards: cards,

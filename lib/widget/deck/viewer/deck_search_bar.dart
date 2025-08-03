@@ -738,20 +738,20 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
           ],
           
           // 검색 버튼
-          if (!isVerySmall)
-            _buildActionButton(
-              icon: Icons.search_rounded,
-              tooltip: '검색',
-              onPressed: () {
-                widget.search(1);
-              },
-              isMobile: isMobile,
-              isSmallHeight: isSmallHeight,
-              style: AppComponentStyles.primaryButtonOutline(
-                isMobile: isMobile,
-                isSmall: isSmallHeight,
-              ),
-            ),
+          // if (!isVerySmall)
+          //   _buildActionButton(
+          //     icon: Icons.search_rounded,
+          //     tooltip: '검색',
+          //     onPressed: () {
+          //       widget.search(1);
+          //     },
+          //     isMobile: isMobile,
+          //     isSmallHeight: isSmallHeight,
+          //     style: AppComponentStyles.primaryButtonOutline(
+          //       isMobile: isMobile,
+          //       isSmall: isSmallHeight,
+          //     ),
+          //   ),
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
           

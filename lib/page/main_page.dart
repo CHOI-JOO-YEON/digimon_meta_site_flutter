@@ -427,10 +427,7 @@ class _MainPageState extends State<MainPage> {
                                                 ),
                                                 padding: EdgeInsets.zero,
                                                 labelPadding: EdgeInsets.zero,
-                                                indicatorPadding: const EdgeInsets.symmetric(
-                                                  horizontal: 4,
-                                                  vertical: 4,
-                                                ),
+                                                indicatorPadding: EdgeInsets.zero,
                                                 labelColor: Colors.white,
                                                 unselectedLabelColor: Colors.grey.shade600,
                                                 dividerColor: Colors.transparent,

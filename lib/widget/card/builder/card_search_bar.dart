@@ -1291,8 +1291,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 8 : 12,
-        vertical: isPortrait ? (isMobile ? 8 : 12) : (isMobile ? 12 : 16), // 가로모드에서 세로 패딩 증가
+        horizontal: isMobile ? 12 : 16,
+        vertical: isPortrait ? (isMobile ? 12 : 16) : (isMobile ? 16 : 20),
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -1335,6 +1335,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
                   hintText: '카드명/효과/번호',
                   isMobile: isMobile,
                                  ).copyWith(
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16 : 20,
+                    vertical: isMobile ? 16 : 18,
+                  ),
                    prefixIcon: Container(
                      margin: const EdgeInsets.all(8),
                      decoration: BoxDecoration(
@@ -1383,20 +1387,20 @@ class _CardSearchBarState extends State<CardSearchBar> {
           SizedBox(width: isMobile ? 6 : 8),
           
           // 검색 버튼
-          if (!isVerySmall)
-            _buildActionButton(
-              icon: Icons.search_rounded,
-              tooltip: '검색',
-                  onPressed: () {
-                    widget.updateSearchParameter();
-                  },
-              isMobile: isMobile,
-              isSmallHeight: isSmallHeight,
-              style: AppComponentStyles.primaryButtonOutline(
-                isMobile: isMobile,
-                isSmall: isSmallHeight,
-              ),
-            ),
+          // if (!isVerySmall)
+          //   _buildActionButton(
+          //     icon: Icons.search_rounded,
+          //     tooltip: '검색',
+          //         onPressed: () {
+          //           widget.updateSearchParameter();
+          //         },
+          //     isMobile: isMobile,
+          //     isSmallHeight: isSmallHeight,
+          //     style: AppComponentStyles.primaryButtonOutline(
+          //       isMobile: isMobile,
+          //       isSmall: isSmallHeight,
+          //     ),
+          //   ),
           
           if (!isVerySmall) SizedBox(width: isMobile ? 4 : 6),
           
@@ -1475,8 +1479,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
     required bool isSmallHeight,
     required ButtonStyle style,
   }) {
-    final buttonSize = isMobile ? 36.0 : (isSmallHeight ? 40.0 : 44.0);
-    final iconSize = isMobile ? 16.0 : (isSmallHeight ? 18.0 : 20.0);
+    final buttonSize = isMobile ? 44.0 : (isSmallHeight ? 48.0 : 52.0);
+    final iconSize = isMobile ? 20.0 : (isSmallHeight ? 22.0 : 24.0);
     
     return SizedBox(
       width: buttonSize,
