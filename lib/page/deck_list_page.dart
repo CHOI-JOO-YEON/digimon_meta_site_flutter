@@ -90,10 +90,14 @@ class _DeckListPageState extends State<DeckListPage> {
   }
 
   void updateSearchParameter() {
-    AutoRouter.of(context).navigate(
-      DeckListRoute(
-          searchParameterString: json.encode(deckSearchParameter.toJson())),
-    );
+    // 로딩 중이거나 초기화 중에는 라우팅 변경을 방지
+    if (!mounted) return;
+    
+    // URL 파라미터만 업데이트하고 페이지 리다이렉션은 하지 않음
+    // AutoRouter.of(context).navigate(
+    //   DeckListRoute(
+    //       searchParameterString: json.encode(deckSearchParameter.toJson())),
+    // );
   }
 
   void updateSelectedDeck(DeckView deckView) {

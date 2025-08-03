@@ -46,10 +46,13 @@ class _DeckSearchViewState extends State<DeckSearchView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
+      if (!_tabController.indexIsChanging && mounted) {
         setState(() {
           widget.deckSearchParameter.isMyDeck = _tabController.index == 1;
-          widget.updateSearchParameter();
+          // 로딩이 완료된 후에만 파라미터 업데이트 호출
+          if (!isLoading) {
+            widget.updateSearchParameter();
+          }
         });
       }
     });

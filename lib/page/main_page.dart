@@ -58,7 +58,7 @@ class _MainPageState extends State<MainPage> {
       routes: [DeckBuilderRoute(deck: null), DeckListRoute(), CollectRoute(), InfoRoute()],
       builder: (context, child, controller) {
         controller.addListener(() {
-          if (controller.indexIsChanging) {
+          if (controller.indexIsChanging && mounted) {
             _cardOverlayService.removeAllOverlays();
           }
         });
