@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 
 enum ToastType {
   success,
@@ -16,23 +17,23 @@ class ToastOverlay {
   }) {
     final overlay = OverlayEntry(
       builder: (context) => Positioned(
-        bottom: 50,
+        bottom: SizeService.largePadding(context) * 2.5,
         left: 0,
         right: 0,
         child: Material(
           color: Colors.transparent,
           child: Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+              padding: SizeService.symmetricPadding(context, horizontal: 4, vertical: 2.4),
               decoration: BoxDecoration(
                 color: _getBackgroundColor(type),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: SizeService.customRadius(context, multiplier: 2.4),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    blurRadius: SizeService.largePadding(context) * 1.6,
+                    offset: Offset(0, SizeService.spacingSize(context)),
                   ),
                 ],
               ),
@@ -42,15 +43,15 @@ class ToastOverlay {
                   Icon(
                     _getIcon(type),
                     color: Colors.white,
-                    size: 20,
+                    size: SizeService.mediumIconSize(context),
                   ),
-                  const SizedBox(width: 12),
+                  SizeService.horizontalSpacing(context, multiplier: 2.4),
                   Flexible(
                     child: Text(
                       message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 15,
+                        fontSize: SizeService.bodyFontSize(context) * 1.07,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

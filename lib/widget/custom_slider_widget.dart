@@ -23,8 +23,8 @@ class _CustomSliderState extends State<CustomSlider> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      padding: const EdgeInsets.all(12),
+      margin: SizeService.symmetricPadding(context, horizontal: 1.6),
+      padding: SizeService.symmetricPadding(context, horizontal: 2.4, vertical: 2.4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -34,12 +34,12 @@ class _CustomSliderState extends State<CustomSlider> {
             const Color(0xFFF8FAFC),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: SizeService.customRadius(context, multiplier: 3.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            blurRadius: SizeService.largePadding(context) * 2.4,
+            offset: Offset(0, SizeService.smallPadding(context) * 0.8),
           ),
         ],
         border: Border.all(
@@ -54,19 +54,19 @@ class _CustomSliderState extends State<CustomSlider> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: SizeService.symmetricPadding(context, horizontal: 1.6, vertical: 0.8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2563EB).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: SizeService.customRadius(context, multiplier: 1.6),
                 ),
                 child: Icon(
                   Icons.grid_view,
-                  size: 16,
+                  size: SizeService.mediumIconSize(context) * 0.8,
                   color: const Color(0xFF2563EB),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: SizeService.symmetricPadding(context, horizontal: 2.4, vertical: 1.2),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -74,12 +74,12 @@ class _CustomSliderState extends State<CustomSlider> {
                       const Color(0xFF1D4ED8),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: SizeService.customRadius(context, multiplier: 2.4),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFF2563EB).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      blurRadius: SizeService.largePadding(context) * 1.6,
+                      offset: Offset(0, SizeService.smallPadding(context) * 0.8),
                     ),
                   ],
                 ),
@@ -94,14 +94,14 @@ class _CustomSliderState extends State<CustomSlider> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizeService.verticalSpacing(context, multiplier: 1.6),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              trackHeight: 6,
+              trackHeight: SizeService.spacingSize(context) * 2,
               thumbShape: CustomSliderThumb(
-                thumbRadius: SizeService.thumbRadius(context) + 2,
+                thumbRadius: SizeService.thumbRadius(context) + SizeService.smallSpacing(context) * 0.8,
               ),
-              overlayShape: RoundSliderOverlayShape(overlayRadius: 20),
+              overlayShape: RoundSliderOverlayShape(overlayRadius: SizeService.largeIconSize(context) * 0.5),
               activeTrackColor: const Color(0xFF2563EB),
               inactiveTrackColor: Colors.grey.shade200,
               thumbColor: Colors.white,

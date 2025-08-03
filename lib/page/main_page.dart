@@ -50,7 +50,8 @@ class _MainPageState extends State<MainPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     final isSmallWidth = screenWidth < 400; // 세로 너비가 작은 화면 감지
-    final isMobilePortrait = isPortrait && screenWidth < 600; // 모바일 세로모드 감지
+    final isMobilePortrait = isPortrait && screenWidth < 768; // 모바일/태블릿 세로모드 감지 (768px 미만)
+    final isTabletPortrait = isPortrait && screenWidth >= 600 && screenWidth < 1024; // 태블릿 세로모드 감지
     
     return AutoTabsRouter.tabBar(
       physics: const NeverScrollableScrollPhysics(),
@@ -77,8 +78,8 @@ class _MainPageState extends State<MainPage> {
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
-                      height: isMobilePortrait 
-                        ? null // 자동 높이로 변경
+                      height: (isMobilePortrait || isTabletPortrait)
+                        ? null // 세로모드에서는 자동 높이로 변경
                         : SizeService.headerHeight(context),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -108,8 +109,8 @@ class _MainPageState extends State<MainPage> {
                             builder: (context, userProvider, deckProvider, child) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: isMobilePortrait 
-                                    ? (isSmallWidth ? 8 : 12) // 모바일에서 패딩 줄임
+                                  horizontal: (isMobilePortrait || isTabletPortrait)
+                                    ? (isSmallWidth ? 8 : (isTabletPortrait ? 16 : 12)) // 태블릿 세로모드에서 적절한 패딩
                                     : SizeService.paddingSize(context) * 2,
                                 ),
                                 child: isPortrait
@@ -118,9 +119,11 @@ class _MainPageState extends State<MainPage> {
                                         children: [
                                           // 세로모드에서 로그인 정보와 설정 버튼
                                           Container(
-                                                                        margin: EdgeInsets.only(
-                              bottom: isMobilePortrait ? 2 : 4,
-                            ),
+                                            margin: EdgeInsets.only(
+                                              bottom: (isMobilePortrait || isTabletPortrait) 
+                                                ? (isTabletPortrait ? 6 : 2) // 태블릿에서 약간 더 많은 마진
+                                                : 4,
+                                            ),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
@@ -134,8 +137,8 @@ class _MainPageState extends State<MainPage> {
                                                         Text(
                                                           '${userProvider.nickname}',
                                                           style: TextStyle(
-                                                            fontSize: isMobilePortrait 
-                                                              ? fontSize * 0.9 // 모바일에서 폰트 크기 줄임
+                                                            fontSize: (isMobilePortrait || isTabletPortrait)
+                                                              ? (isTabletPortrait ? fontSize * 1.1 : fontSize * 0.9) // 태블릿에서 살짝 크게
                                                               : fontSize,
                                                             fontWeight: FontWeight.w600,
                                                           ),
@@ -145,8 +148,8 @@ class _MainPageState extends State<MainPage> {
                                                         Text(
                                                           '#${(userProvider.userNo! - 3).toString().padLeft(4, '0')}',
                                                           style: TextStyle(
-                                                            fontSize: isMobilePortrait 
-                                                              ? fontSize * 0.7 // 모바일에서 작게
+                                                            fontSize: (isMobilePortrait || isTabletPortrait)
+                                                              ? (isTabletPortrait ? fontSize * 0.9 : fontSize * 0.7) // 태블릿에서 적절한 크기
                                                               : fontSize * 0.8,
                                                             color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                                                           ),
@@ -168,7 +171,9 @@ class _MainPageState extends State<MainPage> {
                                                             color: Colors.transparent,
                                                             child: InkWell(
                                                               borderRadius: BorderRadius.circular(
-                                                                isMobilePortrait ? 16 : 20,
+                                                                (isMobilePortrait || isTabletPortrait) 
+                                                                  ? (isTabletPortrait ? 18 : 16) // 태블릿에서 적절한 radius
+                                                                  : 20,
                                                               ),
                                                               onTap: () {
                                                                 userProvider.isLogin
@@ -177,8 +182,12 @@ class _MainPageState extends State<MainPage> {
                                                               },
                                                               child: Container(
                                                                 padding: EdgeInsets.symmetric(
-                                                                  horizontal: isMobilePortrait ? 10 : 16,
-                                                                  vertical: isMobilePortrait ? 6 : 8,
+                                                                  horizontal: (isMobilePortrait || isTabletPortrait)
+                                                                    ? (isTabletPortrait ? 14 : 10) // 태블릿에서 적절한 패딩
+                                                                    : 16,
+                                                                  vertical: (isMobilePortrait || isTabletPortrait)
+                                                                    ? (isTabletPortrait ? 8 : 6) // 태블릿에서 적절한 패딩
+                                                                    : 8,
                                                                 ),
                                                                 decoration: BoxDecoration(
                                                                   gradient: userProvider.isLogin
@@ -195,7 +204,9 @@ class _MainPageState extends State<MainPage> {
                                                                           ],
                                                                         ),
                                                                   borderRadius: BorderRadius.circular(
-                                                                    isMobilePortrait ? 16 : 20,
+                                                                    (isMobilePortrait || isTabletPortrait)
+                                                                      ? (isTabletPortrait ? 18 : 16) // 태블릿에서 적절한 radius
+                                                                      : 20,
                                                                   ),
                                                                   // boxShadow: [
                                                                   //   BoxShadow(
@@ -211,8 +222,8 @@ class _MainPageState extends State<MainPage> {
                                                                 child: Text(
                                                                   userProvider.isLogin ? '로그아웃' : '로그인',
                                                                   style: TextStyle(
-                                                                    fontSize: isMobilePortrait 
-                                                                      ? fontSize * 0.8 // 모바일에서 작게
+                                                                    fontSize: (isMobilePortrait || isTabletPortrait)
+                                                                      ? (isTabletPortrait ? fontSize * 0.95 : fontSize * 0.8) // 태블릿에서 적절한 크기
                                                                       : fontSize * 0.9,
                                                                     color: Colors.white,
                                                                     fontWeight: FontWeight.w600,
@@ -223,7 +234,9 @@ class _MainPageState extends State<MainPage> {
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(width: isMobilePortrait ? 6 : 12),
+                                                      SizedBox(width: (isMobilePortrait || isTabletPortrait) 
+                                                        ? (isTabletPortrait ? 10 : 6) // 태블릿에서 적절한 간격
+                                                        : 12),
                                                       // 설정 버튼
                                                       _buildIconButton(
                                                         onPressed: () {
@@ -239,7 +252,7 @@ class _MainPageState extends State<MainPage> {
                                                         icon: Icons.settings,
                                                         tooltip: '덱 설정',
                                                         context: context,
-                                                        isMobile: isMobilePortrait,
+                                                        isMobile: isMobilePortrait || isTabletPortrait,
                                                       ),
                                                     ],
                                                   ),

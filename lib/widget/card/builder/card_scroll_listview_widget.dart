@@ -117,7 +117,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizeService.horizontalSpacing(context, multiplier: 2.4),
           Text(
             '더 많은 카드를 불러오는 중...',
             style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 /// 🎨 디지몬 메타 사이트 디자인 시스템
 /// 
@@ -329,6 +330,7 @@ class AppComponentStyles {
 
 /// 🎯 Responsive helpers
 class AppResponsive {
+  // 기존 MediaQuery 기반 함수들
   static bool isMobile(BuildContext context) {
     return MediaQuery.of(context).size.width < 768;
   }
@@ -339,5 +341,118 @@ class AppResponsive {
   
   static bool isPortrait(BuildContext context) {
     return MediaQuery.of(context).orientation == Orientation.portrait;
+  }
+
+  // ResponsiveFramework 기반 함수들 (더 정확한 브레이크포인트 사용)
+  static bool isMobileDevice(BuildContext context) {
+    return ResponsiveBreakpoints.of(context).isMobile;
+  }
+
+  static bool isTabletDevice(BuildContext context) {
+    return ResponsiveBreakpoints.of(context).isTablet;
+  }
+
+  static bool isDesktopDevice(BuildContext context) {
+    return ResponsiveBreakpoints.of(context).isDesktop;
+  }
+
+  static bool is4K(BuildContext context) {
+    return ResponsiveBreakpoints.of(context).largerThan('DESKTOP');
+  }
+
+  // 복합 조건 함수들
+  static bool isMobilePortrait(BuildContext context) {
+    return isMobileDevice(context) && isPortrait(context);
+  }
+
+  static bool isTabletPortrait(BuildContext context) {
+    return isTabletDevice(context) && isPortrait(context);
+  }
+
+  static bool isSmallScreen(BuildContext context) {
+    return isMobileDevice(context) || isSmallHeight(context);
+  }
+
+  // 그리드 관련 반응형 함수들
+  static int getCardGridColumns(BuildContext context) {
+    return ResponsiveValue<int>(
+      context,
+      defaultValue: 6,
+      conditionalValues: [
+        const Condition.smallerThan(name: TABLET, value: 2),
+        const Condition.smallerThan(name: DESKTOP, value: 4),
+        const Condition.largerThan(name: DESKTOP, value: 8),
+      ],
+    ).value;
+  }
+
+  static int getDeckGridColumns(BuildContext context) {
+    final isPortrait = AppResponsive.isPortrait(context);
+    if (isPortrait) {
+      return ResponsiveValue<int>(
+        context,
+        defaultValue: 4,
+        conditionalValues: [
+          const Condition.smallerThan(name: TABLET, value: 3),
+          const Condition.smallerThan(name: DESKTOP, value: 4),
+          const Condition.largerThan(name: DESKTOP, value: 6),
+        ],
+      ).value;
+    } else {
+      return ResponsiveValue<int>(
+        context,
+        defaultValue: 8,
+        conditionalValues: [
+          const Condition.smallerThan(name: TABLET, value: 6),
+          const Condition.smallerThan(name: DESKTOP, value: 8),
+          const Condition.largerThan(name: DESKTOP, value: 12),
+        ],
+      ).value;
+    }
+  }
+
+  // 레이아웃 관련 함수들
+  static double getDialogWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: screenWidth * 0.8,
+      conditionalValues: [
+        Condition.smallerThan(name: TABLET, value: screenWidth * 0.95),
+        Condition.smallerThan(name: DESKTOP, value: screenWidth * 0.7),
+        Condition.largerThan(name: DESKTOP, value: screenWidth * 0.6),
+      ],
+    ).value;
+  }
+
+  static double getDialogHeight(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: screenHeight * 0.8,
+      conditionalValues: [
+        Condition.smallerThan(name: TABLET, value: screenHeight * 0.9),
+        Condition.smallerThan(name: DESKTOP, value: screenHeight * 0.8),
+        Condition.largerThan(name: DESKTOP, value: screenHeight * 0.7),
+      ],
+    ).value;
+  }
+
+  // 폰트 크기 관련 함수들 (ResponsiveFramework 기반)
+  static double getResponsiveFontSize(BuildContext context, {
+    required double mobile,
+    required double tablet, 
+    required double desktop,
+    double? desktop4K,
+  }) {
+    return ResponsiveValue<double>(
+      context,
+      defaultValue: tablet,
+      conditionalValues: [
+        Condition.smallerThan(name: TABLET, value: mobile),
+        Condition.smallerThan(name: DESKTOP, value: tablet),
+        Condition.largerThan(name: DESKTOP, value: desktop4K ?? desktop),
+      ],
+    ).value;
   }
 } 

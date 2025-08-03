@@ -4,6 +4,7 @@ import 'package:digimon_meta_site_flutter/model/format.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/deck_service.dart';
+import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,31 +49,34 @@ class DeckMenuDialog {
                 children: [
                   // 고정 헤더 (드래그 핸들 + 제목)
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: SizeService.allPadding(context),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 드래그 핸들
                         Center(
                           child: Container(
-                            width: 50,
-                            height: 5,
-                            margin: const EdgeInsets.only(bottom: 16),
+                            width: SizeService.largePadding(context) * 2.5,
+                            height: SizeService.spacingSize(context) * 1.67,
+                            margin: SizeService.customPadding(context, bottom: 3.2),
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2.5),
+                              borderRadius: SizeService.customRadius(context, multiplier: 0.5),
                             ),
                           ),
                         ),
                         
                         Row(
                           children: [
-                            Icon(Icons.tune, color: Colors.grey[700]),
-                            const SizedBox(width: 8),
+                            Icon(Icons.tune, 
+                              color: Colors.grey[700],
+                              size: SizeService.mediumIconSize(context),
+                            ),
+                            SizeService.horizontalSpacing(context, multiplier: 1.6),
                             Text(
                               '덱 메뉴',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: SizeService.titleFontSize(context),
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey[800],
                               ),
@@ -86,7 +90,7 @@ class DeckMenuDialog {
                   // 스크롤 가능한 메뉴 리스트
                   Flexible(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: SizeService.horizontalPadding(context),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
