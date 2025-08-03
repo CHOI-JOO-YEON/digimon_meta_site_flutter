@@ -48,10 +48,6 @@ class InfoPage extends StatelessWidget {
                   //   text: '룰',
                   // ),
                 ],
-                // TabBar가 앱바 밖에 있으므로 라벨 색상을 수동으로 설정
-                labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Theme.of(context).primaryColor,
               ),
               Expanded(
                 child: child,

@@ -186,6 +186,7 @@ class _MyAppState extends State<MyApp> {
             textStyle: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
+              fontFamily: 'JalnanGothic',
             ),
           ),
         ),
@@ -210,10 +211,12 @@ class _MyAppState extends State<MyApp> {
           labelStyle: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
+            fontFamily: 'JalnanGothic',
           ),
           unselectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 14,
+            fontFamily: 'JalnanGothic',
           ),
           indicator: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
@@ -245,33 +248,39 @@ class _MyAppState extends State<MyApp> {
             fontWeight: FontWeight.bold,
             fontSize: 32,
             height: 1.2,
+            fontFamily: 'JalnanGothic',
           ),
           headlineMedium: TextStyle(
             color: Color(0xFF1F2937), 
             fontWeight: FontWeight.w700,
             fontSize: 24,
             height: 1.3,
+            fontFamily: 'JalnanGothic',
           ),
           headlineSmall: TextStyle(
             color: Color(0xFF374151), 
             fontWeight: FontWeight.w600,
             fontSize: 20,
             height: 1.4,
+            fontFamily: 'JalnanGothic',
           ),
           bodyLarge: TextStyle(
             color: Color(0xFF374151),
             fontSize: 16,
             height: 1.6,
+            fontFamily: 'JalnanGothic',
           ),
           bodyMedium: TextStyle(
             color: Color(0xFF4B5563),
             fontSize: 14,
             height: 1.5,
+            fontFamily: 'JalnanGothic',
           ),
           bodySmall: TextStyle(
             color: Color(0xFF6B7280),
             fontSize: 12,
             height: 1.4,
+            fontFamily: 'JalnanGothic',
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
