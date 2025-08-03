@@ -614,28 +614,44 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                 ),
                                 child: Column(
                                   children: [
-                                    // 드래그 핸들 (더 세련된 디자인)
-                                    Container(
-                                      width: 60,
-                                      height: 5,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.grey[300]!,
-                                            Colors.grey[400]!,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(2.5),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 2,
-                                            offset: Offset(0, 1),
+                                    // 드래그 핸들 (마우스 드래그 지원)
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.resizeUpDown,
+                                      child: GestureDetector(
+                                        onPanUpdate: (details) {
+                                          // 마우스/터치 드래그 처리
+                                          if (_bottomSheetController.isAttached) {
+                                            double currentSize = _bottomSheetController.size;
+                                            double delta = -details.delta.dy / MediaQuery.of(context).size.height;
+                                            double newSize = (currentSize + delta).clamp(
+                                              _calculateMinBottomSheetSize(MediaQuery.of(context).size.height),
+                                              1.0
+                                            );
+                                            _bottomSheetController.jumpTo(newSize);
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 60,
+                                          height: 5,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.grey[300]!,
+                                                Colors.grey[400]!,
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(2.5),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.1),
+                                                blurRadius: 2,
+                                                offset: Offset(0, 1),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                    SizedBox(height: 12),
                                     
                                     // 덱 카운트 요약 (항상 표시)
                                     Container(
