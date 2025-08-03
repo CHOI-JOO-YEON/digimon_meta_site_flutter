@@ -216,44 +216,18 @@ class _DeckListPageState extends State<DeckListPage> {
                                 ],
                               ),
                             )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                // 사용 가능한 높이 계산 (패딩 제외)
-                                final availableHeight = constraints.maxHeight - (SizeService.paddingSize(context) * 2);
-                                
-                                return SingleChildScrollView(
-                                  controller: _scrollController,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight: availableHeight,
-                                    ),
-                                    child: IntrinsicHeight(
-                                      child: Column(
-                                        children: [
-                                          if (_selectedDeck != null) ...[
-                                            Flexible(
-                                              child: DeckViewerView(
-                                                deck: _selectedDeck!,
-                                                searchWithParameter: searchWithParameter,
-                                                fixedRowNumber: _deckViewRowNumber,
-                                                showMenuBar: false, // 세로모드에서는 메뉴바 숨김
-                                                showSlider: false, // 세로모드에서는 슬라이더 숨김 (메뉴에서 조정)
-                                                showButtons: false, // 세로모드에서는 버튼 숨김
-                                                showDeckInfo: true, // 세로모드에서는 덱 정보 표시
-                                              ),
-                                            ),
-                                          ] else ...[
-                                            // 덱이 선택되지 않았을 때 전체 높이를 사용하도록 Expanded 사용
-                                            Expanded(
-                                              child: SizedBox.shrink(),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
+                          : SingleChildScrollView(
+                              controller: _scrollController,
+                              physics: AlwaysScrollableScrollPhysics(),
+                              child: DeckViewerView(
+                                deck: _selectedDeck!,
+                                searchWithParameter: searchWithParameter,
+                                fixedRowNumber: _deckViewRowNumber,
+                                showMenuBar: false, // 세로모드에서는 메뉴바 숨김
+                                showSlider: false, // 세로모드에서는 슬라이더 숨김 (메뉴에서 조정)
+                                showButtons: false, // 세로모드에서는 버튼 숨김
+                                showDeckInfo: true, // 세로모드에서는 덱 정보 표시
+                              ),
                             ),
                     ),
                   ),
