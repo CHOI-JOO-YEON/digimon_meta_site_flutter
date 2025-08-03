@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 
@@ -9,13 +10,21 @@ enum ToastType {
 }
 
 class ToastOverlay {
+  static OverlayEntry? _currentToast;
+  static Timer? _currentTimer;
+
   static void show(
     BuildContext context,
     String message, {
     Duration duration = const Duration(seconds: 2),
     ToastType type = ToastType.info,
   }) {
-    final overlay = OverlayEntry(
+    // 기존 토스트와 타이머가 있으면 제거
+    _currentTimer?.cancel();
+    _currentToast?.remove();
+    _currentToast = null;
+    _currentTimer = null;
+    _currentToast = OverlayEntry(
       builder: (context) => Positioned(
         bottom: SizeService.largePadding(context) * 2.5,
         left: 0,
@@ -64,9 +73,11 @@ class ToastOverlay {
       ),
     );
 
-    Overlay.of(context).insert(overlay);
-    Future.delayed(duration, () {
-      overlay.remove();
+    Overlay.of(context).insert(_currentToast!);
+    _currentTimer = Timer(duration, () {
+      _currentToast?.remove();
+      _currentToast = null;
+      _currentTimer = null;
     });
   }
 
