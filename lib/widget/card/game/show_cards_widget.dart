@@ -159,63 +159,61 @@ class _ShowCardsState extends State<ShowCards> {
                         ),
                         child: Column(
                           children: [
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Wrap(
-                                spacing: 4.0, // 버튼 간 가로 간격
-                                runSpacing: 4.0, // 줄 간 세로 간격
-                                children: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        _sendSelectedToDeckBottom(gameState),
-                                    child: Text(
-                                      '덱 아래로 보내기',
-                                      style: TextStyle(
-                                          fontSize: gameState
-                                              .textWidth(widget.cardWidth)),
-                                    ),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return SizedBox(
+                                  width: constraints.maxWidth,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                  // 왼쪽 그룹: 덱/트래시 관련 버튼들
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () =>
+                                            _sendSelectedToDeckBottom(gameState),
+                                        icon: const Icon(Icons.vertical_align_bottom),
+                                        tooltip: '덱 아래로 보내기',
+                                        iconSize: gameState.iconWidth(widget.cardWidth),
+                                      ),
+                                      IconButton(
+                                        onPressed: () =>
+                                            _sendSelectedToDeckTop(gameState),
+                                        icon: const Icon(Icons.vertical_align_top),
+                                        tooltip: '덱 위로 보내기',
+                                        iconSize: gameState.iconWidth(widget.cardWidth),
+                                      ),
+                                      IconButton(
+                                        onPressed: () =>
+                                            _sendSelectedToTrash(gameState),
+                                        icon: const Icon(Icons.delete),
+                                        tooltip: '트래시로 보내기',
+                                        iconSize: gameState.iconWidth(widget.cardWidth),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        _sendSelectedToDeckTop(gameState),
-                                    child: Text(
-                                      '덱 위로 보내기',
-                                      style: TextStyle(
-                                          fontSize: gameState
-                                              .textWidth(widget.cardWidth)),
-                                    ),
+                                  // 오른쪽 그룹: 선택 관련 버튼들
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () =>
+                                            _selectAll(gameState.shows.length),
+                                        icon: const Icon(Icons.select_all),
+                                        tooltip: '모두 선택',
+                                        iconSize: gameState.iconWidth(widget.cardWidth),
+                                      ),
+                                      IconButton(
+                                        onPressed: _clearSelection,
+                                        icon: const Icon(Icons.clear),
+                                        tooltip: '모두 선택 해제',
+                                        iconSize: gameState.iconWidth(widget.cardWidth),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        _sendSelectedToTrash(gameState),
-                                    child: Text(
-                                      '트래시로 보내기',
-                                      style: TextStyle(
-                                          fontSize: gameState
-                                              .textWidth(widget.cardWidth)),
-                                    ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        _selectAll(gameState.shows.length),
-                                    child: Text(
-                                      '모두 선택',
-                                      style: TextStyle(
-                                          fontSize: gameState
-                                              .textWidth(widget.cardWidth)),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: _clearSelection,
-                                    child: Text(
-                                      '모두 선택 해제',
-                                      style: TextStyle(
-                                          fontSize: gameState
-                                              .textWidth(widget.cardWidth)),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                             DraggableDigimonListWidget(
                               id: id,
