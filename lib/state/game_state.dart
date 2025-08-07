@@ -254,10 +254,21 @@ class GameState extends ChangeNotifier {
   void moveCards(MoveCard move, List<DigimonCard> cards, bool isSaveStack) {
     List<DigimonCard> toCards = getCardListById(move.toId);
     bool isToCardsEmpty = toCards.isEmpty;
-    if (move.toId == move.fromId &&
-        ((move.toStartIndex == move.fromStartIndex + 1) ||
-            move.toStartIndex == move.fromStartIndex)) {
-      return;
+    
+    // 같은 영역에서 같은 위치나 인접한 위치로 이동하는 경우 무시
+    if (move.toId == move.fromId) {
+      // 단일 카드의 경우: 같은 위치이거나 바로 다음 위치
+      if (move.fromStartIndex == move.fromEndIndex &&
+          (move.toStartIndex == move.fromStartIndex || 
+           move.toStartIndex == move.fromStartIndex + 1)) {
+        return;
+      }
+      
+      // 여러 카드의 경우: 목표 위치가 원래 범위와 겹치는 경우
+      if (move.toStartIndex >= move.fromStartIndex && 
+          move.toStartIndex <= move.fromEndIndex + 1) {
+        return;
+      }
     }
 
     List<DigimonCard> fromCards = getCardListById(move.fromId);
