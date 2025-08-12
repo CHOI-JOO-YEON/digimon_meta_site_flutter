@@ -794,21 +794,16 @@ class DeckService {
     );
 
     if (confirmed) {
-      // 덱 카피 실행
-      deck.newCopy();
+      DeckBuild copiedDeck = DeckBuild.deckBuild(deck, context);
       
-      // onCopy 콜백 호출 (UI 업데이트용)
       if (onCopy != null) {
         onCopy();
       }
       
       // 토스트 메시지 표시
       DialogService.showSuccess(context, '덱이 복사되었습니다.');
-
-      // 새 덱 복사본을 생성하지 않고, 현재 덱의 상태를 업데이트한 후 리디렉션
-      // 텍스트 필드 업데이트를 위해 약간의 지연을 추가
       Future.delayed(Duration(milliseconds: 100), () {
-        context.navigateTo(DeckBuilderRoute(deck: deck));
+        context.navigateTo(DeckBuilderRoute(deck: copiedDeck));
       });
       
       return true;
