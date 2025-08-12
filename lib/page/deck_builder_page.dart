@@ -18,10 +18,7 @@ import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_grdivi
 import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listview_widget.dart';
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
-import 'package:digimon_meta_site_flutter/widget/deck/full_deck_viewer_modal.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:html' as html;
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
@@ -33,7 +30,6 @@ import '../widget/common/bottom_sheet_header.dart';
 import '../model/card.dart';
 import '../model/note.dart';
 import '../widget/card/builder/card_search_bar.dart';
-import 'package:digimon_meta_site_flutter/model/format.dart';
 
 @RoutePage()
 class DeckBuilderPage extends StatefulWidget {
@@ -332,46 +328,13 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     setState(() {});
   }
 
-  bool _overlayRemoved = false;
-  
   // 하단 시트 상태 관리
   final DraggableScrollableController _bottomSheetController = DraggableScrollableController();
   double _currentBottomSheetSize = 0.08;
-  bool _isBottomSheetExpanded = false;
-  
-  void _toggleBottomSheet() {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final minSize = _calculateMinBottomSheetSize(screenHeight);
-    final expandThreshold = minSize * 2; // 최소 크기의 2배를 확장 임계값으로
-    
-    if (_currentBottomSheetSize <= expandThreshold) {
-      // 최소 상태에서 중간으로
-      _bottomSheetController.animateTo(
-        0.4,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOutCubic,
-      );
-    } else if (_currentBottomSheetSize <= 0.6) {
-      // 중간 상태에서 최대로
-      _bottomSheetController.animateTo(
-        0.95,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOutCubic,
-      );
-    } else {
-      // 최대 상태에서 최소로
-      _bottomSheetController.animateTo(
-        minSize,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOutCubic,
-      );
-    }
-  }
   
   void _onBottomSheetChanged(double size) {
     setState(() {
       _currentBottomSheetSize = size;
-      _isBottomSheetExpanded = size > 0.8;
     });
     
     // 오버레이 상태 업데이트 (동적 임계값 사용)
@@ -441,7 +404,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     
     if (isPortrait) {
@@ -583,96 +545,84 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           ),
                         ],
                       ),
-                                            child: CustomScrollView(
+                      child: CustomScrollView(
                         controller: scrollController,
                         physics: ClampingScrollPhysics(),
                         slivers: [
-                          // 고정된 헤더 영역 (항상 표시)
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: _BottomSheetHeaderDelegate(
-                              minHeight: 80,
-                              maxHeight: 80,
-                              child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Colors.white,
-                                      const Color(0xFFF8FAFC),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      width: 1,
-                                    ),
+                          // 고정된 헤더 영역 (드래그 가능)
+                          SliverToBoxAdapter(
+                            child: Container(
+                              height: 80,
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white,
+                                    const Color(0xFFF8FAFC),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    width: 1,
                                   ),
                                 ),
-                                child: BottomSheetHeader(
-                                  deck: deck,
-                                  onMenuTap: () => _showDeckMenu(context),
-                                  showDragHandle: true,
-                                  enableMouseDrag: true,
-                                  onDragUpdate: (details) {
-                                    // 마우스/터치 드래그 처리
-                                    if (_bottomSheetController.isAttached) {
-                                      double currentSize = _bottomSheetController.size;
-                                      double delta = -details.delta.dy / MediaQuery.of(context).size.height;
-                                      double newSize = (currentSize + delta).clamp(
-                                        _calculateMinBottomSheetSize(MediaQuery.of(context).size.height),
-                                        1.0
-                                      );
-                                      _bottomSheetController.jumpTo(newSize);
-                                    }
-                                  },
-                                ),
+                              ),
+                              child: BottomSheetHeader(
+                                deck: deck,
+                                onMenuTap: () => _showDeckMenu(context),
+                                showDragHandle: true,
+                                enableMouseDrag: false, // 기본 드래그 동작 사용
                               ),
                             ),
                           ),
                           
-                          // 확장 가능한 컨텐츠 영역
-                          if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5) ...[
+                          // 구분선
+                          if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
                             SliverToBoxAdapter(
                               child: Divider(height: 1, color: Colors.grey[300]),
                             ),
-                            
-                            // 덱 상세 정보 영역
+                          
+                          // 덱 상세 정보 영역 (독립적인 스크롤 - NeverScrollableScrollPhysics 사용)
+                          if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
                             SliverToBoxAdapter(
-                                                              child: deck != null 
-                                ? Padding(
-                                    padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                    child: DeckBuilderView(
-                                      deck: deck!,
-                                      cardPressEvent: removeCardByDeck,
-                                      import: deckUpdate,
-                                      searchWithParameter: searchWithParameter,
-                                      cardOverlayService: _cardOverlayService,
-                                      showMenuBar: false, // 세로 모드에서는 메뉴바 숨김
-                                      showSlider: false, // 세로 모드에서는 슬라이더 숨김
-                                      showButtons: false, // 세로 모드에서는 버튼들 숨김
-                                      showDeckNameOnly: true, // 세로 모드에서는 덱 이름만 표시
-                                      fixedRowNumber: _deckViewRowNumber, // 조정 가능한 행 수 사용
-                                    ),
-                                  )
-                                : Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(50),
-                                      child: Text(
-                                        '덱이 비어있습니다',
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 16,
+                              child: Container(
+                                height: constraints.maxHeight * _currentBottomSheetSize - 120, // 헤더 제외한 높이
+                                child: deck != null 
+                                  ? SingleChildScrollView(
+                                      physics: ClampingScrollPhysics(), // 독립적인 스크롤
+                                      padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                      child: DeckBuilderView(
+                                        deck: deck!,
+                                        cardPressEvent: removeCardByDeck,
+                                        import: deckUpdate,
+                                        searchWithParameter: searchWithParameter,
+                                        cardOverlayService: _cardOverlayService,
+                                        showMenuBar: false, // 세로 모드에서는 메뉴바 숨김
+                                        showSlider: false, // 세로 모드에서는 슬라이더 숨김
+                                        showButtons: false, // 세로 모드에서는 버튼들 숨김
+                                        showDeckNameOnly: true, // 세로 모드에서는 덱 이름만 표시
+                                        fixedRowNumber: _deckViewRowNumber, // 조정 가능한 행 수 사용
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(50),
+                                        child: Text(
+                                          '덱이 비어있습니다',
+                                          style: TextStyle(
+                                            color: Colors.grey[500],
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                              ),
                             ),
-                          ],
                         ],
                       ),
                     ),
@@ -889,33 +839,3 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   }
 }
 
-// SliverPersistentHeader를 위한 헤더 델리게이트
-class _BottomSheetHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  _BottomSheetHeaderDelegate({
-    required this.minHeight,
-    required this.maxHeight,
-    required this.child,
-  });
-
-  @override
-  double get minExtent => minHeight;
-
-  @override
-  double get maxExtent => maxHeight;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox.expand(child: child);
-  }
-
-  @override
-  bool shouldRebuild(_BottomSheetHeaderDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
-  }
-}
