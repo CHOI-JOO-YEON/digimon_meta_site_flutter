@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:digimon_meta_site_flutter/model/deck_search_parameter.dart';
@@ -47,6 +46,7 @@ class _DeckListViewerState extends State<DeckListViewer>
   bool isLoading = false;
   CancelToken? _cancelToken;
   DeckView? _currentSelectedDeck; // 현재 선택된 덱 저장
+  final ScrollController _scrollController = ScrollController(); // 스크롤 컨트롤러 추가
 
   @override
   void initState() {
@@ -61,6 +61,7 @@ class _DeckListViewerState extends State<DeckListViewer>
   void dispose() {
     // 위젯이 dispose될 때 진행 중인 API 요청 취소
     _cancelToken?.cancel('위젯이 dispose됨');
+    _scrollController.dispose(); // 스크롤 컨트롤러 dispose
     super.dispose();
   }
 
@@ -79,6 +80,15 @@ class _DeckListViewerState extends State<DeckListViewer>
     widget.deckSearchParameter.isMyDeck = false;
     currentPage = page;
     widget.deckSearchParameter.updatePage(page, false);
+    
+    // 페이지 변경 시 스크롤을 맨 위로 이동
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
     
     try {
       PagedResponseDeckDto? pagedDeck =
@@ -231,6 +241,7 @@ class _DeckListViewerState extends State<DeckListViewer>
                           ),
                         )
                       : ListView.builder(
+                          controller: _scrollController, // 스크롤 컨트롤러 연결
                           itemCount: decks.length,
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                           physics: const BouncingScrollPhysics(
