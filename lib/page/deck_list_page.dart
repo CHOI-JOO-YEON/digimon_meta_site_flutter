@@ -305,17 +305,11 @@ class _DeckListPageState extends State<DeckListPage> {
                               child: Divider(height: 1, color: Colors.grey[300]),
                             ),
                             
-                            // 덱 검색 패널 - 동적 높이 조정
-                            SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut,
-                                // 바텀시트 확장 정도에 따라 동적 높이 계산
-                                constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight * 0.6,
-                                  maxHeight: constraints.maxHeight * (_currentBottomSheetSize > 0.8 ? 0.95 : 0.8),
-                                ),
+                            // 덱 검색 패널 - 고정 높이로 스크롤 가능하게 변경
+                            SliverToBoxAdapter(
+                              child: Container(
+                                // 바텀시트 현재 크기에서 헤더 높이를 뺀 나머지 공간 사용
+                                height: (constraints.maxHeight * _currentBottomSheetSize) - 100, // 헤더(80) + 여백(20) 제외
                                 padding: EdgeInsets.all(SizeService.paddingSize(context)),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
