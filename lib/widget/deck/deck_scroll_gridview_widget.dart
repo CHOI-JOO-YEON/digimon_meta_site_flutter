@@ -80,7 +80,7 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    final Size newSize = MediaQuery.of(context).size;
+    final Size newSize = MediaQuery.sizeOf(context);
 
     if (newSize != _lastSize) {
       // 큰 이미지 미리보기만 숨김

@@ -332,15 +332,15 @@ class AppComponentStyles {
 class AppResponsive {
   // 기존 MediaQuery 기반 함수들
   static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < 768;
+    return MediaQuery.sizeOf(context).width < 768;
   }
   
   static bool isSmallHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height < 600;
+    return MediaQuery.sizeOf(context).height < 600;
   }
   
   static bool isPortrait(BuildContext context) {
-    return MediaQuery.of(context).orientation == Orientation.portrait;
+    return MediaQuery.orientationOf(context) == Orientation.portrait;
   }
 
   // ResponsiveFramework 기반 함수들 (더 정확한 브레이크포인트 사용)
@@ -413,7 +413,7 @@ class AppResponsive {
 
   // 레이아웃 관련 함수들
   static double getDialogWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     return ResponsiveValue<double>(
       context,
       defaultValue: screenWidth * 0.8,
@@ -426,7 +426,7 @@ class AppResponsive {
   }
 
   static double getDialogHeight(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     return ResponsiveValue<double>(
       context,
       defaultValue: screenHeight * 0.8,

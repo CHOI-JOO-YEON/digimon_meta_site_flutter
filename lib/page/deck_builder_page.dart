@@ -222,7 +222,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       _onScroll();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (MediaQuery.of(context).orientation == Orientation.portrait &&
+      if (MediaQuery.orientationOf(context) == Orientation.portrait &&
           _panelController.isAttached) {
         _panelController.animatePanelToPosition(0.5);
       }
@@ -338,7 +338,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     });
     
     // 오버레이 상태 업데이트 (동적 임계값 사용)
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final minSize = _calculateMinBottomSheetSize(screenHeight);
     final overlayThreshold = minSize * 1.5; // 최소 크기의 1.5배를 오버레이 임계값으로
     
@@ -402,8 +402,8 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   @override
   Widget build(BuildContext context) {
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenHeight = MediaQuery.of(context).size.height;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     
     if (isPortrait) {
@@ -635,7 +635,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       });
     } else {
       // 가로 모드 레이아웃 개선 - 모바일 반응형 추가
-      final screenWidth = MediaQuery.of(context).size.width;
+      final screenWidth = MediaQuery.sizeOf(context).width;
       final isTablet = screenWidth >= 768 && screenWidth < 1024;
       final isSmallLaptop = screenWidth >= 1024 && screenWidth < 1200;
       final isMobileDesktop = screenWidth < 768;

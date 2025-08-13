@@ -130,10 +130,10 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
 
     return AlertDialog(
       content: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.9,
+        width: MediaQuery.sizeOf(context).width * 0.9,
+        height: MediaQuery.sizeOf(context).height * 0.9,
         child: Padding(
-          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+          padding: EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.05),
           child: Column(
             children: [
               Expanded(

@@ -75,7 +75,7 @@ class _DeckListPageState extends State<DeckListPage> {
 
     // 세로 모드에서 초기 위치는 initialChildSize로 설정되므로 별도 애니메이션 불필요
     // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (MediaQuery.of(context).orientation == Orientation.portrait &&
+    //   if (MediaQuery.orientationOf(context) == Orientation.portrait &&
     //       _bottomSheetController.isAttached) {
     //     _bottomSheetController.animateTo(
     //       0.3,
@@ -164,9 +164,9 @@ class _DeckListPageState extends State<DeckListPage> {
   @override
   Widget build(BuildContext context) {
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     
     if (isPortrait) {
       return LayoutBuilder(
@@ -341,7 +341,7 @@ class _DeckListPageState extends State<DeckListPage> {
       );
     } else {
       // 가로 모드 레이아웃 개선 - 모바일 반응형 추가
-      final screenWidth = MediaQuery.of(context).size.width;
+      final screenWidth = MediaQuery.sizeOf(context).width;
       final isTablet = screenWidth >= 768 && screenWidth < 1024;
       final isSmallLaptop = screenWidth >= 1024 && screenWidth < 1200;
       final isMobileDesktop = screenWidth < 768;

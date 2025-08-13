@@ -51,10 +51,9 @@ class _DeckImagePageState extends State<DeckImagePage> {
   }
 
   void _showColorSetsBottomSheet() {
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
-    final isPortrait = mediaQuery.orientation == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     // Calculate responsive values
     final responsiveHeight = isPortrait ? screenHeight * 0.7 : screenHeight * 0.8;
@@ -78,7 +77,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             // Adaptive sizing calculations
-            final bottomSheetWidth = MediaQuery.of(context).size.width;
+            final bottomSheetWidth = MediaQuery.sizeOf(context).width;
             final itemSize = bottomSheetWidth * (isPortrait ? 0.08 : 0.05);
             final fontSize = isPortrait ? 16.0 : 18.0;
             final spacing = isPortrait ? 8.0 : 12.0;
@@ -273,8 +272,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
     }
 
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    double maxWidth = MediaQuery.of(context).size.width;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    double maxWidth = MediaQuery.sizeOf(context).width;
     bottomSheetScale =
         isPortrait ? (maxWidth * 2) / size : (maxWidth * 0.6) / size;
 

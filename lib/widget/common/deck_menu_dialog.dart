@@ -42,7 +42,7 @@ class DeckMenuDialog {
           builder: (context, userProvider, child) {
             return Container(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
+                maxHeight: MediaQuery.sizeOf(context).height * 0.8,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -90,13 +90,14 @@ class DeckMenuDialog {
                   // 스크롤 가능한 메뉴 리스트
                   Flexible(
                     child: SingleChildScrollView(
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                       padding: SizeService.horizontalPadding(context),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // 덱 뷰 행 수 조정 (세로모드에서만)
                           if (deckViewRowNumber != null && onRowNumberChanged != null && 
-                              MediaQuery.of(context).orientation == Orientation.portrait)
+                              MediaQuery.orientationOf(context) == Orientation.portrait)
                             _buildRowNumberSlider(
                               deckViewRowNumber,
                               onRowNumberChanged,

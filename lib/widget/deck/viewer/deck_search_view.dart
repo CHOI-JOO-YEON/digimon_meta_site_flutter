@@ -117,7 +117,7 @@ class _DeckSearchViewState extends State<DeckSearchView>
   @override
   Widget build(BuildContext context) {
     // final isPortrait =
-    //     MediaQuery.of(context).orientation == Orientation.portrait;
+    //     MediaQuery.orientationOf(context) == Orientation.portrait;
     // double fontSize = min(MediaQuery.sizeOf(context).width * 0.009, 15);
     // if (isPortrait) {
     //   fontSize *= 2;

@@ -105,7 +105,7 @@ class _EnhancedPaginationState extends State<EnhancedPagination> {
     if (widget.totalPages <= 1) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     return Container(
       padding: EdgeInsets.symmetric(

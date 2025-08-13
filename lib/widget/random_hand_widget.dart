@@ -83,7 +83,7 @@ class _RandomHandWidgetState extends State<RandomHandWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double cardWidth = (MediaQuery.of(context).size.width / 8);
+    double cardWidth = (MediaQuery.sizeOf(context).width / 8);
     double cardHeight = cardWidth / 0.715;
     return Row(
       children: [

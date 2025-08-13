@@ -24,8 +24,8 @@ class _MemoryGaugeState extends State<MemoryGauge> {
         double availableWidth = constraints.maxWidth;
         
         // 화면 크기에 따른 반응형 계산
-        double screenWidth = MediaQuery.of(context).size.width;
-        double screenHeight = MediaQuery.of(context).size.height;
+        double screenWidth = MediaQuery.sizeOf(context).width;
+        double screenHeight = MediaQuery.sizeOf(context).height;
         double aspectRatio = screenWidth / screenHeight;
         
         // 버튼 크기 계산 (완전 반응형)

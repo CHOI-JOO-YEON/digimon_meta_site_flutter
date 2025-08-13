@@ -45,9 +45,9 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     double fontSize = SizeService.bodyFontSize(context);
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     final isSmallWidth = screenWidth < 400; // 세로 너비가 작은 화면 감지
     final isMobilePortrait = isPortrait && screenWidth < 768; // 모바일/태블릿 세로모드 감지 (768px 미만)
@@ -577,7 +577,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildBottomTabBar(BuildContext context, TabController controller) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobilePortrait = screenWidth < 600;
     
     return Container(

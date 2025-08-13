@@ -33,7 +33,7 @@ class ToastOverlay {
           color: Colors.transparent,
           child: Center(
             child: Container(
-              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.9),
+              constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.9),
               padding: SizeService.symmetricPadding(context, horizontal: 4, vertical: 2.4),
               decoration: BoxDecoration(
                 color: _getBackgroundColor(type),

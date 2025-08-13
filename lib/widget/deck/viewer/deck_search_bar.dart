@@ -88,7 +88,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+        final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
         
         return StatefulBuilder(
           builder: (context, setDialogState) {
@@ -98,7 +98,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: isPortrait ? double.infinity : 600,
-                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.9,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -176,6 +176,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
                     // 컨텐츠
                     Expanded(
                       child: SingleChildScrollView(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,7 +270,7 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
 
   Widget _buildAdvancedFilterContent(StateSetter setFilterState, bool isDialog) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -610,9 +611,9 @@ class _DeckSearchBarState extends State<DeckSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallHeight = screenHeight < 600;
     final isMobile = screenWidth < 768;
     final isVerySmall = screenWidth < 480;

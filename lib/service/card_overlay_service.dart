@@ -28,8 +28,8 @@ class CardOverlayService {
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
       int rowNumber, int index) {
     final offset = renderBox.localToGlobal(Offset.zero);
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     double maxHeight = screenHeight * 0.5;
 
     final aspectRatio = renderBox.size.width / renderBox.size.height;

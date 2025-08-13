@@ -236,7 +236,7 @@ class _GridSizes {
 }
 
 _GridSizes _calculateSizes(BoxConstraints constraints, BuildContext context) {
-  final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+  final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
   
   double fontSize = constraints.maxWidth * 0.02;
   double iconSize = constraints.maxWidth * 0.04;

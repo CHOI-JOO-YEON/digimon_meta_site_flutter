@@ -97,12 +97,12 @@ class _DeckViewerViewState extends State<DeckViewerView> {
   @override
   Widget build(BuildContext context) {
     CardOverlayService cardOverlayService = CardOverlayService();
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-        final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+        final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 768;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
-    double height = MediaQuery.of(context).size.height * 0.88;
+    double height = MediaQuery.sizeOf(context).height * 0.88;
     if (isPortrait && isInit) {
       // fixedRowNumber가 설정되어 있으면 그 값을 사용, 없으면 기본값 4
       _rowNumber = widget.fixedRowNumber ?? 4;

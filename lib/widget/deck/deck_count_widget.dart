@@ -22,7 +22,7 @@ class DeckCount extends StatelessWidget {
         : const Color(0xFFEF4444);
 
     bool isDesktop = ResponsiveBreakpoints.of(context).largerOrEqualTo(DESKTOP);
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallHeight = screenHeight < 600;
 
     return Container(

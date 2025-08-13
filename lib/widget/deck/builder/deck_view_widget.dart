@@ -149,9 +149,9 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
     }
 
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
     final isMobile = screenWidth < 768; // 모바일 화면 감지
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지

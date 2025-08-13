@@ -167,7 +167,7 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     String color = widget.card.color2 ?? widget.card.color1!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 768; // 모바일 화면 감지
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
     

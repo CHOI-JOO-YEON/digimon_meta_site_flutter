@@ -244,7 +244,7 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       
-      final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
       
       // 키보드가 내려갔으나 (높이가 0이 됨) 자동완성이 표시 중인 경우
       if (_previousKeyboardHeight > 0 && keyboardHeight == 0 && _showSuggestions) {
@@ -986,10 +986,10 @@ class _DeckEditorWidgetState extends State<DeckEditorWidget> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
     // 현재 키보드 높이 저장
-    _previousKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    _previousKeyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
     
     // 모바일 환경인지 확인
-    final bool isMobile = MediaQuery.of(context).size.width < 600;
+    final bool isMobile = MediaQuery.sizeOf(context).width < 600;
     
     // 텍스트 필드 위젯 - 키보드 이벤트 처리 로직 복원
     Widget textField = Focus(

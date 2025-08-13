@@ -48,8 +48,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final fontSize = min(screenWidth * 0.03, 15.0);
     
     LocaleCardData localeCardData = widget.card.localeCardData[_selectedLocaleIndex];

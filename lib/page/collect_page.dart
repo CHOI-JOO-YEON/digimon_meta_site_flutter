@@ -184,7 +184,7 @@ class _CollectPageState extends State<CollectPage> {
 
   Widget buildLoginContent() {
     final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+        MediaQuery.orientationOf(context) == Orientation.portrait;
 
     return Row(
       children: [

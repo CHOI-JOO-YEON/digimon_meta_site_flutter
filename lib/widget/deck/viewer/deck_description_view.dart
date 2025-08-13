@@ -186,7 +186,7 @@ class DeckDescriptionView extends StatelessWidget {
     if (card.getDisplayImgUrl() == null) return;
     
     // 화면 크기 가져오기
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.sizeOf(context);
     
     // 마우스 포인터 위치 가져오기
     final mousePosition = event.position;

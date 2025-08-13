@@ -14,7 +14,7 @@ class SizeService {
     ).value;
   }
   static double bodyFontSize(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     if (isPortrait) {
       return ResponsiveValue<double>(
@@ -144,7 +144,7 @@ class SizeService {
   }
 
   static double headerHeight(BuildContext context) {
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     // 세로모드일 때 더 작은 값 반환
     if (isPortrait) {

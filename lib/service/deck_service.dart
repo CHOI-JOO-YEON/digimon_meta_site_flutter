@@ -825,7 +825,7 @@ class DeckService {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             // 화면 크기 정보 가져오기
-            final screenSize = MediaQuery.of(context).size;
+            final screenSize = MediaQuery.sizeOf(context);
             final isSmallScreen = screenSize.width < 600;
             final theme = Theme.of(context);
             
@@ -843,6 +843,7 @@ class DeckService {
                   maxHeight: screenSize.height * 0.7,
                 ),
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1121,7 +1122,7 @@ class DeckService {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             // 화면 크기 정보 가져오기
-            final screenSize = MediaQuery.of(context).size;
+            final screenSize = MediaQuery.sizeOf(context);
             final isSmallScreen = screenSize.width < 600;
             final theme = Theme.of(context);
             
@@ -1139,6 +1140,7 @@ class DeckService {
                   maxHeight: screenSize.height * 0.8,
                 ),
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -360,7 +360,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
     int parallelOption = widget.searchParameter.parallelOption;
     bool enCardInclude = widget.searchParameter.isEnglishCardInclude;
     int typeOperation = widget.searchParameter.typeOperation;
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -370,7 +370,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: isPortrait ? double.infinity : 600,
-                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.9,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -448,6 +448,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                     // 검색어 입력
                     Expanded(
                       child: SingleChildScrollView(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1282,10 +1283,10 @@ class _CardSearchBarState extends State<CardSearchBar> {
   @override
   Widget build(BuildContext context) {
     dropDownMenuItems = generateDropDownMenuItems();
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     final isMobile = screenWidth < 768; // 모바일 화면 감지
     final isVerySmall = screenWidth < 480; // 매우 작은 화면 감지
 

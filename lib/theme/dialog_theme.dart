@@ -103,8 +103,8 @@ class AppDialogTheme {
 
   // 반응형 크기 계산
   static double getDialogWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     
     if (isPortrait) {
       return (screenWidth * 0.9).clamp(minDialogWidth, maxDialogWidth);
@@ -114,7 +114,7 @@ class AppDialogTheme {
   }
 
   static double getDialogHeight(BuildContext context, {double? contentHeight}) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     
     if (contentHeight != null) {
       // 컨텐츠 높이가 주어진 경우, 패딩을 추가하여 계산
