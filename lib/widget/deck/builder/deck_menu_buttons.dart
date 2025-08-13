@@ -236,6 +236,23 @@ class _DeckMenuButtonsState extends State<DeckMenuButtons> {
                 onPressed: () =>
                     DeckService().downloadDeckReceipt(context, widget.deck),
               ),
+              _buildModernIconButton(
+                context: context,
+                icon: Icons.swap_horiz,
+                filledIcon: Icons.swap_horiz,
+                tooltip: '패럴렐 카드를 일반 카드로 변환',
+                color: const Color(0xFFF97316),
+                onPressed: () {
+                  DeckService().convertParallelToNormal(context, widget.deck, () {
+                    widget.reload();
+                    ToastOverlay.show(
+                      context,
+                      '패럴렐 카드가 일반 카드로 변환되었습니다.',
+                      type: ToastType.success
+                    );
+                  });
+                },
+              ),
               if (hasManagerRole)
                 _buildModernIconButton(
                   context: context,

@@ -274,6 +274,28 @@ class DeckMenuDialog {
                               });
                             },
                           ),
+                          
+                          if (menuType == DeckMenuType.deckBuilder)
+                            _buildMenuItem(
+                              icon: Icons.swap_horiz,
+                              color: Colors.orange[600]!,
+                              title: '패럴렐 카드 변환',
+                              subtitle: '모든 패럴렐 카드를 일반 카드로 변환',
+                              onTap: () {
+                                Navigator.pop(context);
+                                // 모달이 닫힌 후 작업 수행
+                                Future.delayed(const Duration(milliseconds: 300), () {
+                                  if (parentContext.mounted) {
+                                    DeckService().convertParallelToNormal(parentContext, deck, () {
+                                      if (onReload != null) onReload();
+                                      if (parentContext.mounted) {
+                                        ToastOverlay.show(parentContext, '패럴렐 카드가 일반 카드로 변환되었습니다.', type: ToastType.success);
+                                      }
+                                    });
+                                  }
+                                });
+                              },
+                            ),
                         ],
                       ),
                     ),

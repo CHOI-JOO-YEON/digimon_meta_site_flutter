@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -1802,6 +1803,59 @@ class DeckService {
     }
     
     return false;
+  }
+
+  /// 모든 패럴렐 카드를 일반 카드로 변환
+  Future<void> convertParallelToNormal(BuildContext context, DeckBuild deck, Function() onSuccess) async {
+    CardOverlayService().removeAllOverlays();
+    
+    Map<DigimonCard, int> pCardMap = <DigimonCard, int>{};
+    
+    for (var entry in deck.deckMap.entries) {
+      if (entry.key.isParallel == true) {
+        pCardMap[entry.key] = entry.value;
+      }
+    }
+    
+    for (var entry in deck.tamaMap.entries) {
+      if (entry.key.isParallel == true) {
+        pCardMap[entry.key] = entry.value;
+      }
+    }
+    
+    if (pCardMap.isEmpty) {
+      ToastOverlay.show(context, '패럴렐 카드가 없습니다.', type: ToastType.info);
+      return;
+    }
+    
+    // 패럴렐 카드 개수 계산
+    int totalParallelCards = 0;
+    for (var count in pCardMap.values) {
+      totalParallelCards += count;
+    }
+    
+    // 확인 다이얼로그 표시
+    final confirmed = await DialogService.showConfirmation(
+      context,
+      title: '패럴렐 카드 변환',
+      message: '${totalParallelCards}장의 패럴렐 카드를 일반 카드로 변환하시겠습니까?',
+      confirmText: '변환',
+      cancelText: '취소',
+    );
+    
+    if (!confirmed) {
+      return;
+    }
+    
+    CardDataService cardService = CardDataService();
+    for (var entry in pCardMap.entries) {
+      var nonParallelCard = cardService.getNonParallelCardByCardNo(entry.key.cardNo!);
+      for (int i = 0; i < entry.value; i++) {
+        deck.removeSingleCard(entry.key);
+        deck.addSingleCard(nonParallelCard!);
+      }
+    }
+    onSuccess();
   }
 
   DeckBuild importDeckQr(String deckMapString, BuildContext context) {
