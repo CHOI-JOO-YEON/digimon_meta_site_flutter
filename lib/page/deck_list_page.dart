@@ -73,17 +73,18 @@ class _DeckListPageState extends State<DeckListPage> {
       userProvider.addListener(_onUserLoginStateChanged);
     });
 
-    // 세로 모드에서 초기 위치는 initialChildSize로 설정되므로 별도 애니메이션 불필요
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (MediaQuery.orientationOf(context) == Orientation.portrait &&
-    //       _bottomSheetController.isAttached) {
-    //     _bottomSheetController.animateTo(
-    //       0.3,
-    //       duration: Duration(milliseconds: 300),
-    //       curve: Curves.easeInOut,
-    //     );
-    //   }
-    // });
+    // 세로 모드에서 바텀시트를 반쯤 열기
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && 
+          MediaQuery.orientationOf(context) == Orientation.portrait &&
+          _bottomSheetController.isAttached) {
+        _bottomSheetController.animateTo(
+          0.5, // 50% 위치로 이동
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
   }
 
   void _onUserLoginStateChanged() {

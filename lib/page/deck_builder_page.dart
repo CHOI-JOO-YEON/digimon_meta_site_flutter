@@ -19,7 +19,6 @@ import 'package:digimon_meta_site_flutter/widget/card/builder/card_scroll_listvi
 import 'package:digimon_meta_site_flutter/widget/common/toast_overlay.dart';
 import 'package:digimon_meta_site_flutter/widget/deck/builder/deck_view_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:html' as html;
 import 'package:digimon_meta_site_flutter/provider/note_provider.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +52,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
   bool init = true;
   String viewMode = 'grid';
   final ScrollController _scrollController = ScrollController();
-  final PanelController _panelController = PanelController();
   bool isSearchLoading = true;
   List<DigimonCard> cards = [];
   List<NoteDto> notes = [];
@@ -221,10 +219,16 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
       CardOverlayService().removeAllOverlays();
       _onScroll();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (MediaQuery.orientationOf(context) == Orientation.portrait &&
-          _panelController.isAttached) {
-        _panelController.animatePanelToPosition(0.5);
+    // 세로 모드에서 바텀시트를 반쯤 열기 - 조금 더 지연시켜서 실행
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted &&
+          MediaQuery.orientationOf(context) == Orientation.portrait &&
+          _bottomSheetController.isAttached) {
+        _bottomSheetController.animateTo(
+          0.5, // 50% 위치로 이동
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        );
       }
     });
   }
@@ -242,6 +246,19 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
         deck = widget.deck ?? DeckBuild(context);
         final deckProvider = Provider.of<DeckProvider>(context, listen: false);
         if (deck != null) deckProvider.setCurrentDeck(deck!);
+      });
+      
+      // 덱이 변경되었을 때도 세로 모드에서 바텀시트를 반쯤 열기
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted &&
+            MediaQuery.orientationOf(context) == Orientation.portrait &&
+            _bottomSheetController.isAttached) {
+          _bottomSheetController.animateTo(
+            0.5, // 50% 위치로 이동
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+          );
+        }
       });
     }
     if (widget.searchParameterString != null &&
