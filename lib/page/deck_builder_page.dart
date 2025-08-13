@@ -589,12 +589,14 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               child: Divider(height: 1, color: Colors.grey[300]),
                             ),
                           
-                          // 덱 상세 정보 영역 (독립적인 스크롤 - NeverScrollableScrollPhysics 사용)
+                          // 덱 상세 정보 영역 (독립적인 스크롤)
                           if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
-                            SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: deck != null 
-                                  ? Padding(
+                            SliverToBoxAdapter(
+                              child: Container(
+                                height: constraints.maxHeight * _currentBottomSheetSize - 120, // 헤더 높이 제외
+                                child: deck != null 
+                                  ? SingleChildScrollView(
+                                      physics: ClampingScrollPhysics(),
                                       padding: EdgeInsets.all(SizeService.paddingSize(context)),
                                       child: DeckBuilderView(
                                         deck: deck!,
@@ -621,6 +623,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                         ),
                                       ),
                                     ),
+                              ),
                             ),
                         ],
                       ),
