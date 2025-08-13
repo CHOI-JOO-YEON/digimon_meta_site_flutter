@@ -138,8 +138,14 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
+      // 세로 모드에서 바텀시트를 위한 추가 패딩 계산
+      final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+      final screenHeight = MediaQuery.sizeOf(context).height;
+      final additionalPadding = isPortrait ? screenHeight * 0.7 : 0.0; // 바텀시트 최대 크기만큼 여유 패딩
+      
       return GridView.builder(
         controller: _scrollController,
+        padding: EdgeInsets.only(bottom: additionalPadding), // 하단 패딩 추가
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: widget.rowNumber,
           crossAxisSpacing: constraints.maxWidth / 100,

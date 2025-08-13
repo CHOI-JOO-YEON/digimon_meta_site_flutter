@@ -416,8 +416,9 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     if (isPortrait) {
       return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-                        return Scaffold(
+            return Scaffold(
           backgroundColor: Colors.grey[50],
+          resizeToAvoidBottomInset: false, // 키보드가 올라와도 화면 크기 조정하지 않음
           body: Stack(
             children: [
               // 메인 컨텐츠 영역
@@ -425,7 +426,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: constraints.maxHeight * _currentBottomSheetSize, // 바텀시트 현재 크기만큼 공간 확보
+                bottom: constraints.maxHeight * _calculateMinBottomSheetSize(constraints.maxHeight), // 바텀시트 최소 크기만큼만 고정 공간 확보
                 child: SafeArea(
                   child: Column(
                     children: [
@@ -483,6 +484,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                     itemCount: 24,
                                   )
                                 : ListView.builder(
+                                    padding: EdgeInsets.only(bottom: constraints.maxHeight * 0.7), // 스켈레톤 로딩에도 패딩 추가
                                     itemCount: 10,
                                     itemBuilder: (context, index) {
                                       return Padding(
@@ -589,12 +591,10 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           
                           // 덱 상세 정보 영역 (독립적인 스크롤 - NeverScrollableScrollPhysics 사용)
                           if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
-                            SliverToBoxAdapter(
-                              child: Container(
-                                height: constraints.maxHeight * _currentBottomSheetSize - 120, // 헤더 제외한 높이
-                                child: deck != null 
-                                  ? SingleChildScrollView(
-                                      physics: ClampingScrollPhysics(), // 독립적인 스크롤
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: deck != null 
+                                  ? Padding(
                                       padding: EdgeInsets.all(SizeService.paddingSize(context)),
                                       child: DeckBuilderView(
                                         deck: deck!,
@@ -621,7 +621,6 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                                         ),
                                       ),
                                     ),
-                              ),
                             ),
                         ],
                       ),

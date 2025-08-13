@@ -133,11 +133,17 @@ class _CardScrollListViewState extends State<CardScrollListView> {
 
   @override
   Widget build(BuildContext context) {
+    // 세로 모드에서 바텀시트를 위한 추가 패딩 계산
+    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final additionalPadding = isPortrait ? screenHeight * 0.7 : 0.0; // 바텀시트 최대 크기만큼 여유 패딩
+    
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
+            padding: EdgeInsets.only(bottom: additionalPadding), // 하단 패딩 추가
             itemCount: widget.cards.length + (isLoading ? 1 : 0),
             itemBuilder: (context, index) {
               if (index < widget.cards.length) {

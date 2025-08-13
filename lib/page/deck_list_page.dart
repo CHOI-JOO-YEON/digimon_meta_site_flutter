@@ -173,16 +173,15 @@ class _DeckListPageState extends State<DeckListPage> {
         builder: (BuildContext context, BoxConstraints constraints) {
           return Scaffold(
             backgroundColor: Colors.grey[50],
+            resizeToAvoidBottomInset: false, // 키보드가 올라와도 화면 크기 조정하지 않음
             body: Stack(
               children: [
                 // 메인 컨텐츠 영역 (선택된 덱 표시)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOut,
+                Positioned(
                   top: 0,
                   left: 0,
                   right: 0,
-                  bottom: constraints.maxHeight * _currentBottomSheetSize,
+                  bottom: constraints.maxHeight * _calculateMinBottomSheetSize(constraints.maxHeight), // 바텀시트 최소 크기만큼만 고정 공간 확보
                   child: SafeArea(
                     child: Container(
                       color: Colors.grey[50],
@@ -219,6 +218,7 @@ class _DeckListPageState extends State<DeckListPage> {
                             )
                           : SingleChildScrollView(
                               controller: _scrollController,
+                              padding: EdgeInsets.only(bottom: constraints.maxHeight * 0.7), // 바텀시트 최대 크기만큼 여유 패딩
                               physics: AlwaysScrollableScrollPhysics(),
                               child: DeckViewerView(
                                 deck: _selectedDeck!,
@@ -301,33 +301,34 @@ class _DeckListPageState extends State<DeckListPage> {
                             ),
                             
                             // 확장 가능한 컨텐츠 영역 (검색 패널) - 항상 표시하여 덱 리스트에 쉽게 접근할 수 있도록 함
-                            SliverToBoxAdapter(
-                              child: Divider(height: 1, color: Colors.grey[300]),
-                            ),
+                            if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
+                              SliverToBoxAdapter(
+                                child: Divider(height: 1, color: Colors.grey[300]),
+                              ),
                             
-                            // 덱 검색 패널 - 고정 높이로 스크롤 가능하게 변경
-                            SliverToBoxAdapter(
-                              child: Container(
-                                // 바텀시트 현재 크기에서 헤더 높이를 뺀 나머지 공간 사용
-                                height: (constraints.maxHeight * _currentBottomSheetSize) - 100, // 헤더(80) + 여백(20) 제외
-                                padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.white,
-                                      const Color(0xFFF8FAFC),
-                                    ],
+                            // 덱 검색 패널 - SliverFillRemaining으로 변경
+                            if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
+                              SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Container(
+                                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.white,
+                                        const Color(0xFFF8FAFC),
+                                      ],
+                                    ),
+                                  ),
+                                  child: DeckSearchView(
+                                    deckUpdate: updateSelectedDeck,
+                                    deckSearchParameter: deckSearchParameter,
+                                    updateSearchParameter: updateSearchParameter,
                                   ),
                                 ),
-                                child: DeckSearchView(
-                                  deckUpdate: updateSelectedDeck,
-                                  deckSearchParameter: deckSearchParameter,
-                                  updateSearchParameter: updateSearchParameter,
-                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),

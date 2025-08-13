@@ -324,7 +324,14 @@ class _MyDeckListViewerState extends State<MyDeckListViewer>
                             : ListView.builder(
                                 controller: _scrollController, // 스크롤 컨트롤러 연결
                                 itemCount: decks.length,
-                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                                padding: EdgeInsets.only(
+                                  top: 8,
+                                  bottom: MediaQuery.orientationOf(context) == Orientation.portrait 
+                                    ? MediaQuery.sizeOf(context).height * 0.7 // 세로 모드에서 바텀시트를 위한 추가 패딩
+                                    : 8,
+                                  left: 4,
+                                  right: 4,
+                                ),
                                 physics: const BouncingScrollPhysics(
                                   parent: AlwaysScrollableScrollPhysics(),
                                 ),
