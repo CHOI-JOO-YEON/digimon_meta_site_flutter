@@ -307,22 +307,26 @@ class _DeckListPageState extends State<DeckListPage> {
                                 child: Divider(height: 1, color: Colors.grey[300]),
                               ),
                             
-                            // 덱 검색 패널 - SliverFillRemaining으로 변경
-                            if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
-                              SliverFillRemaining(
-                                hasScrollBody: false,
-                                child: Container(
-                                  padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.white,
-                                        const Color(0xFFF8FAFC),
-                                      ],
-                                    ),
+                            // 덱 검색 패널 - 항상 위젯 트리에 유지하되 보이지 않을 때는 숨김
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Container(
+                                padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.white,
+                                      const Color(0xFFF8FAFC),
+                                    ],
                                   ),
+                                ),
+                                child: Visibility(
+                                  visible: _currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5,
+                                  maintainState: true, // 상태 유지
+                                  maintainAnimation: true,
+                                  maintainSize: false,
                                   child: DeckSearchView(
                                     deckUpdate: updateSelectedDeck,
                                     deckSearchParameter: deckSearchParameter,
@@ -330,6 +334,7 @@ class _DeckListPageState extends State<DeckListPage> {
                                   ),
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),
