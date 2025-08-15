@@ -421,7 +421,7 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                 return Image.network(
                                   _selectedCard?.getDisplayImgUrl(localeProvider.localePriority) ?? '',
                                   fit: BoxFit.contain,
-                                  cacheWidth: 400,
+                                  cacheWidth: 716,
                                   filterQuality: FilterQuality.medium,
                                 );
                               },

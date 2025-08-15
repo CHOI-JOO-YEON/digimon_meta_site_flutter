@@ -47,13 +47,13 @@ class DeckStat extends StatelessWidget {
               ),
           color: backGroundColor,
           borderRadius: BorderRadius.circular(radius ?? 16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(0.08),
+          //     blurRadius: 12,
+          //     offset: const Offset(0, 3),
+          //   ),
+          // ],
           border: Border.all(
             color: Colors.grey.withOpacity(0.1),
             width: 1,

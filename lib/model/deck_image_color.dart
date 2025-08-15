@@ -7,10 +7,11 @@ class DeckImageColor {
   Color barColor;
   String name;
 
-  DeckImageColor({this.backGroundColor = const Color(0xffE9E9E9),
-    this.textColor = const Color(0xff000000),
+  DeckImageColor({
+    this.backGroundColor = const Color(0xfff7f8f9),
+    this.textColor = const Color(0xff343a40),
     this.cardColor = const Color(0xffffffff),
-    this.barColor = const Color(0xff1a237e),
+    this.barColor = const Color(0xFF1976D2),
     this.name = "기본"
   });
 }
