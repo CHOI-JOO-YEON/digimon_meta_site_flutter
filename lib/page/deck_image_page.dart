@@ -7,10 +7,12 @@ import 'package:digimon_meta_site_flutter/service/deck_image_color_service.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
 import '../model/card.dart';
 import '../model/deck-build.dart';
+import '../provider/locale_provider.dart';
 import '../service/color_service.dart';
 import '../widget/color_picker_bottom_sheet.dart';
 import '../widget/deck/deck_stat_view.dart';
@@ -414,9 +416,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         if (isHorizontal)
                           SizedBox(
                             width: 610,
-                            child: Image.network(
-                                fit: BoxFit.contain,
-                                _selectedCard?.getDisplayImgUrl() ?? ''),
+                            child: Consumer<LocaleProvider>(
+                              builder: (context, localeProvider, child) {
+                                return Image.network(
+                                  fit: BoxFit.contain,
+                                  _selectedCard?.getDisplayImgUrl(localeProvider.localePriority) ?? '');
+                              },
+                            ),
                           ),
                         if (isHorizontal)
                           const SizedBox(
@@ -585,9 +591,13 @@ class _DeckImagePageState extends State<DeckImagePage> {
                     _selectedCard = cards[index];
                     setState(() {});
                   },
-                  child: Image.network(
-                    cards[index].getDisplaySmallImgUrl() ?? '',
-                    fit: BoxFit.contain,
+                  child: Consumer<LocaleProvider>(
+                    builder: (context, localeProvider, child) {
+                      return Image.network(
+                        cards[index].getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
+                        fit: BoxFit.contain,
+                      );
+                    },
                   ),
                 );
               },

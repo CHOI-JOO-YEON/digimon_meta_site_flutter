@@ -5,6 +5,7 @@ import '../model/sort_criterion_dto.dart';
 import '../provider/user_provider.dart';
 import '../provider/limit_provider.dart';
 import '../provider/deck_sort_provider.dart';
+import '../provider/locale_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
 
@@ -159,6 +160,12 @@ class UserSettingService {
         if (sortCriteria.isNotEmpty) {
           deckSortProvider.setSortPriority(sortCriteria);
         }
+      }
+      
+      // 로케일 우선순위 설정 적용
+      final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+      if (setting.localePriority != null && setting.localePriority!.isNotEmpty) {
+        localeProvider.updateLocalePriority(setting.localePriority!);
       }
     } catch (e) {
       print('Error applying user settings: $e');

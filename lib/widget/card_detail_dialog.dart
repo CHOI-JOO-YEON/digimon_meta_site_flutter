@@ -8,6 +8,7 @@ import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/locale_card_data.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/model/use_card_response_dto.dart';
+import 'package:digimon_meta_site_flutter/provider/locale_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/text_simplify_provider.dart';
 import 'package:digimon_meta_site_flutter/router.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
@@ -47,12 +48,36 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
   int _selectedLocaleIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _initializeSelectedLocale();
+  }
+
+  void _initializeSelectedLocale() {
+    // LocaleProvider에서 우선순위를 가져와 초기 탭 설정
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    final localePriority = localeProvider.localePriority;
+    
+    // 카드가 가진 locale 중에서 우선순위가 가장 높은 것을 찾기
+    for (String priorityLocale in localePriority) {
+      for (int i = 0; i < widget.card.localeCardData.length; i++) {
+        if (widget.card.localeCardData[i].locale == priorityLocale) {
+          _selectedLocaleIndex = i;
+          return; // 찾으면 바로 종료
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
+    final isPortrait =
+        MediaQuery.orientationOf(context) == Orientation.portrait;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final fontSize = min(screenWidth * 0.03, 15.0);
-    
-    LocaleCardData localeCardData = widget.card.localeCardData[_selectedLocaleIndex];
+
+    LocaleCardData localeCardData =
+        widget.card.localeCardData[_selectedLocaleIndex];
 
     return AlertDialog(
       content: Stack(
@@ -99,8 +124,10 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                           SizedBox(height: 10),
                           _buildCardName(localeCardData, fontSize),
                           SizedBox(height: 10),
-                          _buildCardImageAndAttributes(context, isPortrait, fontSize),
-                          if (isPortrait) _buildAttributesRow(context, fontSize),
+                          _buildCardImageAndAttributes(
+                              context, isPortrait, fontSize),
+                          if (isPortrait)
+                            _buildAttributesRow(context, fontSize),
                           const SizedBox(height: 5),
                           _buildCardEffects(context, localeCardData, fontSize),
                           const SizedBox(height: 10),
@@ -124,7 +151,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                       onPressed: _toggleUsedCards,
                       child: Text(
                         _showUsedCards ? '카드 정보로 돌아가기' : '같이 사용된 카드 보기',
-                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
+                        style: TextStyle(
+                            fontSize: fontSize, fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -134,7 +162,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                       onPressed: () {
                         // Close dialog and search for cards with the same cardNo
                         Navigator.pop(context);
-                        if (widget.card.cardNo != null && widget.searchWithParameter != null) {
+                        if (widget.card.cardNo != null &&
+                            widget.searchWithParameter != null) {
                           SearchParameter parameter = SearchParameter();
                           parameter.searchString = widget.card.cardNo!;
                           widget.searchWithParameter!(parameter);
@@ -142,7 +171,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                       },
                       child: Text(
                         '다른 일러스트 검색',
-                        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
+                        style: TextStyle(
+                            fontSize: fontSize, fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
@@ -167,7 +197,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         if (_showOtherIllustrations) _showOtherIllustrations = false;
       });
     }
-    
+
     if (_showUsedCards && !_useCardResponseDto.initialize) {
       final response = await CardApi().getUseCard(widget.card.cardId!);
       setState(() {
@@ -188,15 +218,16 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         if (_showUsedCards) _showUsedCards = false;
       });
     }
-    
+
     if (_showOtherIllustrations && _otherIllustrations.isEmpty) {
       // Search cards with the same cardNo
       final cardList = await CardApi().searchCards(cardNo: widget.card.cardNo);
       setState(() {
         // Filter out the current card if needed
-        _otherIllustrations = cardList.where((card) => 
-          card.cardId != widget.card.cardId).toList();
-        
+        _otherIllustrations = cardList
+            .where((card) => card.cardId != widget.card.cardId)
+            .toList();
+
         // If no other illustrations found, include the current one
         if (_otherIllustrations.isEmpty) {
           _otherIllustrations = [widget.card];
@@ -242,7 +273,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
               ),
               child: Text(
                 'Lv.${widget.card.lv == 0 ? '-' : widget.card.lv}',
-                style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.normal),
+                style: TextStyle(
+                    fontSize: fontSize, fontWeight: FontWeight.normal),
               ),
             ),
         ],
@@ -251,34 +283,56 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
   }
 
   Widget _buildLocaleSelector(BuildContext context, double fontSize) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: widget.card.localeCardData.asMap().entries.map((entry) {
-        int index = entry.key;
-        LocaleCardData localeCardData = entry.value;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedLocaleIndex = index;
-              });
-            },
-            child: Text(
-              localeCardData.locale,
-              style: TextStyle(
-                fontSize: fontSize * 0.8,
-                color: _selectedLocaleIndex == index
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey,
-                fontWeight: _selectedLocaleIndex == index
-                    ? FontWeight.bold
-                    : FontWeight.normal,
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, child) {
+        // 우선순위에 따라 로케일 데이터 정렬
+        List<MapEntry<int, LocaleCardData>> sortedEntries = widget.card.localeCardData
+            .asMap()
+            .entries
+            .toList();
+        
+        // 우선순위에 따라 정렬
+        sortedEntries.sort((a, b) {
+          int priorityA = localeProvider.localePriority.indexOf(a.value.locale);
+          int priorityB = localeProvider.localePriority.indexOf(b.value.locale);
+          
+          // 우선순위 리스트에 없으면 맨 뒤로
+          if (priorityA == -1) priorityA = 999;
+          if (priorityB == -1) priorityB = 999;
+          
+          return priorityA.compareTo(priorityB);
+        });
+        
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: sortedEntries.map((entry) {
+            int index = entry.key;
+            LocaleCardData localeCardData = entry.value;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    _selectedLocaleIndex = index;
+                  });
+                },
+                child: Text(
+                  localeCardData.locale,
+                  style: TextStyle(
+                    fontSize: fontSize * 0.8,
+                    color: _selectedLocaleIndex == index
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                    fontWeight: _selectedLocaleIndex == index
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -290,14 +344,16 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           localeCardData.name ?? '데이터 없음',
           style: TextStyle(
             fontSize: fontSize * 1.2,
-            fontFamily: localeCardData.locale == 'JPN' ? "MPLUSC" : "JalnanGothic",
+            fontFamily:
+                localeCardData.locale == 'JPN' ? "MPLUSC" : "JalnanGothic",
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCardImageAndAttributes(BuildContext context, bool isPortrait, double fontSize) {
+  Widget _buildCardImageAndAttributes(
+      BuildContext context, bool isPortrait, double fontSize) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -305,16 +361,23 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           flex: 6,
           child: Column(
             children: [
-              LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+              LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
                 return SizedBox(
                   width: constraints.maxWidth,
                   child: Stack(
                     children: [
                       SizedBox(
                         width: constraints.maxWidth,
-                        child: Image.network(
-                          widget.card.getDisplayImgUrl() ?? '',
-                          fit: BoxFit.fitWidth,
+                        child: Consumer<LocaleProvider>(
+                          builder: (context, localeProvider, child) {
+                            return Image.network(
+                              widget.card.getDisplayImgUrl(
+                                      localeProvider.localePriority) ??
+                                  '',
+                              fit: BoxFit.fitWidth,
+                            );
+                          },
                         ),
                       ),
                       Positioned(
@@ -329,10 +392,16 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                             padding: EdgeInsets.zero,
                             tooltip: '이미지 다운로드',
                             onPressed: () async {
-                              if (widget.card.getDisplayImgUrl() != null) {
+                              final localeProvider =
+                                  Provider.of<LocaleProvider>(context,
+                                      listen: false);
+                              final imgUrl = widget.card.getDisplayImgUrl(
+                                  localeProvider.localePriority);
+                              if (imgUrl != null) {
                                 await WebImageDownloader.downloadImageFromWeb(
-                                  widget.card.getDisplayImgUrl()!,
-                                  name: '${widget.card.cardNo}_${widget.card.getDisplayName()}.png',
+                                  imgUrl,
+                                  name:
+                                      '${widget.card.cardNo}_${widget.card.getDisplayName(localeProvider.localePriority)}.png',
                                 );
                               }
                             },
@@ -392,11 +461,11 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
       children: [
         SizedBox(height: 5),
         AutoScrollingWidget(
-          duration: Duration(milliseconds: 
-          ((widget.card.form?.contains('/') ?? false) ? 2 : 1) + 
-          1 + 
-          ((widget.card.types?.length ?? 0) )
-          *2000),
+          duration: Duration(
+              milliseconds:
+                  ((widget.card.form?.contains('/') ?? false) ? 2 : 1) +
+                      1 +
+                      ((widget.card.types?.length ?? 0)) * 2000),
           pauseDuration: 1,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -453,7 +522,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           Text(
             '$category: ',
             style: TextStyle(
-              color: categoryColor, 
+              color: categoryColor,
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
@@ -466,14 +535,15 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
               if (attribute.contains('/')) {
                 final parts = attribute.split('/');
                 return parts.map((part) => Chip(
-                  label: Text(
-                    part.trim(),
-                    style: TextStyle(fontSize: fontSize * 0.9),
-                  ),
-                  padding: EdgeInsets.zero,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
-                ));
+                      label: Text(
+                        part.trim(),
+                        style: TextStyle(fontSize: fontSize * 0.9),
+                      ),
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      labelPadding:
+                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                    ));
               } else {
                 // 기존과 같이 단일 칩으로 표시
                 return [
@@ -484,7 +554,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                     ),
                     padding: EdgeInsets.zero,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    labelPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
+                    labelPadding:
+                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 0),
                   )
                 ];
               }
@@ -529,15 +600,15 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                 if (attribute.contains('/')) {
                   final parts = attribute.split('/');
                   return parts.map((part) => Tooltip(
-                    message: part.trim(),
-                    triggerMode: TooltipTriggerMode.tap,
-                    child: Chip(
-                      label: Text(
-                        part.trim(),
-                        style: TextStyle(fontSize: fontSize * 0.9),
-                      ),
-                    ),
-                  ));
+                        message: part.trim(),
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Chip(
+                          label: Text(
+                            part.trim(),
+                            style: TextStyle(fontSize: fontSize * 0.9),
+                          ),
+                        ),
+                      ));
                 } else {
                   // 기존과 같이 단일 칩으로 표시
                   return [
@@ -561,7 +632,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     );
   }
 
-  Widget _buildCardEffects(BuildContext context, LocaleCardData localeCardData, double fontSize) {
+  Widget _buildCardEffects(
+      BuildContext context, LocaleCardData localeCardData, double fontSize) {
     return Consumer<TextSimplifyProvider>(
       builder: (context, textSimplifyProvider, child) {
         return Column(
@@ -598,7 +670,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
       width: double.infinity,
       child: InkWell(
         onTap: () {
-          if (widget.searchWithParameter != null && widget.card.noteId != null) {
+          if (widget.searchWithParameter != null &&
+              widget.card.noteId != null) {
             Navigator.pop(context);
             SearchParameter parameter = SearchParameter();
             parameter.noteId = widget.card.noteId!;
@@ -647,10 +720,21 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             borderRadius: BorderRadius.circular(5),
           ),
           child: ListTile(
-            leading: Image.network(usedCard.getDisplaySmallImgUrl() ?? ''),
-            title: Text(
-              usedCard.getDisplayName() ?? '',
-              style: TextStyle(color: _getColor(usedCardInfo.ratio)),
+            leading: Consumer<LocaleProvider>(
+              builder: (context, localeProvider, child) {
+                return Image.network(usedCard.getDisplaySmallImgUrl(
+                        localeProvider.localePriority) ??
+                    '');
+              },
+            ),
+            title: Consumer<LocaleProvider>(
+              builder: (context, localeProvider, child) {
+                return Text(
+                  usedCard.getDisplayName(localeProvider.localePriority) ??
+                      '',
+                  style: TextStyle(color: _getColor(usedCardInfo.ratio)),
+                );
+              },
             ),
             subtitle: Text(
               '덱: ${usedCardInfo.count}, 비율: ${(usedCardInfo.ratio * 100).toStringAsFixed(0)}%',
@@ -693,8 +777,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         ),
       );
     }
-    
-    if (_otherIllustrations.length == 1 && 
+
+    if (_otherIllustrations.length == 1 &&
         _otherIllustrations.first.cardId == widget.card.cardId) {
       return Center(
         child: Padding(
@@ -707,7 +791,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         ),
       );
     }
-    
+
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -716,24 +800,34 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         final card = _otherIllustrations[index];
         // Highlight current card
         final bool isCurrentCard = card.cardId == widget.card.cardId;
-        
+
         return Container(
           margin: EdgeInsets.all(5),
           decoration: BoxDecoration(
             color: isCurrentCard ? Colors.grey.withOpacity(0.2) : Colors.white,
             borderRadius: BorderRadius.circular(5),
-            border: isCurrentCard 
-              ? Border.all(color: Theme.of(context).primaryColor, width: 2)
-              : null,
+            border: isCurrentCard
+                ? Border.all(color: Theme.of(context).primaryColor, width: 2)
+                : null,
           ),
           child: ListTile(
-            leading: Image.network(card.getDisplaySmallImgUrl() ?? ''),
-            title: Text(
-              card.getDisplayName() ?? '',
-              style: TextStyle(
-                fontWeight: isCurrentCard ? FontWeight.bold : FontWeight.normal,
-              ),
+            leading: Consumer<LocaleProvider>(
+              builder: (context, localeProvider, child) {
+                return Image.network(card.getDisplaySmallImgUrl(
+                        localeProvider.localePriority) ??
+                    '');
+              },
             ),
+            title: Consumer<LocaleProvider>(
+                builder: (context, localeProvider, child) {
+              return Text(
+                card.getDisplayName(localeProvider.localePriority) ?? '',
+                style: TextStyle(
+                  fontWeight:
+                      isCurrentCard ? FontWeight.bold : FontWeight.normal,
+                ),
+              );
+            }),
             subtitle: Text(
               '세트: ${card.noteName ?? '정보 없음'}',
             ),
@@ -755,9 +849,10 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                 );
               }
             },
-            trailing: isCurrentCard 
-              ? Icon(Icons.check_circle, color: Theme.of(context).primaryColor)
-              : null,
+            trailing: isCurrentCard
+                ? Icon(Icons.check_circle,
+                    color: Theme.of(context).primaryColor)
+                : null,
           ),
         );
       },
@@ -794,7 +889,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _buildEffectText(context, text, fontSize, locale, isTextSimplify),
+            child: _buildEffectText(
+                context, text, fontSize, locale, isTextSimplify),
           )
         ],
       ),
@@ -809,124 +905,124 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     bool isTextSimplify,
   ) {
     // 현재 활성화된 효과 설명을 추적하기 위한 상태
-    final ValueNotifier<String?> activeDescriptionKey = ValueNotifier<String?>(null);
-    
+    final ValueNotifier<String?> activeDescriptionKey =
+        ValueNotifier<String?>(null);
+
     final List<InlineSpan> spans = [];
 
-    spans.addAll(_getSpansByLocale(locale, text, isTextSimplify, 
-      onBracketTap: (String bracketText) {
-        // 괄호에서 텍스트 추출
-        String content = bracketText;
-        if (content.startsWith('《') && content.endsWith('》')) {
-          content = content.substring(1, content.length - 1);
-        } else if (content.startsWith('≪') && content.endsWith('≫')) {
-          content = content.substring(1, content.length - 1);
-        } else if (content.startsWith('＜') && content.endsWith('＞')) {
-          content = content.substring(1, content.length - 1);
-        }
-        
-        // 같은 항목 클릭 시 토글
-        if (activeDescriptionKey.value == content) {
-          activeDescriptionKey.value = null;
-        } else {
-          activeDescriptionKey.value = content;
-        }
+    spans.addAll(_getSpansByLocale(locale, text, isTextSimplify,
+        onBracketTap: (String bracketText) {
+      // 괄호에서 텍스트 추출
+      String content = bracketText;
+      if (content.startsWith('《') && content.endsWith('》')) {
+        content = content.substring(1, content.length - 1);
+      } else if (content.startsWith('≪') && content.endsWith('≫')) {
+        content = content.substring(1, content.length - 1);
+      } else if (content.startsWith('＜') && content.endsWith('＞')) {
+        content = content.substring(1, content.length - 1);
       }
-    ));
+
+      // 같은 항목 클릭 시 토글
+      if (activeDescriptionKey.value == content) {
+        activeDescriptionKey.value = null;
+      } else {
+        activeDescriptionKey.value = content;
+      }
+    }));
 
     return ValueListenableBuilder<String?>(
-      valueListenable: activeDescriptionKey,
-      builder: (context, activeKey, child) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 메인 텍스트
-            SelectableText.rich(
-              TextSpan(
-                children: spans,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  color: Colors.black,
-                  height: 1.4,
-                  fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic"),
-              ),
-              textAlign: TextAlign.left,
-              textDirection: TextDirection.ltr,
-            ),
-            
-            // 활성화된 설명이 있으면 표시
-            if (activeKey != null)
-              Container(
-                margin: const EdgeInsets.only(top: 4, left: 8),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey.withOpacity(0.4), width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1),
-                    )
-                  ]
+        valueListenable: activeDescriptionKey,
+        builder: (context, activeKey, child) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 메인 텍스트
+              SelectableText.rich(
+                TextSpan(
+                  children: spans,
+                  style: TextStyle(
+                      fontSize: fontSize,
+                      color: Colors.black,
+                      height: 1.4,
+                      fontFamily: locale == 'JPN' ? "MPLUSC" : "JalnanGothic"),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 헤더 (키워드 이름)
-                    Row(
-                      children: [
-                        // 키워드 이름 (주황색으로 변경, 아이콘 제거)
-                        Text(
-                          activeKey,
-                          style: TextStyle(
-                            fontSize: fontSize * 0.9,
-                            fontWeight: FontWeight.bold,
-                            color: const Color.fromRGBO(206, 101, 1, 1), // 주황색으로 변경
-                          ),
-                        ),
-                        
-                        const Spacer(),
-                        
-                        // 닫기 버튼
-                        InkWell(
-                          onTap: () {
-                            activeDescriptionKey.value = null;
-                          },
-                          child: Icon(
-                            Icons.close,
-                            size: fontSize * 0.8,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    // 구분선
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Divider(
-                        color: Colors.grey.withOpacity(0.3),
-                        height: 1,
-                      ),
-                    ),
-                    
-                    // 효과 설명 텍스트
-                    Text(
-                      _getEffectDescriptionText(activeKey),
-                      style: TextStyle(
-                        fontSize: fontSize * 0.85,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
+                textAlign: TextAlign.left,
+                textDirection: TextDirection.ltr,
               ),
-          ],
-        );
-      }
-    );
+
+              // 활성화된 설명이 있으면 표시
+              if (activeKey != null)
+                Container(
+                  margin: const EdgeInsets.only(top: 4, left: 8),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                          color: Colors.grey.withOpacity(0.4), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        )
+                      ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 헤더 (키워드 이름)
+                      Row(
+                        children: [
+                          // 키워드 이름 (주황색으로 변경, 아이콘 제거)
+                          Text(
+                            activeKey,
+                            style: TextStyle(
+                              fontSize: fontSize * 0.9,
+                              fontWeight: FontWeight.bold,
+                              color: const Color.fromRGBO(
+                                  206, 101, 1, 1), // 주황색으로 변경
+                            ),
+                          ),
+
+                          const Spacer(),
+
+                          // 닫기 버튼
+                          InkWell(
+                            onTap: () {
+                              activeDescriptionKey.value = null;
+                            },
+                            child: Icon(
+                              Icons.close,
+                              size: fontSize * 0.8,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // 구분선
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Divider(
+                          color: Colors.grey.withOpacity(0.3),
+                          height: 1,
+                        ),
+                      ),
+
+                      // 효과 설명 텍스트
+                      Text(
+                        _getEffectDescriptionText(activeKey),
+                        style: TextStyle(
+                          fontSize: fontSize * 0.85,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          );
+        });
   }
 
   // 효과 설명 텍스트를 반환하는 헬퍼 메서드
@@ -935,29 +1031,26 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     if (widget.keywordsLoaded) {
       return widget.keywordService.getKeywordDescription(content);
     }
-    
+
     // 설명이 없을 경우 기본 반환
     return '이 효과에 대한 자세한 설명이 없습니다.';
   }
 
   List<InlineSpan> _getSpansByLocale(
-    String locale, 
-    String text, 
-    bool isTextSimplify, 
-    {Function(String)? onBracketTap}
-  ) {
+      String locale, String text, bool isTextSimplify,
+      {Function(String)? onBracketTap}) {
     if (isTextSimplify) {
       // 수정된 코드: '》' 뒤에 오는 괄호만 제거
       // 한국어: '》' 뒤에 오는 괄호
       final RegExp korPattern1 = RegExp(r'》\s*\([^()]*\)');
       final RegExp korPattern2 = RegExp(r'》\s*（[^（）]*）');
-      
+
       // 일본어: '》' 뒤에 오는 괄호
       final RegExp jpnPattern = RegExp(r'》\s*（[^（）]*）');
-      
+
       // 영어: '>' 뒤에 오는 괄호
       final RegExp engPattern = RegExp(r'>\s*\([^()]*\)');
-      
+
       // 괄호 제거 함수: 매치된 텍스트에서 괄호 부분만 제거하고 '》'는 유지
       String removeParentheses(String match) {
         // '》' 또는 '>' 이후의 내용은 제거
@@ -968,14 +1061,18 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
         }
         return '';
       }
-      
+
       // 괄호 제거 적용
-      text = text.replaceAllMapped(korPattern1, (match) => removeParentheses(match.group(0)!));
-      text = text.replaceAllMapped(korPattern2, (match) => removeParentheses(match.group(0)!));
-      text = text.replaceAllMapped(jpnPattern, (match) => removeParentheses(match.group(0)!));
-      text = text.replaceAllMapped(engPattern, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(
+          korPattern1, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(
+          korPattern2, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(
+          jpnPattern, (match) => removeParentheses(match.group(0)!));
+      text = text.replaceAllMapped(
+          engPattern, (match) => removeParentheses(match.group(0)!));
     }
-    
+
     if (locale == "KOR") {
       return _getKorTextSpans(text, onBracketTap);
     } else if (locale == "ENG") {
@@ -986,7 +1083,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     return [];
   }
 
-  List<InlineSpan> _getKorTextSpans(String text, Function(String)? onBracketTap) {
+  List<InlineSpan> _getKorTextSpans(
+      String text, Function(String)? onBracketTap) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -1017,7 +1115,9 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
       {
         'pattern': r'〔[^〔〕]*〕',
         'colorEvaluator': (String matchedText) =>
-            matchedText.contains('조그레스') || matchedText.contains('진화') || matchedText.contains('어플합체')
+            matchedText.contains('조그레스') ||
+                    matchedText.contains('진화') ||
+                    matchedText.contains('어플합체')
                 ? const Color.fromRGBO(59, 88, 101, 1.0)
                 : const Color.fromRGBO(163, 23, 99, 1),
       },
@@ -1058,7 +1158,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           : styleConfig['color'] as Color;
 
       // Check if this style is clickable
-      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+      final isClickable =
+          styleConfig['clickable'] == true && onBracketTap != null;
 
       if (isClickable) {
         spans.add(TextSpan(
@@ -1078,7 +1179,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           style: TextStyle(color: backgroundColor),
         ));
       }
-      
+
       lastIndex = match.end;
     }
 
@@ -1092,7 +1193,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     return spans;
   }
 
-  List<InlineSpan> _getEngTextSpans(String text, {Function(String)? onBracketTap}) {
+  List<InlineSpan> _getEngTextSpans(String text,
+      {Function(String)? onBracketTap}) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -1152,7 +1254,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
 
     for (final match in matches) {
       if (match.start > lastIndex) {
-        spans.add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+        spans
+            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
       }
 
       final matchedText = match.group(0)!;
@@ -1166,7 +1269,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           : styleConfig['color'] as Color;
 
       // Check if this style is clickable
-      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+      final isClickable =
+          styleConfig['clickable'] == true && onBracketTap != null;
 
       if (isClickable) {
         spans.add(TextSpan(
@@ -1186,7 +1290,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           style: TextStyle(color: backgroundColor),
         ));
       }
-      
+
       lastIndex = match.end;
     }
 
@@ -1197,7 +1301,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     return spans;
   }
 
-  List<InlineSpan> _getJpnTextSpans(String text, {Function(String)? onBracketTap}) {
+  List<InlineSpan> _getJpnTextSpans(String text,
+      {Function(String)? onBracketTap}) {
     final spans = <InlineSpan>[];
     final trimmedText = text.replaceAll(RegExp(r'\n\s+'), '\n');
 
@@ -1241,7 +1346,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
 
     for (final match in matches) {
       if (match.start > lastIndex) {
-        spans.add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
+        spans
+            .add(TextSpan(text: trimmedText.substring(lastIndex, match.start)));
       }
 
       final matchedText = match.group(0)!;
@@ -1255,7 +1361,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           : styleConfig['color'] as Color;
 
       // Check if this style is clickable
-      final isClickable = styleConfig['clickable'] == true && onBracketTap != null;
+      final isClickable =
+          styleConfig['clickable'] == true && onBracketTap != null;
 
       if (isClickable) {
         spans.add(TextSpan(
@@ -1275,7 +1382,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           style: TextStyle(color: backgroundColor),
         ));
       }
-      
+
       lastIndex = match.end;
     }
 
@@ -1319,7 +1426,8 @@ class AutoScrollingWidget extends StatefulWidget {
   State<AutoScrollingWidget> createState() => _AutoScrollingWidgetState();
 }
 
-class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTickerProviderStateMixin {
+class _AutoScrollingWidgetState extends State<AutoScrollingWidget>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -1345,7 +1453,7 @@ class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTi
     );
 
     _animation.addListener(_updateScroll);
-    
+
     // Start animation after layout is complete and we know content size
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForOverflow();
@@ -1365,12 +1473,13 @@ class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTi
 
   void _checkForOverflow() {
     if (!_scrollController.hasClients) return;
-    
-    _contentWidth = _scrollController.position.maxScrollExtent + _scrollController.position.viewportDimension;
+
+    _contentWidth = _scrollController.position.maxScrollExtent +
+        _scrollController.position.viewportDimension;
     _viewportWidth = _scrollController.position.viewportDimension;
-    
+
     _hasOverflow = _contentWidth > _viewportWidth;
-    
+
     if (_hasOverflow && !_animationController.isAnimating) {
       _startScrolling();
     }
@@ -1378,10 +1487,10 @@ class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTi
 
   void _updateScroll() {
     if (!_scrollController.hasClients) return;
-    
+
     double maxScrollExtent = _scrollController.position.maxScrollExtent;
     if (maxScrollExtent <= 0) return;
-    
+
     double scrollPosition = maxScrollExtent * _animation.value;
     _scrollController.jumpTo(scrollPosition);
   }
@@ -1420,4 +1529,4 @@ class _AutoScrollingWidgetState extends State<AutoScrollingWidget> with SingleTi
       ),
     );
   }
-} 
+}

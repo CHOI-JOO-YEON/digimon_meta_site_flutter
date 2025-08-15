@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stroke_text/stroke_text.dart';
 
 import '../../model/card.dart';
 import '../../model/search_parameter.dart';
+import '../../provider/locale_provider.dart';
 import '../../service/card_overlay_service.dart';
 import '../../service/card_service.dart';
 import '../card/card_widget.dart';
@@ -138,9 +140,10 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                 ),
                 onHover: (ctx) {
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
+                  final localeProvider = Provider.of<LocaleProvider>(ctx, listen: false);
                   widget.cardOverlayService.showBigImage(
                     ctx, 
-                    card.getDisplayImgUrl()!, 
+                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '', 
                     renderBox, 
                     widget.rowNumber, 
                     index

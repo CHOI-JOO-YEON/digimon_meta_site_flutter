@@ -1,8 +1,4 @@
-import 'dart:html';
-import 'dart:typed_data';
-
 import 'package:digimon_meta_site_flutter/model/locale_card_data.dart';
-import 'package:idb_shim/idb.dart';
 
 import '../enums/form.dart';
 
@@ -158,35 +154,115 @@ class DigimonCard {
     );
   }
 
-  String? getDisplayName() {
+  String? getDisplayName([List<String>? localePriority]) {
+    if (localePriority == null || localePriority.isEmpty) {
+      return localeCardData.first.name;
+    }
+    
+    for (String locale in localePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale && data.name.isNotEmpty) {
+          return data.name;
+        }
+      }
+    }
     return localeCardData.first.name;
   }
 
-  String? getDisplayEffect() {
+  String? getDisplayEffect([List<String>? localePriority]) {
+    if (localePriority == null || localePriority.isEmpty) {
+      return localeCardData.first.effect;
+    }
+    
+    for (String locale in localePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale && data.effect != null && data.effect!.isNotEmpty) {
+          return data.effect;
+        }
+      }
+    }
     return localeCardData.first.effect;
   }
 
-  String? getDisplaySourceEffect() {
+  String? getDisplaySourceEffect([List<String>? localePriority]) {
+    if (localePriority == null || localePriority.isEmpty) {
+      return localeCardData.first.sourceEffect;
+    }
+    
+    for (String locale in localePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale && data.sourceEffect != null && data.sourceEffect!.isNotEmpty) {
+          return data.sourceEffect;
+        }
+      }
+    }
     return localeCardData.first.sourceEffect;
   }
 
-  String? getDisplayLocale() {
+  String? getDisplayLocale([List<String>? localePriority]) {
+    if (localePriority == null || localePriority.isEmpty) {
+      return localeCardData.first.locale;
+    }
+    
+    for (String locale in localePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale) {
+          return data.locale;
+        }
+      }
+    }
     return localeCardData.first.locale;
   }
 
-  String? getDisplayImgUrl() {
-    for (var localeCardData in localeCardData) {
-      if (localeCardData.imgUrl != null) {
-        return localeCardData.imgUrl;
+  String? getDisplayImgUrl([List<String>? imageLocalePriority]) {
+    if (imageLocalePriority == null || imageLocalePriority.isEmpty) {
+      for (var data in localeCardData) {
+        if (data.imgUrl != null) {
+          return data.imgUrl;
+        }
+      }
+      return null;
+    }
+    
+    for (String locale in imageLocalePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale && data.imgUrl != null) {
+          return data.imgUrl;
+        }
+      }
+    }
+    
+    // Fallback to any available image
+    for (var data in localeCardData) {
+      if (data.imgUrl != null) {
+        return data.imgUrl;
       }
     }
     return null;
   }
 
-  String? getDisplaySmallImgUrl() {
-    for (var localeCardData in localeCardData) {
-      if (localeCardData.smallImgUrl != null) {
-        return localeCardData.smallImgUrl;
+  String? getDisplaySmallImgUrl([List<String>? imageLocalePriority]) {
+    if (imageLocalePriority == null || imageLocalePriority.isEmpty) {
+      for (var data in localeCardData) {
+        if (data.smallImgUrl != null) {
+          return data.smallImgUrl;
+        }
+      }
+      return null;
+    }
+    
+    for (String locale in imageLocalePriority) {
+      for (var data in localeCardData) {
+        if (data.locale == locale && data.smallImgUrl != null) {
+          return data.smallImgUrl;
+        }
+      }
+    }
+    
+    // Fallback to any available image
+    for (var data in localeCardData) {
+      if (data.smallImgUrl != null) {
+        return data.smallImgUrl;
       }
     }
     return null;

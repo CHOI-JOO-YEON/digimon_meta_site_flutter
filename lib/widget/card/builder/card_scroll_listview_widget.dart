@@ -4,6 +4,7 @@ import 'package:digimon_meta_site_flutter/service/card_service.dart';
 import 'package:digimon_meta_site_flutter/service/keyword_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../provider/locale_provider.dart';
 import '../../../provider/text_simplify_provider.dart';
 import '../../../service/size_service.dart';
 
@@ -193,10 +194,14 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                   ),
                                   // Make sure this inner GestureDetector doesn't interfere with the parent
                                   behavior: HitTestBehavior.opaque,
-                                  child: Image.network(
-                                    card.getDisplaySmallImgUrl()!,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(Icons.broken_image);
+                                  child: Consumer<LocaleProvider>(
+                                    builder: (context, localeProvider, child) {
+                                      return Image.network(
+                                        card.getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return const Icon(Icons.broken_image);
+                                        },
+                                      );
                                     },
                                   ),
                                 )),
@@ -209,62 +214,75 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${card.cardNo} ${card.getDisplayName()}',
-                                        style: TextStyle(
-                                          fontFamily:
-                                              card.getDisplayLocale() == 'JPN'
+                                      Consumer<LocaleProvider>(
+                                        builder: (context, localeProvider, child) {
+                                          return Text(
+                                            '${card.cardNo} ${card.getDisplayName(localeProvider.localePriority)}',
+                                            style: TextStyle(
+                                              fontFamily:
+                                              card.getDisplayLocale(localeProvider.localePriority) == 'JPN'
                                                   ? "MPLUSC"
                                                   : "JalnanGothic",
-                                          fontSize: SizeService.bodyFontSize(context),
-                                          fontWeight: FontWeight.bold
-                                        ),
+                                              fontSize: SizeService.bodyFontSize(context),
+                                              fontWeight: FontWeight.bold
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      if (card.getDisplayEffect() != null)
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                margin: EdgeInsets.only(top: 4),
-                                                padding: EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context).highlightColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: EffectTextClickable(
-                                                  text: card.getDisplayEffect()!,
-                                                  prefix: '상단 텍스트',
-                                                  locale: card.getDisplayLocale()!,
-                                                  onTap: () => _handleCardAddition(card),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      if (card.getDisplaySourceEffect() != null)
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                margin: EdgeInsets.only(top: 4),
-                                                padding: EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context).highlightColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: EffectTextClickable(
-                                                  text: card
-                                                      .getDisplaySourceEffect()!,
-                                                  prefix: '하단 텍스트',
-                                                  locale: card.getDisplayLocale()!,
-                                                  onTap: () => _handleCardAddition(card),
+                                      Consumer<LocaleProvider>(
+                                        builder: (context, localeProvider, child) {
+                                          final effect = card.getDisplayEffect(localeProvider.localePriority);
+                                          if (effect == null) return const SizedBox.shrink();
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.only(top: 4),
+                                                  padding: EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context).highlightColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(4),
+                                                  ),
+                                                  child: EffectTextClickable(
+                                                    text: effect,
+                                                    prefix: '상단 텍스트',
+                                                    locale: card.getDisplayLocale(localeProvider.localePriority) ?? 'KOR',
+                                                    onTap: () => _handleCardAddition(card),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                      Consumer<LocaleProvider>(
+                                        builder: (context, localeProvider, child) {
+                                          final sourceEffect = card.getDisplaySourceEffect(localeProvider.localePriority);
+                                          if (sourceEffect == null) return const SizedBox.shrink();
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.only(top: 4),
+                                                  padding: EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context).highlightColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(4),
+                                                  ),
+                                                  child: EffectTextClickable(
+                                                    text: sourceEffect,
+                                                    prefix: '하단 텍스트',
+                                                    locale: card.getDisplayLocale(localeProvider.localePriority) ?? 'KOR',
+                                                    onTap: () => _handleCardAddition(card),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ))

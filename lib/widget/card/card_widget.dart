@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/limit_provider.dart';
+import '../../provider/locale_provider.dart';
 import '../../service/color_service.dart';
 import 'game/card_back_widget.dart';
 
@@ -258,10 +259,12 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                 1,
                                 0,
                               ]),
-                        child: Image.network(
-                          widget.card.getDisplaySmallImgUrl() ?? '',
-                          fit: BoxFit.fill,
-                          loadingBuilder: (context, child, loadingProgress) {
+                        child: Consumer<LocaleProvider>(
+                          builder: (context, localeProvider, _) {
+                            return Image.network(
+                              widget.card.getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
+                              fit: BoxFit.fill,
+                              loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) {
                               return child;
                             }
@@ -275,12 +278,10 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                               ),
                             );
                           },
-                          errorBuilder: (context, error, stackTrace) {
-                            // 이미지 로드 실패 시 카드 번호와 이름을 표시
-                            final String cardNo = widget.card.cardNo ?? '';
-                            final String cardName = widget.card.localeCardData.isNotEmpty 
-                                ? widget.card.localeCardData[0].name ?? ''
-                                : '';
+                              errorBuilder: (context, error, stackTrace) {
+                                // 이미지 로드 실패 시 카드 번호와 이름을 표시
+                                final String cardNo = widget.card.cardNo ?? '';
+                                final String cardName = widget.card.getDisplayName(localeProvider.localePriority) ?? '';
                             
                             return Container(
                               decoration: BoxDecoration(
@@ -344,6 +345,8 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                                   ),
                                 ),
                               ),
+                              );
+                              },
                             );
                           },
                         ),

@@ -52,6 +52,7 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
   late LimitDto? selectedLimit;
   late bool isStrict;
   late List<SortCriterion> sortPriority;
+  late List<String> localePriority;
 
   @override
   void initState() {
@@ -92,6 +93,13 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
         ),
       ),
     );
+    
+    // 로컬 스토리지에서 locale 우선순위 로드
+    final localePriorityStr = html.window.localStorage['localePriority'];
+    
+    localePriority = localePriorityStr != null 
+        ? localePriorityStr.split(',').where((s) => s.isNotEmpty).toList()
+        : ['KOR', 'ENG', 'JPN'];
   }
 
   @override
@@ -112,15 +120,19 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
   }
 
   Widget _buildContent(BuildContext context, LimitProvider limitProvider, DeckSortProvider deckSortProvider) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildLimitSection(limitProvider),
-        const Divider(height: AppDialogTheme.spacing * 2),
-        _buildStrictModeSection(),
-        const Divider(height: AppDialogTheme.spacing * 2),
-        _buildSortPrioritySection(deckSortProvider),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildLimitSection(limitProvider),
+          const Divider(height: AppDialogTheme.spacing * 2),
+          _buildStrictModeSection(),
+          const Divider(height: AppDialogTheme.spacing * 2),
+          _buildLocalePrioritySection(),
+          const Divider(height: AppDialogTheme.spacing * 2),
+          _buildSortPrioritySection(deckSortProvider),
+        ],
+      ),
     );
   }
 
@@ -223,6 +235,176 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
         ),
       ],
     );
+  }
+
+  Widget _buildLocalePrioritySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '언어 우선순위',
+              style: AppDialogTheme.titleTextStyle.copyWith(fontSize: 18),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  localePriority = ['KOR', 'ENG', 'JPN'];
+                });
+              },
+              icon: const Icon(Icons.refresh, size: 20),
+              tooltip: '초기화',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppDialogTheme.smallSpacing),
+        _buildCompactLocalePriorityList(),
+      ],
+    );
+  }
+
+  Widget _buildCompactLocalePriorityList() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.shade50,
+      ),
+      child: Row(
+        children: [
+          for (int i = 0; i < localePriority.length; i++) ...[
+            if (i > 0) 
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            _buildLocaleChip(localePriority[i], i),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocaleChip(String locale, int index) {
+    return Draggable<String>(
+      data: locale,
+      feedback: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            _getLocaleDisplayName(locale),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+      childWhenDragging: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.grey.shade200,
+        ),
+        child: Text(
+          _getLocaleDisplayName(locale),
+          style: TextStyle(
+            color: Colors.grey.shade400,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      child: DragTarget<String>(
+        onWillAccept: (data) => data != locale,
+        onAccept: (draggedLocale) {
+          setState(() {
+            final draggedIndex = localePriority.indexOf(draggedLocale);
+            localePriority.removeAt(draggedIndex);
+            localePriority.insert(index, draggedLocale);
+          });
+        },
+        builder: (context, candidateData, rejectedData) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: candidateData.isNotEmpty 
+                ? Theme.of(context).primaryColor.withOpacity(0.2)
+                : Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(20),
+              border: candidateData.isNotEmpty
+                ? Border.all(color: Theme.of(context).primaryColor, width: 2)
+                : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _getLocaleDisplayName(locale),
+                  style: TextStyle(
+                    color: candidateData.isNotEmpty 
+                      ? Theme.of(context).primaryColor
+                      : Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: candidateData.isNotEmpty 
+                      ? Theme.of(context).primaryColor
+                      : Colors.white.withOpacity(0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: candidateData.isNotEmpty 
+                          ? Colors.white
+                          : Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _getLocaleDisplayName(String locale) {
+    switch (locale) {
+      case 'KOR':
+        return '한국어';
+      case 'JPN':
+        return '일본어';
+      case 'ENG':
+        return '영어';
+      default:
+        return locale;
+    }
   }
 
   Widget _buildSortPrioritySection(DeckSortProvider deckSortProvider) {
@@ -376,6 +558,7 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
 
   Future<void> _saveUserSettings(BuildContext context, UserProvider userProvider) async {
     final setting = UserSettingDto(
+      localePriority: localePriority,
       defaultLimitId: selectedLimit?.id == 0 ? 0 : selectedLimit?.id,
       strictDeck: isStrict,
       sortPriority: sortPriority.map((criterion) => 

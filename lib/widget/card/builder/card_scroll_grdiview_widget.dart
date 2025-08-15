@@ -1,7 +1,9 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../provider/locale_provider.dart';
 import '../../../service/card_overlay_service.dart';
 import '../../../service/card_service.dart';
 import '../card_widget.dart';
@@ -184,9 +186,10 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 cardPressEvent: (card) => _handleCardAddition(card),
                 onHover: (ctx) {
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
+                  final localeProvider = Provider.of<LocaleProvider>(ctx, listen: false);
                   _cardOverlayService.showBigImage(
                     ctx, 
-                    card.getDisplayImgUrl()!, 
+                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '', 
                     renderBox, 
                     widget.rowNumber, 
                     index

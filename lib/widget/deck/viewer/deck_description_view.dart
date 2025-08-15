@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:provider/provider.dart';
 import 'package:digimon_meta_site_flutter/model/deck-build.dart';
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
+import 'package:digimon_meta_site_flutter/provider/locale_provider.dart';
 import 'package:digimon_meta_site_flutter/service/size_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/card_service.dart';
@@ -217,9 +219,10 @@ class DeckDescriptionView extends StatelessWidget {
     final index = isRightHalf ? rowNumber - 1 : 0;
     
     // CardOverlayService 이용해 이미지 표시 - 덱의 카드와 동일한 방식
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
     CardOverlayService().showBigImage(
       context,
-      card.getDisplayImgUrl()!,
+      card.getDisplayImgUrl(localeProvider.localePriority) ?? '',
       renderBox,
       rowNumber,
       index,

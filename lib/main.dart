@@ -2,6 +2,7 @@ import 'package:digimon_meta_site_flutter/provider/collect_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_sort_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/format_deck_count_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/limit_provider.dart';
+import 'package:digimon_meta_site_flutter/provider/locale_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/text_simplify_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/user_provider.dart';
 import 'package:digimon_meta_site_flutter/provider/deck_provider.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => LimitProvider()),
+      ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ChangeNotifierProvider(create: (_) => DeckSortProvider()),
       ChangeNotifierProvider(create: (_) => TextSimplifyProvider()),
       ChangeNotifierProvider(create: (_) => FormatDeckCountProvider()),
