@@ -419,8 +419,11 @@ class _DeckImagePageState extends State<DeckImagePage> {
                             child: Consumer<LocaleProvider>(
                               builder: (context, localeProvider, child) {
                                 return Image.network(
+                                  _selectedCard?.getDisplayImgUrl(localeProvider.localePriority) ?? '',
                                   fit: BoxFit.contain,
-                                  _selectedCard?.getDisplayImgUrl(localeProvider.localePriority) ?? '');
+                                  cacheWidth: 400,
+                                  filterQuality: FilterQuality.medium,
+                                );
                               },
                             ),
                           ),
@@ -596,6 +599,8 @@ class _DeckImagePageState extends State<DeckImagePage> {
                       return Image.network(
                         cards[index].getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
                         fit: BoxFit.contain,
+                        cacheWidth: 150,
+                        filterQuality: FilterQuality.medium,
                       );
                     },
                   ),
