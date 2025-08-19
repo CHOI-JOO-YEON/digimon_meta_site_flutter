@@ -903,21 +903,21 @@
   "cardCount" : 14,
   "isDisable" : false
 }, {
-  "noteId" : 147,
-  "name" : "부스터 팩 시크릿 크라이시스 [BT-17]",
+  "noteId" : 386,
+  "name" : "부스터 팩 시크릿 크라이시스 [BTK-17]",
   "releaseDate" : "2025-08-22",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
-  "cardCount" : 102,
-  "isDisable" : false
+  "cardCount" : 130,
+  "isDisable" : null
 }, {
-  "noteId" : 148,
-  "name" : "부스터 팩 시크릿 크라이시스 [BT-17] 박스 프로모",
+  "noteId" : 387,
+  "name" : "부스터 팩 시크릿 크라이시스 [BTK-17] 박스 프로모",
   "releaseDate" : "2025-08-22",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
-  "cardCount" : 6,
-  "isDisable" : false
+  "cardCount" : 20,
+  "isDisable" : null
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
