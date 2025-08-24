@@ -232,7 +232,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       Consumer<LocaleProvider>(
                                         builder: (context, localeProvider, child) {
                                           final effect = card.getDisplayEffect(localeProvider.localePriority);
-                                          if (effect == null) return const SizedBox.shrink();
+                                          if (effect == null || effect.isEmpty) return const SizedBox.shrink();
                                           return Row(
                                             children: [
                                               Expanded(
@@ -259,7 +259,7 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                                       Consumer<LocaleProvider>(
                                         builder: (context, localeProvider, child) {
                                           final sourceEffect = card.getDisplaySourceEffect(localeProvider.localePriority);
-                                          if (sourceEffect == null) return const SizedBox.shrink();
+                                          if (sourceEffect == null || sourceEffect.isEmpty) return const SizedBox.shrink();
                                           return Row(
                                             children: [
                                               Expanded(

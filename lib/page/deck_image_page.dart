@@ -465,14 +465,16 @@ class _DeckImagePageState extends State<DeckImagePage> {
       children: [
         SizedBox(
           width: ((isHorizontal ? 982 : 328) + (isQrShow ? 0 : 160)),
-          child: Center(
-            child: Text(
-              widget.deck.deckName,
-              style: TextStyle(
-                  fontSize: 25,
-                  fontFamily: 'JalnanGothic',
-                  color:
-                      deckImageColorService.selectedDeckImageColor.textColor),
+          child: Container(
+            child: Center(
+              child: Text(
+                widget.deck.deckName,
+                style: TextStyle(
+                    fontSize: 25,
+                    fontFamily: 'JalnanGothic',
+                    color:
+                        deckImageColorService.selectedDeckImageColor.textColor),
+              ),
             ),
           ),
         ),

@@ -57,7 +57,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     // LocaleProvider에서 우선순위를 가져와 초기 탭 설정
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
     final localePriority = localeProvider.localePriority;
-    
+
     // 카드가 가진 locale 중에서 우선순위가 가장 높은 것을 찾기
     for (String priorityLocale in localePriority) {
       for (int i = 0; i < widget.card.localeCardData.length; i++) {
@@ -125,7 +125,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                           _buildCardName(localeCardData, fontSize),
                           SizedBox(height: 10),
                           _buildCardImageAndAttributes(
-                              context, isPortrait, fontSize),
+                              context, isPortrait, fontSize, localeCardData),
                           if (isPortrait)
                             _buildAttributesRow(context, fontSize),
                           const SizedBox(height: 5),
@@ -286,23 +286,21 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     return Consumer<LocaleProvider>(
       builder: (context, localeProvider, child) {
         // 우선순위에 따라 로케일 데이터 정렬
-        List<MapEntry<int, LocaleCardData>> sortedEntries = widget.card.localeCardData
-            .asMap()
-            .entries
-            .toList();
-        
+        List<MapEntry<int, LocaleCardData>> sortedEntries =
+            widget.card.localeCardData.asMap().entries.toList();
+
         // 우선순위에 따라 정렬
         sortedEntries.sort((a, b) {
           int priorityA = localeProvider.localePriority.indexOf(a.value.locale);
           int priorityB = localeProvider.localePriority.indexOf(b.value.locale);
-          
+
           // 우선순위 리스트에 없으면 맨 뒤로
           if (priorityA == -1) priorityA = 999;
           if (priorityB == -1) priorityB = 999;
-          
+
           return priorityA.compareTo(priorityB);
         });
-        
+
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: sortedEntries.map((entry) {
@@ -352,8 +350,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
     );
   }
 
-  Widget _buildCardImageAndAttributes(
-      BuildContext context, bool isPortrait, double fontSize) {
+  Widget _buildCardImageAndAttributes(BuildContext context, bool isPortrait,
+      double fontSize, LocaleCardData localeCardData) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -372,8 +370,9 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                         child: Consumer<LocaleProvider>(
                           builder: (context, localeProvider, child) {
                             return Image.network(
-                              widget.card.getDisplayImgUrl(
-                                      localeProvider.localePriority) ??
+                              (localeCardData.imgUrl ??
+                                      widget.card.getDisplayImgUrl(
+                                          localeProvider.localePriority)) ??
                                   '',
                               fit: BoxFit.fitWidth,
                             );
@@ -638,7 +637,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
       builder: (context, textSimplifyProvider, child) {
         return Column(
           children: [
-            if (localeCardData.effect != null)
+            if (localeCardData.effect != null &&
+                localeCardData.effect!.isNotEmpty)
               _effectWidget(
                 context,
                 localeCardData.effect!,
@@ -649,7 +649,8 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                 true,
               ),
             const SizedBox(height: 5),
-            if (localeCardData.sourceEffect != null)
+            if (localeCardData.sourceEffect != null &&
+                localeCardData.sourceEffect!.isNotEmpty)
               _effectWidget(
                 context,
                 localeCardData.sourceEffect!,
@@ -722,16 +723,15 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           child: ListTile(
             leading: Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
-                return Image.network(usedCard.getDisplaySmallImgUrl(
-                        localeProvider.localePriority) ??
+                return Image.network(usedCard
+                        .getDisplaySmallImgUrl(localeProvider.localePriority) ??
                     '');
               },
             ),
             title: Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
                 return Text(
-                  usedCard.getDisplayName(localeProvider.localePriority) ??
-                      '',
+                  usedCard.getDisplayName(localeProvider.localePriority) ?? '',
                   style: TextStyle(color: _getColor(usedCardInfo.ratio)),
                 );
               },
@@ -813,9 +813,9 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           child: ListTile(
             leading: Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
-                return Image.network(card.getDisplaySmallImgUrl(
-                        localeProvider.localePriority) ??
-                    '');
+                return Image.network(
+                    card.getDisplaySmallImgUrl(localeProvider.localePriority) ??
+                        '');
               },
             ),
             title: Consumer<LocaleProvider>(
