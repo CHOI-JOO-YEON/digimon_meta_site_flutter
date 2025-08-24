@@ -5,7 +5,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "프로모션 팩 Ver0.0"
 }, {
   "noteId" : 1,
   "name" : "스타트 덱 가이아 레드 [STK-1]",
@@ -13,15 +15,19 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 1,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST1-3 레드 & 블루 & 옐로"
 }, {
   "noteId" : 31,
-  "name" : "STK-01&02&03 프로모카드",
+  "name" : "ST1-3 프로모",
   "releaseDate" : "2023-02-24",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 1,
   "cardCount" : 4,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST1-3 레드 & 블루 & 옐로"
 }, {
   "noteId" : 2,
   "name" : "스타트 덱 코큐토스 블루 [STK-2]",
@@ -29,7 +35,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 2,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST1-3 레드 & 블루 & 옐로"
 }, {
   "noteId" : 3,
   "name" : "스타트 덱 헤븐즈 옐로 [STK-3]",
@@ -37,15 +45,19 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 3,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST1-3 레드 & 블루 & 옐로"
 }, {
   "noteId" : 21,
-  "name" : "스페셜 부스터 1.0&1.5 공통 박스 프로모",
+  "name" : "스페셜 부스터 1.0 & 1.5 박스 프로모",
   "releaseDate" : "2023-03-10",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT1-3 스페셜 부스터"
 }, {
   "noteId" : 34,
   "name" : "스페셜 부스터 버전 1.0 [BTK-1.0]",
@@ -53,15 +65,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 209,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT1-3 스페셜 부스터"
 }, {
   "noteId" : 72,
-  "name" : "스페셜 부스터 버전 1.0 [BTK-1.0] 박스 프로모카드",
+  "name" : "스페셜 부스터 버전 1.0 [BTK-1.0] 박스 프로모",
   "releaseDate" : "2023-03-10",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 10,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT1-3 스페셜 부스터"
 }, {
   "noteId" : 35,
   "name" : "스페셜 부스터 버전 1.5 [BTK-1.5]",
@@ -69,15 +85,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 168,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT1-3 스페셜 부스터"
 }, {
   "noteId" : 73,
-  "name" : "스페셜 부스터 버전 1.5 [BTK-1.5] 박스 프로모카드",
+  "name" : "스페셜 부스터 버전 1.5 [BTK-1.5] 박스 프로모",
   "releaseDate" : "2023-05-12",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT1-3 스페셜 부스터"
 }, {
   "noteId" : 23,
   "name" : "테이머 배틀 팩 2023 Vol.1",
@@ -85,31 +105,39 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 25,
-  "name" : "에볼루션 컵 우승자 프로모션 카드",
+  "name" : "에볼루션컵 우승",
   "releaseDate" : "2023-05-27",
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "에볼루션컵"
 }, {
   "noteId" : 24,
-  "name" : "에볼루션 컵 Top 8 프로모션 카드",
+  "name" : "에볼루션컵 TOP8",
   "releaseDate" : "2023-05-27",
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "에볼루션컵"
 }, {
   "noteId" : 46,
-  "name" : "STK-04&05&06 프로모카드",
+  "name" : "ST4-6 프로모",
   "releaseDate" : "2023-06-16",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 2,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST4-6 그린 & 블랙 & 퍼플"
 }, {
   "noteId" : 4,
   "name" : "스타트 덱 기가 그린 [STK-4]",
@@ -117,7 +145,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 4,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST4-6 그린 & 블랙 & 퍼플"
 }, {
   "noteId" : 5,
   "name" : "스타트 덱 파워 블랙 [STK-5]",
@@ -125,7 +155,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 5,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST4-6 그린 & 블랙 & 퍼플"
 }, {
   "noteId" : 6,
   "name" : "스타트 덱 베놈 바이올렛 [STK-6]",
@@ -133,7 +165,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 6,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST4-6 그린 & 블랙 & 퍼플"
 }, {
   "noteId" : 22,
   "name" : "메모리얼 컬렉션 팩",
@@ -141,15 +175,19 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 8,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "메모리얼 컬렉션 팩"
 }, {
   "noteId" : 30,
-  "name" : "부스터 팩 그레이트 레전드 [BTK-04] 박스 프로모카드",
+  "name" : "부스터 팩 그레이트 레전드 [BTK-04] 박스 프로모",
   "releaseDate" : "2023-07-14",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT4 그레이트 레전드"
 }, {
   "noteId" : 36,
   "name" : "부스터 팩 그레이트 레전드 [BTK-04]",
@@ -157,15 +195,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 130,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT4 그레이트 레전드"
 }, {
   "noteId" : 20,
-  "name" : "부스터 팩 배틀 오브 오메가 [BTK-05] 박스 프로모카드",
+  "name" : "부스터 팩 배틀 오브 오메가 [BTK-05] 박스 프로모",
   "releaseDate" : "2023-08-18",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 22,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT5 배틀 오브 오메가"
 }, {
   "noteId" : 37,
   "name" : "부스터 팩 배틀 오브 오메가 [BTK-05]",
@@ -173,15 +215,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 124,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT5 배틀 오브 오메가"
 }, {
   "noteId" : 29,
-  "name" : "STK-07&08 프로모카드",
+  "name" : "ST7-8 프로모",
   "releaseDate" : "2023-09-15",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 3,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST7-8 듀크 & 알포스"
 }, {
   "noteId" : 9,
   "name" : "스타트 덱 듀크몬 [STK-7]",
@@ -189,7 +235,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 7,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST7-8 듀크 & 알포스"
 }, {
   "noteId" : 10,
   "name" : "스타트 덱 알포스브이드라몬 [STK-8]",
@@ -197,7 +245,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 8,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST7-8 듀크 & 알포스"
 }, {
   "noteId" : 19,
   "name" : "테이머 배틀 팩 2023 Vol.2",
@@ -205,7 +255,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 38,
   "name" : "부스터 팩 더블 다이아몬드 [BTK-06]",
@@ -213,23 +265,29 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 131,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT6 더블 다이아몬드"
 }, {
   "noteId" : 39,
-  "name" : "부스터 팩 더블 다이아몬드 [BTK-06] 박스 프로모카드",
+  "name" : "부스터 팩 더블 다이아몬드 [BTK-06] 박스 프로모",
   "releaseDate" : "2023-10-20",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT6 더블 다이아몬드"
 }, {
   "noteId" : 28,
-  "name" : "테마 부스터 클래식 컬렉션 [EXK-01] 박스 프로모카드",
+  "name" : "테마 부스터 클래식 컬렉션 [EXK-01] 박스 프로모",
   "releaseDate" : "2023-11-17",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 8,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX1 클래식 컬렉션"
 }, {
   "noteId" : 40,
   "name" : "테마 부스터 클래식 컬렉션 [EXK-01]",
@@ -237,23 +295,29 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 99,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX1 클래식 컬렉션"
 }, {
   "noteId" : 18,
-  "name" : "KDM(KOREA DIGIMON CARDGAME MASTERS) 2023 점포 예선 참가",
+  "name" : "KDM 2023 점포 예선 참가",
   "releaseDate" : "2023-12-09",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 67,
-  "name" : "『극장판 파워 디지몬 더 비기닝』 프로모션 카드",
+  "name" : "『극장판 파워 디지몬 더 비기닝』 프로모",
   "releaseDate" : "2023-12-13",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "『극장판 파워 디지몬 더 비기닝』 프로모"
 }, {
   "noteId" : 41,
   "name" : "부스터 팩 넥스트 어드벤처 [BTK-07]",
@@ -261,23 +325,29 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 138,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT7 넥스트 어드벤처"
 }, {
   "noteId" : 42,
-  "name" : "부스터 팩 넥스트 어드벤처 [BTK-07] 박스 프로모카드",
+  "name" : "부스터 팩 넥스트 어드벤처 [BTK-07] 박스 프로모",
   "releaseDate" : "2023-12-15",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT7 넥스트 어드벤처"
 }, {
   "noteId" : 27,
-  "name" : "STK-09&10 프로모카드",
+  "name" : "ST9-10 프로모",
   "releaseDate" : "2024-01-19",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 4,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST9-10 고대용 & 군사"
 }, {
   "noteId" : 11,
   "name" : "스타트 덱 궁극의 고대용 [STK-09]",
@@ -285,7 +355,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 9,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST9-10 고대용 & 군사"
 }, {
   "noteId" : 12,
   "name" : "스타트 덱 이세계의 군사 [STK-10]",
@@ -293,7 +365,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 10,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST9-10 고대용 & 군사"
 }, {
   "noteId" : 14,
   "name" : "KDM 2023 최종전 1위",
@@ -301,7 +375,9 @@
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 13,
   "name" : "KDM 2023 최종전 2위",
@@ -309,7 +385,9 @@
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 15,
   "name" : "KDM 2023 최종전 3위",
@@ -317,7 +395,9 @@
   "cardOrigin" : "EVENT",
   "priority" : 3,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 16,
   "name" : "KDM 2023 최종전 4위",
@@ -325,23 +405,29 @@
   "cardOrigin" : "EVENT",
   "priority" : 4,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 17,
-  "name" : "KDM 2023 최종전 TOP 16",
+  "name" : "KDM 2023 최종전 TOP16",
   "releaseDate" : "2024-01-21",
   "cardOrigin" : "EVENT",
   "priority" : 5,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "KDM 2023"
 }, {
   "noteId" : 26,
-  "name" : "부스터 팩 뉴 히어로 [BTK-08] 박스 프로모카드",
+  "name" : "부스터 팩 뉴 히어로 [BTK-08] 박스 프로모",
   "releaseDate" : "2024-02-16",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT8 뉴 히어로"
 }, {
   "noteId" : 33,
   "name" : "스페셜 프로모션 팩 2024 Ver.1.0",
@@ -349,7 +435,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "스페셜 프로모션 팩 2024 Ver.1.0"
 }, {
   "noteId" : 43,
   "name" : "부스터 팩 뉴 히어로 [BTK-08]",
@@ -357,7 +445,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 130,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT8 뉴 히어로"
 }, {
   "noteId" : 44,
   "name" : "테마 부스터 디지털 해저드 [EXK-02]",
@@ -365,23 +455,29 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 98,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX2 디지털 해저드"
 }, {
   "noteId" : 45,
-  "name" : "테마 부스터 디지털 해저드 [EXK-02] 박스 프로모카드",
+  "name" : "테마 부스터 디지털 해저드 [EXK-02] 박스 프로모",
   "releaseDate" : "2024-03-15",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 14,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX2 디지털 해저드"
 }, {
   "noteId" : 70,
-  "name" : "D-3 동봉 프로모",
+  "name" : "D-3 프로모",
   "releaseDate" : "2024-03-30",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "D-3 프로모"
 }, {
   "noteId" : 66,
   "name" : "테이머 배틀 팩 2024 Vol.1",
@@ -389,31 +485,39 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 71,
-  "name" : "챌린지컵 2024 카드샵 예선 우승자 상품",
+  "name" : "챌린지컵 2024 카드샵 예선 우승",
   "releaseDate" : "2024-04-06",
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 68,
-  "name" : "챌린지컵 2024 카드샵 예선 8강 입상자 상품",
+  "name" : "챌린지컵 2024 카드샵 예선 TOP8",
   "releaseDate" : "2024-04-06",
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 69,
-  "name" : "챌린지컵 2024 카드샵 예선 참가상",
+  "name" : "챌린지컵 2024 카드샵 예선 참가",
   "releaseDate" : "2024-04-06",
   "cardOrigin" : "EVENT",
   "priority" : 3,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 74,
   "name" : "부스터 팩 X레코드 [BTK-09]",
@@ -421,39 +525,49 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 130,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT9 X레코드"
 }, {
   "noteId" : 75,
-  "name" : "부스터 팩 X레코드 [BTK-09] 박스 프로모카드",
+  "name" : "부스터 팩 X레코드 [BTK-09] 박스 프로모",
   "releaseDate" : "2024-04-19",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT9 X레코드"
 }, {
   "noteId" : 110,
-  "name" : "STK-12 프로모",
+  "name" : "ST-12 프로모",
   "releaseDate" : "2024-05-17",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 5,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST12-13 제스 & 라그나로드"
 }, {
   "noteId" : 112,
-  "name" : "STK-13 프로모",
+  "name" : "ST-13 프로모",
   "releaseDate" : "2024-05-17",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 6,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST12-13 제스 & 라그나로드"
 }, {
   "noteId" : 113,
-  "name" : "STK-12&13 프로모",
+  "name" : "ST12-13 프로모",
   "releaseDate" : "2024-05-17",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : 7,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST12-13 제스 & 라그나로드"
 }, {
   "noteId" : 109,
   "name" : "스타트 덱 제스몬 [STK-12]",
@@ -461,7 +575,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 12,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST12-13 제스 & 라그나로드"
 }, {
   "noteId" : 111,
   "name" : "스타트 덱 라그나로드몬 [STK-13]",
@@ -469,39 +585,49 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 13,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST12-13 제스 & 라그나로드"
 }, {
   "noteId" : 162,
-  "name" : "챌린지컵 2024 우승상",
+  "name" : "챌린지컵 2024 우승",
   "releaseDate" : "2024-06-16",
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 161,
-  "name" : "챌린지컵 2024 준우승상",
+  "name" : "챌린지컵 2024 준우승",
   "releaseDate" : "2024-06-16",
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 160,
-  "name" : "챌린지컵 2024 3위상",
+  "name" : "챌린지컵 2024 3위",
   "releaseDate" : "2024-06-16",
   "cardOrigin" : "EVENT",
   "priority" : 3,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 159,
-  "name" : "챌린지컵 2024 4위상",
+  "name" : "챌린지컵 2024 4위",
   "releaseDate" : "2024-06-16",
   "cardOrigin" : "EVENT",
   "priority" : 4,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "챌린지컵 2024"
 }, {
   "noteId" : 114,
   "name" : "부스터 팩 크로스 인카운터 [BTK-10]",
@@ -509,15 +635,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 131,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT10 크로스 인카운터"
 }, {
   "noteId" : 115,
-  "name" : "부스터 팩 크로스 인카운터 [BTK-10] 박스 프로모카드",
+  "name" : "부스터 팩 크로스 인카운터 [BTK-10] 박스 프로모",
   "releaseDate" : "2024-06-21",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 14,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT10 크로스 인카운터"
 }, {
   "noteId" : 116,
   "name" : "조그레스컵 참가상",
@@ -525,7 +655,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 2,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "조그레스컵"
 }, {
   "noteId" : 117,
   "name" : "테마 부스터 드래곤즈 로어 [EXK-03]",
@@ -533,15 +665,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 92,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX3 드래곤즈 로어"
 }, {
   "noteId" : 118,
-  "name" : "테마 부스터 드래곤즈 로어 [EXK-03] 박스 프로모카드",
+  "name" : "테마 부스터 드래곤즈 로어 [EXK-03] 박스 프로모",
   "releaseDate" : "2024-07-19",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 19,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX3 드래곤즈 로어"
 }, {
   "noteId" : 157,
   "name" : "테이머 배틀 팩 2024 Vol.2",
@@ -549,7 +685,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 158,
   "name" : "WCS 2024 한국 대표 선발전 지역 예선 상품",
@@ -557,7 +695,9 @@
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "WCS 2024"
 }, {
   "noteId" : 146,
   "name" : "부스터 팩 디멘셔널 페이즈 [BTK-11]",
@@ -565,7 +705,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 133,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT11 디멘셔널 페이즈"
 }, {
   "noteId" : 149,
   "name" : "부스터 팩 디멘셔널 페이즈 [BTK-11] 박스 프로모",
@@ -573,7 +715,9 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 13,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT11 디멘셔널 페이즈"
 }, {
   "noteId" : 150,
   "name" : "어드밴스 덱 베르제브몬 [STK-14]",
@@ -581,15 +725,19 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST14 베르제브몬"
 }, {
   "noteId" : 151,
-  "name" : "어드밴스 덱 베르제브몬 [STK-14] 특전 카드",
+  "name" : "어드밴스 덱 베르제브몬 [STK-14] 프로모",
   "releaseDate" : "2024-09-10",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : null,
   "cardCount" : 10,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST14 베르제브몬"
 }, {
   "noteId" : 155,
   "name" : "부스터 팩 어크로스 타임 [BTK-12]",
@@ -597,15 +745,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 132,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT12 어크로스 타임"
 }, {
   "noteId" : 156,
-  "name" : "BTK-12 어크로스 타임 이너박스 프로모",
+  "name" : "부스터 팩 어크로스 타임 [BTK-12] 박스 프로모",
   "releaseDate" : "2024-09-25",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 7,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT12 어크로스 타임"
 }, {
   "noteId" : 163,
   "name" : "테마 부스터 얼터너티브 비잉 [EXK-04]",
@@ -613,23 +765,29 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 92,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX4 얼터너티브 비잉"
 }, {
   "noteId" : 164,
-  "name" : "테마 부스터 얼터너티브 비잉 [EXK-04] 박스 프로모카드",
+  "name" : "테마 부스터 얼터너티브 비잉 [EXK-04] 박스 프로모",
   "releaseDate" : "2024-10-18",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX4 얼터너티브 비잉"
 }, {
   "noteId" : 223,
-  "name" : "Championship 2024 카드샵 대표 선발전 우승상",
+  "name" : "Championship 2024 카드샵 대표 선발전 우승",
   "releaseDate" : "2024-10-26",
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Championship 2024"
 }, {
   "noteId" : 222,
   "name" : "Championship 2024 카드샵 대표 선발전 TOP4",
@@ -637,23 +795,29 @@
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Championship 2024"
 }, {
   "noteId" : 221,
-  "name" : "Championship 2024 카드샵 대표 선발전 참가상",
+  "name" : "Championship 2024 카드샵 대표 선발전 참가",
   "releaseDate" : "2024-10-26",
   "cardOrigin" : "EVENT",
   "priority" : 3,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Championship 2024"
 }, {
   "noteId" : 220,
-  "name" : "에볼루션컵 리부트 우승상",
+  "name" : "에볼루션컵 리부트 우승",
   "releaseDate" : "2024-11-17",
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "에볼루션컵 리부트"
 }, {
   "noteId" : 219,
   "name" : "에볼루션컵 리부트 TOP8",
@@ -661,15 +825,19 @@
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "에볼루션컵 리부트"
 }, {
   "noteId" : 218,
-  "name" : "에볼루션컵 리부트 참가상",
+  "name" : "에볼루션컵 리부트 참가",
   "releaseDate" : "2024-11-17",
   "cardOrigin" : "EVENT",
   "priority" : 3,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "에볼루션컵 리부트"
 }, {
   "noteId" : 165,
   "name" : "부스터 팩 vs 로얄 나이츠 [BTK-13]",
@@ -677,7 +845,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 136,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT13 vs 로얄 나이츠"
 }, {
   "noteId" : 166,
   "name" : "부스터 팩 vs 로얄 나이츠 [BTK-13] 박스 프로모",
@@ -685,15 +855,19 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 18,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT13 vs 로얄 나이츠"
 }, {
   "noteId" : 213,
-  "name" : "STK-15&16 프로모",
+  "name" : "ST15-16 프로모",
   "releaseDate" : "2024-12-13",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST15-16 용기 & 우정"
 }, {
   "noteId" : 212,
   "name" : "스타트 덱 용기의 전룡 [STK-15]",
@@ -701,7 +875,9 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 1,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST15-16 용기 & 우정"
 }, {
   "noteId" : 211,
   "name" : "스타트 덱 우정의 강랑 [STK-16]",
@@ -709,63 +885,79 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : 2,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST15-16 용기 & 우정"
 }, {
   "noteId" : 256,
-  "name" : "초! 테이머 배틀 1on1 참가상",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 참가",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 250,
-  "name" : "Grand Korea Open 구매 특전",
+  "name" : "Grand Korea Open 2024 구매 특전",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 251,
-  "name" : "초! 테이머 배틀 1on1 TOP 2",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 TOP2",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 252,
-  "name" : "초! 테이머 배틀 1on1 TOP 4",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 TOP4",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 253,
-  "name" : "초! 테이머 배틀 1on1 TOP 8",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 TOP8",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 254,
-  "name" : "초! 테이머 배틀 1on1 TOP 16",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 TOP16",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 255,
-  "name" : "초! 테이머 배틀 1on1 TOP 32",
+  "name" : "Grand Korea Open 2024 초! 테이머 배틀 1on1 TOP32",
   "releaseDate" : "2025-01-19",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "Grand Korea Open 2024"
 }, {
   "noteId" : 217,
   "name" : "스페셜 프로모션 팩 2024 Ver.Royal",
@@ -773,7 +965,9 @@
   "cardOrigin" : "EVENT",
   "priority" : 1,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "스페셜 프로모션 팩 2024 Ver.Royal"
 }, {
   "noteId" : 216,
   "name" : "스페셜 프로모션 팩 2024 Ver.Royal 100매 한정 카드",
@@ -781,7 +975,9 @@
   "cardOrigin" : "EVENT",
   "priority" : 2,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "스페셜 프로모션 팩 2024 Ver.Royal"
 }, {
   "noteId" : 214,
   "name" : "리부트 부스터 라이징 윈드 [RBK-01]",
@@ -789,15 +985,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 142,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "RB1 라이징 윈드 "
 }, {
   "noteId" : 215,
-  "name" : "부스터 팩 라이징 윈드 [RBK-01] 박스 프로모",
+  "name" : "리부트 부스터 라이징 윈드 [RBK-01] 박스 프로모",
   "releaseDate" : "2025-01-21",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 26,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "RB1 라이징 윈드 "
 }, {
   "noteId" : 233,
   "name" : "부스터 팩 BLAST ACE [BTK-14]",
@@ -805,7 +1005,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 124,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT14 BLAST ACE"
 }, {
   "noteId" : 234,
   "name" : "부스터 팩 BLAST ACE [BTK-14] 박스 프로모",
@@ -813,15 +1015,19 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT14 BLAST ACE"
 }, {
   "noteId" : 249,
-  "name" : "테이머 배틀팩 2025 Vol.1",
+  "name" : "테이머 배틀 팩 2025 Vol.1",
   "releaseDate" : "2025-03-01",
   "cardOrigin" : "EVENT",
   "priority" : null,
   "cardCount" : 16,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 235,
   "name" : "테마 부스터 애니멀 콜로세움 [EXK-05]",
@@ -829,7 +1035,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 95,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX5 애니멀 콜로세움"
 }, {
   "noteId" : 236,
   "name" : "테마 부스터 애니멀 콜로세움 [EXK-05] 박스 프로모",
@@ -837,7 +1045,9 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 19,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX5 애니멀 콜로세움"
 }, {
   "noteId" : 245,
   "name" : "부스터 팩 익시드 아포칼립스 [BTK-15]",
@@ -845,7 +1055,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 137,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT15 익시드 아포칼립스"
 }, {
   "noteId" : 246,
   "name" : "부스터 팩 익시드 아포칼립스 [BTK-15] 박스 프로모",
@@ -853,7 +1065,9 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 14,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT15 익시드 아포칼립스"
 }, {
   "noteId" : 247,
   "name" : "어드밴스 덱 더블 타이푼 [STK-17]",
@@ -861,15 +1075,19 @@
   "cardOrigin" : "STARTER_DECK",
   "priority" : null,
   "cardCount" : 20,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST17 더블 타이푼"
 }, {
   "noteId" : 248,
-  "name" : "어드밴스 덱 더블 타이푼 [STK-17] 특전 카드",
+  "name" : "어드밴스 덱 더블 타이푼 [STK-17] 프로모",
   "releaseDate" : "2025-05-16",
   "cardOrigin" : "STARTER_PROMO",
   "priority" : null,
   "cardCount" : 27,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST17 더블 타이푼"
 }, {
   "noteId" : 259,
   "name" : "부스터 팩 BEGINNING OBSERVER [BTK-16]",
@@ -877,7 +1095,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 129,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT16 BEGINNING OBSERVER"
 }, {
   "noteId" : 260,
   "name" : "부스터 팩 BEGINNING OBSERVER [BTK-16] 박스 프로모",
@@ -885,7 +1105,9 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 22,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT16 BEGINNING OBSERVER"
 }, {
   "noteId" : 266,
   "name" : "테마 부스터 인퍼널 어센션 [EXK-06]",
@@ -893,15 +1115,19 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 100,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX6 인퍼널 어센션"
 }, {
   "noteId" : 267,
-  "name" : "테마 부스터 인퍼널 어센션 [EXK-06] 부스터 프로모",
+  "name" : "테마 부스터 인퍼널 어센션 [EXK-06] 박스 프로모",
   "releaseDate" : "2025-07-18",
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 14,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX6 인퍼널 어센션"
 }, {
   "noteId" : 386,
   "name" : "부스터 팩 시크릿 크라이시스 [BTK-17]",
@@ -909,7 +1135,9 @@
   "cardOrigin" : "BOOSTER_PACK",
   "priority" : null,
   "cardCount" : 130,
-  "isDisable" : null
+  "isDisable" : null,
+  "description" : null,
+  "parent" : "BT17 시크릿 크라이시스"
 }, {
   "noteId" : 387,
   "name" : "부스터 팩 시크릿 크라이시스 [BTK-17] 박스 프로모",
@@ -917,7 +1145,9 @@
   "cardOrigin" : "BOOSTER_PROMO",
   "priority" : null,
   "cardCount" : 20,
-  "isDisable" : null
+  "isDisable" : null,
+  "description" : null,
+  "parent" : "BT17 시크릿 크라이시스"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
@@ -925,15 +1155,19 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 1,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ETC"
 }, {
   "noteId" : 122,
-  "name" : "테이머배틀 21&22",
+  "name" : "테이머 배틀 21 & 22",
   "releaseDate" : "2025-09-19",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 8,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 170,
   "name" : "리미티드 카드팩 2024 [LM-03]",
@@ -941,7 +1175,9 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 12,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 2024"
 }, {
   "noteId" : 153,
   "name" : "스타트 덱 가디언 볼텍스 [ST-18]",
@@ -949,7 +1185,9 @@
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST18 가디언 볼텍스"
 }, {
   "noteId" : 154,
   "name" : "스타트 덱 페블 왈츠 [ST-19]",
@@ -957,7 +1195,9 @@
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST19 페블 왈츠"
 }, {
   "noteId" : 81,
   "name" : "디지몬 리버레이터 프로모션 팩",
@@ -965,7 +1205,9 @@
   "cardOrigin" : "ENGLISH",
   "priority" : 16,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "디지몬 리버레이터 프로모션 팩"
 }, {
   "noteId" : 152,
   "name" : "엑스트라 부스터 디지몬 리버레이터 [EX-07]",
@@ -973,7 +1215,9 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 74,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX7 디지몬 리버레이터"
 }, {
   "noteId" : 169,
   "name" : "부스터 팩 엘리멘트 석세서 [BT-18]",
@@ -981,15 +1225,19 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 102,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT18 엘리멘트 석세서"
 }, {
   "noteId" : 175,
-  "name" : "테이머배틀 23",
+  "name" : "테이머 배틀 23",
   "releaseDate" : "2025-11-21",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 4,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 171,
   "name" : "리미티드 카드팩 트리드바이스 [LM-04]",
@@ -997,15 +1245,19 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 트리드바이스"
 }, {
   "noteId" : 173,
-  "name" : "테이머배틀 24",
+  "name" : "테이머 배틀 24",
   "releaseDate" : "2026-01-16",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 3,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 192,
   "name" : "부스터 팩 크로스 에볼루션 [BT-19]",
@@ -1013,79 +1265,99 @@
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 102,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT19 크로스 에볼루션"
 }, {
   "noteId" : 172,
-  "name" : "테이머배틀 25",
+  "name" : "테이머 배틀 25",
   "releaseDate" : "2026-02-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 4,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 193,
-  "name" : "엑스트라 부스터 체인 오브 리버레이션 [EX-08]",
+  "name" : "엑스트라 부스터 CHAIN OF LIBERATION [EX-08]",
   "releaseDate" : "2026-02-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 74,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX8 CHAIN OF LIBERATION"
 }, {
   "noteId" : 224,
-  "name" : "부스터 팩 오버 더 엑스 [BT-20]",
+  "name" : "부스터 팩 OVER THE X [BT-20]",
   "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 102,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT20 OVER THE X"
 }, {
   "noteId" : 225,
-  "name" : "테이머배틀 26",
+  "name" : "테이머 배틀 26",
   "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 230,
-  "name" : "부스터 팩 오버 더 엑스 [BT-20] 박스 프로모",
+  "name" : "부스터 팩 OVER THE X [BT-20] 박스 프로모",
   "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT20 OVER THE X"
 }, {
   "noteId" : 239,
-  "name" : "부스터 팩 월드 컨버전스 [BT-21]",
+  "name" : "부스터 팩 WORLD CONVERGENCE [BT-21]",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 102,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT21 WORLD CONVERGENCE"
 }, {
   "noteId" : 240,
-  "name" : "부스터 팩 월드 컨버전스 [BT-21] 박스 프로모",
+  "name" : "부스터 팩 WORLD CONVERGENCE [BT-21] 박스 프로모",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT21 WORLD CONVERGENCE"
 }, {
   "noteId" : 243,
-  "name" : "Starter Deck PROTECTOR OF LIGHT [ST-20]",
+  "name" : "스타트 덱 PROTECTOR OF LIGHT [ST-20]",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 3,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST20 PROTECTOR OF LIGHT"
 }, {
   "noteId" : 244,
-  "name" : "Starter Deck HERO OF HOPE [ST-21]",
+  "name" : "스타트 덱 HERO OF HOPE [ST-21]",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 4,
   "cardCount" : 15,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST21 HERO OF HOPE"
 }, {
   "noteId" : 241,
   "name" : "리미티드 카드팩 파이널 엘리시온 [LM-05]",
@@ -1093,37 +1365,47 @@
   "cardOrigin" : "ENGLISH",
   "priority" : 5,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 파이널 엘리시온"
 }, {
   "noteId" : 242,
-  "name" : "테이머배틀 27",
+  "name" : "테이머 배틀 27",
   "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 6,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 257,
-  "name" : "엑스트라 부스터 버서스 몬스터즈 [EX-09]",
+  "name" : "엑스트라 부스터 VERSUS MONSTERS [EX-09]",
   "releaseDate" : "2026-05-22",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 74,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX9 VERSUS MONSTERS"
 }, {
   "noteId" : 258,
-  "name" : "테이머배틀 28",
+  "name" : "테이머 배틀 28",
   "releaseDate" : "2026-05-22",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 6,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 265,
-  "name" : "부스터 팩 사이버 에덴 [BT-22]",
+  "name" : "부스터 팩 CYBER EDEN [BT-22]",
   "releaseDate" : "2026-06-19",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 102,
-  "isDisable" : false
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT22 CYBER EDEN"
 } ]
