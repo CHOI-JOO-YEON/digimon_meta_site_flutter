@@ -675,7 +675,7 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
               widget.card.noteId != null) {
             Navigator.pop(context);
             SearchParameter parameter = SearchParameter();
-            parameter.noteId = widget.card.noteId!;
+            parameter.noteIds = {widget.card.noteId!};
             widget.searchWithParameter!(parameter);
           }
         },

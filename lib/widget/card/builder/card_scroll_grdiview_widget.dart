@@ -184,6 +184,7 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                 card: card,
                 width: (constraints.maxWidth / widget.rowNumber) * 0.99,
                 cardPressEvent: (card) => _handleCardAddition(card),
+                searchWithParameter: widget.searchWithParameter,
                 onHover: (ctx) {
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
                   final localeProvider = Provider.of<LocaleProvider>(ctx, listen: false);

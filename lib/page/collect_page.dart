@@ -44,6 +44,16 @@ class _CollectPageState extends State<CollectPage> {
   int currentPage = 0;
   SearchParameter searchParameter = SearchParameter();
 
+  void searchWithParameter(SearchParameter parameter) {
+    setState(() {
+      searchParameter = parameter;
+      isSearchLoading = true;
+      cards.clear();
+      currentPage = 0;
+    });
+    initSearch();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -257,6 +267,7 @@ class _CollectPageState extends State<CollectPage> {
                                         totalPages: totalPages,
                                         currentPage: currentPage,
                                         isTextSimplify: false,
+                                        searchWithParameter: searchWithParameter,
                                       )
                                     : const Center(
                                         child: CircularProgressIndicator(),
