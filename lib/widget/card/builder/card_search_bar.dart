@@ -2,16 +2,12 @@ import 'package:digimon_meta_site_flutter/model/search_parameter.dart';
 import 'package:digimon_meta_site_flutter/service/card_data_service.dart';
 import 'package:digimon_meta_site_flutter/service/color_service.dart';
 import 'package:digimon_meta_site_flutter/theme/app_design_system.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/note.dart';
-import '../../../provider/text_simplify_provider.dart';
 import '../../../service/card_overlay_service.dart';
-import '../../../service/size_service.dart';
 import '../../common/toast_overlay.dart';
+import '../../common/hierarchical_note_selector.dart';
 
 // 마퀴 효과를 위한 ScrollingText 위젯 추가
 class ScrollingText extends StatefulWidget {
@@ -195,7 +191,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
   TextEditingController? _trieSearchController;
   TextEditingController? _searchStringEditingController;
   TextEditingController? _dialogSearchStringEditingController;
-  List<DropdownMenuItem<NoteDto>> dropDownMenuItems = [];
   final List<String> colors = [
     'RED',
     'BLUE',
@@ -213,7 +208,6 @@ class _CardSearchBarState extends State<CardSearchBar> {
   ];
   final List<String> rarities = ['C', 'U', 'R', 'SR', 'SEC', 'P'];
   final List<int> levels = [0, 2, 3, 4, 5, 6, 7];
-  NoteDto all = NoteDto(noteId: null, name: '모든 카드');
   bool _isFeaturesSectionExpanded = false;
   bool _isDetailedSearchSectionExpanded = false;
   int _selectedFeatureTabIndex = 0;
@@ -305,18 +299,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
       text: widget.searchParameter.sourceEffectSearch ?? ''
     );
     
-    NoteDto? selectedNote;
-
-    if (widget.searchParameter.noteId == null) {
-      selectedNote = all;
-    } else {
-      for (var note in widget.notes) {
-        if (note.noteId == widget.searchParameter.noteId) {
-          selectedNote = note;
-          break;
-        }
-      }
-    }
+    // 다중선택 모드에서는 기존 noteId 무시
+    // (전체 해제 후 다시 선택되는 문제 방지)
 
     Map<String, bool> selectedColorMap = {};
     for (var color in colors) {
@@ -526,37 +510,78 @@ class _CardSearchBarState extends State<CardSearchBar> {
                             const SizedBox(height: 24),
                             
                             // 입수처
-                            _buildSearchSection(
-                              title: "입수처",
-                              icon: Icons.inventory_2_rounded,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey[200]!),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: ExpansionTile(
+                                leading: Icon(Icons.inventory_2_rounded, color: Colors.grey[600]),
+                                title: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "입수처${widget.searchParameter.noteIds.isNotEmpty ? ' (${widget.searchParameter.noteIds.length}개 선택)' : ''}",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
+                                    ),
+                                    if (widget.searchParameter.noteIds.isNotEmpty)
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            widget.searchParameter.noteIds.clear();
+                                          });
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          '모두 해제',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                        child: DropdownButton<NoteDto>(
-                          value: selectedNote,
-                                  isExpanded: true,
-                                  underline: const SizedBox(),
-                                  icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey[600]),
-                          hint: Text(
-                                    selectedNote?.name ?? "입수처 선택",
-                                    style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500),
-                          ),
-                          items: dropDownMenuItems,
-                          onChanged: (NoteDto? newValue) {
-                            setState(() {
-                              selectedNote = newValue;
-                              if (newValue!.cardOrigin == 'ENGLISH') {
-                                enCardInclude = true;
-                              }
-                            });
-                          },
-                        ),
-                      ),
+                                backgroundColor: Colors.transparent,
+                                collapsedBackgroundColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                collapsedShape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: HierarchicalNoteSelector(
+                                      notes: widget.notes,
+                                      selectedNoteIds: Set.from(widget.searchParameter.noteIds),
+                                      onSelectionChanged: (selectedIds) {
+                                        setState(() {
+                                          widget.searchParameter.noteIds = Set.from(selectedIds);
+                                          final hasEnglishNote = widget.notes
+                                              .where((note) => selectedIds.contains(note.noteId))
+                                              .any((note) => note.cardOrigin == 'ENGLISH');
+                                          if (hasEnglishNote) {
+                                            enCardInclude = true;
+                                          }
+                                        });
+                                      },
+                                      title: "",
+                                      allowSelectAll: false,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             
                             const SizedBox(height: 24),
@@ -991,7 +1016,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                             child: OutlinedButton.icon(
                   onPressed: () {
                                 // 초기화 로직
-                    selectedNote = all;
+                                widget.searchParameter.noteIds.clear();
+                                widget.searchParameter.noteId = null; // 기존 noteId도 초기화
                                 selectedColorMap.updateAll((key, value) => false);
                                 selectedCardTypeMap.updateAll((key, value) => false);
                                 selectedLvMap.updateAll((key, value) => false);
@@ -1036,11 +1062,8 @@ class _CardSearchBarState extends State<CardSearchBar> {
                             flex: 2,
                             child: ElevatedButton.icon(
                   onPressed: () {
-                                // 기존 적용 로직
-                    if (selectedNote != null) {
-                      widget.searchParameter.noteId = selectedNote?.noteId;
-                    }
-
+                                // 기존 적용 로직 - noteIds는 이미 HierarchicalNoteSelector에서 업데이트됨
+                    
                     widget.searchParameter.colors = selectedColorMap.entries
                         .where((entry) => entry.value)
                         .map((entry) => entry.key)
@@ -1144,145 +1167,9 @@ class _CardSearchBarState extends State<CardSearchBar> {
     setState(() {});
   }
 
-  Comparator<NoteDto> noteDtoComparator = (a, b) {
-    if (a.releaseDate == null && b.releaseDate == null) {
-      return a.name.compareTo(b.name);
-    } else if (a.releaseDate == null) {
-      return 1;
-    } else if (b.releaseDate == null) {
-      return -1;
-    }
-
-    int releaseDateComparison = b.releaseDate!.compareTo(a.releaseDate!);
-    if (releaseDateComparison != 0) {
-      return releaseDateComparison;
-    }
-
-    if (a.priority == null && b.priority == null) {
-      return 0;
-    } else if (a.priority == null) {
-      return 1;
-    } else if (b.priority == null) {
-      return -1;
-    }
-
-    return b.priority!.compareTo(a.priority!);
-  };
-
-  List<DropdownMenuItem<NoteDto>> generateDropDownMenuItems() {
-    List<NoteDto> boosterPackList = [];
-    List<NoteDto> staterDeckList = [];
-    List<NoteDto> boosterPromoList = [];
-    List<NoteDto> starterPromoList = [];
-    List<NoteDto> eventList = [];
-    List<NoteDto> enList = [];
-    List<NoteDto> etcList = [];
-
-    for (var note in widget.notes) {
-      switch (note.cardOrigin) {
-        case 'BOOSTER_PACK':
-          boosterPackList.add(note);
-          break;
-        case 'STARTER_DECK':
-          staterDeckList.add(note);
-          break;
-        case 'BOOSTER_PROMO':
-          boosterPromoList.add(note);
-          break;
-        case 'STARTER_PROMO':
-          starterPromoList.add(note);
-          break;
-        case 'EVENT':
-          eventList.add(note);
-          break;
-        case 'ENGLISH':
-          enList.add(note);
-          break;
-        default:
-          etcList.add(note);
-      }
-    }
-
-    boosterPackList.sort(noteDtoComparator);
-    staterDeckList.sort(noteDtoComparator);
-    boosterPromoList.sort(noteDtoComparator);
-    starterPromoList.sort(noteDtoComparator);
-    eventList.sort(noteDtoComparator);
-    etcList.sort(noteDtoComparator);
-
-    List<DropdownMenuItem<NoteDto>> menuItems = [];
-
-    menuItems.add(
-      DropdownMenuItem<NoteDto>(
-        value: all,
-        child: Text(
-          all.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-    menuItems.add(
-      const DropdownMenuItem<NoteDto>(
-        enabled: false,
-        child: Divider(),
-      ),
-    );
-    menuItems
-        .addAll(_createMenuItemsWithHeaderAndDivider('부스터 팩', boosterPackList));
-    menuItems
-        .addAll(_createMenuItemsWithHeaderAndDivider('스타터 덱', staterDeckList));
-    menuItems.addAll(
-        _createMenuItemsWithHeaderAndDivider('부스터 프로모', boosterPromoList));
-    menuItems.addAll(
-        _createMenuItemsWithHeaderAndDivider('스타터 프로모', starterPromoList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('이벤트', eventList));
-    menuItems.addAll(_createMenuItemsWithHeaderAndDivider('미발매 카드', enList));
-
-    if (!etcList.isEmpty) {
-      menuItems.addAll(_createMenuItemsWithHeaderAndDivider('기타', etcList));
-    }
-
-    return menuItems;
-  }
-
-  List<DropdownMenuItem<NoteDto>> _createMenuItemsWithHeaderAndDivider(
-      String header, List<NoteDto> items) {
-    List<DropdownMenuItem<NoteDto>> menuItems = [];
-
-    menuItems.add(
-      DropdownMenuItem<NoteDto>(
-        enabled: false,
-        child: Text(
-          header,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-
-    for (var item in items) {
-      menuItems.add(
-        DropdownMenuItem<NoteDto>(
-          value: item,
-          child: Text(item.name),
-        ),
-      );
-    }
-
-    if (items.isNotEmpty) {
-      menuItems.add(
-        const DropdownMenuItem<NoteDto>(
-          enabled: false,
-          child: Divider(),
-        ),
-      );
-    }
-
-    return menuItems;
-  }
 
   @override
   Widget build(BuildContext context) {
-    dropDownMenuItems = generateDropDownMenuItems();
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallHeight = screenHeight < 600; // 세로 높이가 작은 화면 감지

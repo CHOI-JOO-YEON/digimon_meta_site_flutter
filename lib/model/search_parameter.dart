@@ -8,6 +8,7 @@ class SearchParameter{
   String? sourceEffectSearch;
   
   int? noteId;
+  Set<int> noteIds = {}; // 다중 입수처 선택을 위한 새 필드
   Set<String>? colors ={};
   int? colorOperation;
   Set<int>? lvs;
@@ -58,6 +59,7 @@ class SearchParameter{
       ..effectSearch = json['effectSearch'] as String?
       ..sourceEffectSearch = json['sourceEffectSearch'] as String?
       ..noteId = json['noteId'] as int?
+      ..noteIds = (json['noteIds'] as List<dynamic>?)?.map((e) => e as int).toSet() ?? {}
       ..colors = json['colors'] != null ? Set<String>.from(json['colors']) : null
       ..colorOperation = json['colorOperation'] as int?
       ..lvs = json['lvs'] != null ? Set<int>.from(json['lvs']) : null
@@ -93,7 +95,13 @@ class SearchParameter{
     if (cardNoSearch != null) data['cardNoSearch'] = cardNoSearch;
     if (effectSearch != null) data['effectSearch'] = effectSearch;
     if (sourceEffectSearch != null) data['sourceEffectSearch'] = sourceEffectSearch;
-    if (noteId != null) data['noteId'] = noteId;
+    
+    // noteIds가 있으면 다중선택 모드
+    if (noteIds.isNotEmpty) {
+      data['noteIds'] = noteIds.toList();
+      data['noteId'] = noteIds.first; // 하위 호환성을 위해 첫 번째 값을 noteId에 설정
+    }
+    // noteIds가 비어있으면 noteId도 설정하지 않음 (전체 표시 모드)
     if (colors != null) data['colors'] = colors!.toList();
     if (colorOperation != null) data['colorOperation'] = colorOperation;
     if (lvs != null) data['lvs'] = lvs!.toList();
@@ -130,7 +138,7 @@ class SearchParameter{
 
   @override
   String toString() {
-    return 'SearchParameter{ searchString: $searchString, cardNameSearch: $cardNameSearch, cardNoSearch: $cardNoSearch, effectSearch: $effectSearch, sourceEffectSearch: $sourceEffectSearch, noteId: $noteId, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc, minReleaseDate: $minReleaseDate, maxReleaseDate: $maxReleaseDate, isLatestReleaseFirst: $isLatestReleaseFirst}';
+    return 'SearchParameter{ searchString: $searchString, cardNameSearch: $cardNameSearch, cardNoSearch: $cardNoSearch, effectSearch: $effectSearch, sourceEffectSearch: $sourceEffectSearch, noteId: $noteId, noteIds: ${noteIds.join(", ")}, colors: ${colors?.join(", ")}, colorOperation: $colorOperation, lvs: ${lvs?.join(", ")}, cardTypes: ${cardTypes?.join(", ")}, forms: ${forms.join(", ")}, attributes: ${attributes.join(", ")}, minPlayCost: $minPlayCost, maxPlayCost: $maxPlayCost, minDp: $minDp, maxDp: $maxDp, minDigivolutionCost: $minDigivolutionCost, maxDigivolutionCost: $maxDigivolutionCost, rarities: ${rarities?.join(", ")}, page: $page, size: $size, parallelOption: $parallelOption, orderOption: $orderOption, isOrderDesc: $isOrderDesc, minReleaseDate: $minReleaseDate, maxReleaseDate: $maxReleaseDate, isLatestReleaseFirst: $isLatestReleaseFirst}';
   }
 
   void reset() {
@@ -140,6 +148,7 @@ class SearchParameter{
     effectSearch = null;
     sourceEffectSearch = null;
     noteId = null;
+    noteIds = {};
     colors ={};
     colorOperation = null;
     lvs = null;

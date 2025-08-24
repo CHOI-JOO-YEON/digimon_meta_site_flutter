@@ -365,8 +365,8 @@ class CardDataService {
         }
       }
       
-      if (params.noteId != null) {
-        matches = card.noteId == params.noteId;
+      if (params.noteIds.isNotEmpty) {
+        matches = params.noteIds.contains(card.noteId);
         if (!matches) return false;
       }
       
