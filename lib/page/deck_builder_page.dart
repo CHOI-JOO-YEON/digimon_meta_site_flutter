@@ -610,7 +610,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                           if (_currentBottomSheetSize > _calculateMinBottomSheetSize(constraints.maxHeight) * 1.5)
                             SliverToBoxAdapter(
                               child: Container(
-                                height: constraints.maxHeight * _currentBottomSheetSize - 120, // 헤더 높이 제외
+                                height: constraints.maxHeight * _currentBottomSheetSize - 80, // 헤더 높이 제외
                                 child: deck != null 
                                   ? SingleChildScrollView(
                                       physics: ClampingScrollPhysics(),
