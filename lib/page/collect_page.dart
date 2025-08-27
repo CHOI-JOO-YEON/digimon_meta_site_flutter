@@ -267,7 +267,6 @@ class _CollectPageState extends State<CollectPage> {
                                         totalPages: totalPages,
                                         currentPage: currentPage,
                                         isTextSimplify: false,
-                                        searchWithParameter: searchWithParameter,
                                       )
                                     : const Center(
                                         child: CircularProgressIndicator(),
