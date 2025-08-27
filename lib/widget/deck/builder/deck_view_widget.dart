@@ -115,11 +115,15 @@ class _DeckBuilderViewState extends State<DeckBuilderView> {
   addCard(DigimonCard card) {
     widget.deck.addSingleCard(card);
     setState(() {});
+    // 상위 위젯에 덱 변경 알림
+    DeckDescriptionChangedNotification(widget.deck).dispatch(context);
   }
 
   removeCard(DigimonCard card) {
     widget.deck.removeSingleCard(card);
     setState(() {});
+    // 상위 위젯에 덱 변경 알림
+    DeckDescriptionChangedNotification(widget.deck).dispatch(context);
   }
 
   sortDeck(List<String> sortPriority) {

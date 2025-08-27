@@ -612,20 +612,31 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
                               child: Container(
                                 height: constraints.maxHeight * _currentBottomSheetSize - 80, // 헤더 높이 제외
                                 child: deck != null 
-                                  ? SingleChildScrollView(
-                                      physics: ClampingScrollPhysics(),
-                                      padding: EdgeInsets.all(SizeService.paddingSize(context)),
-                                      child: DeckBuilderView(
-                                        deck: deck!,
-                                        cardPressEvent: removeCardByDeck,
-                                        import: deckUpdate,
-                                        searchWithParameter: searchWithParameter,
-                                        cardOverlayService: _cardOverlayService,
-                                        showMenuBar: false, // 세로 모드에서는 메뉴바 숨김
-                                        showSlider: false, // 세로 모드에서는 슬라이더 숨김
-                                        showButtons: false, // 세로 모드에서는 버튼들 숨김
-                                        showDeckNameOnly: true, // 세로 모드에서는 덱 이름만 표시
-                                        fixedRowNumber: _deckViewRowNumber, // 조정 가능한 행 수 사용
+                                  ? NotificationListener<DeckDescriptionChangedNotification>(
+                                      onNotification: (notification) {
+                                        // 덱 변경 알림을 받으면 상태 업데이트
+                                        setState(() {});
+                                        return true;
+                                      },
+                                      child: SingleChildScrollView(
+                                        physics: ClampingScrollPhysics(),
+                                        padding: EdgeInsets.all(SizeService.paddingSize(context)),
+                                        child: DeckBuilderView(
+                                          deck: deck!,
+                                          cardPressEvent: (card) {
+                                            removeCardByDeck(card);
+                                            // 상태 변경을 명시적으로 전파
+                                            setState(() {});
+                                          },
+                                          import: deckUpdate,
+                                          searchWithParameter: searchWithParameter,
+                                          cardOverlayService: _cardOverlayService,
+                                          showMenuBar: false, // 세로 모드에서는 메뉴바 숨김
+                                          showSlider: false, // 세로 모드에서는 슬라이더 숨김
+                                          showButtons: false, // 세로 모드에서는 버튼들 숨김
+                                          showDeckNameOnly: true, // 세로 모드에서는 덱 이름만 표시
+                                          fixedRowNumber: _deckViewRowNumber, // 조정 가능한 행 수 사용
+                                        ),
                                       ),
                                     )
                                   : Center(
