@@ -116,22 +116,22 @@ class DeckSortProvider with ChangeNotifier {
       int comparison = 0;
       switch (criterion.field) {
         case 'cardType':
-          int aOrder = criterion.orderMap?[a.cardType] ?? max;
-          int bOrder = criterion.orderMap?[b.cardType] ?? max;
+          int aOrder = criterion.orderMap?[a.cardType] ?? 0;
+          int bOrder = criterion.orderMap?[b.cardType] ?? 0;
           comparison = aOrder.compareTo(bOrder);
           break;
         case 'lv':
           comparison =
-              (a.lv ?? double.infinity).compareTo(b.lv ?? double.infinity);
+              (a.lv ?? 0).compareTo(b.lv ?? 0);
           break;
         case 'color1':
-          int aOrder = criterion.orderMap?[a.color1] ?? max;
-          int bOrder = criterion.orderMap?[b.color1] ?? max;
+          int aOrder = criterion.orderMap?[a.color1] ?? 0;
+          int bOrder = criterion.orderMap?[b.color1] ?? 0;
           comparison = aOrder.compareTo(bOrder);
           break;
         case 'color2':
-          int aOrder = criterion.orderMap?[a.color2] ?? max;
-          int bOrder = criterion.orderMap?[b.color2] ?? max;
+          int aOrder = criterion.orderMap?[a.color2] ?? 0;
+          int bOrder = criterion.orderMap?[b.color2] ?? 0;
           comparison = aOrder.compareTo(bOrder);
           break;
         case 'playCost':
