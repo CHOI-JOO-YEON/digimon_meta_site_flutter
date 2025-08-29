@@ -123,7 +123,7 @@
   "name" : "테이머 배틀 팩 2023 Vol.1",
   "releaseDate" : "2023-05-27",
   "cardOrigin" : "EVENT",
-  "priority" : 5,
+  "priority" : 6,
   "cardCount" : 16,
   "isDisable" : false,
   "description" : null,
@@ -253,7 +253,7 @@
   "name" : "테이머 배틀 팩 2023 Vol.2",
   "releaseDate" : "2023-09-23",
   "cardOrigin" : "EVENT",
-  "priority" : 4,
+  "priority" : 5,
   "cardCount" : 16,
   "isDisable" : false,
   "description" : null,
@@ -483,7 +483,7 @@
   "name" : "테이머 배틀 팩 2024 Vol.1",
   "releaseDate" : "2024-04-06",
   "cardOrigin" : "EVENT",
-  "priority" : 3,
+  "priority" : 4,
   "cardCount" : 16,
   "isDisable" : false,
   "description" : null,
@@ -693,7 +693,7 @@
   "name" : "테이머 배틀 팩 2024 Vol.2",
   "releaseDate" : "2024-08-18",
   "cardOrigin" : "EVENT",
-  "priority" : 2,
+  "priority" : 3,
   "cardCount" : 16,
   "isDisable" : false,
   "description" : null,
@@ -1023,7 +1023,7 @@
   "name" : "테이머 배틀 팩 2025 Vol.1",
   "releaseDate" : "2025-03-01",
   "cardOrigin" : "EVENT",
-  "priority" : 1,
+  "priority" : 2,
   "cardCount" : 16,
   "isDisable" : false,
   "description" : null,
@@ -1149,6 +1149,16 @@
   "description" : null,
   "parent" : "BT17 시크릿 크라이시스"
 }, {
+  "noteId" : 388,
+  "name" : "테이머 배틀 2025 Vol.2",
+  "releaseDate" : "2025-09-05",
+  "cardOrigin" : "EVENT",
+  "priority" : 1,
+  "cardCount" : 24,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
   "noteId" : 170,
   "name" : "리미티드 카드팩 2024 [LM-03]",
   "releaseDate" : "2025-09-19",
@@ -1189,16 +1199,6 @@
   "description" : null,
   "parent" : "EX7 디지몬 리버레이터"
 }, {
-  "noteId" : 122,
-  "name" : "테이머 배틀 21 & 22",
-  "releaseDate" : "2025-10-17",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 1,
-  "cardCount" : 8,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "테이머 배틀 팩"
-}, {
   "noteId" : 81,
   "name" : "디지몬 리버레이터 프로모션 팩",
   "releaseDate" : "2025-10-17",
@@ -1218,16 +1218,6 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "BT18 엘리멘트 석세서"
-}, {
-  "noteId" : 175,
-  "name" : "테이머 배틀 23",
-  "releaseDate" : "2025-11-21",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 2,
-  "cardCount" : 4,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 171,
   "name" : "리미티드 카드팩 트리드바이스 [LM-04]",
@@ -1251,10 +1241,30 @@
 }, {
   "noteId" : 173,
   "name" : "테이머 배틀 24",
-  "releaseDate" : "2025-12-19",
+  "releaseDate" : "2026-01-02",
   "cardOrigin" : "ENGLISH",
   "priority" : 3,
   "cardCount" : 3,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
+  "noteId" : 172,
+  "name" : "테이머 배틀 25",
+  "releaseDate" : "2026-01-02",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 4,
+  "cardCount" : 4,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
+  "noteId" : 225,
+  "name" : "테이머 배틀 26",
+  "releaseDate" : "2026-01-02",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 5,
+  "cardCount" : 6,
   "isDisable" : false,
   "description" : null,
   "parent" : "테이머 배틀 팩"
@@ -1268,16 +1278,6 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "EX8 CHAIN OF LIBERATION"
-}, {
-  "noteId" : 172,
-  "name" : "테이머 배틀 25",
-  "releaseDate" : "2026-01-16",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 4,
-  "cardCount" : 4,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "테이머 배틀 팩"
 }, {
   "noteId" : 224,
   "name" : "부스터 팩 OVER THE X [BT-20]",
@@ -1319,16 +1319,6 @@
   "description" : null,
   "parent" : "ST21 HERO OF HOPE"
 }, {
-  "noteId" : 225,
-  "name" : "테이머 배틀 26",
-  "releaseDate" : "2026-02-20",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 5,
-  "cardCount" : 6,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "테이머 배틀 팩"
-}, {
   "noteId" : 239,
   "name" : "부스터 팩 WORLD CONVERGENCE [BT-21]",
   "releaseDate" : "2026-03-20",
@@ -1359,16 +1349,6 @@
   "description" : null,
   "parent" : "LM 파이널 엘리시온"
 }, {
-  "noteId" : 242,
-  "name" : "테이머 배틀 27",
-  "releaseDate" : "2026-03-20",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 6,
-  "cardCount" : 6,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "테이머 배틀 팩"
-}, {
   "noteId" : 257,
   "name" : "엑스트라 부스터 VERSUS MONSTERS [EX-09]",
   "releaseDate" : "2026-04-17",
@@ -1379,9 +1359,19 @@
   "description" : null,
   "parent" : "EX9 VERSUS MONSTERS"
 }, {
+  "noteId" : 242,
+  "name" : "테이머 배틀 27",
+  "releaseDate" : "2026-05-01",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 6,
+  "cardCount" : 6,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
   "noteId" : 258,
   "name" : "테이머 배틀 28",
-  "releaseDate" : "2026-04-17",
+  "releaseDate" : "2026-05-01",
   "cardOrigin" : "ENGLISH",
   "priority" : 7,
   "cardCount" : 6,
