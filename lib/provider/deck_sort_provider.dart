@@ -7,6 +7,11 @@ class SortCriterion {
   Map<String, int>? orderMap; // For cardType and colors
 
   SortCriterion(this.field, {this.ascending = true, this.orderMap});
+
+  @override
+  String toString() {
+    return 'SortCriterion{field: $field, ascending: $ascending, orderMap: $orderMap}';
+  }
 }
 
 class DeckSortProvider with ChangeNotifier {
@@ -92,7 +97,7 @@ class DeckSortProvider with ChangeNotifier {
     'color1': '색상1',
     'color2': '색상2',
     'playCost': '등장/사용 코스트',
-    'sortString': '정렬 문자열',
+    'sortString': '카드 넘버',
     'isParallel': '패럴렐 우선',
     'dp': 'DP',
     'cardName': '카드 이름',
@@ -130,12 +135,12 @@ class DeckSortProvider with ChangeNotifier {
           comparison = aOrder.compareTo(bOrder);
           break;
         case 'playCost':
-          comparison = (a.playCost ?? double.infinity)
-              .compareTo(b.playCost ?? double.infinity);
+          comparison = (a.playCost ?? 0)
+              .compareTo(b.playCost ?? 0);
           break;
         case 'dp':
           comparison =
-              (a.dp ?? double.infinity).compareTo(b.dp ?? double.infinity);
+              (a.dp ?? 0).compareTo(b.dp ?? 0);
           break;
         case 'sortString':
           comparison = (a.sortString ?? '').compareTo(b.sortString ?? '');

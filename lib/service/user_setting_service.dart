@@ -8,6 +8,7 @@ import '../provider/deck_sort_provider.dart';
 import '../provider/locale_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
+import 'dart:convert';
 
 class UserSettingService {
   static final UserSettingService _instance = UserSettingService._internal();
@@ -21,6 +22,31 @@ class UserSettingService {
   static const String _defaultLimitIdKey = 'defaultLimitId';
   static const String _strictDeckKey = 'strictDeck';
   static const String _sortPriorityKey = 'sortPriority';
+
+  // 기본 orderMap 정의
+  static Map<String, int>? _getDefaultOrderMap(String field) {
+    switch (field) {
+      case 'cardType':
+        return {
+          'DIGIMON': 1,
+          'TAMER': 2,
+          'OPTION': 3,
+        };
+      case 'color1':
+      case 'color2':
+        return {
+          'RED': 1,
+          'BLUE': 2,
+          'YELLOW': 3,
+          'GREEN': 4,
+          'BLACK': 5,
+          'PURPLE': 6,
+          'WHITE': 7,
+        };
+      default:
+        return null;
+    }
+  }
 
   // 사용자 설정 로드 (로그인 시 서버에서, 비로그인 시 로컬에서)
   Future<UserSettingDto> loadUserSetting(BuildContext context) async {
@@ -64,18 +90,30 @@ class UserSettingService {
 
     List<SortCriterionDto>? sortPriority;
     if (sortPriorityStr != null && sortPriorityStr.isNotEmpty) {
-      // 기존 문자열 형식을 SortCriterionDto로 변환
-      final sortStrings = sortPriorityStr.split(',').where((s) => s.isNotEmpty).toList();
-      sortPriority = sortStrings.map((sortString) {
-        List<String> parts = sortString.split(':');
-        if (parts.length == 2) {
+      try {
+        // JSON 형식으로 저장된 데이터 파싱
+        final sortJsonList = jsonDecode(sortPriorityStr) as List;
+        sortPriority = sortJsonList.map((json) => 
+          SortCriterionDto.fromJson(json as Map<String, dynamic>)
+        ).toList();
+      } catch (e) {
+        // 기존 문자열 형식 호환성을 위한 fallback
+        final sortStrings = sortPriorityStr.split(',').where((s) => s.isNotEmpty).toList();
+        sortPriority = sortStrings.map((sortString) {
+          List<String> parts = sortString.split(':');
+          String field = parts.isNotEmpty ? parts[0] : sortString;
+          bool ascending = parts.length == 2 ? parts[1] == 'asc' : true;
+          
+          // 기본 orderMap 복원
+          Map<String, int>? orderMap = _getDefaultOrderMap(field);
+          
           return SortCriterionDto(
-            field: parts[0],
-            ascending: parts[1] == 'asc',
+            field: field,
+            ascending: ascending,
+            orderMap: orderMap,
           );
-        }
-        return SortCriterionDto(field: sortString, ascending: true);
-      }).toList();
+        }).toList();
+      }
     }
 
     return UserSettingDto(
@@ -104,11 +142,9 @@ class UserSettingService {
       html.window.localStorage[_strictDeckKey] = setting.strictDeck.toString();
     }
     if (setting.sortPriority != null) {
-      // SortCriterionDto를 문자열 형식으로 변환하여 저장
-      final sortStrings = setting.sortPriority!.map((criterion) => 
-        '${criterion.field}:${criterion.ascending == true ? 'asc' : 'desc'}'
-      ).toList();
-      html.window.localStorage[_sortPriorityKey] = sortStrings.join(',');
+      // SortCriterionDto를 JSON 형식으로 저장하여 orderMap도 포함
+      final sortJson = setting.sortPriority!.map((criterion) => criterion.toJson()).toList();
+      html.window.localStorage[_sortPriorityKey] = jsonEncode(sortJson);
     }
   }
 
