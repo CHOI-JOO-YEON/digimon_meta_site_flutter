@@ -517,7 +517,7 @@ class _CardSearchBarState extends State<CardSearchBar> {
                                 border: Border.all(color: Colors.grey[200]!),
                               ),
                               child: ExpansionTile(
-                                leading: Icon(Icons.inventory_2_rounded, color: Colors.grey[600]),
+                                leading: Icon(Icons.inventory_2_rounded, color: Theme.of(context).primaryColor),
                                 title: Row(
                                   children: [
                                     Expanded(
