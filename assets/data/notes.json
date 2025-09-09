@@ -1170,24 +1170,24 @@
   "parent" : "LM 2024"
 }, {
   "noteId" : 153,
-  "name" : "스타트 덱 가디언 볼텍스 [ST-18]",
+  "name" : "스타트 덱 선풍의 수호자 [ST-18]",
   "releaseDate" : "2025-09-19",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 15,
   "isDisable" : false,
   "description" : null,
-  "parent" : "ST18 가디언 볼텍스"
+  "parent" : "ST18 선풍의 수호자"
 }, {
   "noteId" : 154,
-  "name" : "스타트 덱 페블 왈츠 [ST-19]",
+  "name" : "스타트 덱 동화의 무도 [ST-19]",
   "releaseDate" : "2025-09-19",
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 15,
   "isDisable" : false,
   "description" : null,
-  "parent" : "ST19 페블 왈츠"
+  "parent" : "ST19 동화의 무도"
 }, {
   "noteId" : 152,
   "name" : "엑스트라 부스터 디지몬 리버레이터 [EX-07]",
@@ -1388,6 +1388,26 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "BT22 CYBER EDEN"
+}, {
+  "noteId" : 389,
+  "name" : "엑스트라 부스터 SINISTER ORDER [EX-10]",
+  "releaseDate" : "2026-06-19",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 74,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX10 SINISTER ORDER"
+}, {
+  "noteId" : 390,
+  "name" : "디지몬 스토리 타임스트레인저 프로모",
+  "releaseDate" : "2026-07-17",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 2,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "기타"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
