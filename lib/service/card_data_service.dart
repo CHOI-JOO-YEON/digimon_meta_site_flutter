@@ -204,11 +204,11 @@ class CardDataService {
         for (LocaleCardData localeData in card.localeCardData ?? []) {
           bool matches = false;
           if (isRegex) {
-            matches = regex!.hasMatch(localeData.name) ||
+            matches = (localeData.name != null && regex!.hasMatch(localeData.name!)) ||
                     (localeData.effect != null && regex.hasMatch(localeData.effect!)) ||
                     (localeData.sourceEffect != null && regex.hasMatch(localeData.sourceEffect!));
           } else {
-            matches = localeData.name.toLowerCase().contains(searchString) ||
+            matches = (localeData.name?.toLowerCase().contains(searchString) == true) ||
                     (localeData.effect?.toLowerCase().contains(searchString) == true) ||
                     (localeData.sourceEffect?.toLowerCase().contains(searchString) == true);
           }
@@ -256,9 +256,9 @@ class CardDataService {
           
           for (LocaleCardData localeData in card.localeCardData ?? []) {
             if (isRegex) {
-              if (regex!.hasMatch(localeData.name)) return true;
+              if (localeData.name != null && regex!.hasMatch(localeData.name!)) return true;
             } else {
-              if (localeData.name.toLowerCase().contains(searchString)) return true;
+              if (localeData.name?.toLowerCase().contains(searchString) == true) return true;
             }
           }
           return false;
