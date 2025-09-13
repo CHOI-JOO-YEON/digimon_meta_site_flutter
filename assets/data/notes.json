@@ -1379,6 +1379,16 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
+  "noteId" : 393,
+  "name" : "테이머 배틀 29",
+  "releaseDate" : "2026-05-01",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 8,
+  "cardCount" : 6,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
   "noteId" : 265,
   "name" : "부스터 팩 CYBER EDEN [BT-22]",
   "releaseDate" : "2026-05-22",
@@ -1401,13 +1411,23 @@
 }, {
   "noteId" : 390,
   "name" : "디지몬 스토리 타임스트레인저 프로모",
-  "releaseDate" : "2026-07-17",
+  "releaseDate" : "2026-07-24",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
-  "cardCount" : 2,
+  "cardCount" : 7,
   "isDisable" : false,
   "description" : null,
   "parent" : "기타"
+}, {
+  "noteId" : 392,
+  "name" : "부스터 팩 HACKERS' SLUMBER [BT-23]",
+  "releaseDate" : "2026-07-24",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 26,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT23 HACKERS' SLUMBER"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
