@@ -17,6 +17,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_downloader_web/image_downloader_web.dart';
 import 'package:provider/provider.dart';
+import 'common/card_image_fallback.dart';
 
 class CardDetailDialog extends StatefulWidget {
   final DigimonCard card;
@@ -375,6 +376,12 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
                                           localeProvider.localePriority)) ??
                                   '',
                               fit: BoxFit.fitWidth,
+                              errorBuilder: (context, error, stackTrace) {
+                                return CardImageFallback(
+                                  card: widget.card,
+                                  width: constraints.maxWidth,
+                                );
+                              },
                             );
                           },
                         ),
@@ -723,9 +730,14 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
           child: ListTile(
             leading: Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
-                return Image.network(usedCard
-                        .getDisplaySmallImgUrl(localeProvider.localePriority) ??
-                    '');
+                return Image.network(
+                  usedCard.getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
+                  errorBuilder: (context, error, stackTrace) {
+                    return CardImageFallback(
+                      card: usedCard,
+                    );
+                  },
+                );
               },
             ),
             title: Consumer<LocaleProvider>(
@@ -814,8 +826,13 @@ class _CardDetailDialogState extends State<CardDetailDialog> {
             leading: Consumer<LocaleProvider>(
               builder: (context, localeProvider, child) {
                 return Image.network(
-                    card.getDisplaySmallImgUrl(localeProvider.localePriority) ??
-                        '');
+                  card.getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
+                  errorBuilder: (context, error, stackTrace) {
+                    return CardImageFallback(
+                      card: card,
+                    );
+                  },
+                );
               },
             ),
             title: Consumer<LocaleProvider>(

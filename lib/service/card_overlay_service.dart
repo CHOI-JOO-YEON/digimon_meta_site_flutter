@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../model/card.dart';
+import '../widget/common/card_image_fallback.dart';
 
 class CardOverlayService {
   static final CardOverlayService _instance = CardOverlayService._internal();
@@ -26,7 +28,7 @@ class CardOverlayService {
   }
 
   void showBigImage(BuildContext context, String imgUrl, RenderBox renderBox,
-      int rowNumber, int index) {
+      int rowNumber, int index, {DigimonCard? card}) {
     final offset = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -85,28 +87,9 @@ class CardOverlayService {
                       return _buildShimmerEffect();
                     },
                     errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[100],
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                color: Colors.red[400],
-                                size: 40,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '이미지 로딩 실패',
-                                style: TextStyle(
-                                  color: Colors.red[400],
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      return CardImageFallback(
+                        card: card!,
+                        width: correctedWidth,
                       );
                     },
                   ),
@@ -118,7 +101,7 @@ class CardOverlayService {
       ),
     );
 
-    Overlay.of(context)?.insert(_imageOverlayEntry!);
+    Overlay.of(context).insert(_imageOverlayEntry!);
   }
 
   // Shimmer effect for skeleton loading

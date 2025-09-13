@@ -226,6 +226,7 @@ class DeckDescriptionView extends StatelessWidget {
       renderBox,
       rowNumber,
       index,
+      card: card,
     );
   }
   

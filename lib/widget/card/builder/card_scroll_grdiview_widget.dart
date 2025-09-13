@@ -189,11 +189,12 @@ class _CardScrollGridViewState extends State<CardScrollGridView> {
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
                   final localeProvider = Provider.of<LocaleProvider>(ctx, listen: false);
                   _cardOverlayService.showBigImage(
-                    ctx, 
-                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '', 
-                    renderBox, 
-                    widget.rowNumber, 
-                    index
+                    ctx,
+                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '',
+                    renderBox,
+                    widget.rowNumber,
+                    index,
+                    card: card,
                   );
                 },
                 onExit: () => _cardOverlayService.hideBigImage(),

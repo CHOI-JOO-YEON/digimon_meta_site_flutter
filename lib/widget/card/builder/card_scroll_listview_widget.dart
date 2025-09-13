@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../provider/locale_provider.dart';
 import '../../../provider/text_simplify_provider.dart';
+import '../../../service/card_overlay_service.dart';
 import '../../../service/size_service.dart';
+import '../../common/card_image_fallback.dart';
+import '../card_widget.dart';
 
 class CardScrollListView extends StatefulWidget {
   final List<DigimonCard> cards;
@@ -37,7 +40,8 @@ class _CardScrollListViewState extends State<CardScrollListView> {
   bool isLoading = false;
   // cardNo 대신 cardId를 사용하여 효과 관리
   final Map<int, bool> _cardAddingEffects = {};
-
+  final CardOverlayService _cardOverlayService = CardOverlayService();
+  
   @override
   void initState() {
     super.initState();
@@ -185,26 +189,26 @@ class _CardScrollListViewState extends State<CardScrollListView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                                flex: 8,
-                                child: GestureDetector(
-                                  onTap: () => CardService().showImageDialog(
-                                    context,
-                                    card,
-                                    searchWithParameter: widget.searchWithParameter,
-                                  ),
-                                  // Make sure this inner GestureDetector doesn't interfere with the parent
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Consumer<LocaleProvider>(
-                                    builder: (context, localeProvider, child) {
-                                      return Image.network(
-                                        card.getDisplaySmallImgUrl(localeProvider.localePriority) ?? '',
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return const Icon(Icons.broken_image);
-                                        },
+                              flex: 8,
+                              child: Consumer<LocaleProvider>(
+                                builder: (context, localeProvider, child) {
+                                  return LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return CustomCard(
+                                        card: card,
+                                        width: constraints.maxWidth, // 부모 Expanded가 차지한 전체 너비
+                                        cardPressEvent: (card) => CardService().showImageDialog(
+                                          context,
+                                          card,
+                                          searchWithParameter: widget.searchWithParameter,
+                                        ),
+                                        zoomActive: false,
                                       );
                                     },
-                                  ),
-                                )),
+                                  );
+                                },
+                              ),
+                            ),
                             Expanded(flex: 1, child: Container(),),
                             Expanded(
                                 flex: 32,

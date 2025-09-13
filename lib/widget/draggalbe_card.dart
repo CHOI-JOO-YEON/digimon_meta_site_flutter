@@ -1,5 +1,6 @@
 import 'package:digimon_meta_site_flutter/model/card.dart';
 import 'package:flutter/material.dart';
+import 'common/card_image_fallback.dart';
 
 class DraggableCard extends StatelessWidget {
   final DigimonCard card;
@@ -11,7 +12,14 @@ class DraggableCard extends StatelessWidget {
     return Draggable<DigimonCard>(
       data: card,
         child: MouseRegion(
-          child: Image.network(card.getDisplaySmallImgUrl()??''),
+          child: Image.network(
+            card.getDisplaySmallImgUrl() ?? '',
+            errorBuilder: (context, error, stackTrace) {
+              return CardImageFallback(
+                card: card,
+              );
+            },
+          ),
         ),
         feedback: Material(
             child: Text('1',

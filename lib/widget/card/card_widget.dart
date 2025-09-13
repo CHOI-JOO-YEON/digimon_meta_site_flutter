@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import '../../provider/limit_provider.dart';
 import '../../provider/locale_provider.dart';
 import '../../service/color_service.dart';
+import '../common/card_image_fallback.dart';
 import 'game/card_back_widget.dart';
 
 class CustomCard extends StatefulWidget {
@@ -279,73 +280,10 @@ class _CustomCardState extends State<CustomCard> with SingleTickerProviderStateM
                             );
                           },
                               errorBuilder: (context, error, stackTrace) {
-                                // 이미지 로드 실패 시 카드 번호와 이름을 표시
-                                final String cardNo = widget.card.cardNo ?? '';
-                                final String cardName = widget.card.getDisplayName(localeProvider.localePriority) ?? '';
-                            
-                            return Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    const Color(0xFF6B7280),
-                                    const Color(0xFF4B5563),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(cardRadius),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(widget.width * 0.08),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.image_not_supported_outlined,
-                                        size: widget.width * 0.2,
-                                        color: Colors.white.withOpacity(0.8),
-                                      ),
-                                      SizedBox(height: widget.width * 0.04),
-                                      Text(
-                                        cardNo,
-                                        style: TextStyle(
-                                          fontSize: widget.width * 0.14,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                          shadows: [
-                                            Shadow(
-                                              offset: const Offset(0, 1),
-                                              blurRadius: 2,
-                                              color: Colors.black.withOpacity(0.5),
-                                            ),
-                                          ],
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      if (cardName.isNotEmpty) ...[
-                                        SizedBox(height: widget.width * 0.02),
-                                        Text(
-                                          cardName,
-                                          style: TextStyle(
-                                            fontSize: widget.width * 0.1,
-                                            color: Colors.white.withOpacity(0.9),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              );
+                                return CardImageFallback(
+                                  card: widget.card,
+                                  width: widget.width,
+                                );
                               },
                             );
                           },

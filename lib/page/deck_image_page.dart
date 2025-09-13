@@ -15,6 +15,7 @@ import '../model/deck-build.dart';
 import '../provider/locale_provider.dart';
 import '../service/color_service.dart';
 import '../widget/color_picker_bottom_sheet.dart';
+import '../widget/common/card_image_fallback.dart';
 import '../widget/deck/deck_stat_view.dart';
 
 @RoutePage()
@@ -423,6 +424,19 @@ class _DeckImagePageState extends State<DeckImagePage> {
                                   fit: BoxFit.contain,
                                   cacheWidth: 716,
                                   filterQuality: FilterQuality.medium,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _selectedCard != null
+                                        ? CardImageFallback(
+                                            card: _selectedCard!,
+                                            width: 610,
+                                          )
+                                        : Container(
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                              child: Icon(Icons.image_not_supported),
+                                            ),
+                                          );
+                                  },
                                 );
                               },
                             ),
@@ -603,6 +617,12 @@ class _DeckImagePageState extends State<DeckImagePage> {
                         fit: BoxFit.contain,
                         cacheWidth: 150,
                         filterQuality: FilterQuality.medium,
+                        errorBuilder: (context, error, stackTrace) {
+                          return CardImageFallback(
+                            card: cards[index],
+                            width: 150,
+                          );
+                        },
                       );
                     },
                   ),

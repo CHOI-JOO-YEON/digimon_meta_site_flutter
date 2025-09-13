@@ -8,6 +8,7 @@ import '../../../model/card.dart';
 import '../../../model/deck-view.dart';
 import '../../../model/format.dart';
 import '../../../provider/collect_provider.dart';
+import '../../common/card_image_fallback.dart';
 import '../../deck/color_palette.dart';
 
 class DeckCalcDialog extends StatefulWidget {
@@ -331,7 +332,8 @@ class _DeckCalcDialogState extends State<DeckCalcDialog> {
                                   return Card(
                                     child: ListTile(
                                       leading: Image.network(
-                                          card.getDisplaySmallImgUrl() ?? ''),
+                                        card.getDisplaySmallImgUrl() ?? '',
+                                      ),
                                       title: Text(
                                           '${card.cardNo} ${card.getDisplayName()} ${card.rarity}' ??
                                               ''),

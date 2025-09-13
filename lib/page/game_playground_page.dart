@@ -18,6 +18,7 @@ import '../widget/card/game/razing_zone_widget.dart';
 import '../widget/card/game/security_stack_area.dart';
 import '../widget/card/game/show_cards_widget.dart';
 import '../widget/card/game/trash_area.dart';
+import '../widget/common/card_image_fallback.dart';
 
 @RoutePage()
 class GamePlayGroundPage extends StatefulWidget {
@@ -381,11 +382,18 @@ class _GamePlayGroundPageState extends State<GamePlayGroundPage> {
                                                       gameState.getSelectedCard()!.getDisplayImgUrl() ?? '',
                                                       fit: BoxFit.fitWidth,
                                                       errorBuilder: (context, error, stackTrace) {
-                                                        return Container(
-                                                          height: constraints.maxWidth * 1.4,
-                                                          color: Colors.grey[300],
-                                                          child: const Icon(Icons.image_not_supported),
-                                                        );
+                                                        final selectedCard = gameState.getSelectedCard();
+                                                        return selectedCard != null
+                                                            ? CardImageFallback(
+                                                                card: selectedCard,
+                                                                width: constraints.maxWidth,
+                                                                aspectRatio: 0.715, // 카드 비율
+                                                              )
+                                                            : Container(
+                                                                height: constraints.maxWidth * 1.4,
+                                                                color: Colors.grey[300],
+                                                                child: const Icon(Icons.image_not_supported),
+                                                              );
                                                       },
                                                     ),
                                                   );

@@ -142,11 +142,12 @@ class _DeckScrollGridViewState extends State<DeckScrollGridView>
                   final RenderBox renderBox = ctx.findRenderObject() as RenderBox;
                   final localeProvider = Provider.of<LocaleProvider>(ctx, listen: false);
                   widget.cardOverlayService.showBigImage(
-                    ctx, 
-                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '', 
-                    renderBox, 
-                    widget.rowNumber, 
-                    index
+                    ctx,
+                    card.getDisplayImgUrl(localeProvider.localePriority) ?? '',
+                    renderBox,
+                    widget.rowNumber,
+                    index,
+                    card: card,
                   );
                 },
                 onExit: () => widget.cardOverlayService.hideBigImage(),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../model/card.dart';
 import '../../../state/game_state.dart';
+import '../../common/card_image_fallback.dart';
 import 'card_back_widget.dart';
 
 class CardWidget extends StatelessWidget {
@@ -45,12 +46,9 @@ class CardWidget extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey,
-                    child: Center(
-                        child: Text(card.getDisplayName() ?? 'Unknown',
-                            style: TextStyle(
-                                fontSize: gameState.textWidth(cardWidth)))),
+                  return CardImageFallback(
+                    card: card,
+                    width: cardWidth,
                   );
                 },
               ),
