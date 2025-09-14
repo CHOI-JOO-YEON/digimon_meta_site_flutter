@@ -1424,10 +1424,20 @@
   "releaseDate" : "2026-07-24",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
-  "cardCount" : 26,
+  "cardCount" : 29,
   "isDisable" : false,
   "description" : null,
   "parent" : "BT23 HACKERS' SLUMBER"
+}, {
+  "noteId" : 394,
+  "name" : "리미티드 카드팩 브릴리언 불렛 [LM-06]",
+  "releaseDate" : "2026-07-24",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 1,
+  "cardCount" : 6,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 브릴리언 블렛"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
@@ -1438,4 +1448,14 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "기타"
+}, {
+  "noteId" : 395,
+  "name" : "리미티드 카드팩 어나더 나이트 [LM-07]",
+  "releaseDate" : "9999-12-31",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 1,
+  "cardCount" : 6,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 어나더 나이트"
 } ]
