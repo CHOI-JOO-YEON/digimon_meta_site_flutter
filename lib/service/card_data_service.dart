@@ -205,8 +205,8 @@ class CardDataService {
           bool matches = false;
           if (isRegex) {
             matches = (localeData.name != null && regex!.hasMatch(localeData.name!)) ||
-                    (localeData.effect != null && regex.hasMatch(localeData.effect!)) ||
-                    (localeData.sourceEffect != null && regex.hasMatch(localeData.sourceEffect!));
+                    (localeData.effect != null && regex!.hasMatch(localeData.effect!)) ||
+                    (localeData.sourceEffect != null && regex!.hasMatch(localeData.sourceEffect!));
           } else {
             matches = (localeData.name?.toLowerCase().contains(searchString) == true) ||
                     (localeData.effect?.toLowerCase().contains(searchString) == true) ||

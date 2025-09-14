@@ -1,5 +1,5 @@
 class LocaleCardData {
-  String name;
+  String? name;
   String? effect;
   String? sourceEffect;
   String locale;

@@ -161,7 +161,7 @@ class DigimonCard {
     
     for (String locale in localePriority) {
       for (var data in localeCardData) {
-        if (data.locale == locale && data.name.isNotEmpty) {
+        if (data.locale == locale && data.name != null && data.name!.isNotEmpty) {
           return data.name;
         }
       }
