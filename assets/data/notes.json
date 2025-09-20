@@ -1169,26 +1169,6 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
-  "noteId" : 396,
-  "name" : "스타트 덱 선풍의 수호자 [STK-18]",
-  "releaseDate" : "2025-09-19",
-  "cardOrigin" : "STARTER_DECK",
-  "priority" : null,
-  "cardCount" : 22,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "ST18 선풍의 수호자"
-}, {
-  "noteId" : 397,
-  "name" : "스타트 덱 동화의 무도 [STK-19]",
-  "releaseDate" : "2025-09-19",
-  "cardOrigin" : "STARTER_DECK",
-  "priority" : null,
-  "cardCount" : 22,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "ST19 동화의 무도"
-}, {
   "noteId" : 170,
   "name" : "리미티드 카드팩 2024 [LM-03]",
   "releaseDate" : "2025-09-19",
@@ -1199,25 +1179,25 @@
   "description" : null,
   "parent" : "LM 2024"
 }, {
-  "noteId" : 153,
-  "name" : "스타트 덱 선풍의 수호자 [ST-18]",
+  "noteId" : 397,
+  "name" : "스타트 덱 동화의 무도 [STK-19]",
   "releaseDate" : "2025-09-19",
-  "cardOrigin" : "ENGLISH",
+  "cardOrigin" : "STARTER_DECK",
   "priority" : 1,
-  "cardCount" : 0,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "ST18 선풍의 수호자"
-}, {
-  "noteId" : 154,
-  "name" : "스타트 덱 동화의 무도 [ST-19]",
-  "releaseDate" : "2025-09-19",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 2,
-  "cardCount" : 0,
+  "cardCount" : 22,
   "isDisable" : false,
   "description" : null,
   "parent" : "ST19 동화의 무도"
+}, {
+  "noteId" : 396,
+  "name" : "스타트 덱 선풍의 수호자 [STK-18]",
+  "releaseDate" : "2025-09-19",
+  "cardOrigin" : "STARTER_DECK",
+  "priority" : 2,
+  "cardCount" : 22,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST18 선풍의 수호자"
 }, {
   "noteId" : 81,
   "name" : "디지몬 리버레이터 프로모션 팩",
