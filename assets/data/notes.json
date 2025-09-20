@@ -1,34 +1,4 @@
 [ {
-  "noteId" : 396,
-  "name" : "스타트 덱 선풍의 수호자 [STK-18]",
-  "releaseDate" : null,
-  "cardOrigin" : null,
-  "priority" : null,
-  "cardCount" : 22,
-  "isDisable" : null,
-  "description" : null,
-  "parent" : null
-}, {
-  "noteId" : 397,
-  "name" : "스타트 덱 동화의 무도 [STK-19]",
-  "releaseDate" : null,
-  "cardOrigin" : null,
-  "priority" : null,
-  "cardCount" : 22,
-  "isDisable" : null,
-  "description" : null,
-  "parent" : null
-}, {
-  "noteId" : 398,
-  "name" : "테이머 배틀 2025 Vol.2 WINNER",
-  "releaseDate" : null,
-  "cardOrigin" : null,
-  "priority" : null,
-  "cardCount" : 24,
-  "isDisable" : null,
-  "description" : null,
-  "parent" : null
-}, {
   "noteId" : 32,
   "name" : "프로모션 팩 Ver0.0",
   "releaseDate" : "2023-02-24",
@@ -1189,6 +1159,36 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
+  "noteId" : 398,
+  "name" : "테이머 배틀 2025 Vol.2 WINNER",
+  "releaseDate" : "2025-09-05",
+  "cardOrigin" : "EVENT",
+  "priority" : 2,
+  "cardCount" : 24,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "테이머 배틀 팩"
+}, {
+  "noteId" : 396,
+  "name" : "스타트 덱 선풍의 수호자 [STK-18]",
+  "releaseDate" : "2025-09-19",
+  "cardOrigin" : "STARTER_DECK",
+  "priority" : null,
+  "cardCount" : 22,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST18 선풍의 수호자"
+}, {
+  "noteId" : 397,
+  "name" : "스타트 덱 동화의 무도 [STK-19]",
+  "releaseDate" : "2025-09-19",
+  "cardOrigin" : "STARTER_DECK",
+  "priority" : null,
+  "cardCount" : 22,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST19 동화의 무도"
+}, {
   "noteId" : 170,
   "name" : "리미티드 카드팩 2024 [LM-03]",
   "releaseDate" : "2025-09-19",
@@ -1219,16 +1219,6 @@
   "description" : null,
   "parent" : "ST19 동화의 무도"
 }, {
-  "noteId" : 152,
-  "name" : "엑스트라 부스터 디지몬 리버레이터 [EX-07]",
-  "releaseDate" : "2025-10-17",
-  "cardOrigin" : "ENGLISH",
-  "priority" : null,
-  "cardCount" : 74,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "EX7 디지몬 리버레이터"
-}, {
   "noteId" : 81,
   "name" : "디지몬 리버레이터 프로모션 팩",
   "releaseDate" : "2025-10-17",
@@ -1238,6 +1228,16 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "디지몬 리버레이터 프로모션 팩"
+}, {
+  "noteId" : 152,
+  "name" : "엑스트라 부스터 디지몬 리버레이터 [EX-07]",
+  "releaseDate" : "2025-10-24",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 74,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX7 디지몬 리버레이터"
 }, {
   "noteId" : 169,
   "name" : "부스터 팩 엘리멘트 석세서 [BT-18]",
