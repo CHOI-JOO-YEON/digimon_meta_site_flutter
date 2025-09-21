@@ -1433,7 +1433,7 @@
   "name" : "부스터 팩 HACKERS' SLUMBER [BT-23]",
   "releaseDate" : "2026-07-24",
   "cardOrigin" : "ENGLISH",
-  "priority" : null,
+  "priority" : 1,
   "cardCount" : 55,
   "isDisable" : false,
   "description" : null,
@@ -1448,6 +1448,26 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "LM 브릴리언 블렛"
+}, {
+  "noteId" : 399,
+  "name" : "부스터 팩 HACKERS' SLUMBER [BT-23] 박스 프로모",
+  "releaseDate" : "2026-07-24",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 2,
+  "cardCount" : 6,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT23 HACKERS' SLUMBER"
+}, {
+  "noteId" : 400,
+  "name" : "어드밴스 덱 어메지스트 만다라 [ST22]",
+  "releaseDate" : "2026-08-21",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 1,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "ST22 어메지스트 만다라"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
