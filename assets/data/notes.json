@@ -1169,16 +1169,6 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
-  "noteId" : 170,
-  "name" : "리미티드 카드팩 2024 [LM-03]",
-  "releaseDate" : "2025-09-19",
-  "cardOrigin" : "ENGLISH",
-  "priority" : null,
-  "cardCount" : 12,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "LM 2024"
-}, {
   "noteId" : 397,
   "name" : "스타트 덱 동화의 무도 [STK-19]",
   "releaseDate" : "2025-09-19",
@@ -1229,6 +1219,16 @@
   "description" : null,
   "parent" : "BT18 엘리멘트 석세서"
 }, {
+  "noteId" : 170,
+  "name" : "리미티드 카드팩 2024 [LM-03]",
+  "releaseDate" : "2025-12-19",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 12,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "LM 2024"
+}, {
   "noteId" : 171,
   "name" : "리미티드 카드팩 트리드바이스 [LM-04]",
   "releaseDate" : "2025-12-19",
@@ -1238,16 +1238,6 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "LM 트리드바이스"
-}, {
-  "noteId" : 192,
-  "name" : "부스터 팩 크로스 에볼루션 [BT-19]",
-  "releaseDate" : "2025-12-19",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 2,
-  "cardCount" : 102,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "BT19 크로스 에볼루션"
 }, {
   "noteId" : 173,
   "name" : "테이머 배틀 24",
@@ -1279,9 +1269,19 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
+  "noteId" : 192,
+  "name" : "부스터 팩 크로스 에볼루션 [BT-19]",
+  "releaseDate" : "2026-01-23",
+  "cardOrigin" : "ENGLISH",
+  "priority" : 2,
+  "cardCount" : 102,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT19 크로스 에볼루션"
+}, {
   "noteId" : 193,
   "name" : "엑스트라 부스터 CHAIN OF LIBERATION [EX-08]",
-  "releaseDate" : "2026-01-16",
+  "releaseDate" : "2026-02-20",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 74,
@@ -1291,7 +1291,7 @@
 }, {
   "noteId" : 224,
   "name" : "부스터 팩 OVER THE X [BT-20]",
-  "releaseDate" : "2026-02-20",
+  "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 102,
@@ -1301,7 +1301,7 @@
 }, {
   "noteId" : 230,
   "name" : "부스터 팩 OVER THE X [BT-20] 박스 프로모",
-  "releaseDate" : "2026-02-20",
+  "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 6,
@@ -1311,7 +1311,7 @@
 }, {
   "noteId" : 243,
   "name" : "스타트 덱 PROTECTOR OF LIGHT [ST-20]",
-  "releaseDate" : "2026-02-20",
+  "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : 3,
   "cardCount" : 15,
@@ -1321,7 +1321,7 @@
 }, {
   "noteId" : 244,
   "name" : "스타트 덱 HERO OF HOPE [ST-21]",
-  "releaseDate" : "2026-02-20",
+  "releaseDate" : "2026-03-20",
   "cardOrigin" : "ENGLISH",
   "priority" : 4,
   "cardCount" : 15,
@@ -1331,7 +1331,7 @@
 }, {
   "noteId" : 239,
   "name" : "부스터 팩 WORLD CONVERGENCE [BT-21]",
-  "releaseDate" : "2026-03-20",
+  "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 102,
@@ -1341,7 +1341,7 @@
 }, {
   "noteId" : 240,
   "name" : "부스터 팩 WORLD CONVERGENCE [BT-21] 박스 프로모",
-  "releaseDate" : "2026-03-20",
+  "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 6,
@@ -1351,23 +1351,13 @@
 }, {
   "noteId" : 241,
   "name" : "리미티드 카드팩 파이널 엘리시온 [LM-05]",
-  "releaseDate" : "2026-03-20",
+  "releaseDate" : "2026-04-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 5,
   "cardCount" : 6,
   "isDisable" : false,
   "description" : null,
   "parent" : "LM 파이널 엘리시온"
-}, {
-  "noteId" : 257,
-  "name" : "엑스트라 부스터 VERSUS MONSTERS [EX-09]",
-  "releaseDate" : "2026-04-17",
-  "cardOrigin" : "ENGLISH",
-  "priority" : null,
-  "cardCount" : 74,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "EX9 VERSUS MONSTERS"
 }, {
   "noteId" : 242,
   "name" : "테이머 배틀 27",
@@ -1399,9 +1389,19 @@
   "description" : null,
   "parent" : "테이머 배틀 팩"
 }, {
+  "noteId" : 257,
+  "name" : "엑스트라 부스터 VERSUS MONSTERS [EX-09]",
+  "releaseDate" : "2026-05-22",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 74,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX9 VERSUS MONSTERS"
+}, {
   "noteId" : 265,
   "name" : "부스터 팩 CYBER EDEN [BT-22]",
-  "releaseDate" : "2026-05-22",
+  "releaseDate" : "2026-06-19",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 102,
@@ -1411,7 +1411,7 @@
 }, {
   "noteId" : 389,
   "name" : "엑스트라 부스터 SINISTER ORDER [EX-10]",
-  "releaseDate" : "2026-06-19",
+  "releaseDate" : "2026-07-24",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 74,
@@ -1421,7 +1421,7 @@
 }, {
   "noteId" : 390,
   "name" : "디지몬 스토리 타임스트레인저 프로모",
-  "releaseDate" : "2026-07-24",
+  "releaseDate" : "2026-08-21",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 7,
@@ -1431,7 +1431,7 @@
 }, {
   "noteId" : 392,
   "name" : "부스터 팩 HACKERS' SLUMBER [BT-23]",
-  "releaseDate" : "2026-07-24",
+  "releaseDate" : "2026-08-21",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 97,
@@ -1441,7 +1441,7 @@
 }, {
   "noteId" : 394,
   "name" : "리미티드 카드팩 브릴리언 불렛 [LM-06]",
-  "releaseDate" : "2026-07-24",
+  "releaseDate" : "2026-08-21",
   "cardOrigin" : "ENGLISH",
   "priority" : 1,
   "cardCount" : 6,
@@ -1451,7 +1451,7 @@
 }, {
   "noteId" : 399,
   "name" : "부스터 팩 HACKERS' SLUMBER [BT-23] 박스 프로모",
-  "releaseDate" : "2026-07-24",
+  "releaseDate" : "2026-08-21",
   "cardOrigin" : "ENGLISH",
   "priority" : 2,
   "cardCount" : 6,
@@ -1461,7 +1461,7 @@
 }, {
   "noteId" : 400,
   "name" : "어드밴스 덱 어메지스트 만다라 [ST22]",
-  "releaseDate" : "2026-08-21",
+  "releaseDate" : "2026-09-18",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
   "cardCount" : 1,
