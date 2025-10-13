@@ -193,7 +193,7 @@ class _DeckSettingDialogState extends State<DeckSettingDialog> {
             limitPairs: [],
           ),
           child: Text(
-            '항상 최신 금제로 설정${limitProvider.getCurrentLimit()?.restrictionBeginDate ?? ''}',
+            '항상 최신 금제로 설정 현재: ${DateFormat('yyyy-MM-dd').format(limitProvider.getCurrentLimit()?.restrictionBeginDate ?? DateTime.now())}',
             style: AppDialogTheme.bodyTextStyle.copyWith(
               fontWeight: FontWeight.bold,
               color: AppDialogTheme.primaryColor,
