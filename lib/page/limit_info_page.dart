@@ -805,19 +805,6 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.swap_horiz, 
-                  color: isRemovedPair ? Colors.grey : Colors.purple.shade700,
-                  size: 18,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'A가 들어 있는 덱에는 B 카드 넣을 수 없음',
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: isNewPair ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
                 if (isNewPair)
                   Container(
                     margin: const EdgeInsets.only(left: 8),
