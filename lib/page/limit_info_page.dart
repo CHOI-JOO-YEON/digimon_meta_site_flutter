@@ -692,7 +692,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                       Icon(Icons.compare_arrows, color: Colors.purple),
                       const SizedBox(width: 8),
                       Text(
-                        '조합 제한',
+                        '금지 페어',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -731,7 +731,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                             Icon(Icons.info_outline, color: Colors.teal, size: 16),
                             const SizedBox(width: 4),
                             Text(
-                              '제거된 조합 제한',
+                              '금지 해제된 페어',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -812,7 +812,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '그룹 하나만 선택 가능',
+                  'A가 들어 있는 덱에는 B 카드 넣을 수 없음',
                   style: TextStyle(
                     color: textColor,
                     fontWeight: isNewPair ? FontWeight.bold : FontWeight.normal,
@@ -881,7 +881,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '그룹 A', 
+                        'A', 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: titleColor,
@@ -945,7 +945,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '그룹 B', 
+                        'B', 
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: titleColor,
