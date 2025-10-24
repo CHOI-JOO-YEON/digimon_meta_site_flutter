@@ -1194,7 +1194,7 @@
   "releaseDate" : "2025-10-17",
   "cardOrigin" : "ENGLISH",
   "priority" : 16,
-  "cardCount" : 6,
+  "cardCount" : 0,
   "isDisable" : false,
   "description" : null,
   "parent" : "디지몬 리버레이터 프로모션 팩"
@@ -1204,7 +1204,27 @@
   "releaseDate" : "2025-10-24",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
-  "cardCount" : 74,
+  "cardCount" : 0,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX7 디지몬 리버레이터"
+}, {
+  "noteId" : 412,
+  "name" : "엑스트라 부스터 디지몬 리버레이터 [EXK-07]",
+  "releaseDate" : "2025-10-24",
+  "cardOrigin" : "BOOSTER_PACK",
+  "priority" : 1,
+  "cardCount" : 141,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "EX7 디지몬 리버레이터"
+}, {
+  "noteId" : 413,
+  "name" : "엑스트라 부스터 디지몬 리버레이터 [EXK-07] 박스 프로모",
+  "releaseDate" : "2025-10-24",
+  "cardOrigin" : "BOOSTER_PROMO",
+  "priority" : 2,
+  "cardCount" : 17,
   "isDisable" : false,
   "description" : null,
   "parent" : "EX7 디지몬 리버레이터"
