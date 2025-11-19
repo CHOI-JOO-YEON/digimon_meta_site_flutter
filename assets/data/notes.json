@@ -1189,26 +1189,6 @@
   "description" : null,
   "parent" : "ST18 선풍의 수호자"
 }, {
-  "noteId" : 81,
-  "name" : "디지몬 리버레이터 프로모션 팩",
-  "releaseDate" : "2025-10-17",
-  "cardOrigin" : "ENGLISH",
-  "priority" : 16,
-  "cardCount" : 0,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "디지몬 리버레이터 프로모션 팩"
-}, {
-  "noteId" : 152,
-  "name" : "엑스트라 부스터 디지몬 리버레이터 [EX-07]",
-  "releaseDate" : "2025-10-24",
-  "cardOrigin" : "ENGLISH",
-  "priority" : null,
-  "cardCount" : 0,
-  "isDisable" : false,
-  "description" : null,
-  "parent" : "EX7 디지몬 리버레이터"
-}, {
   "noteId" : 412,
   "name" : "엑스트라 부스터 디지몬 리버레이터 [EXK-07]",
   "releaseDate" : "2025-10-24",
@@ -1222,19 +1202,29 @@
   "noteId" : 413,
   "name" : "엑스트라 부스터 디지몬 리버레이터 [EXK-07] 박스 프로모",
   "releaseDate" : "2025-10-24",
-  "cardOrigin" : "BOOSTER_PROMO",
+  "cardOrigin" : "BOOSTER_PACK",
   "priority" : 2,
   "cardCount" : 17,
   "isDisable" : false,
   "description" : null,
   "parent" : "EX7 디지몬 리버레이터"
 }, {
-  "noteId" : 169,
-  "name" : "부스터 팩 엘리멘트 석세서 [BT-18]",
-  "releaseDate" : "2025-11-21",
-  "cardOrigin" : "ENGLISH",
+  "noteId" : 415,
+  "name" : "부스터 팩 엘리멘트 석세서 [BTK-18]",
+  "releaseDate" : "2025-11-19",
+  "cardOrigin" : "BOOSTER_PACK",
   "priority" : 1,
-  "cardCount" : 102,
+  "cardCount" : 128,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT18 엘리멘트 석세서"
+}, {
+  "noteId" : 416,
+  "name" : "부스터 팩 엘리멘트 석세서 [BTK-18] 박스 프로모",
+  "releaseDate" : "2025-11-19",
+  "cardOrigin" : "BOOSTER_PACK",
+  "priority" : 2,
+  "cardCount" : 21,
   "isDisable" : false,
   "description" : null,
   "parent" : "BT18 엘리멘트 석세서"
@@ -1488,6 +1478,16 @@
   "isDisable" : false,
   "description" : null,
   "parent" : "ST22 어메지스트 만다라"
+}, {
+  "noteId" : 414,
+  "name" : "부스터 팩 TIMESTRANGER [BT-24]",
+  "releaseDate" : "2026-10-23",
+  "cardOrigin" : "ENGLISH",
+  "priority" : null,
+  "cardCount" : 4,
+  "isDisable" : false,
+  "description" : null,
+  "parent" : "BT-24 TIMESTRANGER"
 }, {
   "noteId" : 177,
   "name" : "디지몬 드리머즈 2권",
