@@ -1470,21 +1470,21 @@
   "parent" : "BT23 HACKERS' SLUMBER"
 }, {
   "noteId" : 400,
-  "name" : "어드밴스 덱 어메지스트 만다라 [ST22]",
+  "name" : "어드밴스 덱 금강계만다라 [ST22]",
   "releaseDate" : "2026-09-18",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
-  "cardCount" : 1,
+  "cardCount" : 14,
   "isDisable" : false,
   "description" : null,
-  "parent" : "ST22 어메지스트 만다라"
+  "parent" : "ST22 금강계만다라"
 }, {
   "noteId" : 414,
   "name" : "부스터 팩 TIMESTRANGER [BT-24]",
   "releaseDate" : "2026-10-23",
   "cardOrigin" : "ENGLISH",
   "priority" : null,
-  "cardCount" : 4,
+  "cardCount" : 7,
   "isDisable" : false,
   "description" : null,
   "parent" : "BT-24 TIMESTRANGER"
